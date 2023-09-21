@@ -1,0 +1,435 @@
+@import url(styles.scss);
+
+$primary-200:var(--primary-200);
+$primary-300:var(--primary-300);
+$primary:var(--primary);
+$primary-500:var(--primary-500);
+$primary-600:var(--primary-600);
+$secondary-200:var(--secondary-200);
+$secondary-300:var(--secondary-300);
+$secondary:var(--secondary);
+$secondary-500:var(--secondary-500);
+$secondary-600:var(--secondary-600);
+$accent:var(--accent);
+$branco:var(--branco);
+$cinzac:var(--cinzac);
+$cinzam:var(--cinzam);
+$cinza:var(--cinza);
+$preto:var(--preto);
+$sombra:var(--sombra);
+$transparente:var(--transparente);
+
+  #home{
+    .fa-solid{
+      font-size: 3rem;
+      margin-right: 1rem;
+      color: var(--primary-500);
+      mix-blend-mode: color-burn;
+    }
+    .card-title{
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0;
+    }
+    .card-text{
+      color: var(--accent);
+    }
+    .card{
+      height: 100%;
+      background: none;
+      border-color: var(--accent);
+    }
+    .card-footer{
+      border-color: var(--accent);
+      background-color: var(--accent);
+    }
+    .icone{
+      max-width: 130px;
+      mix-blend-mode: color-burn;
+    }
+    .icone-text{
+      max-width: 160px;
+      mix-blend-mode: color-burn;
+    }
+  }
+  #cardapio{
+
+    .height-184{
+      height: 184px;
+    }
+    .card{
+      height: 100%;
+      background: none;
+      border-color: var(--accent);
+    }
+    .card-body, .card-footer{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: start;
+      padding: 0.5rem 1rem;
+    }
+    .card-title, .card-subtitle{
+      margin: 0;
+      font-weight: 600;
+    }
+    .card-title{
+      color: var(--secondary);
+    }
+    .card-subtitle{
+      color: var(--primary-500);
+      mix-blend-mode: color-burn;
+    }
+    .card-footer{
+      border-color: var(--accent);
+    }
+    .card-text{
+      margin-bottom: 0;
+      margin-right: 10px;
+    }
+    .preco{
+
+      &::before{
+        content: "R$";
+        font-size: 80%;
+      }
+    }
+
+    .btn-outline-primary{
+      padding: 0.1rem 0.75rem;
+    }
+
+    .quant{
+      
+
+      &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
+        background-color: transparent;
+        border-color: $primary;
+        color: $secondary;
+        font-size: 100%;
+      }
+    }
+    
+    .small, small {
+      font-size: .8em;
+  }
+    
+    .carrinho{
+      z-index: 99999;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      border-radius: 35px;
+      display: flex;
+      align-items: end;
+      background-color: $accent;
+
+      .carrinho-infos{
+        padding: 0rem;
+        opacity: 0;
+        height: 50px;
+        width: 00px;
+        transition: .3s all ease-in-out;
+
+        .total, .preco{
+          transform: scale(0 , 0);
+        }
+        .total{
+          border-bottom: 2px solid;
+          padding-bottom: 0.5rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .atualizar{
+            font-size: 1.4rem;
+            transition: .3s all ease-in-out;
+            &:hover{
+              transform: rotate(30deg);
+            }
+            &:active{
+              transform: rotate(360deg);
+            }
+          }
+        }
+
+        &.show{
+          padding: 1.5rem;
+          opacity: 1;
+          height: auto;
+          width: auto;
+
+          .total, .preco{
+            transform: scale(1 , 1);
+          }
+        }
+      }
+
+      .btn{
+        border-radius: 35px;
+        height: 70px;
+        width: 70px;
+        font-size: 1.5rem;
+
+        &:hover{
+          font-size: 1.4rem;
+        }
+      }
+    }
+  }
+
+  #doe{
+
+    .card-text{
+
+      color: $secondary;
+      user-select: all;
+      background: none;
+      border: none;
+      resize: none;
+      display: inline;
+      height: 30px;
+    }
+
+    .copy-html{
+      &.success::before {
+        content: 'Pix copiado com sucesso!'!important;
+        padding: 0 10px;
+    }
+    }
+
+  }
+
+  #laudes{
+    .space{
+      height: 72px;
+    }
+    .icone{
+      max-width: 130px;
+      mix-blend-mode: color-burn;
+    }
+    .icone-text{
+      max-width: 160px;
+      mix-blend-mode: color-burn;
+    }
+
+    #tabs{
+      background: $accent;
+      position: fixed;
+      top: 55px;
+      width: 100%;
+      z-index: 100;
+      .seta{
+        position: absolute;
+        right: 12px;
+        bottom: 8px;
+      }
+
+      .nav{
+        flex-flow: nowrap;
+        overflow: scroll;
+      }
+      .nav-link{
+        color: white;
+        white-space: nowrap;
+        &.active{
+          background: $primary;
+          border: $primary;
+          
+        }
+      }
+
+    }
+    
+    .texto{
+      margin: auto;
+      padding: 1.5rem 2rem;
+      padding-bottom: 0.5rem;
+      background-color: rgba($color: #fff, $alpha: .4);
+      border-radius: .3rem;
+
+      p{
+        color: $accent;
+        span{
+          color: $primary;
+        }
+      }
+    }
+    .title{
+      font-weight: 800;
+      text-align: center;
+    }
+    .subtitle{
+      font-weight: 300;
+      text-transform: uppercase;
+      text-align: center;
+      font-size: .8rem;
+    }
+    hr{
+      border:1px solid $primary;
+      z-index: -1;
+    }
+  }
+
+  #dados{
+    #navbar-dados{
+      .navbar-brand{
+        img{
+          height: 80px;
+          @media (max-width:992px) {
+            height: 42px;
+          }
+        }
+        @media (max-width:992px) {
+          margin: auto;
+        }
+      }
+      .nav-item{
+        text-align: end;
+        .nav-link{
+          display: inline-flex;
+          padding: .375rem .75rem;
+
+          border:1px solid $branco;
+          color: $branco!important;
+          transition: .3s all ease-in-out;
+          margin: 0 5px;
+
+          &:hover{
+            border:1px solid $primary;
+            filter:none;
+          }
+          &.active{
+            background: $secondary;
+            border:1px solid $secondary;
+            color: $branco;
+          }
+        }
+      }
+    }
+    .height-106{
+      height: 106px;
+    }
+    .titulo-dados{
+      z-index: -1;
+      position: relative;
+    }
+    .py-2rem{
+      padding: 2rem 0;
+    }
+    .nav-link{
+      @media (max-width:370px) {
+        padding: 0.35rem 0.5rem;
+      }
+    }
+    .titulo-dia{
+      padding-bottom: 1rem;
+      border-bottom: 2px solid $branco;
+      font-weight: 800;
+    }
+    .descricao{
+      color: $branco;
+      margin: 0;
+    }
+    .btn-outline-secondary{
+      border:1px solid $primary;
+      color: $primary;
+      transition: .3s all ease-in-out;
+      margin: 0 5px;
+
+      &:hover{
+        color: $branco;
+      }
+      &.active{
+        background: $primary;
+        color: $branco;
+      }
+    }
+    .scroll{
+      overflow-x: scroll;
+    }
+    .card{
+        max-width: 605px!important;
+        margin: auto;
+      .tab-pane{
+        overflow-x: scroll;
+        text-align: center;
+      }
+      .nav-item{
+        width: 50%;
+
+        .nav-link{
+          background-color: $transparente;
+          width: 100%;
+          color: $primary;
+          font-weight: bold;
+          border-radius: 0;
+          border-bottom: 2px solid $transparente;
+          transition: .3s all ease-in-out;
+
+
+          &.active{
+            color: $secondary;
+            background-color: $transparente;
+            border-bottom: 2px solid $secondary!important;
+          }
+          &:hover{
+            border-bottom: 2px solid $primary;
+          }
+        }
+      }
+     
+      
+    }
+
+    .dados{
+      h1,h2,h3,h4,h5,h6{
+        margin: 0;
+      }
+      .icon{
+        width: 68px;
+        margin-right: 1rem;
+        display: flex;
+        justify-content: center;
+        .fa-solid{
+          font-size: 4.25rem;
+          
+          color: $secondary;
+        }
+      }
+
+      .pequeno{
+        font-size: 90%;
+
+        i{
+          font-size: 70%;
+          margin-right: 0.25rem;
+        }
+      }
+
+      h5{
+        color: $primary-500;
+        border-bottom: 2px solid $primary-500;
+        padding-left: 32.35px;
+        padding-bottom: .25rem;
+        margin-bottom: .5rem;
+      }
+      .small, small {
+        font-size: .75em;
+      }
+      p.accent{
+        i{
+          color: $secondary!important;
+        }
+      }
+      li, .small{
+        span{
+          color: $primary-500;
+        }
+      }
+      
+      li::marker{
+        color: $secondary;
+      }
+    }
+  }

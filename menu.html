@@ -1,0 +1,81 @@
+    
+    <div class="w-100 fixed-top">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <nav class="navbar navbar-expand-lg navbar-dark">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="https://www.eventoshbsb.com">
+                            <img src="images/arraiadapaz.png" alt="Arraiá">
+                        </a>
+                        
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" href="https://shalombsb.github.io/eventosh/arraiadapaz">Início</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="https://shalombsb.github.io/eventosh/arraiadapaz/cardapio">Cardápio</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="https://shalombsb.github.io/eventosh/arraiadapaz/doe">Doe</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="https://shalombsb.github.io/eventosh/arraiadapaz#programacao">Programação</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="https://goo.gl/maps/dtWGk8dS54BBPAwr8">Localização</a>
+                                </li>
+                                
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="nav bg-shadow" style="will-change: opacity;"></div>
+    </div>
+    <div class="container opacity-0">
+        <div class="row">
+            <div class="col">
+                <nav class="navbar navbar-expand-lg ">
+                <div class="container-fluid">
+                    <a class="navbar-brand" >
+                        <img src="" alt="logo" height="80">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="https://shalombsb.github.io/eventosh/semanasanta">Início</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        window.addEventListener('scroll', function() {
+            var navbarShadow = document.querySelector('.bg-shadow');
+            var scrollTop = window.scrollY;
+        
+            if (scrollTop <= 100) {
+            var opacity = scrollTop / 500;
+            navbarShadow.style.opacity = opacity;
+            } else {
+            navbarShadow.style.opacity = 1;
+            }
+        });
+
+    </script>
