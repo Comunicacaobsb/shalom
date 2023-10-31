@@ -13,6 +13,21 @@ styleBase.rel = "stylesheet";
 // Anexar o styleBase ao head da página
 document.getElementsByTagName("head")[0].appendChild(styleBase);
 
+/*
+Bootstrap
+*/
+
+// Criar novo elemento link
+var Bootstrap = document.createElement("link");
+
+// Definir atributos do Bootstrap
+Bootstrap.href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css";
+Bootstrap.type = "text/css";
+Bootstrap.rel = "stylesheet";
+
+// Anexar o Bootstrap ao head da página
+document.getElementsByTagName("head")[0].appendChild(Bootstrap);
+
 /* 
 
 Fontes Google
@@ -62,23 +77,25 @@ document.addEventListener('DOMContentLoaded', function() {
     var icon1 = document.createElement("link");
     icon1.rel = "apple-touch-icon";
     icon1.sizes = "180x180";
-    icon1.href = "favicon/apple-touch-icon.png";
+    icon1.href = basePath + "apple-touch-icon.png";
     head.appendChild(icon1);
 
     var icon2 = document.createElement("link");
     icon2.rel = "icon";
     icon2.type = "image/png";
     icon2.sizes = "32x32";
-    icon2.href = basePath + "favicon/favicon-32x32.png";
+    icon2.href = basePath + "favicon-32x32.png";
     head.appendChild(icon2);
 
     var icon3 = document.createElement("link");
     icon3.rel = "icon";
     icon3.type = "image/png";
     icon3.sizes = "16x16";
-    icon3.href = basePath + "favicon/favicon-16x16.png";
+    icon3.href = basePath + "favicon-16x16.png";
     head.appendChild(icon3);
 });
+
+
 
 /* 
 

@@ -1,3 +1,33 @@
+/*
+Estilo Padrão
+*/
+
+// Criar novo elemento link
+var styleBase = document.createElement("link");
+
+// Definir atributos do styleBase
+styleBase.href = "https://brasilia.comshalom.org/scss/styles.css";
+styleBase.type = "text/css";
+styleBase.rel = "stylesheet";
+
+// Anexar o styleBase ao head da página
+document.getElementsByTagName("head")[0].appendChild(styleBase);
+
+/*
+Bootstrap
+*/
+
+// Criar novo elemento link
+var Bootstrap = document.createElement("link");
+
+// Definir atributos do Bootstrap
+Bootstrap.href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css";
+Bootstrap.type = "text/css";
+Bootstrap.rel = "stylesheet";
+
+// Anexar o Bootstrap ao head da página
+document.getElementsByTagName("head")[0].appendChild(Bootstrap);
+
 /* 
 
 Fontes Google
@@ -32,12 +62,12 @@ Favicon
 
 */
 function getFaviconBasePath() {
-    // Por exemplo, se a página atual estiver em algum subdiretório
-    // você pode retornar um caminho diferente.
-    if (window.location.pathname.includes('subdiretorio')) {
-        return '../favicon/';
+    // Verificar se o usuário está na raiz do site
+    if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+        return 'favicon/';
     }
-    return 'favicon/';
+    // Caso contrário, retornar o caminho do favicon para subdiretórios
+    return '../favicon/';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -64,6 +94,8 @@ document.addEventListener('DOMContentLoaded', function() {
     icon3.href = basePath + "favicon-16x16.png";
     head.appendChild(icon3);
 });
+
+
 
 /* 
 

@@ -6,10 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <script src="../js/header.js"></script>
-  <link rel="stylesheet" href="../css/bootstrap.min.css" >
-  <link rel="stylesheet" href="fontes/stylesheet.css">
-  <link rel="stylesheet" href="../scss/styles.css">
-  <link rel="stylesheet" href="../scss/style-pages.css">
+  
+  
   
 
   <script src="js/header.js"></script>
@@ -46,9 +44,11 @@
       margin: 0;
       }
       a{
+        width: 150px;
         padding: 0.3em 1.5em;
-      border: 1px solid var(--color-2);
-      color: var(--color-1);
+        background: var(--color-3)!important;
+      border: 1px solid var(--color-2)!important;
+      color: var(--color-1)!important;
       text-decoration: none;
       border-radius: 0.5em;
       margin-top: 1em;
@@ -57,8 +57,8 @@
       }
       
       a:hover{
-        background: var(--color-2);
-        color: #fff;
+        background: var(--color-2)!important;
+        color: #fff!important;
       }
       a:after{
         content: '';
@@ -78,10 +78,15 @@
         transform: scale(1000);
         background: var(--color-2);
       }
+
+      img{
+        width: 100%;
+    max-width: 300px;
+      }
   </style>
 
 </head>
-<body class="bg-branco bg position-relative">
+<body class="">
   <!--
   <div class="preloader">
     
@@ -113,19 +118,19 @@
 <div class="page">
   <div class="container">
     <div class="row">
-      <div class="col-12">
-        
-        <h1>Fut SH</h1>
+      <div class="col-12 text-center">
+        <img src="images/logo.png" alt="logo">
+        <h1 class="fw-700">Fut SH</h1>
         <p>Inscrições</p>
       </div>
-      <div class="col-6">
+      <div class="col-6 text-end">
     
-        <a class="btn btn-primary" href="https://comshalom.org/brasilia/">
+        <a class="btn btn-primary" href="https://forms.gle/1YxAjq5ygsT3q7p78">
         Mensalista
         </a>
       </div>
       <div class="col-6">
-        <a class="btn btn-primary" href="https://comshalom.org/brasilia/">
+        <a class="btn btn-primary" href="https://forms.gle/LBufVMU2aEPauxzF9">
           Avulso
         </a>
       </div>
