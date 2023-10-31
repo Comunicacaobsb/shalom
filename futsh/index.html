@@ -38,24 +38,34 @@
       color: var(--color-1);
       margin: 0;
       }
-      a{
-        width: 150px;
+      .small{
+        font-size: .875em!important;
+      }
+      .btn-secondary{
+        width: 100%;
+        max-width: 150px;
+        padding: 0.3em .75em;
+        margin-top: .5em;
+      }
+      .btn-primary{
+        width: 100%;
+        max-width: 150px;
         padding: 0.3em 1.5em;
         background: var(--color-3)!important;
-      border: 1px solid var(--color-2)!important;
-      color: var(--color-1)!important;
-      text-decoration: none;
-      border-radius: 0.5em;
-      margin-top: 1em;
-      transition: all .3s ease-in-out;
-      position: relative;
+        border: 1px solid var(--color-2)!important;
+        color: var(--color-1)!important;
+        text-decoration: none;
+        border-radius: 0.5em;
+        margin-top: 1em;
+        transition: all .3s ease-in-out;
+        position: relative;
       }
       
-      a:hover{
+      .btn-primary:hover{
         background: var(--color-2)!important;
         color: #fff!important;
       }
-      a:after{
+      .btn-primary:after{
         content: '';
         position: absolute;
         background: transparent;
@@ -68,7 +78,7 @@
         transition: all .2s ease-in-out;
         z-index: -1;
       }
-      a:focus:after{
+      .btn-primary:focus:after{
         opacity: 1;
         transform: scale(1000);
         background: var(--color-2);
@@ -123,10 +133,18 @@
         <a class="btn btn-primary" href="https://forms.gle/1YxAjq5ygsT3q7p78">
         Mensalista
         </a>
+          <br>
+        <a class="btn btn-secondary small" id="btn-mensalista">
+          PIX copia e cola
+        </a>
       </div>
       <div class="col-6">
         <a class="btn btn-primary" href="https://forms.gle/LBufVMU2aEPauxzF9">
           Avulso
+        </a>
+        <br>
+        <a class="btn btn-secondary small" id="btn-avulso">
+          PIX copia e cola
         </a>
       </div>
     </div>
@@ -148,6 +166,30 @@
   <script>
     $("#menu").load("menu.html");
     $("#footer").load("footer.html");
+  </script>
+
+<script>
+  // Função para copiar texto para a área de transferência
+  function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+  }
+  
+  // Adicionando evento de clique ao botão
+  document.querySelector('#btn-mensalista').addEventListener('click', function() {
+      copyToClipboard('00020101021126630014br.gov.bcb.pix0120joao.crf93@gmail.com0217Fut Sh mensalista520400005303986540540.005802BR5923JOAO PEDRO CALDAS VIDAL6008BRASILIA62070503***6304AA48');
+      alert('PIX Copia e cola - Mensalista copiado para a área de transferência!');
+  });
+
+   // Adicionando evento de clique ao botão
+   document.querySelector('#btn-avulso').addEventListener('click', function() {
+      copyToClipboard('00020101021126580014br.gov.bcb.pix0120joao.crf93@gmail.com0212Fut Sh  0311520400005303986540515.005802BR5923JOAO PEDRO CALDAS VIDAL6008BRASILIA62070503***630446D9');
+      alert('PIX Copia e cola - Avulso copiado para a área de transferência!');
+  });
   </script>
 
 </body>
