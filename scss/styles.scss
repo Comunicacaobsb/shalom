@@ -316,9 +316,9 @@
       transition: .5s all ease-in-out;
   
       &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
-        border-color: $secondary;
+        border-color: $accent;
         background-color: $secondary;
-        color: $cinza-200;
+        color: $cinza-500;
       }
   
       &:focus-visible{

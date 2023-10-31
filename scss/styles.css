@@ -314,9 +314,9 @@ body {
   transition: 0.5s all ease-in-out;
 }
 .btn-secondary:not(:disabled):not(.disabled).active, .btn-secondary:not(:disabled):not(.disabled):active, .show > .btn-secondary.dropdown-toggle, .btn-secondary:hover {
-  border-color: #f0f0f0;
+  border-color: var(--accent);
   background-color: #f0f0f0;
-  color: #bdbdbd;
+  color: #777777;
 }
 .btn-secondary:focus-visible {
   outline: 0px;

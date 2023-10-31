@@ -106,6 +106,12 @@
         width: 100%;
     max-width: 300px;
       }
+      .toast {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+}
   </style>
 
 </head>
@@ -187,7 +193,9 @@
 
     <script>
       // Neste exemplo, não queremos carregar o popper
-      // var popper = false;
+      var jquery = false;
+      var popper = false;
+      // var bootstrap = false;
   </script>
   
   <script src="../js/centralScript.js"></script>
@@ -205,17 +213,19 @@
       document.execCommand('copy');
       document.body.removeChild(textarea);
   }
+  // Seleciona o toast
   
+
+
   // Adicionando evento de clique ao botão Mensalista
 document.querySelector('#btn-mensalista').addEventListener('click', function() {
     copyToClipboard('00020101021126630014br.gov.bcb.pix0120joao.crf93@gmail.com0217Fut Sh mensalista520400005303986540540.005802BR5923JOAO PEDRO CALDAS VIDAL6008BRASILIA62070503***6304AA48');
-    
-    // Seleciona o toast
+
     var toastElement = document.querySelector('.toast');
     var toast = new bootstrap.Toast(toastElement);
 
     // Modifica o texto do toast
-    toastElement.querySelector('.toast-body').textContent = "PIX Copia e cola - Mensalista copiado para a área de transferência!";
+    toastElement.querySelector('.toast-body').textContent = "PIX Copia e cola - Mensalista copiado!";
 
     // Mostra o toast
     toast.show();
@@ -224,13 +234,29 @@ document.querySelector('#btn-mensalista').addEventListener('click', function() {
    // Adicionando evento de clique ao botão
    document.querySelector('#btn-avulso').addEventListener('click', function() {
       copyToClipboard('00020101021126580014br.gov.bcb.pix0120joao.crf93@gmail.com0212Fut Sh  0311520400005303986540515.005802BR5923JOAO PEDRO CALDAS VIDAL6008BRASILIA62070503***630446D9');
-      alert('PIX Copia e cola - Avulso copiado para a área de transferência!');
+      
+      var toastElement = document.querySelector('.toast');
+      var toast = new bootstrap.Toast(toastElement);
+
+      // Modifica o texto do toast
+      toastElement.querySelector('.toast-body').textContent = "PIX Copia e cola - Avulso copiado!";
+
+      // Mostra o toast
+      toast.show();
   });
 
   // Adicionando evento de clique ao botão
   document.querySelector('#btn-chave').addEventListener('click', function() {
       copyToClipboard('joao.crf93@gmail.com');
-      alert('Chave PIX copiada para a área de transferência!');
+
+      var toastElement = document.querySelector('.toast');
+      var toast = new bootstrap.Toast(toastElement);
+
+      // Modifica o texto do toast
+      toastElement.querySelector('.toast-body').textContent = "Chave PIX copiada!";
+
+      // Mostra o toast
+      toast.show();
   });
   </script>
 
