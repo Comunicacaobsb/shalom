@@ -11,11 +11,11 @@
   $secondary-500:var(--secondary-500);
   $secondary-600:var(--secondary-600);
   $accent:var(--accent);
-  $branco:var(--branco);
-  $cinzac:var(--cinzac);
-  $cinzam:var(--cinzam);
-  $cinza:var(--cinza);
-  $preto:var(--preto);
+  $bw-100:var(--bw-100);
+  $bw-200:var(--bw-200);
+  $bw-400:var(--bw-400);
+  $bw-500:var(--bw-500);
+  $bw-900:var(--bw-900);
   $sombra:var(--sombra);
   $transparente:var(--transparente);
 
@@ -31,12 +31,16 @@
     --secondary-500:#e19401;
     --secondary-600:#e49713;
     --accent:#4d8cdb;
-    --branco:#d0ccc5;
-    --cinzac:#F9F9F9;
-    --cinzam:#D1D1D1;
-    --cinza:#5E5E5E;
-    --preto:#000;
-    --sombra:#3c3c3c0d;
+    --bw-100:#fafafa;
+    --bw-200:#ddd;
+    --bw-300:#cacaca;
+    --bw-400:#bbb;
+    --bw-500:#a5a5a5;
+    --bw-600:#444;
+    --bw-700:#3a3a3a;
+    --bw-800:#222;
+    --bw-900:#1a1a1a;
+    --sombra:#3a3a3a0d;
     --transparente:rgba(0,0,0,0);
     --font-primary:'Louis', sans-serif; 
     --font-secondary:'Urban', sans-serif; 
@@ -132,20 +136,20 @@
     &accent{
       color:$accent!important;
     }
-    &branco{
-      color:$branco!important;
+    &bw-100{
+      color:$bw-100!important;
     }
-    &cinza{
-      color:$cinza!important;
+    &bw-500{
+      color:$bw-500!important;
     }
-    &cinzac{
-      color:$cinzac!important;
+    &bw-200{
+      color:$bw-200!important;
     }
-    &cinzam{
-      color:$cinzam!important;
+    &bw-400{
+      color:$bw-400!important;
     }
-    &preto{
-      color:$preto!important;
+    &bw-900{
+      color:$bw-900!important;
     }
   }
 
@@ -167,20 +171,20 @@
     &accent{
       background-color:$accent!important;
     }
-    &branco{
-      background-color:$branco!important;
+    &bw-100{
+      background-color:$bw-100!important;
     }
-    &cinza{
-      background-color:$cinza!important;
+    &bw-500{
+      background-color:$bw-500!important;
     }
-    &cinzac{
-      background-color:$cinzac!important;
+    &bw-200{
+      background-color:$bw-200!important;
     }
-    &cinzam{
-      background-color:$cinzam!important;
+    &bw-400{
+      background-color:$bw-400!important;
     }
-    &preto{
-      background-color:$preto!important;
+    &bw-900{
+      background-color:$bw-900!important;
     }
   }
 
@@ -202,20 +206,20 @@
     &accent{
       border-color:$accent!important;
     }
-    &branco{
-      border-color:$branco!important;
+    &bw-100{
+      border-color:$bw-100!important;
     }
-    &cinza{
-      border-color:$cinza!important;
+    &bw-500{
+      border-color:$bw-500!important;
     }
-    &cinzac{
-      border-color:$cinzac!important;
+    &bw-200{
+      border-color:$bw-200!important;
     }
-    &cinzam{
-      border-color:$cinzam!important;
+    &bw-400{
+      border-color:$bw-400!important;
     }
-    &preto{
-      border-color:$preto!important;
+    &bw-900{
+      border-color:$bw-900!important;
     }
     
     &1{
@@ -327,7 +331,7 @@
     &primary{
       font-size: var(--font-geral);
       border-color: $accent;
-      background-color: $branco;
+      background-color: $bw-100;
       background-image: url(../images/BG.jpg);
       color: $accent;
       transition: .5s all ease-in-out;
@@ -349,13 +353,13 @@
       font-size: var(--font-geral);
       border-color: $accent;
       background-color: $accent;
-      color: $cinzac;
+      color: $bw-200;
       transition: .5s all ease-in-out;
   
       &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
         border-color: $secondary;
         background-color: $secondary;
-        color: $cinzac;
+        color: $bw-200;
       }
   
       &:focus-visible{
@@ -375,7 +379,7 @@
       &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
         background-color: $primary;
         border-color: $primary;
-        color: $branco;
+        color: $bw-100;
         font-size: calc(var(--font-geral) + .1rem);
       }
   
@@ -408,9 +412,7 @@
 
   }
 
-  .burn{
-    mix-blend-mode: color-burn;
-  }
+
 
   .card{
     box-shadow: 0 16px 16px $sombra, 0 8px 8px $sombra, 0 4px 4px $sombra, 0 0 10px $sombra;
@@ -423,9 +425,7 @@
     }
   }
 
-  .bg{
-    background-image: url(../images/BG.jpg);
-  }
+
   #menu{
     .navbar-brand img{
       mix-blend-mode: color-burn;
@@ -440,15 +440,6 @@
     }
   }
   
-  
-  #content{
-    min-height: 50vh;
-
-
-    .sect{
-      top:106px;
-    }
-  }
   
   
   footer{
@@ -465,7 +456,7 @@
   
 
 .preloader{
-  background-color: $branco;
+  background-color: $bw-100;
   bottom: 0;
   height: 100%;
   position: fixed;
@@ -526,7 +517,7 @@
 }
 .spinner{
   --spinner-size: 5;
-  --line-color: #52001f;
+  --line-color: var(--primary);
   --line-alpha: 1;
   --ring-color: transparent;
   --ring-alpha: 1;
