@@ -1,17 +1,4 @@
-/*
-Estilo Padrão
-*/
 
-// Criar novo elemento link
-var styleBase = document.createElement("link");
-
-// Definir atributos do styleBase
-styleBase.href = "https://brasilia.comshalom.org/scss/styles.css";
-styleBase.type = "text/css";
-styleBase.rel = "stylesheet";
-
-// Anexar o styleBase ao head da página
-document.getElementsByTagName("head")[0].appendChild(styleBase);
 
 /*
 Bootstrap
@@ -27,6 +14,26 @@ Bootstrap.rel = "stylesheet";
 
 // Anexar o Bootstrap ao head da página
 document.getElementsByTagName("head")[0].appendChild(Bootstrap);
+
+
+
+/*
+Estilo Padrão
+*/
+
+// Criar novo elemento link
+var styleBase = document.createElement("link");
+
+// Definir atributos do styleBase
+styleBase.href = "https://brasilia.comshalom.org/scss/styles.css";
+styleBase.type = "text/css";
+styleBase.rel = "stylesheet";
+
+// Anexar o styleBase ao head da página
+document.getElementsByTagName("head")[0].appendChild(styleBase);
+
+
+
 
 /* 
 
@@ -55,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     montserratFont.href = "https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap";
     head.appendChild(montserratFont);
 });
+
 
 /* 
 

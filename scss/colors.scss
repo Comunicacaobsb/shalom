@@ -1,12 +1,33 @@
+$branco:#FFF;
+$cinza-100:#f0f0f0;
+$cinza-200:#ddd;
+$cinza-300:#cacaca;
+$cinza-400:#bbb;
+$cinza-500:#a5a5a5;
+$cinza-600:#444;
+$cinza-700:#3a3a3a;
+$cinza-800:#222;
+$cinza-900:#111;
+$preto:#000;
 
-$preto:#111;
-$branco:#f0f0f0;
+$dark:#111;
+$light:#f0f0f0;
 $azul:#204f8c;
 $marinho:#1f2540;
 $amarelo:#eabc02;
-$laranja:#e8620d;
+$laranja:#e8620d;   
 $verde:#096b4e;
 $floresta:#192517;
+
+$dark-100: tint-color($dark, 80%) !default;
+$dark-200: tint-color($dark, 60%) !default;
+$dark-300: tint-color($dark, 40%) !default;
+$dark-400: tint-color($dark, 20%) !default;
+$dark-500: $dark !default;
+$dark-600: shade-color($dark, 20%) !default;
+$dark-700: shade-color($dark, 40%) !default;
+$dark-800: shade-color($dark, 60%) !default;
+$dark-900: shade-color($dark, 80%) !default;
 
 
 :root{   
@@ -21,15 +42,15 @@ $floresta:#192517;
   --secondary-500:#e19401;
   --secondary-600:#e49713;
   --accent:#4d8cdb;
-  --bw-100:#fafafa;
-  --bw-200:#ddd;
-  --bw-300:#cacaca;
-  --bw-400:#bbb;
-  --bw-500:#a5a5a5;
-  --bw-600:#444;
-  --bw-700:#3a3a3a;
-  --bw-800:#222;
-  --bw-900:#1a1a1a;
+  --cinza-100:#fafafa;
+  --cinza-200:#ddd;
+  --cinza-300:#cacaca;
+  --cinza-400:#bbb;
+  --cinza-500:#a5a5a5;
+  --cinza-600:#444;
+  --cinza-700:#3a3a3a;
+  --cinza-800:#222;
+  --cinza-900:#1a1a1a;
   --sombra:#3a3a3a0d;
   --transparente:rgba(0,0,0,0);
 }
@@ -46,10 +67,10 @@ $secondary:var(--secondary);
 $secondary-500:var(--secondary-500);
 $secondary-600:var(--secondary-600);
 $accent:var(--accent);
-$bw-100:var(--bw-100);
-$bw-200:var(--bw-200);
-$bw-400:var(--bw-400);
-$bw-500:var(--bw-500);
-$bw-900:var(--bw-900);
+$cinza-100:var(--cinza-100);
+$cinza-200:var(--cinza-200);
+$cinza-400:var(--cinza-400);
+$cinza-500:var(--cinza-500);
+$cinza-900:var(--cinza-900);
 $sombra:var(--sombra);
 $transparente:var(--transparente);

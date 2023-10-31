@@ -1,5 +1,4 @@
 @charset "UTF-8";
-@import url(../fontes/stylesheet.css);
 :root {
   --primary-200:#de7f05;
   --primary-300:#d56f03;
@@ -23,8 +22,6 @@
   --bw-900:#1a1a1a;
   --sombra:#3a3a3a0d;
   --transparente:rgba(0,0,0,0);
-  --font-primary:"Louis", sans-serif;
-  --font-secondary:"Urban", sans-serif;
 }
 
 /* 
