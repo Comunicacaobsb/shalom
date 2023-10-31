@@ -1,47 +1,5 @@
-
-  $primary-200:var(--primary-200);
-  $primary-300:var(--primary-300);
-  $primary:var(--primary);
-  $primary-500:var(--primary-500);
-  $primary-600:var(--primary-600);
-  $secondary-200:var(--secondary-200);
-  $secondary-300:var(--secondary-300);
-  $secondary:var(--secondary);
-  $secondary-500:var(--secondary-500);
-  $secondary-600:var(--secondary-600);
-  $accent:var(--accent);
-  $bw-100:var(--bw-100);
-  $bw-200:var(--bw-200);
-  $bw-400:var(--bw-400);
-  $bw-500:var(--bw-500);
-  $bw-900:var(--bw-900);
-  $sombra:var(--sombra);
-  $transparente:var(--transparente);
-
-  :root{   
-    --primary-200:#de7f05;
-    --primary-300:#d56f03; 
-    --primary:#d05f00;
-    --primary-500:#cd5200;
-    --primary-600:#ad4001;
-    --secondary-200:#f3d05d;
-    --secondary-300:#e6bc1a;
-    --secondary:#e8b110;
-    --secondary-500:#e19401;
-    --secondary-600:#e49713;
-    --accent:#4d8cdb;
-    --bw-100:#fafafa;
-    --bw-200:#ddd;
-    --bw-300:#cacaca;
-    --bw-400:#bbb;
-    --bw-500:#a5a5a5;
-    --bw-600:#444;
-    --bw-700:#3a3a3a;
-    --bw-800:#222;
-    --bw-900:#1a1a1a;
-    --sombra:#3a3a3a0d;
-    --transparente:rgba(0,0,0,0);
-  }
+@import "colors";
+  
 
   
   /* 
@@ -137,20 +95,20 @@
     &accent{
       color:$accent!important;
     }
-    &bw-100{
-      color:$bw-100!important;
+    &cinza-100{
+      color:$cinza-100!important;
     }
-    &bw-500{
-      color:$bw-500!important;
+    &cinza-500{
+      color:$cinza-500!important;
     }
-    &bw-200{
-      color:$bw-200!important;
+    &cinza-200{
+      color:$cinza-200!important;
     }
-    &bw-400{
-      color:$bw-400!important;
+    &cinza-400{
+      color:$cinza-400!important;
     }
-    &bw-900{
-      color:$bw-900!important;
+    &cinza-900{
+      color:$cinza-900!important;
     }
   }
 
@@ -172,20 +130,20 @@
     &accent{
       background-color:$accent!important;
     }
-    &bw-100{
-      background-color:$bw-100!important;
+    &cinza-100{
+      background-color:$cinza-100!important;
     }
-    &bw-500{
-      background-color:$bw-500!important;
+    &cinza-500{
+      background-color:$cinza-500!important;
     }
-    &bw-200{
-      background-color:$bw-200!important;
+    &cinza-200{
+      background-color:$cinza-200!important;
     }
-    &bw-400{
-      background-color:$bw-400!important;
+    &cinza-400{
+      background-color:$cinza-400!important;
     }
-    &bw-900{
-      background-color:$bw-900!important;
+    &cinza-900{
+      background-color:$cinza-900!important;
     }
   }
 
@@ -207,20 +165,20 @@
     &accent{
       border-color:$accent!important;
     }
-    &bw-100{
-      border-color:$bw-100!important;
+    &cinza-100{
+      border-color:$cinza-100!important;
     }
-    &bw-500{
-      border-color:$bw-500!important;
+    &cinza-500{
+      border-color:$cinza-500!important;
     }
-    &bw-200{
-      border-color:$bw-200!important;
+    &cinza-200{
+      border-color:$cinza-200!important;
     }
-    &bw-400{
-      border-color:$bw-400!important;
+    &cinza-400{
+      border-color:$cinza-400!important;
     }
-    &bw-900{
-      border-color:$bw-900!important;
+    &cinza-900{
+      border-color:$cinza-900!important;
     }
     
     &1{
@@ -332,7 +290,7 @@
     &primary{
       font-size: var(--font-geral);
       border-color: $accent;
-      background-color: $bw-100;
+      background-color: $cinza-100;
       background-image: url(../images/BG.jpg);
       color: $accent;
       transition: .5s all ease-in-out;
@@ -354,13 +312,13 @@
       font-size: var(--font-geral);
       border-color: $accent;
       background-color: $accent;
-      color: $bw-200;
+      color: $cinza-200;
       transition: .5s all ease-in-out;
   
       &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
         border-color: $secondary;
         background-color: $secondary;
-        color: $bw-200;
+        color: $cinza-200;
       }
   
       &:focus-visible{
@@ -380,7 +338,7 @@
       &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
         background-color: $primary;
         border-color: $primary;
-        color: $bw-100;
+        color: $cinza-100;
         font-size: calc(var(--font-geral) + .1rem);
       }
   
@@ -457,7 +415,7 @@
   
 
 .preloader{
-  background-color: $bw-100;
+  background-color: $cinza-100;
   bottom: 0;
   height: 100%;
   position: fixed;

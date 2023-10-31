@@ -176,22 +176,26 @@
 
     </section>
 
-    
+    <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          Hello, world! This is a toast message.
+        </div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
 
     <script>
-      var jquery = true;
-      var bootstrap = true;
+      // Neste exemplo, não queremos carregar o popper
+      // var popper = false;
   </script>
   
   <script src="../js/centralScript.js"></script>
 
 
-  <script>
-    $("#menu").load("menu.html");
-    $("#footer").load("footer.html");
-  </script>
-
 <script>
+
+
   // Função para copiar texto para a área de transferência
   function copyToClipboard(text) {
       const textarea = document.createElement('textarea');
@@ -202,11 +206,20 @@
       document.body.removeChild(textarea);
   }
   
-  // Adicionando evento de clique ao botão
-  document.querySelector('#btn-mensalista').addEventListener('click', function() {
-      copyToClipboard('00020101021126630014br.gov.bcb.pix0120joao.crf93@gmail.com0217Fut Sh mensalista520400005303986540540.005802BR5923JOAO PEDRO CALDAS VIDAL6008BRASILIA62070503***6304AA48');
-      alert('PIX Copia e cola - Mensalista copiado para a área de transferência!');
-  });
+  // Adicionando evento de clique ao botão Mensalista
+document.querySelector('#btn-mensalista').addEventListener('click', function() {
+    copyToClipboard('00020101021126630014br.gov.bcb.pix0120joao.crf93@gmail.com0217Fut Sh mensalista520400005303986540540.005802BR5923JOAO PEDRO CALDAS VIDAL6008BRASILIA62070503***6304AA48');
+    
+    // Seleciona o toast
+    var toastElement = document.querySelector('.toast');
+    var toast = new bootstrap.Toast(toastElement);
+
+    // Modifica o texto do toast
+    toastElement.querySelector('.toast-body').textContent = "PIX Copia e cola - Mensalista copiado para a área de transferência!";
+
+    // Mostra o toast
+    toast.show();
+});
 
    // Adicionando evento de clique ao botão
    document.querySelector('#btn-avulso').addEventListener('click', function() {
