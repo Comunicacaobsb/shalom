@@ -25,6 +25,11 @@
   --transparente:rgba(0,0,0,0);
 }
 
+:root {
+  --bs-link-color: var(--primary);
+  --primary: #8f2d2d;
+}
+
 body {
   color: #111;
 }
@@ -42,6 +47,9 @@ body {
 .nav-link {
   width: 100%;
 }
+.nav-pills {
+  --bs-nav-pills-link-active-bg:var(--primary);
+}
 
 p {
   margin: 0;
@@ -50,6 +58,11 @@ p {
 i {
   color: var(--primary);
   font-style: normal;
+}
+
+.title {
+  font-weight: 800;
+  color: var(--primary);
 }
 
 .rec {

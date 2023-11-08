@@ -2,6 +2,10 @@
 @import '../../scss/styles.css';
 
 
+:root{
+    --bs-link-color: var(--primary);
+    --primary: #{$vermelho};
+}
 body{
     color: $dark;
 }
@@ -20,6 +24,10 @@ body{
     &-link{
         width: 100%;
     }
+
+    &-pills{
+        --bs-nav-pills-link-active-bg:var(--primary);
+    }
 }
 
 p{
@@ -28,6 +36,10 @@ p{
 i{
     color: $primary;
     font-style: normal;
+}
+.title{
+    font-weight: 800;
+    color: $primary;
 }
 .rec { 
     text-indent:1em 
