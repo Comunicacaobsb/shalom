@@ -1,0 +1,35 @@
+@import '../../scss/colors.scss';
+@import '../../scss/styles.css';
+
+
+body{
+    color: $dark;
+}
+.nav{
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+
+    &::-webkit-scrollbar { 
+        display: none;
+    }
+
+    &-item{
+        //flex: 0 0 30%;
+        min-width: 30%;
+    }
+    &-link{
+        width: 100%;
+    }
+}
+
+p{
+    margin: 0;
+}
+i{
+    color: $primary;
+    font-style: normal;
+}
+.rec { 
+    text-indent:1em 
+}
+

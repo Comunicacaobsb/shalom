@@ -16,25 +16,6 @@ Bootstrap.rel = "stylesheet";
 document.getElementsByTagName("head")[0].appendChild(Bootstrap);
 
 
-
-/*
-Estilo Padrão
-*/
-
-// Criar novo elemento link
-var styleBase = document.createElement("link");
-
-// Definir atributos do styleBase
-styleBase.href = "https://brasilia.comshalom.org/scss/styles.css";
-styleBase.type = "text/css";
-styleBase.rel = "stylesheet";
-
-// Anexar o styleBase ao head da página
-document.getElementsByTagName("head")[0].appendChild(styleBase);
-
-
-
-
 /* 
 
 Fontes Google
@@ -102,6 +83,35 @@ document.addEventListener('DOMContentLoaded', function() {
     icon3.href = basePath + "favicon-16x16.png";
     head.appendChild(icon3);
 });
+
+
+
+
+/*
+Estilo Padrão
+*/
+
+
+function getStyleBasePath() {
+    // Verificar se o usuário está na raiz do site
+    if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+        return 'scss/';
+    }
+    // Caso contrário, retornar o caminho do scss para subdiretórios
+    return '../scss/';
+}
+
+var baseStyle = getStyleBasePath();
+// Criar novo elemento link
+var styleBase = document.createElement("link");
+
+// Definir atributos do styleBase
+styleBase.href = baseStyle + "styles.css";
+styleBase.type = "text/css";
+styleBase.rel = "stylesheet";
+
+// Anexar o styleBase ao head da página
+document.getElementsByTagName("head")[0].appendChild(styleBase);
 
 
 

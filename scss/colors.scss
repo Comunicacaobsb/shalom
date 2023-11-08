@@ -8,6 +8,8 @@ $amarelo:#eabc02;
 $laranja:#e8620d;   
 $verde:#096b4e;
 $floresta:#192517;
+$vermelho:#8f2d2d;
+$vinho:#3b1313;
 
 
 $branco:#FFF;
@@ -25,31 +27,41 @@ $preto:#000;
 
 
 
-$azul-100: lighten($azul, 80%) !default;
-$azul-200: lighten($azul, 60%) !default;
-$azul-300: lighten($azul, 40%) !default;
-$azul-400: lighten($azul, 20%) !default;
+$azul-100: lighten($azul, 30%) !default;
+$azul-200: lighten($azul, 20%) !default;
+$azul-300: lighten($azul, 15%) !default;
+$azul-400: lighten($azul, 10%) !default;
 $azul-500: $azul !default;
-$azul-600: darken($azul, 20%) !default;
-$azul-700: darken($azul, 40%) !default;
-$azul-800: darken($azul, 60%) !default;
-$azul-900: darken($azul, 80%) !default;
+$azul-600: darken($azul, 10%) !default;
+$azul-700: darken($azul, 15%) !default;
+$azul-800: darken($azul, 20%) !default;
+$azul-900: darken($azul, 30%) !default;
+
+$amarelo-100: lighten($amarelo, 30%) !default;
+$amarelo-200: lighten($amarelo, 20%) !default;
+$amarelo-300: lighten($amarelo, 15%) !default;
+$amarelo-400: lighten($amarelo, 10%) !default;
+$amarelo-500: $amarelo !default;
+$amarelo-600: darken($amarelo, 10%) !default;
+$amarelo-700: darken($amarelo, 15%) !default;
+$amarelo-800: darken($amarelo, 30%) !default;
+$amarelo-900: darken($amarelo, 30%) !default;
 
 
 :root{   
-  --primary-200:#de7f05;
-  --primary-300:#d56f03; 
-  --primary:#d05f00;
-  --primary-500:#cd5200;
-  --primary-600:#ad4001;
-  --secondary-200:#f3d05d;
-  --secondary-300:#e6bc1a;
-  --secondary:#e8b110;
-  --secondary-500:#e19401;
-  --secondary-600:#e49713;
+  --primary-300:#{$azul-300};
+  --primary-400:#{$azul-400}; 
+  --primary:#{$azul-500};
+  --primary-600:#{$azul-600};
+  --primary-700:#{$azul-700};
+  --secondary-300:#{$amarelo-300};
+  --secondary-400:#{$amarelo-400}; 
+  --secondary:#{$amarelo-500};
+  --secondary-600:#{$amarelo-600};
+  --secondary-700:#{$amarelo-700};
 
 
-  --accent: #{$azul};
+  --accent: #{$vermelho};
 
 
   --cinza-50: #{$cinza-50};
@@ -70,17 +82,17 @@ $azul-900: darken($azul, 80%) !default;
 
 
 
-$primary-200:$cinza-600;
-$primary-300:$cinza-700;
-$primary:$dark;
-$primary-500:$cinza-900;
-$primary-600:$preto;
+$primary-300:var(--primary-300);
+$primary-400:var(--primary-400);
+$primary:var(--primary);
+$primary-600:var(--primary-600);
+$primary-700:var(--primary-700);
 
-$secondary-200:$branco;
-$secondary-300:$cinza-100;
-$secondary:$light;
-$secondary-500:$cinza-200;
-$secondary-600:$cinza-300;
+$secondary-300:var(--secondary-300);
+$secondary-400:var(--secondary-400);
+$secondary:var(--secondary);
+$secondary-600:var(--secondary-600);
+$secondary-700:var(--secondary-700);
 // $tertiary:;
 $accent: var(--accent);
 // $success:;

@@ -1,6 +1,8 @@
 @import "colors";
   
-
+:root{
+  --font-primary:'Montserrat', sans-serif;
+}
   
   /* 
   --------------------------------
@@ -43,7 +45,6 @@
     width: 100vw;
     font-family: var(--font-primary);
     overflow-x: hidden;
-    color: $primary!important;
   }
 
   .font-primary{
@@ -62,35 +63,35 @@
   /* COR DAS FONTES */
   .c-{
 
-    &primary-200{
-      color:$primary-200!important;
-    }
     &primary-300{
       color:$primary-300!important;
+    }
+    &primary-400{
+      color:$primary-400!important;
     }
     &primary{
       color:$primary!important;
     }
-    &primary-500{
-      color:$primary-500!important;
-    }
     &primary-600{
       color:$primary-600!important;
     }
-    &secondary-200{
-      color:$secondary-200!important;
+    &primary-700{
+      color:$primary-700!important;
     }
     &secondary-300{
       color:$secondary-300!important;
     }
+    &secondary-400{
+      color:$secondary-400!important;
+    }
     &secondary{
       color:$secondary!important;
     }
-    &secondary-500{
-      color:$secondary-500!important;
-    }
     &secondary-600{
       color:$secondary-600!important;
+    }
+    &secondary-700{
+      color:$secondary-700!important;
     }
     &accent{
       color:$accent!important;
@@ -98,11 +99,11 @@
     &cinza-100{
       color:$cinza-100!important;
     }
-    &cinza-500{
-      color:$cinza-500!important;
+    &cinza-600{
+      color:$cinza-600!important;
     }
-    &cinza-200{
-      color:$cinza-200!important;
+    &cinza-300{
+      color:$cinza-300!important;
     }
     &cinza-400{
       color:$cinza-400!important;
@@ -115,14 +116,20 @@
   /* COR DOS FUNDOS */
   .bg-{
 
+    &primary-300{
+      background-color:$primary-300!important;
+    }
+    &primary-400{
+      background-color:$primary-400!important;
+    }
     &primary{
       background-color:$primary!important;
     }
-    &primary-500{
-      background-color:$primary-500!important;
-    }
     &primary-600{
       background-color:$primary-600!important;
+    }
+    &primary-700{
+      background-color:$primary-700!important;
     }
     &secondary{
       background-color:$secondary!important;
@@ -133,11 +140,11 @@
     &cinza-100{
       background-color:$cinza-100!important;
     }
-    &cinza-500{
-      background-color:$cinza-500!important;
+    &cinza-600{
+      background-color:$cinza-600!important;
     }
-    &cinza-200{
-      background-color:$cinza-200!important;
+    &cinza-300{
+      background-color:$cinza-300!important;
     }
     &cinza-400{
       background-color:$cinza-400!important;
@@ -153,11 +160,11 @@
     &primary{
       border-color:$primary!important;
     }
-    &primary-500{
-      border-color:$primary-500!important;
-    }
     &primary-600{
       border-color:$primary-600!important;
+    }
+    &primary-700{
+      border-color:$primary-700!important;
     }
     &secondary{
       border-color:$secondary!important;
@@ -168,11 +175,11 @@
     &cinza-100{
       border-color:$cinza-100!important;
     }
-    &cinza-500{
-      border-color:$cinza-500!important;
+    &cinza-600{
+      border-color:$cinza-600!important;
     }
-    &cinza-200{
-      border-color:$cinza-200!important;
+    &cinza-300{
+      border-color:$cinza-300!important;
     }
     &cinza-400{
       border-color:$cinza-400!important;
@@ -227,17 +234,17 @@
     &-100{
       font-weight: 100!important;
     }
-    &-200{
-      font-weight: 200!important;
-    }
     &-300{
       font-weight: 300!important;
     }
-    &-500{
-      font-weight: 500!important;
+    &-400{
+      font-weight: 400!important;
     }
     &-600{
       font-weight: 600!important;
+    }
+    &-700{
+      font-weight: 700!important;
     }
     &-700{
       font-weight: 700!important;
@@ -312,13 +319,13 @@
       font-size: var(--font-geral);
       border-color: $accent;
       background-color: $accent;
-      color: $cinza-200;
+      color: $cinza-300;
       transition: .5s all ease-in-out;
   
       &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
         border-color: $accent;
         background-color: $secondary;
-        color: $cinza-500;
+        color: $cinza-600;
       }
   
       &:focus-visible{
@@ -437,7 +444,7 @@
     background: #e1e1e1;
     border-radius: 100%;
     height: 60px;
-    width: 200px;
+    width: 300px;
     line-height: 60px;
     position: absolute;
     top: 0;
@@ -464,7 +471,7 @@
     width: 80px;
     margin-left: auto;
     margin-right: auto;
-    @media (max-width: 500px){
+    @media (max-width: 600px){
       margin-top: 70%
     }
     .icone{

@@ -1,3 +1,4 @@
+@import '../../scss/styles.css';
 :root {
   --primary-300:#2e72ca;
   --primary-400:#2966b6;
@@ -22,4 +23,35 @@
   --cinza-900:#111;
   --sombra:#3a3a3a0d;
   --transparente:rgba(0,0,0,0);
-}/*# sourceMappingURL=colors.css.map */
+}
+
+body {
+  color: #111;
+}
+
+.nav {
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+}
+.nav::-webkit-scrollbar {
+  display: none;
+}
+.nav-item {
+  min-width: 30%;
+}
+.nav-link {
+  width: 100%;
+}
+
+p {
+  margin: 0;
+}
+
+i {
+  color: var(--primary);
+  font-style: normal;
+}
+
+.rec {
+  text-indent: 1em;
+}/*# sourceMappingURL=style-page.css.map */
