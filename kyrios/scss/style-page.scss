@@ -71,6 +71,10 @@ body {
     z-index: 1000;
     border-radius: .5rem;
     //transition: all 1s cubic-bezier(0.6, -0.10, 0.4, 1.10);
+
+    &-is{
+        border-radius: 0 0 .5rem .5rem;
+    }
 }
 
 .smaller {
@@ -87,7 +91,7 @@ i {
 }
 
 b {
-    color: var(--secondary);
+    //color: var(--secondary);
 }
 
 .title {

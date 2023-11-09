@@ -62,8 +62,8 @@
     <div class="container">
       <div class="row py-3">
         <div class="col">
-          <nav>
-            <img src="images/kyrios.svg" height="50px" alt="kyrios">
+          <nav class="center-s">
+            <img src="images/kyrios.svg" height="70px" alt="kyrios">
           </nav>
         </div>
       </div>
@@ -87,6 +87,18 @@
               <button class="nav-link" id="pills-3-tab" data-bs-toggle="pill" data-bs-target="#pills-3" type="button"
                 role="tab" aria-controls="pills-3" aria-selected="false">
                 Oração III
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="pills-4-tab" data-bs-toggle="pill" data-bs-target="#pills-4" type="button"
+                role="tab" aria-controls="pills-4" aria-selected="false">
+                Oração IV
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="pills-5-tab" data-bs-toggle="pill" data-bs-target="#pills-5" type="button"
+                role="tab" aria-controls="pills-5" aria-selected="false">
+                Oração V
               </button>
             </li>
           </ul>
@@ -452,6 +464,40 @@
                 </p>
               </div>
             </div>
+
+            <!--
+            ORAÇÃO 4
+            -->
+            <div class="tab-pane fade" id="pills-4" role="tabpanel" aria-labelledby="pills-4-tab" tabindex="0">
+              <h2 class="title">
+                ORAÇÃO EUCARÍSTICA V
+              </h2>
+
+              <div class="mb-3">
+
+                <p class="rec">
+                  Em breve
+                </p>
+              </div>
+            </div>
+
+            <!--
+            ORAÇÃO 5
+            -->
+            <div class="tab-pane fade" id="pills-5" role="tabpanel" aria-labelledby="pills-5-tab" tabindex="0">
+              <h2 class="title">
+                ORAÇÃO EUCARÍSTICA IV
+              </h2>
+
+              <div class="mb-3">
+
+                <p class="rec">
+                  Em breve
+                </p>
+              </div>
+            </div>
+
+            
           </div>
         </div>
       </div>
@@ -472,7 +518,7 @@
   <script>
     document.addEventListener("DOMContentLoaded", function() {
     var stickyElement = document.querySelector('.sticky');
-    var stickyStart = 82; // O valor inicial de 'top' para o elemento sticky
+    var stickyStart = 102; // O valor inicial de 'top' para o elemento sticky
 
     function handleScroll() {
         var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -521,9 +567,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // Callback que será executado quando o sentinel intersectar com a viewport
         entries.forEach(entry => {
             if (entry.intersectionRatio === 0) {
-                stickyElement.classList.add('is-sticky');
+                stickyElement.classList.add('sticky-is');
             } else if (entry.intersectionRatio === 1) {
-                stickyElement.classList.remove('is-sticky');
+                stickyElement.classList.remove('sticky-is');
             }
         });
     }, { threshold: [0, 1] });
