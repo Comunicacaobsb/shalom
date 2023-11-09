@@ -26,7 +26,8 @@
 }
 
 :root {
-  --bs-link-color: var(--primary);
+  --bs-link-color: $primary;
+  --bs-link-hover-color: $primary;
   --primary: #8f2d2d;
 }
 
@@ -42,13 +43,25 @@ body {
   display: none;
 }
 .nav-item {
-  min-width: 30%;
+  min-width: 35%;
+  margin-inline: 0.5rem;
 }
 .nav-link {
   width: 100%;
+  border: 1px solid #FFF;
+}
+.nav-link:hover {
+  border-color: var(--primary);
+}
+.nav-link:active {
+  border-color: var(--primary);
 }
 .nav-pills {
   --bs-nav-pills-link-active-bg:var(--primary);
+}
+
+.smaller {
+  font-size: 0.6rem;
 }
 
 p {

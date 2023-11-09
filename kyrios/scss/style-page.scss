@@ -3,7 +3,8 @@
 
 
 :root{
-    --bs-link-color: var(--primary);
+    --bs-link-color: $primary;
+    --bs-link-hover-color: $primary;
     --primary: #{$vermelho};
 }
 body{
@@ -19,15 +20,27 @@ body{
 
     &-item{
         //flex: 0 0 30%;
-        min-width: 30%;
+        min-width: 35%;
+        margin-inline: .5rem;
     }
     &-link{
         width: 100%;
+        border: 1px solid $branco;
+        &:hover{
+            border-color: $primary;
+        }
+        &:active{
+            border-color: $primary;
+        }
     }
 
     &-pills{
         --bs-nav-pills-link-active-bg:var(--primary);
     }
+}
+
+.smaller{
+    font-size: .6rem;
 }
 
 p{
