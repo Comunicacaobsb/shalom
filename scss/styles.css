@@ -26,19 +26,18 @@
 }
 
 :root {
-  --font-primary:"Montserrat", sans-serif;
+  --font-primary: "Montserrat", sans-serif;
 }
 
 /* 
---------------------------------
-GERAIS
---------------------------------
-*/
-/*
-
-SCROLLBAR
+  --------------------------------
+  GERAIS
+  --------------------------------
+  */
+/* 
+  SCROLLBAR
+  */
 * {
-
   scrollbar-width: none;
   scrollbar-color: transparent;
 }
@@ -46,7 +45,7 @@ SCROLLBAR
 *::-webkit-scrollbar {
   display: none;
   width: 0px;
-  height: 0px; // A altura só é vista quando a rolagem é horizontal 
+  height: 0px;
 }
 
 *::-webkit-scrollbar-track {
@@ -57,7 +56,7 @@ SCROLLBAR
 *::-webkit-scrollbar-thumb {
   background-color: transparent;
 }
-*/
+
 html {
   width: 100vw;
   overflow-x: hidden;
@@ -375,17 +374,6 @@ body {
 }
 .card .card-footer {
   text-align: end;
-}
-
-#menu .navbar-brand img {
-  mix-blend-mode: color-burn;
-}
-#menu .nav-link {
-  color: var(--primary) !important;
-  text-align: end;
-}
-#menu .nav-link:hover {
-  filter: brightness(0.8);
 }
 
 footer {

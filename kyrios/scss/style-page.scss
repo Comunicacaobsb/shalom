@@ -2,59 +2,99 @@
 @import '../../scss/styles.css';
 
 
-:root{
+:root {
     --bs-link-color: $primary;
     --bs-link-hover-color: $primary;
     --primary: #{$vermelho};
+    --secondary: #06343f;
+    --accent: #d4b605;
+
 }
-body{
+
+body {
     color: $dark;
+    background: $cinza-50;
 }
-.nav{
+
+.tabs {
+    background-color: $cinza-100;
+}
+
+.nav {
     flex-wrap: nowrap;
     overflow-x: scroll;
+    scroll-behavior: smooth;
 
-    &::-webkit-scrollbar { 
+    &::-webkit-scrollbar {
         display: none;
     }
 
-    &-item{
+    &-pills {
+        --bs-nav-pills-link-active-bg: var(--primary);
+    }
+
+    &-item {
         //flex: 0 0 30%;
         min-width: 35%;
-        margin-inline: .5rem;
+        margin-inline: .25rem;
+        &:nth-child(1){
+            margin-left: .75rem;
+        }
+        &:nth-last-child(1){
+            margin-right: .75rem;
+        }
+        
     }
-    &-link{
+
+    &-link {
         width: 100%;
-        border: 1px solid $branco;
-        &:hover{
+        border: 1px solid $cinza-50;
+
+        &:hover {
             border-color: $primary;
         }
-        &:active{
+
+        &:active {
             border-color: $primary;
         }
     }
 
-    &-pills{
-        --bs-nav-pills-link-active-bg:var(--primary);
-    }
+    
 }
 
-.smaller{
+#sentinel{
+    height: 74px;
+    width: 100%;
+}
+.sticky{
+    position: fixed;
+    z-index: 1000;
+    border-radius: .5rem;
+    //transition: all 1s cubic-bezier(0.6, -0.10, 0.4, 1.10);
+}
+
+.smaller {
     font-size: .6rem;
 }
 
-p{
+p {
     margin: 0;
 }
-i{
+
+i {
     color: $primary;
     font-style: normal;
 }
-.title{
+
+b {
+    color: var(--secondary);
+}
+
+.title {
     font-weight: 800;
     color: $primary;
 }
-.rec { 
-    text-indent:1em 
-}
 
+.rec {
+    text-indent: 1em
+}

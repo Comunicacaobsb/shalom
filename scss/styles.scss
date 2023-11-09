@@ -1,427 +1,497 @@
 @import "colors";
-  
-:root{
-  --font-primary:'Montserrat', sans-serif;
+
+:root {
+  --font-primary: 'Montserrat', sans-serif;
 }
-  
-  /* 
+
+/* 
   --------------------------------
   GERAIS
   --------------------------------
   */
 
-  /*
-
+/* 
   SCROLLBAR
-  * {
-    
-    scrollbar-width: none;
-    scrollbar-color: transparent;
-  }
-  
-  *::-webkit-scrollbar {
-    display: none;
-    width: 0px;
-    height: 0px; // A altura só é vista quando a rolagem é horizontal 
-  }
-  
-  *::-webkit-scrollbar-track {
-    background: transparent;
-    padding: 0px;
-  }
-  
-  *::-webkit-scrollbar-thumb {
-    background-color: transparent;
-  }
   */
 
-  html{
-    width: 100vw;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
+* {
+
+  scrollbar-width: none;
+  scrollbar-color: transparent;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  height: 0px; // A altura só é vista quando a rolagem é horizontal 
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+  padding: 0px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+
+html {
+  width: 100vw;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  width: 100vw;
+  font-family: var(--font-primary);
+  overflow-x: hidden;
+}
+
+.font-primary {
+  font-family: var(--font-primary);
+}
+
+.font-secondary {
+  font-family: var(--font-secondary);
+}
+
+.small {
+  font-size: .875em !important;
+}
+
+
+/* COR DAS FONTES */
+.c- {
+
+  &primary-300 {
+    color: $primary-300 !important;
   }
 
-  body {
-    width: 100vw;
-    font-family: var(--font-primary);
-    overflow-x: hidden;
+  &primary-400 {
+    color: $primary-400 !important;
   }
 
-  .font-primary{
-    font-family: var(--font-primary); 
+  &primary {
+    color: $primary !important;
   }
 
-  .font-secondary{
-    font-family: var(--font-secondary); 
+  &primary-600 {
+    color: $primary-600 !important;
   }
 
-  .small{
-    font-size: .875em!important;
+  &primary-700 {
+    color: $primary-700 !important;
   }
 
-  
-  /* COR DAS FONTES */
-  .c-{
-
-    &primary-300{
-      color:$primary-300!important;
-    }
-    &primary-400{
-      color:$primary-400!important;
-    }
-    &primary{
-      color:$primary!important;
-    }
-    &primary-600{
-      color:$primary-600!important;
-    }
-    &primary-700{
-      color:$primary-700!important;
-    }
-    &secondary-300{
-      color:$secondary-300!important;
-    }
-    &secondary-400{
-      color:$secondary-400!important;
-    }
-    &secondary{
-      color:$secondary!important;
-    }
-    &secondary-600{
-      color:$secondary-600!important;
-    }
-    &secondary-700{
-      color:$secondary-700!important;
-    }
-    &accent{
-      color:$accent!important;
-    }
-    &cinza-100{
-      color:$cinza-100!important;
-    }
-    &cinza-600{
-      color:$cinza-600!important;
-    }
-    &cinza-300{
-      color:$cinza-300!important;
-    }
-    &cinza-400{
-      color:$cinza-400!important;
-    }
-    &cinza-900{
-      color:$cinza-900!important;
-    }
+  &secondary-300 {
+    color: $secondary-300 !important;
   }
 
-  /* COR DOS FUNDOS */
-  .bg-{
-
-    &primary-300{
-      background-color:$primary-300!important;
-    }
-    &primary-400{
-      background-color:$primary-400!important;
-    }
-    &primary{
-      background-color:$primary!important;
-    }
-    &primary-600{
-      background-color:$primary-600!important;
-    }
-    &primary-700{
-      background-color:$primary-700!important;
-    }
-    &secondary{
-      background-color:$secondary!important;
-    }
-    &accent{
-      background-color:$accent!important;
-    }
-    &cinza-100{
-      background-color:$cinza-100!important;
-    }
-    &cinza-600{
-      background-color:$cinza-600!important;
-    }
-    &cinza-300{
-      background-color:$cinza-300!important;
-    }
-    &cinza-400{
-      background-color:$cinza-400!important;
-    }
-    &cinza-900{
-      background-color:$cinza-900!important;
-    }
+  &secondary-400 {
+    color: $secondary-400 !important;
   }
 
-  /* COR DA BORDA */
-  /* PESO DA BORDA */
-  .border-{
-    &primary{
-      border-color:$primary!important;
-    }
-    &primary-600{
-      border-color:$primary-600!important;
-    }
-    &primary-700{
-      border-color:$primary-700!important;
-    }
-    &secondary{
-      border-color:$secondary!important;
-    }
-    &accent{
-      border-color:$accent!important;
-    }
-    &cinza-100{
-      border-color:$cinza-100!important;
-    }
-    &cinza-600{
-      border-color:$cinza-600!important;
-    }
-    &cinza-300{
-      border-color:$cinza-300!important;
-    }
-    &cinza-400{
-      border-color:$cinza-400!important;
-    }
-    &cinza-900{
-      border-color:$cinza-900!important;
-    }
-    
-    &1{
-      border-style:solid; 
-      border-width: 1px;
-    }
-    &2{
-      border-style:solid; 
-      border-width: 2px;
-    }
-    &3{
-      border-style:solid; 
-      border-width: 3px;
-    }
-    &4{
-      border-style:solid; 
-      border-width: 4px;
-    }
-    &5{
-      border-style:solid; 
-      border-width: 5px;
-    }
-
-    &radius-05{
-      border-radius: .5rem;
-    }
-    &radius-075{
-      border-radius: .75rem;
-    }
-    &radius-1{
-      border-radius: 1rem;
-    }
-    &radius-15{
-      border-radius: 1.5rem;
-    }
-    &radius-2{
-      border-radius: 2rem;
-    }
-    &radius-25{
-      border-radius: 2.5rem;
-    }
+  &secondary {
+    color: $secondary !important;
   }
 
-  /* PESO DAS FONTES */
-  .fw{
-    &-100{
-      font-weight: 100!important;
-    }
-    &-300{
-      font-weight: 300!important;
-    }
-    &-400{
-      font-weight: 400!important;
-    }
-    &-600{
-      font-weight: 600!important;
-    }
-    &-700{
-      font-weight: 700!important;
-    }
-    &-700{
-      font-weight: 700!important;
-    }
-    &-800{
-      font-weight: 800!important;
-    }
-    &-900{
-      font-weight: 900!important;
-    }
+  &secondary-600 {
+    color: $secondary-600 !important;
   }
 
-
-  /* ALINHAMENTO */
-  .center-{
-    &s{
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .v{
-      display: flex;
-      align-items: center;
-    }
-    .h{
-      display: flex;
-      justify-content: center;
-    }
+  &secondary-700 {
+    color: $secondary-700 !important;
   }
 
-  /* ALTURA */
-  .h-{
-    &100{
-      height: 100%;
-    }
-    &75{
-      height: 75%;
-    }
-    &50{
-      height: 50%;
-    }
-    &25{
-      height: 25%;
-    }
+  &accent {
+    color: $accent !important;
   }
 
+  &cinza-100 {
+    color: $cinza-100 !important;
+  }
 
-  /* BOTÕES */
-  .btn-{
-    &primary{
-      font-size: var(--font-geral);
+  &cinza-600 {
+    color: $cinza-600 !important;
+  }
+
+  &cinza-300 {
+    color: $cinza-300 !important;
+  }
+
+  &cinza-400 {
+    color: $cinza-400 !important;
+  }
+
+  &cinza-900 {
+    color: $cinza-900 !important;
+  }
+}
+
+/* COR DOS FUNDOS */
+.bg- {
+
+  &primary-300 {
+    background-color: $primary-300 !important;
+  }
+
+  &primary-400 {
+    background-color: $primary-400 !important;
+  }
+
+  &primary {
+    background-color: $primary !important;
+  }
+
+  &primary-600 {
+    background-color: $primary-600 !important;
+  }
+
+  &primary-700 {
+    background-color: $primary-700 !important;
+  }
+
+  &secondary {
+    background-color: $secondary !important;
+  }
+
+  &accent {
+    background-color: $accent !important;
+  }
+
+  &cinza-100 {
+    background-color: $cinza-100 !important;
+  }
+
+  &cinza-600 {
+    background-color: $cinza-600 !important;
+  }
+
+  &cinza-300 {
+    background-color: $cinza-300 !important;
+  }
+
+  &cinza-400 {
+    background-color: $cinza-400 !important;
+  }
+
+  &cinza-900 {
+    background-color: $cinza-900 !important;
+  }
+}
+
+/* COR DA BORDA */
+/* PESO DA BORDA */
+.border- {
+  &primary {
+    border-color: $primary !important;
+  }
+
+  &primary-600 {
+    border-color: $primary-600 !important;
+  }
+
+  &primary-700 {
+    border-color: $primary-700 !important;
+  }
+
+  &secondary {
+    border-color: $secondary !important;
+  }
+
+  &accent {
+    border-color: $accent !important;
+  }
+
+  &cinza-100 {
+    border-color: $cinza-100 !important;
+  }
+
+  &cinza-600 {
+    border-color: $cinza-600 !important;
+  }
+
+  &cinza-300 {
+    border-color: $cinza-300 !important;
+  }
+
+  &cinza-400 {
+    border-color: $cinza-400 !important;
+  }
+
+  &cinza-900 {
+    border-color: $cinza-900 !important;
+  }
+
+  &1 {
+    border-style: solid;
+    border-width: 1px;
+  }
+
+  &2 {
+    border-style: solid;
+    border-width: 2px;
+  }
+
+  &3 {
+    border-style: solid;
+    border-width: 3px;
+  }
+
+  &4 {
+    border-style: solid;
+    border-width: 4px;
+  }
+
+  &5 {
+    border-style: solid;
+    border-width: 5px;
+  }
+
+  &radius-05 {
+    border-radius: .5rem;
+  }
+
+  &radius-075 {
+    border-radius: .75rem;
+  }
+
+  &radius-1 {
+    border-radius: 1rem;
+  }
+
+  &radius-15 {
+    border-radius: 1.5rem;
+  }
+
+  &radius-2 {
+    border-radius: 2rem;
+  }
+
+  &radius-25 {
+    border-radius: 2.5rem;
+  }
+}
+
+/* PESO DAS FONTES */
+.fw {
+  &-100 {
+    font-weight: 100 !important;
+  }
+
+  &-300 {
+    font-weight: 300 !important;
+  }
+
+  &-400 {
+    font-weight: 400 !important;
+  }
+
+  &-600 {
+    font-weight: 600 !important;
+  }
+
+  &-700 {
+    font-weight: 700 !important;
+  }
+
+  &-700 {
+    font-weight: 700 !important;
+  }
+
+  &-800 {
+    font-weight: 800 !important;
+  }
+
+  &-900 {
+    font-weight: 900 !important;
+  }
+}
+
+
+/* ALINHAMENTO */
+.center- {
+  &s {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .v {
+    display: flex;
+    align-items: center;
+  }
+
+  .h {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* ALTURA */
+.h- {
+  &100 {
+    height: 100%;
+  }
+
+  &75 {
+    height: 75%;
+  }
+
+  &50 {
+    height: 50%;
+  }
+
+  &25 {
+    height: 25%;
+  }
+}
+
+
+/* BOTÕES */
+.btn- {
+  &primary {
+    font-size: var(--font-geral);
+    border-color: $accent;
+    background-color: $cinza-100;
+    background-image: url(../images/BG.jpg);
+    color: $accent;
+    transition: .5s all ease-in-out;
+
+    &:not(:disabled):not(.disabled).active,
+    &:not(:disabled):not(.disabled):active,
+    .show>&.dropdown-toggle,
+    &:hover {
       border-color: $accent;
-      background-color: $cinza-100;
-      background-image: url(../images/BG.jpg);
       color: $accent;
-      transition: .5s all ease-in-out;
-  
-      &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
-        border-color: $accent;
-        color: $accent;
-      }
-  
-      &:focus-visible{
-        outline: $accent auto 1px;
-      }
-  
-      &.focus, &:focus, &:not(:disabled):not(.disabled).active:focus, &:not(:disabled):not(.disabled):active:focus, .show>&.dropdown-toggle:focus{
-        box-shadow: 0 0 0 0rem $accent;
-      }
     }
-    &secondary{
-      font-size: var(--font-geral);
+
+    &:focus-visible {
+      outline: $accent auto 1px;
+    }
+
+    &.focus,
+    &:focus,
+    &:not(:disabled):not(.disabled).active:focus,
+    &:not(:disabled):not(.disabled):active:focus,
+    .show>&.dropdown-toggle:focus {
+      box-shadow: 0 0 0 0rem $accent;
+    }
+  }
+
+  &secondary {
+    font-size: var(--font-geral);
+    border-color: $accent;
+    background-color: $accent;
+    color: $cinza-300;
+    transition: .5s all ease-in-out;
+
+    &:not(:disabled):not(.disabled).active,
+    &:not(:disabled):not(.disabled):active,
+    .show>&.dropdown-toggle,
+    &:hover {
       border-color: $accent;
-      background-color: $accent;
-      color: $cinza-300;
-      transition: .5s all ease-in-out;
-  
-      &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
-        border-color: $accent;
-        background-color: $secondary;
-        color: $cinza-600;
-      }
-  
-      &:focus-visible{
-        outline: 0px;
-      }
-  
-      &.focus, &:focus, &:not(:disabled):not(.disabled).active:focus, &:not(:disabled):not(.disabled):active:focus, .show>&.dropdown-toggle:focus{
-        box-shadow: 0 0 0 0rem $accent;
-      }
+      background-color: $secondary;
+      color: $cinza-600;
     }
-    &outline-primary{
-      font-size: var(--font-geral);
+
+    &:focus-visible {
+      outline: 0px;
+    }
+
+    &.focus,
+    &:focus,
+    &:not(:disabled):not(.disabled).active:focus,
+    &:not(:disabled):not(.disabled):active:focus,
+    .show>&.dropdown-toggle:focus {
+      box-shadow: 0 0 0 0rem $accent;
+    }
+  }
+
+  &outline-primary {
+    font-size: var(--font-geral);
+    border-color: $primary;
+    color: $secondary;
+    transition: .5s all ease-in-out;
+
+    &:not(:disabled):not(.disabled).active,
+    &:not(:disabled):not(.disabled):active,
+    .show>&.dropdown-toggle,
+    &:hover {
+      background-color: $primary;
       border-color: $primary;
-      color: $secondary;
-      transition: .5s all ease-in-out;
-  
-      &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
-        background-color: $primary;
-        border-color: $primary;
-        color: $cinza-100;
-        font-size: calc(var(--font-geral) + .1rem);
-      }
-  
-      &:focus-visible{
-        border: 1px solid $secondary;
-      }
-      
-      &.focus, &:focus, &:not(:disabled):not(.disabled).active:focus, &:not(:disabled):not(.disabled):active:focus, .show>&.dropdown-toggle:focus{
-        box-shadow: 0 0 0 0rem $accent;
-      }
-      &.active:focus{
-        border: 1px solid $secondary;
-      }
+      color: $cinza-100;
+      font-size: calc(var(--font-geral) + .1rem);
     }
-    &click{
-      box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.2);
-      transition:all 0.3s ease-in-out;
-  
-      &:hover{
-        transform: translateX(2px) translateY(2px);
-        box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-      }
-    
-      &:active{
-        transform: translateX(4px) translateY(4px);
-        box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
-      }
-  
+
+    &:focus-visible {
+      border: 1px solid $secondary;
+    }
+
+    &.focus,
+    &:focus,
+    &:not(:disabled):not(.disabled).active:focus,
+    &:not(:disabled):not(.disabled):active:focus,
+    .show>&.dropdown-toggle:focus {
+      box-shadow: 0 0 0 0rem $accent;
+    }
+
+    &.active:focus {
+      border: 1px solid $secondary;
+    }
+  }
+
+  &click {
+    box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+      transform: translateX(2px) translateY(2px);
+      box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+      transform: translateX(4px) translateY(4px);
+      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
     }
 
   }
 
+}
 
 
-  .card{
-    box-shadow: 0 16px 16px $sombra, 0 8px 8px $sombra, 0 4px 4px $sombra, 0 0 10px $sombra;
 
-    &:hover{
-      border: 1px solid $primary!important;
-    }
-    .card-footer{
-      text-align: end;
-    }
+.card {
+  box-shadow: 0 16px 16px $sombra, 0 8px 8px $sombra, 0 4px 4px $sombra, 0 0 10px $sombra;
+
+  &:hover {
+    border: 1px solid $primary !important;
   }
 
-
-  #menu{
-    .navbar-brand img{
-      mix-blend-mode: color-burn;
-    }
-    .nav-link{
-      color: $primary!important;
-      text-align: end;
-  
-      &:hover{
-        filter: brightness(0.8);
-      }
-    }
+  .card-footer {
+    text-align: end;
   }
-  
-  
-  
-  footer{
+}
+
+
+
+
+footer {
   position: relative;
-    .position-absolute{
-      bottom: 0;
-    }
+
+  .position-absolute {
+    bottom: 0;
   }
-  
+}
 
 
-  
 
-  
 
-.preloader{
+
+
+
+.preloader {
   background-color: $cinza-100;
   bottom: 0;
   height: 100%;
@@ -429,18 +499,20 @@
   top: 0;
   width: 100%;
   z-index: 99999999;
-  .preview{
+
+  .preview {
     transform: scale(1.5);
   }
-  
-  .icone{
+
+  .icone {
     transform: scale(2.5);
   }
 
-  g{
+  g {
     transform: scale(.25);
   }
-  span{
+
+  span {
     background: #e1e1e1;
     border-radius: 100%;
     height: 60px;
@@ -457,31 +529,37 @@
     margin: auto;
     -webkit-animation: mymove 1.5s infinite linear;
     animation: mymove 1.5s infinite linear;
-    img{
+
+    img {
       margin-top: 0px;
     }
-    p{
-      color:#5f5f5f;
+
+    p {
+      color: #5f5f5f;
     }
   }
-  .content-preloader{
+
+  .content-preloader {
     position: relative;
     text-align: center;
     margin-top: 15%;
     width: 80px;
     margin-left: auto;
     margin-right: auto;
-    @media (max-width: 600px){
+
+    @media (max-width: 600px) {
       margin-top: 70%
     }
-    .icone{
+
+    .icone {
       position: absolute;
       top: 30px;
       left: 34px;
     }
   }
 }
-.spinner{
+
+.spinner {
   --spinner-size: 5;
   --line-color: var(--primary);
   --line-alpha: 1;
@@ -492,7 +570,8 @@
   width: 1em;
   height: 1em;
   border-radius: 50%;
-  .line{
+
+  .line {
     fill: none;
     stroke: var(--line-color);
     stroke-width: var(--ring-size);
@@ -502,24 +581,29 @@
     transform: rotate3d(0, 0, 1, 0deg);
     animation: 2156ms spinner-arc ease-in-out infinite, 1829ms spinner-rotate linear infinite;
   }
-  .ring{
+
+  .ring {
     fill: none;
     stroke: var(--ring-color);
     stroke-width: var(--ring-size);
     opacity: var(--ring-alpha);
   }
 }
-@keyframes spinner-rotate{
-  to{
+
+@keyframes spinner-rotate {
+  to {
     transform: rotate3d(0, 0, 1, 360deg);
   }
 }
-@keyframes spinner-arc{
-  from{
-    stroke-dasharray: 0 150; stroke-dashoffset: 0;
-  }
-    to{
-      stroke-dasharray: 100 150; stroke-dashoffset: -140;
-    }
-}
 
+@keyframes spinner-arc {
+  from {
+    stroke-dasharray: 0 150;
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dasharray: 100 150;
+    stroke-dashoffset: -140;
+  }
+}
