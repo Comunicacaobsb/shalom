@@ -8,18 +8,18 @@
   <script src="../js/header.js"></script>
 
   <link rel="stylesheet" href="scss/style-page.css">
-  <title>Orações Eucarísticas</title>
+  <title>Orações Eucarísticas | Kyrios</title>
 
-  <meta property="og:site_name" content="Fut SH">
-  <meta name="site_name" content="Fut SH">
-  <meta property="og:title" content="Fut SH" />
-  <meta name="title" content="Fut SH" />
-  <meta property="og:description" content="Toda sexta, 22h no Zico EPTG">
-  <meta name="description" content="Toda sexta, 22h no Zico EPTG">
-  <meta property="og:url" content="https://brasilia.comshalom.org/futsh" />
-  <meta name="url" content="https://brasilia.comshalom.org/futsh" />
-  <meta property="og:image" itemprop="image" content="https://brasilia.comshalom.org/futsh/images/image.png" />
-  <meta name="image" itemprop="image" content="https://brasilia.comshalom.org/futsh/images/image.png" />
+  <meta property="og:site_name" content="Orações Eucarísticas">
+  <meta name="site_name" content="Orações Eucarísticas">
+  <meta property="og:title" content="Orações Eucarísticas" />
+  <meta name="title" content="Orações Eucarísticas" />
+  <meta property="og:description" content="do novo missal">
+  <meta name="description" content="do novo missal">
+  <meta property="og:url" content="https://brasilia.comshalom.org" />
+  <meta name="url" content="https://brasilia.comshalom.org" />
+  <meta property="og:image" itemprop="image" content="https://brasilia.comshalom.org/kyrios/images/image.png" />
+  <meta name="image" itemprop="image" content="https://brasilia.comshalom.org/kyrios/images/image.png" />
   <meta property="og:image:type" content="image/jpeg">
   <meta name="image:type" content="image/jpeg">
   <meta property="og:image:width" content="300">
@@ -105,8 +105,7 @@
 
         </div>
       </div>
-      <div id="sentinel"></div>
-      
+
 
       <div class="row">
         <div class="col pt-4">
@@ -139,7 +138,7 @@
               </h2>
 
               <div class="mb-3">
-                <p class="mb-3">
+                <p>
                   <i>V.</i> O Senhor esteja convosco. <br>
                   <i>R.</i> <b>Ele está no meio de nós.</b> <br>
                   <i>V.</i> Corações ao alto. <br>
@@ -147,6 +146,8 @@
                   <i>V.</i> Demos graças ao Senhor, nosso Deus. <br>
                   <i>R.</i> <b>É nosso dever e nossa salvação.</b><br>
                 </p>
+              </div>
+              <div class="mb-3">
 
                 <p class="rec">
                   Na verdade, é digno e justo,
@@ -175,7 +176,9 @@
                   cantando (dizendo) a uma só voz:
                 </p>
 
-                <p class="fw-700 mt-3">
+              </div>
+              <div class="mb-3">
+                <b class="">
                   Santo, Santo, Santo,
                   Senhor, Deus do universo.
                   O céu e a terra proclamam a vossa glória.
@@ -183,14 +186,15 @@
                   Bendito o que vem em nome do Senhor!
                   Hosana nas alturas!
 
-                </p>
+                </b>
+
               </div>
 
               <div class="mb-3">
                 <i class="small">
                   O sacerdote diz:
                 </i>
-                <p class="rec">
+                <p class="">
                   Na verdade, ó Pai, vós sois Santo, <br>
                   fonte de toda santidade. <br>
                   Santificai, pois,estes dons, <br>
@@ -273,7 +277,6 @@
                 </i> <br>
                 <p class="ms-3">
                   <b>
-                    A assembleia aclama:
                     Todas as vezes que comemos deste pão
                     e bebemos deste cálice,
                     anunciamos, Senhor, a vossa morte,
@@ -497,7 +500,7 @@
               </div>
             </div>
 
-            
+
           </div>
         </div>
       </div>
@@ -516,69 +519,69 @@
   <script src="../js/centralScript.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-    var stickyElement = document.querySelector('.sticky');
-    var stickyStart = 102; // O valor inicial de 'top' para o elemento sticky
+    // Simular Sticky
+    document.addEventListener("DOMContentLoaded", function () {
+      var stickyElement = document.querySelector('.sticky');
+      var stickyStart = 102; // O valor inicial de 'top' para o elemento sticky
 
-    function handleScroll() {
+      function handleScroll() {
         var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         var topValue = Math.max(0, stickyStart - scrollTop); // Não permite valores menores que 0
 
         stickyElement.style.top = topValue + 'px'; // Ajusta o 'top' baseado no scroll
-    }
+      }
 
-    window.addEventListener('scroll', handleScroll); // Ouve o evento de scroll
-});
+      window.addEventListener('scroll', handleScroll); // Ouve o evento de scroll
+    });
+    // Sticky no tamanho de container
+    document.addEventListener("DOMContentLoaded", function () {
+      var stickyElement = document.querySelector('.sticky');
+      var container = document.querySelector('.container') || document.querySelector('.container-fluid');
 
-document.addEventListener("DOMContentLoaded", function() {
-    var stickyElement = document.querySelector('.sticky');
-    var container = document.querySelector('.container') || document.querySelector('.container-fluid');
-
-    function resizeSticky() {
+      function resizeSticky() {
         if (container) {
-            var containerStyles = window.getComputedStyle(container);
-            var containerPaddingLeft = parseInt(containerStyles.paddingLeft, 10);
-            var containerPaddingRight = parseInt(containerStyles.paddingRight, 10);
+          var containerStyles = window.getComputedStyle(container);
+          var containerPaddingLeft = parseInt(containerStyles.paddingLeft, 10);
+          var containerPaddingRight = parseInt(containerStyles.paddingRight, 10);
 
-            // Definir a largura do elemento sticky para ser igual à largura do contêiner menos os paddings
-            stickyElement.style.width = `${container.clientWidth}px`;
+          // Definir a largura do elemento sticky para ser igual à largura do contêiner menos os paddings
+          stickyElement.style.width = `${container.clientWidth}px`;
 
-            // Obter o left do contêiner e adicionar o padding esquerdo para alinhar corretamente
-            var containerLeft = container.getBoundingClientRect().left + containerPaddingLeft;
-            stickyElement.style.left = `${containerLeft}px`;
+          // Obter o left do contêiner e adicionar o padding esquerdo para alinhar corretamente
+          var containerLeft = container.getBoundingClientRect().left + containerPaddingLeft;
+          stickyElement.style.left = `${containerLeft}px`;
         }
-    }
+      }
 
-    // Ajustar a largura e o left quando a página é carregada e quando a janela é redimensionada
-    resizeSticky();
-    window.addEventListener('resize', resizeSticky);
-});
+      // Ajustar a largura e o left quando a página é carregada e quando a janela é redimensionada
+      resizeSticky();
+      window.addEventListener('resize', resizeSticky);
+    });
+    // Inserir classe .sticky-is
+    document.addEventListener("DOMContentLoaded", function () {
+      var stickyElement = document.querySelector('.sticky'); // Selecione o elemento que deseja tornar "sticky"
+      var sentinel = document.createElement(
+      'div'); // Crie um sentinel para saber quando o elemento deve ser "sticky"
 
+      // Insira o sentinel antes do elemento sticky na página
+      stickyElement.parentNode.insertBefore(sentinel, stickyElement);
 
-
-document.addEventListener("DOMContentLoaded", function() {
-    var stickyElement = document.querySelector('.sticky'); // Selecione o elemento que deseja tornar "sticky"
-    var sentinel = document.createElement('div'); // Crie um sentinel para saber quando o elemento deve ser "sticky"
-
-    // Insira o sentinel antes do elemento sticky na página
-    stickyElement.parentNode.insertBefore(sentinel, stickyElement);
-
-    var observer = new IntersectionObserver(function(entries) {
+      var observer = new IntersectionObserver(function (entries) {
         // Callback que será executado quando o sentinel intersectar com a viewport
         entries.forEach(entry => {
-            if (entry.intersectionRatio === 0) {
-                stickyElement.classList.add('sticky-is');
-            } else if (entry.intersectionRatio === 1) {
-                stickyElement.classList.remove('sticky-is');
-            }
+          if (entry.intersectionRatio === 0) {
+            stickyElement.classList.add('sticky-is');
+          } else if (entry.intersectionRatio === 1) {
+            stickyElement.classList.remove('sticky-is');
+          }
         });
-    }, { threshold: [0, 1] });
+      }, {
+        threshold: [0, 1]
+      });
 
-    // Observe o sentinel
-    observer.observe(sentinel);
-});
-
-
+      // Observe o sentinel
+      observer.observe(sentinel);
+    });
   </script>
 
 
