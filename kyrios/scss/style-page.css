@@ -74,7 +74,7 @@ body {
   border-color: var(--primary);
 }
 
-#sentinel {
+.sentinel {
   height: 74px;
   width: 100%;
 }
@@ -99,10 +99,6 @@ p {
 i {
   color: var(--primary);
   font-style: normal;
-}
-
-b {
-  color: var(--secondary);
 }
 
 .title {
