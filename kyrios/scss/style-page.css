@@ -33,6 +33,11 @@
   --accent: #d4b605;
 }
 
+img {
+  width: 100%;
+  max-width: 300px;
+}
+
 body {
   color: #111;
   background: #f0f0f0;

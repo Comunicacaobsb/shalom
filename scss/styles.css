@@ -295,6 +295,12 @@ body {
   height: 25%;
 }
 
+/* LARGURA */
+.w-fit-content {
+  width: -moz-fit-content !important;
+  width: fit-content !important;
+}
+
 /* BOTÕES */
 .btn-primary {
   font-size: var(--font-geral);

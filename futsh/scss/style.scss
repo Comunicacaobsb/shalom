@@ -1,0 +1,118 @@
+@import '../../scss/colors.scss';
+@import '../../scss/styles.css';
+
+
+:root {
+    --bs-link-color: $primary;
+    --bs-link-hover-color: $primary;
+
+    --color-1: #111;
+    --color-2: #222;
+    --color-3: #f0f0f0;
+}
+
+img {
+    width: 100%;
+    max-width: 300px;
+}
+
+.form-control {
+    appearance: auto;
+}
+
+.dataTable {
+    border-collapse: separate;
+    border-spacing: 0.25rem !important;
+
+    th {
+        max-width: 70px !important;
+        min-width: 70px !important;
+
+        &:nth-child(1) {
+            width: 200px !important;
+            min-width: 200px !important;
+            
+        }
+    }
+
+    td {
+        border-radius: .5rem;
+        text-align: center;
+        background-color: $cinza-50;
+
+        &:nth-child(1) {
+            background: var(--primary) !important;
+            text-align: start;
+            font-weight: bold;
+            color: var(--color-3);
+        }
+    }
+
+    &s_info{
+        display: none;
+    }
+}
+
+.ranking-table {
+    counter-reset: rowNumber;
+    /* Inicializa um contador */
+
+    tbody {
+        tr {
+            counter-increment: rowNumber;
+
+            /* Incrementa o contador para cada linha */
+            td:nth-child(1):before {
+                content: counter(rowNumber) "°";
+                padding: 0.25rem;
+                background: var(--color-2);
+                color: var(--color-3);
+                width: 34px;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                margin-right: 0.5rem;
+                border-radius: 0.25rem;
+            }
+            &:nth-child(1){
+                td:nth-child(1):before {
+                    background: var(--secondary);
+                    color: var(--color-2);
+                }
+            }
+            &:nth-child(2),&:nth-child(3){
+                td:nth-child(1):before {
+                    background: var(--color-3);
+                    color: var(--color-2);
+                }
+            }
+        }
+    }
+
+    // thead{
+    //     tr {
+    //         th:nth-child(1):before {
+    //             content: "#";
+    //             /* Exibe o número da linha */
+    //             padding-right: 8px;
+    //             /* Espaçamento à direita do número */
+    //             /* Estilize conforme necessário */
+    //         }
+    //     }
+    // }
+
+
+}
+
+.DTFC_LeftWrapper{
+    thead{
+        opacity: 0;
+        th{
+
+            &:before, &:after{
+                content: '';
+                opacity: 0;
+            }
+        }
+    }
+}
