@@ -1,0 +1,390 @@
+@import url(styles.scss);
+.bargemo {
+  font-family: "Bargemo", sans-serif;
+}
+
+.saudagar {
+  font-family: "Saudagar", "serif";
+}
+
+#home {
+  position: relative;
+  background-color: var(--primary);
+}
+#home .img-logo {
+  max-width: 400px;
+  width: 50%;
+}
+#home .gratuita {
+  width: 220px;
+}
+#home .link {
+  text-decoration: none;
+  color: var(--branco) !important;
+}
+#home .element {
+  position: absolute;
+}
+#home .element.balao1 {
+  left: 10%;
+  bottom: -8%;
+}
+@media (max-width: 675px) {
+  #home .element.balao1 {
+    left: 5%;
+    bottom: -15%;
+  }
+}
+#home .element.balao1 img {
+  width: 150px;
+}
+@media (max-width: 675px) {
+  #home .element.balao1 img {
+    width: 100px;
+  }
+}
+@media (max-width: 425px) {
+  #home .element.balao1 img {
+    width: 70px;
+  }
+}
+#home .element.balao2 {
+  right: 10%;
+  top: 2%;
+}
+@media (max-width: 675px) {
+  #home .element.balao2 {
+    right: 5%;
+  }
+}
+#home .element.balao2 img {
+  width: 150px;
+}
+@media (max-width: 675px) {
+  #home .element.balao2 img {
+    width: 100px;
+  }
+}
+@media (max-width: 425px) {
+  #home .element.balao2 img {
+    width: 70px;
+  }
+}
+#home #programacao .table {
+  border-spacing: 3px;
+  border-collapse: separate;
+  vertical-align: middle;
+  text-align: center;
+}
+#home #programacao .table th, #home #programacao .table td {
+  border-radius: 0.25rem;
+  color: var(--primary);
+}
+#home #programacao .table thead th {
+  background-color: var(--secondary);
+  color: var(--branco);
+  font-weight: 900;
+}
+#home #localizacao .card {
+  width: 100%;
+  max-width: 600px;
+}
+#home .card {
+  height: 100%;
+  background: var(--branco);
+  border: 0;
+}
+#home .card .card-body .fa-solid {
+  font-size: 3rem;
+  margin-right: 1rem;
+  color: var(--secondary);
+}
+#home .card .card-body .card-title {
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 0;
+}
+#home .card .card-body .card-text {
+  color: var(--primary-500);
+}
+#home .card .card-footer {
+  border: 0;
+  background-color: var(--cinza-300);
+  text-align: end;
+}
+
+#cardapio .height-184 {
+  height: 184px;
+}
+#cardapio .height-70 {
+  height: 70px;
+}
+#cardapio .title {
+  height: 48px;
+}
+#cardapio .title.comidas {
+  height: 62px;
+}
+#cardapio .card {
+  height: 100%;
+  background: var(--branco);
+  border: 0;
+}
+#cardapio .card-body, #cardapio .card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: start;
+  padding: 0.5rem 1rem;
+}
+#cardapio .card-title, #cardapio .card-subtitle {
+  margin: 0;
+  font-weight: 600;
+}
+#cardapio .card-title {
+  color: var(--primary);
+  margin-right: 0.5rem;
+}
+#cardapio .card-subtitle {
+  color: var(--primary-500);
+}
+#cardapio .card-footer {
+  border: var(--transparente);
+}
+#cardapio .card-text {
+  margin-bottom: 0;
+  margin-right: 10px;
+}
+#cardapio .preco::before {
+  content: "R$";
+  font-size: 80%;
+}
+#cardapio .btn-outline-primary {
+  font-size: 0.875rem;
+  padding: 0.1rem 0.75rem;
+}
+#cardapio .quant:not(:disabled):not(.disabled).active, #cardapio .quant:not(:disabled):not(.disabled):active, .show > #cardapio .quant.dropdown-toggle, #cardapio .quant:hover {
+  background-color: transparent;
+  border-color: var(--primary);
+  color: var(--secondary);
+  font-size: 100%;
+}
+#cardapio .small, #cardapio small {
+  font-size: 0.8em;
+}
+#cardapio .carrinho {
+  z-index: 99999;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  border-radius: 35px;
+  display: flex;
+  align-items: end;
+  background-color: var(--accent);
+}
+#cardapio .carrinho .carrinho-infos {
+  padding: 0rem;
+  opacity: 0;
+  height: 50px;
+  width: 0px;
+  transition: 0.3s all ease-in-out;
+}
+#cardapio .carrinho .carrinho-infos .total, #cardapio .carrinho .carrinho-infos .preco {
+  transform: scale(0, 0);
+}
+#cardapio .carrinho .carrinho-infos .total {
+  border-bottom: 2px solid;
+  padding-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#cardapio .carrinho .carrinho-infos .total .atualizar {
+  font-size: 1.4rem;
+  transition: 0.3s all ease-in-out;
+}
+#cardapio .carrinho .carrinho-infos .total .atualizar:hover {
+  transform: rotate(30deg);
+}
+#cardapio .carrinho .carrinho-infos .total .atualizar:active {
+  transform: rotate(360deg);
+}
+#cardapio .carrinho .carrinho-infos .total-cart {
+  color: var(--secondary);
+  font-weight: bold;
+}
+#cardapio .carrinho .carrinho-infos.show {
+  padding: 1.5rem;
+  opacity: 1;
+  height: auto;
+  width: auto;
+}
+#cardapio .carrinho .carrinho-infos.show .total, #cardapio .carrinho .carrinho-infos.show .preco {
+  transform: scale(1, 1);
+}
+#cardapio .carrinho .btn {
+  border-radius: 35px;
+  height: 70px;
+  width: 70px;
+  font-size: 1.5rem;
+}
+#cardapio .carrinho .btn:hover {
+  font-size: 1.4rem;
+}
+
+#doe .card-text {
+  color: var(--secondary);
+  -webkit-user-select: all;
+     -moz-user-select: all;
+          user-select: all;
+  background: none;
+  border: none;
+  resize: none;
+  display: inline;
+  height: 30px;
+}
+#doe .copy-html.success::before {
+  content: "Pix copiado com sucesso!" !important;
+  padding: 0 10px;
+}
+
+#dados #navbar-dados .navbar-brand img {
+  height: 80px;
+}
+@media (max-width: 992px) {
+  #dados #navbar-dados .navbar-brand img {
+    height: 42px;
+  }
+}
+@media (max-width: 992px) {
+  #dados #navbar-dados .navbar-brand {
+    margin: auto;
+  }
+}
+#dados #navbar-dados .nav-item {
+  text-align: end;
+}
+#dados #navbar-dados .nav-item .nav-link {
+  display: inline-flex;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--branco);
+  color: var(--branco) !important;
+  transition: 0.3s all ease-in-out;
+  margin: 0 5px;
+}
+#dados #navbar-dados .nav-item .nav-link:hover {
+  border: 1px solid var(--primary);
+  filter: none;
+}
+#dados #navbar-dados .nav-item .nav-link.active {
+  background: var(--secondary);
+  border: 1px solid var(--secondary);
+  color: var(--branco);
+}
+#dados .height-106 {
+  height: 106px;
+}
+#dados .titulo-dados {
+  z-index: -1;
+  position: relative;
+}
+#dados .py-2rem {
+  padding: 2rem 0;
+}
+@media (max-width: 370px) {
+  #dados .nav-link {
+    padding: 0.35rem 0.5rem;
+  }
+}
+#dados .titulo-dia {
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--branco);
+  font-weight: 800;
+}
+#dados .descricao {
+  color: var(--branco);
+  margin: 0;
+}
+#dados .btn-outline-secondary {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  transition: 0.3s all ease-in-out;
+  margin: 0 5px;
+}
+#dados .btn-outline-secondary:hover {
+  color: var(--branco);
+}
+#dados .btn-outline-secondary.active {
+  background: var(--primary);
+  color: var(--branco);
+}
+#dados .scroll {
+  overflow-x: scroll;
+}
+#dados .card {
+  max-width: 605px !important;
+  margin: auto;
+}
+#dados .card .tab-pane {
+  overflow-x: scroll;
+  text-align: center;
+}
+#dados .card .nav-item {
+  width: 50%;
+}
+#dados .card .nav-item .nav-link {
+  background-color: var(--transparente);
+  width: 100%;
+  color: var(--primary);
+  font-weight: bold;
+  border-radius: 0;
+  border-bottom: 2px solid var(--transparente);
+  transition: 0.3s all ease-in-out;
+}
+#dados .card .nav-item .nav-link.active {
+  color: var(--secondary);
+  background-color: var(--transparente);
+  border-bottom: 2px solid var(--secondary) !important;
+}
+#dados .card .nav-item .nav-link:hover {
+  border-bottom: 2px solid var(--primary);
+}
+#dados .dados h1, #dados .dados h2, #dados .dados h3, #dados .dados h4, #dados .dados h5, #dados .dados h6 {
+  margin: 0;
+}
+#dados .dados .icon {
+  width: 68px;
+  margin-right: 1rem;
+  display: flex;
+  justify-content: center;
+}
+#dados .dados .icon .fa-solid {
+  font-size: 4.25rem;
+  color: var(--secondary);
+}
+#dados .dados .pequeno {
+  font-size: 90%;
+}
+#dados .dados .pequeno i {
+  font-size: 70%;
+  margin-right: 0.25rem;
+}
+#dados .dados h5 {
+  color: var(--primary-500);
+  border-bottom: 2px solid var(--primary-500);
+  padding-left: 32.35px;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+#dados .dados .small, #dados .dados small {
+  font-size: 0.75em;
+}
+#dados .dados p.accent i {
+  color: var(--secondary) !important;
+}
+#dados .dados li span, #dados .dados .small span {
+  color: var(--primary-500);
+}
+#dados .dados li::marker {
+  color: var(--secondary);
+}/*# sourceMappingURL=style-pages.css.map */

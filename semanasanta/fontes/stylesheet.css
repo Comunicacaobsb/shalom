@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'Saudagar';
+    src: url('Saudagar.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Bargemo';
+    src: url('Bargemo.otf') format('opentype');
+    font-weight: 500;
+    font-style:normal;
+}

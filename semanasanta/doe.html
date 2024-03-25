@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="../css/bootstrap.min.css" >
+  <link rel="stylesheet" href="fontes/stylesheet.css">
+  <link rel="stylesheet" href="sass/styles.css">
+  <link rel="stylesheet" href="sass/style-pages.css">
+  <link rel="stylesheet" href="https://kit.fontawesome.com/ca98b537e7.css" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/ca98b537e7.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="../favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="../favicon_io/site.webmanifest">
+  
+
+    <title>Doação | Semana Santa</title>
+
+
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J2S6TM4YRH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-J2S6TM4YRH');
+</script>
+</head>
+<body id="doe" class="bg">
+    
+    <section id="menu" class="nav-section" data-aos="fade-up"></section>
+
+
+    <section id="content" class="s-center py-5">
+
+      <div class="container">
+        <div class="row">
+          <div class="col h-100 center-s py-5">
+            <div class="card">
+              <div class="card-body ">
+                <img src="images/qr-code.jpeg" class="card-img img-fluid" style="max-width: 300px;">
+                <h5 class="card-title fw-700">Chave Pix</h5>
+                <textarea disabled id="text-html" class="card-text w-100">eventosbrasilia@comshalom.org</textarea>
+                
+              </div>
+              <div class="card-footer">
+                <button class="btn btn-secondary btn-click copy-html" onclick="copyHTML()">Copiar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <footer id="footer" class="w-100 text-end"></footer>
+
+  <script src="../script/jquery.3.5.1.js"></script>
+  <script src="../script/bootstrap.bundle.min.js"></script>
+
+  <script>
+    $("#menu").load("menu.html");
+    $("#footer").load("footer.html");
+  </script>
+
+  <script>
+    /* -- BTN Copiar código HTML -- */
+/* -- BTN Copiar código -- */
+
+function copyHtmlSuccess() {
+    var textoSucesso = document.querySelector('.copy-html');
+    textoSucesso.classList.toggle('success');
+    
+};
+
+function copyHTML() {
+    /* Capturar campo texto em variável */
+    var copyText = document.getElementById("text-html");
+    
+    /* Selecionar campo texto */
+    copyText.select();
+    copyText.setSelectionRange(0, 999999); /* For mobile devices */
+
+    
+     /* Copiar para clipboard */
+     document.execCommand("copy");
+    navigator.clipboard.writeText(copyText.value);
+    
+    
+    copyHtmlSuccess();
+    setTimeout(copyHtmlSuccess, 3000);
+    
+};
+
+/* -- END BTN Copiar código -- */
+  </script>
+
+</body>
+
+</html>

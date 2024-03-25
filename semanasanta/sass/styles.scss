@@ -1,0 +1,690 @@
+@import url(../fontes/stylesheet.css);
+
+  $primary-200:var(--primary-200);
+  $primary-300:var(--primary-300);
+  $primary:var(--primary);
+  $primary-500:var(--primary-500);
+  $primary-600:var(--primary-600);
+  $secondary-200:var(--secondary-200);
+  $secondary-300:var(--secondary-300);
+  $secondary:var(--secondary);
+  $secondary-500:var(--secondary-500);
+  $secondary-600:var(--secondary-600);
+  $accent:var(--accent);
+  $branco:var(--branco);
+  $cinza-300:var(--cinza-300);
+  $cinza-400:var(--cinza-400);
+  $cinza-500:var(--cinza-500);
+  $preto:var(--preto);
+  $sombra:var(--sombra);
+  $transparente:var(--transparente);
+
+  :root{   
+    --primary-200:#f1a68b;
+    --primary-300:#b26c52; 
+    --primary:#9b5a43;
+    --primary-500:#864b35;
+    --primary-600:#4f2515;
+    --secondary-200:#fff3e6;
+    --secondary-300:#f8e7d3;
+    --secondary:#ebe1d5;
+    --secondary-500:#d6cabb;
+    --secondary-600:#9c8e7c;
+    --accent:#de5a4a;
+    --branco:#FFF;
+    --cinza-300:#F9F9F9;
+    --cinza-400:#D1D1D1;
+    --cinza-500:#5E5E5E;
+    --preto:#000;
+    --sombra:#3c3c3c0d;
+    --transparente:rgba(0,0,0,0);
+    --font-primary:'Montserrat', sans-serif; 
+    --font-secondary:'Bargemo', sans-serif; 
+  }
+
+  
+  /* 
+  --------------------------------
+  GERAIS
+  --------------------------------
+  */
+
+  /*
+
+  SCROLLBAR
+  * {
+    
+    scrollbar-width: none;
+    scrollbar-color: transparent;
+  }
+  
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0px;
+    height: 0px; // A altura só é vista quando a rolagem é horizontal 
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: transparent;
+    padding: 0px;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background-color: transparent;
+  }
+  */
+
+  html{
+    width: 100vw;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    width: 100vw;
+    font-family: var(--font-primary);
+    overflow-x: hidden;
+    color: $primary!important;
+  }
+
+  /* FAMÍLIAS DAS FONTES */
+  .ft-pri{
+    font-family: var(--font-primary); 
+  }
+
+  .ft-sec{
+    font-family: var(--font-secondary); 
+  }
+
+  /* TAMANHOS DAS FONTES */
+
+  h{
+    &1{
+      font-size: 3rem;
+    }
+  }
+  
+  /* COR DAS FONTES */
+  .c-{
+
+    &primary-200{
+      color:$primary-200!important;
+    }
+    &primary-300{
+      color:$primary-300!important;
+    }
+    &primary{
+      color:$primary!important;
+    }
+    &primary-500{
+      color:$primary-500!important;
+    }
+    &primary-600{
+      color:$primary-600!important;
+    }
+    &secondary-200{
+      color:$secondary-200!important;
+    }
+    &secondary-300{
+      color:$secondary-300!important;
+    }
+    &secondary{
+      color:$secondary!important;
+    }
+    &secondary-500{
+      color:$secondary-500!important;
+    }
+    &secondary-600{
+      color:$secondary-600!important;
+    }
+    &accent{
+      color:$accent!important;
+    }
+    &branco{
+      color:$branco!important;
+    }
+    &cinza-500{
+      color:$cinza-500!important;
+    }
+    &cinza-300{
+      color:$cinza-300!important;
+    }
+    &cinza-400{
+      color:$cinza-400!important;
+    }
+    &preto{
+      color:$preto!important;
+    }
+  }
+
+  /* COR DOS FUNDOS */
+  .bg-{
+
+    &primary{
+      background-color:$primary!important;
+    }
+    &primary-500{
+      background-color:$primary-500!important;
+    }
+    &primary-600{
+      background-color:$primary-600!important;
+    }
+    &secondary{
+      background-color:$secondary!important;
+    }
+    &accent{
+      background-color:$accent!important;
+    }
+    &branco{
+      background-color:$branco!important;
+    }
+    &cinza-500{
+      background-color:$cinza-500!important;
+    }
+    &cinza-300{
+      background-color:$cinza-300!important;
+    }
+    &cinza-400{
+      background-color:$cinza-400!important;
+    }
+    &preto{
+      background-color:$preto!important;
+    }
+  }
+
+  /* COR DA BORDA */
+  /* PESO DA BORDA */
+  .border-{
+    &primary{
+      border-color:$primary!important;
+    }
+    &primary-500{
+      border-color:$primary-500!important;
+    }
+    &primary-600{
+      border-color:$primary-600!important;
+    }
+    &secondary{
+      border-color:$secondary!important;
+    }
+    &accent{
+      border-color:$accent!important;
+    }
+    &branco{
+      border-color:$branco!important;
+    }
+    &cinza-500{
+      border-color:$cinza-500!important;
+    }
+    &cinza-300{
+      border-color:$cinza-300!important;
+    }
+    &cinza-400{
+      border-color:$cinza-400!important;
+    }
+    &preto{
+      border-color:$preto!important;
+    }
+    
+    &1{
+      border-style:solid; 
+      border-width: 1px;
+    }
+    &2{
+      border-style:solid; 
+      border-width: 2px;
+    }
+    &3{
+      border-style:solid; 
+      border-width: 3px;
+    }
+    &4{
+      border-style:solid; 
+      border-width: 4px;
+    }
+    &5{
+      border-style:solid; 
+      border-width: 5px;
+    }
+
+    &radius-05{
+      border-radius: .5rem;
+    }
+    &radius-075{
+      border-radius: .75rem;
+    }
+    &radius-1{
+      border-radius: 1rem;
+    }
+    &radius-15{
+      border-radius: 1.5rem;
+    }
+    &radius-2{
+      border-radius: 2rem;
+    }
+    &radius-25{
+      border-radius: 2.5rem;
+    }
+  }
+
+  /* PESO DAS FONTES */
+  .fw{
+    &-100{
+      font-weight: 100!important;
+    }
+    &-200{
+      font-weight: 200!important;
+    }
+    &-300{
+      font-weight: 300!important;
+    }
+    &-500{
+      font-weight: 500!important;
+    }
+    &-600{
+      font-weight: 600!important;
+    }
+    &-700{
+      font-weight: 700!important;
+    }
+    &-800{
+      font-weight: 800!important;
+    }
+    &-900{
+      font-weight: 900!important;
+    }
+  }
+
+
+  /* ALINHAMENTO */
+  .center-{
+    &s{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    &v{
+      display: flex;
+      align-items: center;
+    }
+    &h{
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  /* ALTURA */
+  .h-{
+    &fit{
+      height: fit-content;
+    }
+    &100{
+      height: 100%;
+    }
+    &75{
+      height: 75%;
+    }
+    &50{
+      height: 50%;
+    }
+    &25{
+      height: 25%;
+    }
+  }
+
+  /* LARGURA */
+  .w-{
+    &fit{
+      width: fit-content;
+    }
+    &100{
+      width: 100%;
+    }
+    &75{
+      width: 75%;
+    }
+    &50{
+      width: 50%;
+    }
+    &25{
+      width: 25%;
+    }
+  }
+
+
+  /* BOTÕES */
+  .btn-{
+    &primary{
+      font-size: var(--font-geral);
+      border-color: $primary;
+      background-color: $primary;
+      color: $branco;
+      font-weight: bold;
+      transition: .5s all ease-in-out;
+  
+      &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
+        background: $secondary;
+        border-color: $secondary;
+        color: $primary;
+      }
+  
+      &:focus-visible{
+        outline: $primary auto 1px;
+      }
+  
+      &.focus, &:focus, &:not(:disabled):not(.disabled).active:focus, &:not(:disabled):not(.disabled):active:focus, .show>&.dropdown-toggle:focus{
+        box-shadow: 0 0 0 0rem $primary;
+      }
+    }
+    &secondary{
+      font-size: var(--font-geral);
+      border-color: $accent;
+      background-color: $accent;
+      color: $cinza-300;
+      transition: .5s all ease-in-out;
+  
+      &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
+        border-color: $secondary;
+        background-color: $secondary;
+        color: $cinza-300;
+      }
+  
+      &:focus-visible{
+        outline: 0px;
+      }
+  
+      &.focus, &:focus, &:not(:disabled):not(.disabled).active:focus, &:not(:disabled):not(.disabled):active:focus, .show>&.dropdown-toggle:focus{
+        box-shadow: 0 0 0 0rem $accent;
+      }
+    }
+    &outline-primary{
+      font-size: var(--font-geral);
+      border-color: $primary;
+      color: $secondary;
+      transition: .5s all ease-in-out;
+  
+      &:not(:disabled):not(.disabled).active, &:not(:disabled):not(.disabled):active, .show>&.dropdown-toggle, &:hover{
+        background-color: $primary;
+        border-color: $primary;
+        color: $branco;
+        font-size: calc(var(--font-geral) + .1rem);
+      }
+  
+      &:focus-visible{
+        border: 1px solid $secondary;
+      }
+      
+      &.focus, &:focus, &:not(:disabled):not(.disabled).active:focus, &:not(:disabled):not(.disabled):active:focus, .show>&.dropdown-toggle:focus{
+        box-shadow: 0 0 0 0rem $accent;
+      }
+      &.active:focus{
+        border: 1px solid $secondary;
+      }
+    }
+    &click{
+      box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.2);
+      transition:all 0.3s ease-in-out;
+  
+      &:hover{
+        transform: translateX(2px) translateY(2px);
+        box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      }
+    
+      &:active{
+        transform: translateX(4px) translateY(4px);
+        box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
+      }
+  
+    }
+    &click-img{
+      box-shadow: none!important;
+      transition:all 0.3s ease-in-out;
+      filter: drop-shadow(3px 3px 4px rgba(0, 0, 0, 0.2));
+  
+      &:hover{
+        transform: translateX(2px) translateY(2px);
+        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.2));
+      }
+      
+      &:active{
+        transform: translateX(4px) translateY(4px);
+        filter: drop-shadow(0px 0px 0px rgba(0, 0, 0, 0.2));
+      }
+    }
+
+  }
+
+  .card{
+    box-shadow: 0 16px 16px $sombra, 0 8px 8px $sombra, 0 4px 4px $sombra, 0 0 10px $sombra;
+
+    //box-shadow: rgba(173, 64, 1, 0.35) 0px 5px 15px;
+    //box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    //box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 28px 0px, rgba(0, 0, 0, 0.1) 0px 2px 4px 0px, rgba(255, 255, 255, 0.05) 0px 0px 0px 1px inset;
+    //box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
+
+
+    .card-footer{
+      text-align: end;
+    }
+  }
+
+  .bg{
+    background-image: url(../images/bg.png);
+    background-attachment: fixed;
+  }
+  
+
+  #menu{
+    .navbar-brand img{
+      height: 40px;
+    }
+    .nav-link{
+      color: $primary!important;
+      text-align: end;
+  
+      &:hover{
+        filter: brightness(0.8);
+      }
+    }
+
+    ul.navbar-nav{
+      .nav-link{
+        border-bottom: 2px solid transparent;
+        width: fit-content;
+        margin-left: auto;
+        transition: all .3s ease-in-out;
+        &:hover{
+          
+          border-bottom: 2px solid $accent;
+        }
+        &:active{
+          margin-right: 6px;
+        }
+      }
+      @media only screen and (max-width:991px) {
+        background: var(--primary);
+        padding: 1rem;
+        border-radius: 1rem;
+      }
+    }
+
+    .bg-shadow{
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(10px) brightness(0.9);
+      background-color: transparent;
+      //background-color: #d05e00aa;
+      position: absolute;
+      top: 0%;
+      bottom: 0%;
+      left: 0%;
+      right: 0%;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .navbar-toggler {
+      border: 0;
+      box-shadow: none!important;
+    }
+    .navbar-toggler-icon {
+      background-image: url(../images/menu.svg) !important;
+
+      &:hover {
+       fill: $accent!important;
+      }
+    }
+  }
+  
+  
+  #content{
+    min-height: 50vh;
+
+
+    .sect{
+      top:106px;
+    }
+  }
+  
+  
+  footer{
+  position: relative;
+    
+    .jijoca{
+      height: 30px;
+    }
+    .zac{
+      height: 23px;
+    }
+
+    #shalom{
+      height: 40px;
+      .logo-color{
+        fill: $primary;
+      }
+    }
+    .btn{
+      font-size: .8rem;
+    }
+    #insta, #comshalom{
+      height: 16px;
+      width: 16px;
+      path{
+        fill: $primary;
+      }
+    }
+    
+    .position-absolute{
+      bottom: 0;
+    }
+  }
+  
+
+
+  
+
+  
+
+.preloader{
+  background-color: $branco;
+  bottom: 0;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 99999999;
+  .preview{
+    transform: scale(1.5);
+  }
+  
+  .icone{
+    transform: scale(2.5);
+  }
+
+  g{
+    transform: scale(.25);
+  }
+  span{
+    background: #e1e1e1;
+    border-radius: 100%;
+    height: 60px;
+    width: 200px;
+    line-height: 60px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+    color: #ffffff;
+    font-size: 24px;
+    margin: auto;
+    -webkit-animation: mymove 1.5s infinite linear;
+    animation: mymove 1.5s infinite linear;
+    img{
+      margin-top: 0px;
+    }
+    p{
+      color:#5f5f5f;
+    }
+  }
+  .content-preloader{
+    position: relative;
+    text-align: center;
+    margin-top: 15%;
+    width: 80px;
+    margin-left: auto;
+    margin-right: auto;
+    @media (max-width: 500px){
+      margin-top: 70%
+    }
+    .icone{
+      position: absolute;
+      top: 30px;
+      left: 34px;
+    }
+  }
+}
+.spinner{
+  --spinner-size: 5;
+  --line-color: #52001f;
+  --line-alpha: 1;
+  --ring-color: transparent;
+  --ring-alpha: 1;
+  --ring-size: 2.4;
+  font-size: calc(var(--spinner-size) * 1em);
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  .line{
+    fill: none;
+    stroke: var(--line-color);
+    stroke-width: var(--ring-size);
+    opacity: var(--line-alpha);
+    stroke-linecap: round;
+    transform-origin: 50% 50%;
+    transform: rotate3d(0, 0, 1, 0deg);
+    animation: 2156ms spinner-arc ease-in-out infinite, 1829ms spinner-rotate linear infinite;
+  }
+  .ring{
+    fill: none;
+    stroke: var(--ring-color);
+    stroke-width: var(--ring-size);
+    opacity: var(--ring-alpha);
+  }
+}
+@keyframes spinner-rotate{
+  to{
+    transform: rotate3d(0, 0, 1, 360deg);
+  }
+}
+@keyframes spinner-arc{
+  from{
+    stroke-dasharray: 0 150; stroke-dashoffset: 0;
+  }
+    to{
+      stroke-dasharray: 100 150; stroke-dashoffset: -140;
+    }
+}
+
