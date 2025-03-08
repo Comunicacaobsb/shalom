@@ -106,7 +106,7 @@ Gtag
     // Carrega o script gtag.js
     var gtagScript = document.createElement('script');
     gtagScript.async = true;
-    gtagScript.src = "https://www.googletagmanager.com/gtag/js?id=G-QTBP5720DJ";
+    gtagScript.src = "https://www.googletagmanager.com/gtag/js?id=G-YXNT4YQP1H";
     
     document.head.appendChild(gtagScript);
   
@@ -117,9 +117,9 @@ Gtag
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
   
-      gtag('config', 'G-QTBP5720DJ');
+      gtag('config', 'G-YXNT4YQP1H');
     `;
     
     document.head.appendChild(inlineScript);
   })();
-  
+//   G-QTBP5720DJ
