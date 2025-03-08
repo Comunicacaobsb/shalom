@@ -15,7 +15,7 @@
 
     <title>Asa Sul | Shalom Brasília</title>
 
-    <meta http-equiv="refresh" content="0; URL='https://brasilia.comshalom.org/asasul'"/>
+    <!-- <meta http-equiv="refresh" content="0; URL='https://brasilia.comshalom.org/asasul'"/> -->
 
 </head>
 
@@ -27,5 +27,47 @@
 
 </body>
 
+<!-- 
+ ?sala=auditorio
+ ?sala=salas
+ ?sala=liturgia
+ ?sala=liturgiakyrios
+ ?sala=depositos
+ ?sala=seccomunitaria
+ ?sala=coworking
+ ?sala=musica
+ ?sala=cap
+ ?sala=bazar
+ ?sala=limpeza
+ ?sala=economo
+ ?sala=economato
+ ?sala=financeiro
+ ?sala=copa
+ ?sala=rl
+ ?sala=ar
+ 
 
+-->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Captura o parâmetro 'destino' da URL
+    const params = new URLSearchParams(window.location.search);
+    const destino = params.get("destino");
+
+    // Dicionário de redirecionamento
+    const redirecionamentos = {
+        'ar': 'https://wa.me/5561981988644?text=Gostaria%20de%20falar%20com%20a%20Respons%C3%A1vel%20Local%20de%20Bras%C3%ADlia',
+        'economo': 'https://wa.me/5561983408398?text=Gostaria%20de%20falar%20com%20o%20Ec%C3%B4nomo%20Local%20de%20Bras%C3%ADlia',
+    };
+
+    // Redirecionar se o destino for válido
+    if (destino && redirecionamentos[destino.toLowerCase()]) {
+        window.location.href = redirecionamentos[destino.toLowerCase()];
+    } else {
+        // Página padrão ou erro
+        window.location.href = '/asasul';
+    }
+});
+
+</script>
 </html>
