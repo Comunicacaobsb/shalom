@@ -45,14 +45,17 @@
  ?sala=copa
  ?sala=rl
  ?sala=ar
- 
+
+ ?sala=atencao
+ ?sala=sugestao
+ ?sala=doacao
 
 -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     // Captura o parâmetro 'destino' da URL
     const params = new URLSearchParams(window.location.search);
-    const destino = params.get("destino");
+    const destino = params.get("sala");
 
     // Dicionário de redirecionamento
     const redirecionamentos = {
