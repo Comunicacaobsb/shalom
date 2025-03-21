@@ -4,19 +4,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    
-    <script src="../js/header.js"></script>
 
-    <meta property="og:site_name" content="Shalom Brasília">
-    <meta property="og:title" content="Shalom Brasília" />
-    <meta property="og:description" content="Acesse tudo aqui - Mais informações">
-    <meta property="og:image" itemprop="image" content="../images/shalom-asasul.jpg" />
-    <meta property="og:type" content="website" />
 
-    <title>Asa Sul | Shalom Brasília</title>
+  <script src="../js/header.js"></script>
 
-    <!-- <meta http-equiv="refresh" content="0; URL='https://brasilia.comshalom.org/asasul'"/> -->
+  <meta property="og:site_name" content="Shalom Brasília">
+  <meta property="og:title" content="Shalom Brasília" />
+  <meta property="og:description" content="Acesse tudo aqui - Mais informações">
+  <meta property="og:image" itemprop="image" content="../images/shalom-asasul.jpg" />
+  <meta property="og:type" content="website" />
+
+  <title>Salas | Asa Sul | Shalom Brasília</title>
+
+  <!-- <meta http-equiv="refresh" content="0; URL='https://brasilia.comshalom.org/asasul'"/> -->
 
 </head>
 
@@ -60,18 +60,22 @@
 
     // Dicionário de redirecionamento
     const redirecionamentos = {
-        'ar': 'https://wa.me/5561981988644?text=Gostaria%20de%20falar%20com%20a%20Respons%C3%A1vel%20Local%20de%20Bras%C3%ADlia',
-        'economo': 'https://wa.me/5561983408398?text=Gostaria%20de%20falar%20com%20o%20Ec%C3%B4nomo%20Local%20de%20Bras%C3%ADlia',
+      'ar': 'https://wa.me/5561981988644?text=Gostaria%20de%20falar%20com%20a%20Respons%C3%A1vel%20Local%20de%20Bras%C3%ADlia',
+      'economo': 'https://wa.me/5561983408398?text=Gostaria%20de%20falar%20com%20o%20Ec%C3%B4nomo%20Local%20de%20Bras%C3%ADlia',
+      'ar': 'https://wa.me/556192737904?text=Quero%20falar%20com%20o%20Acompanhador%20Regional',
+      'cap': 'https://wa.me/5561982584121?text=Quero%20falar%20com%20a%20Coordenadora%20Apost%C3%B3lica%20de%20Bras%C3%ADlia',
+
     };
 
     // Redirecionar se o destino for válido
     if (destino && redirecionamentos[destino.toLowerCase()]) {
-        window.location.href = redirecionamentos[destino.toLowerCase()];
+      window.location.href = redirecionamentos[destino.toLowerCase()];
     } else {
-        // Página padrão ou erro
-        window.location.href = '/asasul';
+      // Página padrão ou erro
+      window.location.href = '/asasul';
     }
-});
+  });
 
 </script>
+
 </html>
