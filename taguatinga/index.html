@@ -78,6 +78,13 @@
     .card-hero-content .card-title .icon{ fill: #fff; color: #fff; }
     .card-hero-content .list-unstyled{ color: rgba(255,255,255,.95); }
     .card-hero{ box-shadow: 0 16px 40px rgba(32,79,140,.2); }
+    .skeleton{ background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    .skeleton-text{ height: 16px; margin-bottom: 8px; }
+    .skeleton-text:last-child{ margin-bottom: 0; width: 60%; }
+    .hero .skeleton{ background: linear-gradient(90deg, rgba(32,79,140,.1) 25%, rgba(59,116,196,.15) 50%, rgba(32,79,140,.1) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer{ 0%{ background-position: -200% 0; } 100%{ background-position: 200% 0; } }
+    .hero-img{ opacity: 0; transition: opacity .3s ease; }
+    .hero-img.loaded{ opacity: 1; }
     @media (prefers-reduced-motion: reduce){ *{ transition:none!important; animation:none!important; } }
     img[loading="lazy"], iframe[loading="lazy"]{ content-visibility:auto; contain-intrinsic-size:1px 400px; }
   </style>
@@ -88,7 +95,8 @@
   <header class="section">
     <div class="container">
       <div class="hero">
-        <img class="hero-img" src="images/hero.jpg" alt="Shalom Taguatinga" loading="eager" decoding="async">
+        <div class="skeleton" style="position:absolute; inset:0; z-index:0; border-radius:28px;"></div>
+        <img class="hero-img" src="images/hero.jpg" alt="Shalom Taguatinga" loading="eager" decoding="async" onload="this.parentElement.querySelector('.skeleton').style.display='none';">
         <div class="hero-content">
           <h1 class="fw-700 m-0" style="color:#fff; font-size:clamp(28px,3.6vw,44px); letter-spacing:-.02em;">Shalom Taguatinga</h1>
           <p class="subtitle">Centro de Evangelização • Informações oficiais</p>
@@ -252,11 +260,13 @@
             <div class="card-body">
               <h5 class="card-title title-icon mb-4"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4Zm0 4h16v2H4V8Zm0 4h10v2H4v-2Zm0 4h10v2H4v-2Z"/></svg> Avisos</h5>
               <ul class="list-unstyled mb-4" id="avisos-list">
-                <li class="small">Carregando avisos…</li>
+                <li class="skeleton skeleton-text"></li>
+                <li class="skeleton skeleton-text"></li>
               </ul>
               <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4Zm0 4h16v2H4V8Zm0 4h16v2H4v-2Zm0 4h16v2H4v-2Z"/></svg> Últimas notícias (comshalom)</h5>
               <ul class="list-unstyled mb-0" id="comshalom-list">
-                <li class="small">Carregando notícias…</li>
+                <li class="skeleton skeleton-text"></li>
+                <li class="skeleton skeleton-text"></li>
               </ul>
             </div>
           </div>
@@ -383,6 +393,14 @@
         const list = document.getElementById('comshalom-list');
         if(list){ list.innerHTML = '<li class="small">Não foi possível carregar as notícias agora.</li>'; }
       }
+    }
+
+    document.querySelector('.hero-img').addEventListener('load', function(){
+      this.classList.add('loaded');
+    });
+
+    if(document.querySelector('.hero-img').complete){
+      document.querySelector('.hero-img').classList.add('loaded');
     }
 
     carregarAvisos();
