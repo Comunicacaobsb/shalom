@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <script src="../js/header.js"></script>
+
+  <title>Shalom Taguatinga</title>
+  <meta property="og:site_name" content="Shalom Taguatinga">
+  <meta property="og:title" content="Shalom Taguatinga" />
+  <meta name="description" content="Horários, serviços, doações, localização e contatos do Centro de Evangelização Shalom Taguatinga." />
+  <meta property="og:description" content="Horários, serviços, doações, localização e contatos do Centro de Evangelização Shalom Taguatinga." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://brasilia.comshalom.org/taguatinga/" />
+  <meta property="og:image" content="https://brasilia.comshalom.org/taguatinga/images/hero.jpg" />
+  <link rel="canonical" href="https://brasilia.comshalom.org/taguatinga/" />
+  <meta name="robots" content="index,follow" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Shalom Taguatinga" />
+  <meta name="twitter:description" content="Horários, serviços, doações, localização e contatos do Centro de Evangelização Shalom Taguatinga." />
+  <meta name="twitter:image" content="https://brasilia.comshalom.org/taguatinga/images/hero.jpg" />
+  <meta name="theme-color" content="#f5f5f7" />
+  <meta name="theme-color" content="#0e0e10" media="(prefers-color-scheme: dark)" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Shalom Taguatinga",
+    "url": "https://brasilia.comshalom.org/taguatinga/",
+    "logo": "https://brasilia.comshalom.org/taguatinga/images/hero.jpg",
+    "sameAs": ["https://instagram.com/shalomtaguatinga"],
+    "contactPoint": [{"@type": "ContactPoint", "telephone": "+55-61-8488-8904", "contactType": "customer service"}]
+  }
+  </script>
+
+  <style>
+    :root{
+      --brand:#204f8c; --brand-2:#3b74c4; --bg:#f6f7fb; --text:#0f172a; --muted:#6b7280; --card:rgba(255,255,255,0.72); --border:#e5e7eb;
+    }
+    body{ margin:0; background: radial-gradient(1200px 600px at 10% -10%, #eaf2ff 0%, transparent 60%), radial-gradient(1000px 500px at 110% -20%, #e9f0ff 0%, transparent 60%), var(--bg); color:var(--text); font-family: 'Montserrat', sans-serif; }
+    .container{ max-width: 880px; }
+    .section{ padding: 2rem 0; }
+    .section:first-of-type{ padding-top: 0; }
+    .hero{ position: relative; overflow: hidden; border-radius: 28px; background: linear-gradient(120deg, rgba(32,79,140,.18), rgba(59,116,196,.12)); box-shadow: 0 16px 40px rgba(32,79,140,.18); }
+    .hero-img{ width:100%; height: 42vh; min-height:300px; object-fit: cover; display:block; filter:saturate(1.05) contrast(1.02); }
+    .hero::after{ content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.22) 0%, rgba(0,0,0,.36) 55%, rgba(0,0,0,0) 100%); pointer-events:none; z-index:0; }
+    .hero-content{ position:absolute; left:0; right:0; bottom:0; padding:clamp(16px,3vw,28px); z-index:1; }
+    .subtitle{ color: rgba(255,255,255,.85); margin: .25rem 0 0; font-size:clamp(13px,1.4vw,16px); }
+    .links-grid{ display:grid; gap:12px; grid-template-columns: 1fr; margin-top: 14px; }
+    @media(min-width:768px){ .links-grid{ grid-template-columns: repeat(2,1fr); } }
+    .link-btn{ display:flex; align-items:center; justify-content:center; gap:.6rem; padding: 1rem 1.2rem; border-radius:999px; border:1px solid rgba(255,255,255,.4); background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,.55)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-decoration:none; color:#0f172a; font-weight:700; box-shadow: 0 10px 24px rgba(15,23,42,.12); transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
+    .link-btn:hover{ transform: translateY(-1px); box-shadow:0 16px 32px rgba(15,23,42,.18); }
+    .link-btn.primary{ background: linear-gradient(135deg, var(--brand), var(--brand-2)); color:#fff; border-color: transparent; }
+    .link-btn:focus-visible{ outline:3px solid var(--brand-2); outline-offset:2px; }
+    .icon{ width:18px; height:18px; fill: currentColor; opacity:.9; }
+    .icon-img{ width:18px; height:18px; border-radius:4px; }
+    .card{ border:1px solid var(--border); border-radius: 24px; background: var(--card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 12px 30px rgba(32,79,140,.12); }
+    .card-title{ font-weight: 800; letter-spacing:-.01em; color:#0b1222; }
+    .small{ font-size:.9em!important; color:var(--muted); }
+    .list-unstyled li{ margin-bottom:.4rem; }
+    .grid-2{ display:grid; gap:1rem; grid-template-columns: 1fr; }
+    @media(min-width:768px){ .grid-2{ grid-template-columns: repeat(2,1fr); } }
+    iframe.calendar{ width:100%; height:600px; border:0; border-radius: 16px; box-shadow: 0 10px 24px rgba(32,79,140,.12); }
+    iframe.map{ width:100%; height:360px; border:0; border-radius: 16px; box-shadow: 0 10px 24px rgba(32,79,140,.12); }
+    .title-icon{ display:inline-flex; align-items:center; gap:.5rem; }
+    .title-icon .icon{ width:20px; height:20px; fill:var(--brand); color:var(--brand); }
+    .codeblock{ position:relative; background:#0f172a; color:#e5e7eb; border-radius:12px; padding:.75rem 2.5rem .75rem .75rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; border:1px solid #0b1222; }
+    .copy-btn{ position:absolute; top:6px; right:6px; background:transparent; border:1px solid rgba(229,231,235,.3); color:#e5e7eb; border-radius:10px; padding:.25rem .5rem; display:inline-flex; align-items:center; gap:.35rem; cursor:pointer; }
+    .copy-btn svg{ width:16px; height:16px; }
+    .copy-btn:hover{ background:rgba(255,255,255,.06); }
+    .card-hero{ position: relative; overflow: hidden; border-radius: 24px; min-height: 280px; }
+    .card-hero-bg{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(8px) saturate(1.1) contrast(1.05); transform: scale(1.1); }
+    .card-hero::after{ content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,.42) 60%, rgba(0,0,0,.15) 100%); pointer-events:none; z-index:0; }
+    .card-hero-content{ position: relative; z-index: 1; padding: 2rem; color: #fff; }
+    .card-hero-content .card-title{ color: #fff; }
+    .card-hero-content .card-title .icon{ fill: #fff; color: #fff; }
+    .card-hero-content .list-unstyled{ color: rgba(255,255,255,.95); }
+    .card-hero{ box-shadow: 0 16px 40px rgba(32,79,140,.2); }
+    @media (prefers-reduced-motion: reduce){ *{ transition:none!important; animation:none!important; } }
+    img[loading="lazy"], iframe[loading="lazy"]{ content-visibility:auto; contain-intrinsic-size:1px 400px; }
+  </style>
+</head>
+
+<body>
+
+  <header class="section">
+    <div class="container">
+      <div class="hero">
+        <img class="hero-img" src="images/hero.jpg" alt="Shalom Taguatinga" loading="eager" decoding="async">
+        <div class="hero-content">
+          <h1 class="fw-700 m-0" style="color:#fff; font-size:clamp(28px,3.6vw,44px); letter-spacing:-.02em;">Shalom Taguatinga</h1>
+          <p class="subtitle">Centro de Evangelização • Informações oficiais</p>
+          <div class="links-grid">
+            <a class="link-btn primary" href="https://wa.me/556184888904" target="_blank">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M20.52 3.48A11.78 11.78 0 0 0 12.06 0C5.45.02.08 5.4.1 12c0 2.1.55 4.06 1.5 5.77L0 24l6.4-1.67a11.86 11.86 0 0 0 5.64 1.44h.01c6.61 0 12-5.38 12.01-11.99a11.86 11.86 0 0 0-3.54-8.3Zm-8.46 18.2h-.01a9.86 9.86 0 0 1-5.02-1.37l-.36-.21-3.8 1 1.02-3.7-.24-.38A9.86 9.86 0 0 1 2.2 12C2.18 6.66 6.57 2.27 11.93 2.25h.05c5.34 0 9.73 4.37 9.75 9.72-.02 5.36-4.41 9.71-9.67 9.71Zm5.6-7.32c-.31-.16-1.82-.9-2.1-1-.28-.1-.49-.16-.7.16-.2.31-.8 1-.98 1.2-.18.2-.36.22-.67.06-.31-.16-1.3-.48-2.47-1.52-.91-.8-1.53-1.78-1.7-2.09-.18-.31-.02-.48.13-.64.14-.14.31-.36.47-.54.16-.18.21-.31.32-.52.1-.2.05-.38-.02-.54-.16-.16-.7-1.68-.96-2.3-.25-.62-.5-.52-.7-.53h-.6c-.2 0-.53.08-.81.38-.28.31-1.07 1.05-1.07 2.54s1.1 2.94 1.25 3.15c.16.2 2.16 3.3 5.22 4.62.73.32 1.3.51 1.75.65.74.24 1.4.21 1.93.13.59-.09 1.82-.74 2.08-1.45.26-.71.26-1.3.18-1.45-.08-.16-.28-.24-.58-.39Z"/></svg>
+              WhatsApp
+            </a>
+            <a class="link-btn primary" href="#mapa">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5Z"/></svg>
+              Como chegar
+            </a>
+            <a class="link-btn" href="https://comshalom.org/brasilia" target="_blank">
+              <img class="icon-img" src="../favicon/favicon-32x32.png" alt="favicon">
+              Comshalom
+            </a>
+            <a class="link-btn" href="#horarios">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.65 0-3 1.35-3 3v12c0 1.66 1.35 3 3 3h14c1.66 0 3-1.34 3-3V7c0-1.65-1.34-3-3-3Zm1 15c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1V10h16v9Zm0-11H4V7c0-.55.45-1 1-1h1v2h2V6h8v2h2V6h1c.55 0 1 .45 1 1v2Z"/></svg>
+              Horários e Missas
+            </a>
+            <a class="link-btn" href="#doacoes">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4 8.04 4 9.54 4.81 10.35 6.09 11.16 4.81 12.66 4 14.2 4 16.7 4 18.7 6 18.7 8.5c0 3.78-3.4 6.86-8.55 11.5Z"/></svg>
+              Comunhão de bens
+            </a>
+            <a class="link-btn" href="#calendarios">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.65 0-3 1.35-3 3v12c0 1.66 1.35 3 3 3h14c1.66 0 3-1.34 3-3V7c0-1.65-1.34-3-3-3Zm1 15c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1V10h16v9Zm0-11H4V7c0-.55.45-1 1-1h1v2h2V6h8v2h2V6h1c.55 0 1 .45 1 1v2Z"/></svg>
+              Calendários
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="horarios" class="section">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-12 col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 8V4h-2v6h6v-2h-4Zm0-6a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/></svg> Funcionamento</h5>
+              <ul class="list-unstyled mb-0">
+                <li>Seg a sáb: 14h às 22h</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M20 6h-5V4h-2v2H4v2h9v2h2V8h5V6Zm-2 6H6c-1.1 0-2 .9-2 2v6h2v-2h12v2h2v-6c0-1.1-.9-2-2-2ZM6 16v-2h12v2H6Z"/></svg> Missas</h5>
+              <ul class="list-unstyled mb-0">
+                <li>Segunda: 18h30</li>
+                <li>Domingo: 10h</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2 9.5 8.5 3 11l6.5 2.5L12 20l2.5-6.5L21 11l-6.5-2.5L12 2Z"/></svg> Adoração</h5>
+              <ul class="list-unstyled mb-0">
+                <li>Seg a sex: 14h30 às 21h</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="card-hero card">
+            <img src="images/grupos-oracao.jpg" alt="Grupos de oração" class="card-hero-bg" loading="lazy">
+            <div class="card-hero-content">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm-7 9a7 7 0 0 1 14 0Z"/></svg> Grupos de oração</h5>
+              <ul class="list-unstyled mb-0 mt-3">
+                <li>Grupo de casais: sáb 17h</li>
+                <li>Quinta da paz: qui 19h30</li>
+                <li>Grupo jovem: sáb 14h30</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="doacoes" class="section">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 4a4 4 0 1 1-4 4 4 4 0 0 1 4-4Zm0 8c-3.31 0-6 2.13-6 4.75V20h12v-3.25C18 14.13 15.31 12 12 12Z"/></svg> Oração e aconselhamento</h5>
+              <ul class="list-unstyled mb-0">
+                <li>Seg a sex: 14h30 às 21h</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M16 11V7H8v4H2v6h6v4h8v-4h6v-6h-6Zm-6 8v-6h4v6h-4Zm10-4h-4v-4h4v4Zm-14-4h4v4H6v-4Zm8-4v2h-4V7h4Z"/></svg> Serviços</h5>
+              <ul class="list-unstyled mb-0">
+                <li>Bazar: seg a sáb 14h às 21h</li>
+                <li>Livraria: seg a sáb 14h às 21h</li>
+                <li>Lanchonete: seg a sáb 14h às 21h</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4 8.04 4 9.54 4.81 10.35 6.09 11.16 4.81 12.66 4 14.2 4 16.7 4 18.7 6 18.7 8.5c0 3.78-3.4 6.86-8.55 11.5Z"/></svg> Comunhão de bens — Obra Taguatinga</h5>
+              <div class="grid-2">
+                <div>
+                  <h6>10%</h6>
+                  <p class="mb-1">Transferência: BB:001 AG:1230-0 CC:125360-3</p>
+                  <div class="codeblock mb-2"><code id="pix-10">economatotaguatinga@comshalom.org</code><button class="copy-btn" data-target="pix-10" title="Copiar"><svg viewBox="0 0 24 24"><path fill="#e5e7eb" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1Zm3 4H8c-1.1 0-2 .9-2 2v16h13c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2Zm0 18H8V7h11v16Z"/></svg></button></div>
+                  <p class="small mt-2 mb-0">Comprovante: economatotaguatinga@comshalom.org ou 61 98219-0360</p>
+                </div>
+                <div>
+                  <h6>5%</h6>
+                  <p class="mb-1">Transferência: BB:001 AG:1230-0 CC:123.413-7</p>
+                  <div class="codeblock mb-2"><code id="pix-5">secomunitariabrasilia@comshalom.org</code><button class="copy-btn" data-target="pix-5" title="Copiar"><svg viewBox="0 0 24 24"><path fill="#e5e7eb" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1Zm3 4H8c-1.1 0-2 .9-2 2v16h13c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2Zm0 18H8V7h11v16Z"/></svg></button></div>
+                  <p class="small mt-2 mb-0">Comprovante: providenciabrasilia@comshalom.org</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="mapa" class="section">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Localização</h5>
+              <p class="small">Como chegar ao Centro de Evangelização Shalom Taguatinga.</p>
+              <iframe class="map" src="https://www.google.com/maps?q=Shalom+Taguatinga&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              <div class="mt-3">
+                <a class="link-btn" href="https://g.co/kgs/ySgKBL" target="_blank">Abrir no Google Maps</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon mb-4"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4Zm0 4h16v2H4V8Zm0 4h10v2H4v-2Zm0 4h10v2H4v-2Z"/></svg> Avisos</h5>
+              <ul class="list-unstyled mb-4" id="avisos-list">
+                <li class="small">Carregando avisos…</li>
+              </ul>
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4Zm0 4h16v2H4V8Zm0 4h16v2H4v-2Zm0 4h16v2H4v-2Z"/></svg> Últimas notícias (comshalom)</h5>
+              <ul class="list-unstyled mb-0" id="comshalom-list">
+                <li class="small">Carregando notícias…</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="calendarios" class="section">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Calendários</h5>
+              <ul class="nav nav-pills mb-3" role="tablist">
+                <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#vig">Vigílias</button></li>
+                <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#mis">Missão</button></li>
+              </ul>
+              <div class="tab-content">
+                <div id="vig" class="tab-pane fade" tabindex="0">
+                  <a class="link-btn" href="https://vigiliash.web.app/app/pages/home.html?t=YzJoaGJHOXRYMkp5WVhOcGJHbGg7CgkJCVUyaGhiRzl0SUVKeVlYUHRiR2xoOwoJCQliV2x6YzJGdg==" target="_blank">Abrir calendário de vigílias</a>
+                </div>
+                <div id="mis" class="tab-pane fade show active" tabindex="0">
+                  <iframe class="calendar" loading="lazy" src="https://calendar.google.com/calendar/u/0/embed?src=n9c03lrse3tl4uvt381d3is5jo@group.calendar.google.com&ctz=America/Sao_Paulo"></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Instagram do CEV</h5>
+              <p class="small">Acompanhe as novidades no Instagram.</p>
+              <iframe class="calendar" loading="lazy" src="https://www.instagram.com/shalomtaguatinga/embed"></iframe>
+              <div class="mt-3"><a class="link-btn" href="https://instagram.com/shalomtaguatinga" target="_blank">Abrir perfil</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">Copiado!</div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+
+  <footer class="section" style="padding-top:2rem; padding-bottom:3rem;">
+    <div class="container">
+      <div class="text-center small" style="color:var(--muted)">Shalom Taguatinga 2026, todos os direitos reservados. Problemas? chama na DM do insta: <a href="https://instagram.com/tomina.ga" target="_blank">@tomina.ga</a></div>
+    </div>
+  </footer>
+
+  <script src="../js/centralScript.js"></script>
+  <script>
+    function copyText(text){
+      const textarea=document.createElement('textarea');
+      textarea.value=text; document.body.appendChild(textarea);
+      textarea.select(); document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      var toastElement=document.querySelector('.toast');
+      var toast=new bootstrap.Toast(toastElement);
+      toastElement.querySelector('.toast-body').textContent='PIX copiado!';
+      toast.show();
+    }
+
+    document.querySelectorAll('.copy-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var targetId = this.getAttribute('data-target');
+        var code = document.getElementById(targetId);
+        if(code){ copyText(code.textContent.trim()); }
+      });
+    });
+
+    async function carregarAvisos(){
+      try{
+        const feedUrl = 'https://shalomtaguatinga.blogspot.com/feeds/posts/default?alt=json';
+        const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(feedUrl);
+        const res = await fetch(proxy);
+        const data = await res.json();
+        const entries = (data.feed && data.feed.entry) ? data.feed.entry : [];
+        const list = document.getElementById('avisos-list');
+        list.innerHTML = '';
+        (entries || []).slice(0,2).forEach(function(item){
+          const linkObj = (item.link || []).find(l => l.rel === 'alternate');
+          const href = linkObj ? linkObj.href : '#';
+          const title = item.title && item.title.$t ? item.title.$t : 'Atualização';
+          const li = document.createElement('li');
+          li.innerHTML = '<a href="'+href+'" target="_blank" rel="noopener">'+title+'</a>';
+          list.appendChild(li);
+        });
+        if(list.children.length === 0){ list.innerHTML = '<li class="small">Nenhum aviso encontrado.</li>'; }
+      }catch(e){
+        const list = document.getElementById('avisos-list');
+        if(list){ list.innerHTML = '<li class="small">Não foi possível carregar os avisos agora.</li>'; }
+      }
+    }
+
+    async function carregarNoticiasComShalom(){
+      try{
+        const feedUrl = 'https://comshalom.org/feed';
+        const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(feedUrl);
+        const res = await fetch(proxy);
+        const text = await res.text();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(text, 'application/xml');
+        const items = Array.from(xml.querySelectorAll('item')).slice(0,2);
+        const list = document.getElementById('comshalom-list');
+        list.innerHTML = '';
+        items.forEach((item)=>{
+          const title = item.querySelector('title')?.textContent || 'Notícia';
+          const link = item.querySelector('link')?.textContent || '#';
+          const li = document.createElement('li');
+          li.innerHTML = '<a href="'+link+'" target="_blank" rel="noopener">'+title+'</a>';
+          list.appendChild(li);
+        });
+        if(list.children.length === 0){ list.innerHTML = '<li class="small">Nenhuma notícia encontrada.</li>'; }
+      }catch(e){
+        const list = document.getElementById('comshalom-list');
+        if(list){ list.innerHTML = '<li class="small">Não foi possível carregar as notícias agora.</li>'; }
+      }
+    }
+
+    carregarAvisos();
+    carregarNoticiasComShalom();
+  </script>
+
+</body>
+
+</html>
+
+
