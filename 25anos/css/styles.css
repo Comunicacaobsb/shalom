@@ -311,6 +311,7 @@ b{
    Blockquote Revelação
    -------------------------------------------------------------------------- */
 .blockquote-revelacao {
+  text-wrap: balance;
   background-color: var(--branco);
   padding: clamp(1.25rem, 4vw, 2rem);
   border-radius: 4px;
