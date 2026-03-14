@@ -1,0 +1,563 @@
+/* ============================================
+   PROVIDÊNCIA - Estilos
+   Comunidade Católica Shalom Brasília
+   ============================================ */
+
+/* ---- Tokens de Design ---- */
+:root {
+  --prov-primary: #463942;
+  --prov-light: #a6adee;
+  --prov-dark: #2b0620;
+  --prov-white: #ffffff;
+  --prov-whatsapp: #25D366;
+  --prov-whatsapp-hover: #1da851;
+  --prov-bg-overlay: rgba(255, 255, 255, 0.92);
+  --prov-shadow: 0 4px 24px rgba(43, 6, 32, 0.10);
+  --prov-shadow-hover: 0 8px 32px rgba(43, 6, 32, 0.18);
+  --prov-radius: 1rem;
+  --prov-radius-pill: 999px;
+  --prov-transition: 0.3s cubic-bezier(0.6, -0.10, 0.4, 1.10);
+  --font-cinzel: 'Cinzel', serif;
+  --font-montserrat: 'Montserrat', sans-serif;
+}
+
+/* ---- Reset & Base ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-montserrat);
+  color: var(--prov-dark);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--prov-light);
+  background-image: url('../imagens/bg-mobile.jpg');
+  background-attachment: fixed;
+  background-position: bottom center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+@media (min-width: 768px) {
+  body {
+    background-image: url('../imagens/bg-tablet.jpg');
+  }
+}
+
+@media (min-width: 1200px) {
+  body {
+    background-image: url('../imagens/bg-desktop.jpg');
+  }
+}
+
+/* ---- Preloader ---- */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--prov-light);
+  transition: opacity 0.5s ease;
+}
+
+.preloader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(70, 57, 66, 0.2);
+  border-top-color: var(--prov-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-sm {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(70, 57, 66, 0.15);
+  border-top-color: var(--prov-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 0.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Container ---- */
+.container {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ---- Header ---- */
+.site-header {
+  background: var(--prov-primary);
+  padding: 0.75rem 0;
+  position: relative;
+  z-index: 200;
+  overflow: hidden;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.header-logo-link {
+  display: none;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.header-logo {
+  height: 40px;
+  width: auto;
+}
+
+.header-title {
+  font-family: var(--font-cinzel);
+  font-size: clamp(1.5rem, 6vw, 1.75rem);
+  font-weight: 600;
+  color: var(--prov-white);
+  margin: 0;
+  letter-spacing: 0.02em;
+  text-align: center;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .header-logo-link {
+    display: flex;
+  }
+
+  .header-inner {
+    justify-content: space-between;
+  }
+
+  .header-logo {
+    height: 70px;
+  }
+
+  .header-title {
+    text-align: right;
+    width: auto;
+  }
+}
+
+/* ---- Navegação entre Seções ---- */
+.section-nav {
+  position: sticky;
+  top: 0;
+  z-index: 150;
+  background: rgba(70, 57, 66, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0.625rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-nav-inner {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.section-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--prov-radius-pill);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-montserrat);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--prov-transition);
+  white-space: nowrap;
+}
+
+.section-btn:hover {
+  border-color: var(--prov-white);
+  color: var(--prov-white);
+}
+
+.section-btn.active {
+  background: var(--prov-white);
+  border-color: var(--prov-white);
+  color: var(--prov-primary);
+}
+
+.section-btn svg {
+  flex-shrink: 0;
+}
+
+/* ---- Conteúdo das Seções ---- */
+.section-content {
+  padding: 1.5rem 0 2rem;
+  min-height: 60vh;
+}
+
+.content-card {
+  background: var(--prov-bg-overlay);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--prov-radius);
+  padding: 1.5rem 1.25rem;
+  box-shadow: var(--prov-shadow);
+}
+
+@media (min-width: 768px) {
+  .content-card {
+    padding: 2rem;
+  }
+}
+
+.section-title {
+  font-family: var(--font-cinzel);
+  font-size: clamp(1.25rem, 3.5vw, 1.625rem);
+  font-weight: 700;
+  color: var(--prov-dark);
+  margin: 0 0 0.25rem;
+}
+
+.section-subtitle {
+  font-size: 0.9rem;
+  color: var(--prov-primary);
+  margin: 0 0 1.5rem;
+  opacity: 0.8;
+}
+
+/* ---- Tabs de Necessidades ---- */
+.tabs-wrapper {
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tabs-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+#needs-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  padding-bottom: 0.25rem;
+  min-width: max-content;
+}
+
+#needs-tabs .nav-link {
+  font-family: var(--font-montserrat);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--prov-primary);
+  background: transparent;
+  border: 2px solid var(--prov-primary);
+  border-radius: var(--prov-radius-pill);
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+  transition: all var(--prov-transition);
+  cursor: pointer;
+}
+
+#needs-tabs .nav-link:hover {
+  background: rgba(70, 57, 66, 0.1);
+}
+
+#needs-tabs .nav-link.active {
+  background: var(--prov-primary);
+  border-color: var(--prov-primary);
+  color: var(--prov-white);
+}
+
+/* ---- Lista de Necessidades ---- */
+.needs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.needs-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid rgba(70, 57, 66, 0.1);
+}
+
+.needs-list li:last-child {
+  border-bottom: none;
+}
+
+.need-item-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--prov-dark);
+  flex: 1;
+}
+
+/* ---- Botão WhatsApp ---- */
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: var(--prov-whatsapp);
+  color: var(--prov-white);
+  border: none;
+  border-radius: var(--prov-radius-pill);
+  font-family: var(--font-montserrat);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--prov-transition);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.btn-whatsapp:hover {
+  background: var(--prov-whatsapp-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+  color: var(--prov-white);
+  text-decoration: none;
+}
+
+.btn-whatsapp svg {
+  flex-shrink: 0;
+}
+
+/* ---- CTA Cadastro de Habilidades ---- */
+.skills-cta {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.btn-cadastro {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  background: var(--prov-primary);
+  color: var(--prov-white);
+  border: none;
+  border-radius: var(--prov-radius-pill);
+  font-family: var(--font-montserrat);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--prov-transition);
+}
+
+.btn-cadastro:hover {
+  background: var(--prov-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--prov-shadow-hover);
+  color: var(--prov-white);
+  text-decoration: none;
+}
+
+/* ---- Busca de Habilidades ---- */
+.search-wrapper {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--prov-primary);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  border: 2px solid var(--prov-light);
+  border-radius: var(--prov-radius-pill);
+  font-family: var(--font-montserrat);
+  font-size: 0.95rem;
+  color: var(--prov-dark);
+  background: var(--prov-white);
+  outline: none;
+  transition: border-color var(--prov-transition);
+}
+
+.search-input::placeholder {
+  color: var(--prov-primary);
+  opacity: 0.4;
+}
+
+.search-input:focus {
+  border-color: var(--prov-primary);
+}
+
+/* ---- Grid de Cards de Habilidades ---- */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .skills-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---- Card de Habilidade ---- */
+.skill-card {
+  background: var(--prov-white);
+  border-radius: var(--prov-radius);
+  padding: 1.25rem;
+  box-shadow: 0 2px 12px rgba(43, 6, 32, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: all var(--prov-transition);
+  border-left: 4px solid var(--prov-primary);
+}
+
+.skill-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--prov-shadow-hover);
+}
+
+.skill-card-name {
+  font-family: var(--font-cinzel);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--prov-dark);
+  margin: 0;
+}
+
+.skill-card-skills {
+  font-size: 0.875rem;
+  color: var(--prov-primary);
+  margin: 0;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.skill-card-skills span {
+  display: inline-block;
+  background: rgba(166, 173, 238, 0.25);
+  color: var(--prov-dark);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--prov-radius-pill);
+  font-size: 0.8rem;
+  margin: 0.15rem 0.15rem;
+  font-weight: 500;
+}
+
+.skill-card-footer {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+/* ---- Estados: Carregando, Erro, Vazio ---- */
+.loading-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--prov-primary);
+  opacity: 0.7;
+  grid-column: 1 / -1;
+}
+
+.loading-state p {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.error-state,
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--prov-primary);
+  opacity: 0.7;
+}
+
+.error-state p,
+.empty-state p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ---- Rodapé ---- */
+.site-footer {
+  background: var(--prov-dark);
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 1.25rem 0;
+  font-size: 0.8rem;
+  margin-top: 2rem;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+/* ---- Animação de entrada dos cards ---- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.skill-card {
+  animation: fadeInUp 0.4s ease both;
+}
+
+.needs-list li {
+  animation: fadeInUp 0.3s ease both;
+}
+
+/* Delay escalonado para as animações */
+.skill-card:nth-child(1) { animation-delay: 0.05s; }
+.skill-card:nth-child(2) { animation-delay: 0.10s; }
+.skill-card:nth-child(3) { animation-delay: 0.15s; }
+.skill-card:nth-child(4) { animation-delay: 0.20s; }
+.skill-card:nth-child(5) { animation-delay: 0.25s; }
+.skill-card:nth-child(6) { animation-delay: 0.30s; }
+.skill-card:nth-child(7) { animation-delay: 0.35s; }
+.skill-card:nth-child(8) { animation-delay: 0.40s; }
+.skill-card:nth-child(9) { animation-delay: 0.45s; }

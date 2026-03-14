@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Providência | Shalom Brasília</title>
+  <meta name="description" content="Providência - Comunidade Católica Shalom Brasília. Veja as necessidades das casas comunitárias e encontre habilidades dos irmãos.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Providência | Shalom Brasília">
+  <meta property="og:description" content="Necessidades das casas comunitárias e catálogo de habilidades dos irmãos.">
+  <meta property="og:type" content="website">
+
+  <!-- Header do projeto pai: Bootstrap 5 CSS, Montserrat, Favicons, GA -->
+  <script src="../js/header.js"></script>
+
+  <!-- Cinzel (títulos) - não carregada pelo header.js -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos locais -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- ==================== PRELOADER ==================== -->
+  <div id="preloader" class="preloader">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="./" class="header-logo-link">
+          <img src="imagens/logo-completa.svg" alt="Providência - Shalom" class="header-logo">
+        </a>
+        <h1 class="header-title">Providência</h1>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== NAVEGAÇÃO ENTRE SEÇÕES ==================== -->
+  <nav class="section-nav" id="section-nav">
+    <div class="container">
+      <div class="section-nav-inner">
+        <button class="section-btn active" data-section="necessidades" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Necessidades
+        </button>
+        <button class="section-btn" data-section="habilidades" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Habilidades
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== SEÇÃO: NECESSIDADES ==================== -->
+  <section id="section-necessidades" class="section-content">
+    <div class="container">
+      <div class="content-card">
+        <h2 class="section-title">Necessidades das Casas</h2>
+        <p class="section-subtitle">Veja o que nossas casas comunitárias e centros de evangelização estão precisando e contribua com uma doação.</p>
+
+        <!-- Abas dinâmicas (geradas pelo JS) -->
+        <div class="tabs-wrapper">
+          <ul class="nav nav-pills" id="needs-tabs" role="tablist">
+            <!-- JS insere as abas aqui -->
+          </ul>
+        </div>
+
+        <!-- Estado de carregamento -->
+        <div id="needs-loading" class="loading-state">
+          <div class="spinner-sm"></div>
+          <p>Carregando necessidades...</p>
+        </div>
+        <!-- Estado de erro -->
+        <div id="needs-error" class="error-state" style="display:none;">
+          <p>Não foi possível carregar os dados. Tente novamente mais tarde.</p>
+        </div>
+
+        <!-- Conteúdo das abas (gerado pelo JS) -->
+        <div class="tab-content" id="needs-tab-content">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SEÇÃO: HABILIDADES ==================== -->
+  <section id="section-habilidades" class="section-content" style="display:none;">
+    <div class="container">
+      <div class="content-card">
+        <h2 class="section-title">Habilidades dos Irmãos</h2>
+        <p class="section-subtitle">Encontre irmãos da comunidade que podem ajudar com seus talentos e habilidades.</p>
+
+        <!-- CTA para cadastro de habilidades -->
+        <div class="skills-cta">
+          <a href="https://forms.gle/Q87hBtAKNfNNBtVZ9" target="_blank" rel="noopener noreferrer" class="btn-cadastro">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            Cadastrar minhas habilidades
+          </a>
+        </div>
+
+        <!-- Campo de busca -->
+        <div class="search-wrapper">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="skills-search" class="search-input" placeholder="Buscar por nome ou habilidade...">
+        </div>
+
+        <!-- Estado de carregamento -->
+        <div id="skills-loading" class="loading-state">
+          <div class="spinner-sm"></div>
+          <p>Carregando habilidades...</p>
+        </div>
+        <!-- Estado de erro -->
+        <div id="skills-error" class="error-state" style="display:none;">
+          <p>Não foi possível carregar os dados. Tente novamente mais tarde.</p>
+        </div>
+        <!-- Estado vazio de busca -->
+        <div id="skills-empty" class="empty-state" style="display:none;">
+          <p>Nenhum resultado encontrado para a sua busca.</p>
+        </div>
+
+        <!-- Grid de cards (gerado pelo JS) -->
+        <div id="skills-grid" class="skills-grid">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== RODAPÉ ==================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>Comunidade Católica Shalom &mdash; Brasília</p>
+    </div>
+  </footer>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <!-- Bootstrap 5 JS Bundle (via projeto pai) -->
+  <script src="../js/centralScript.js"></script>
+  <!-- PapaParse: biblioteca para parsing de CSV (lida com UTF-8 e acentuação) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- Lógica principal do app -->
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>

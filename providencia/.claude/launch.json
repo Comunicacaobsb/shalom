@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "providencia",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "/Users/joaoroque/Documents/GitHub/Shalom", "-p", "8090", "-c-1"],
+      "port": 8090
+    }
+  ]
+}
