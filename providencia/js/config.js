@@ -26,6 +26,9 @@ var PROVIDENCIA_CONFIG = {
   // URL do CSV de Habilidades (colunas: Nome_do_Irmao, Habilidades, Telefone_WhatsApp)
   csvHabilidades: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-pbvSfuIvxl3WarKBKMsOBHOO3zmpup7EBInURPaDNRjIhkLSGduNTJxdDyISbRFq3xawLaa5uJC0/pub?gid=862267857&single=true&output=csv',
 
+  // URL do CSV de Comunhão de Bens (colunas: mes, percentual)
+  csvComunhao: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-pbvSfuIvxl3WarKBKMsOBHOO3zmpup7EBInURPaDNRjIhkLSGduNTJxdDyISbRFq3xawLaa5uJC0/pub?gid=812880566&single=true&output=csv',
+
   // Tempo de espera (ms) antes de aplicar o filtro de busca
   debounceDelay: 300
 };

@@ -9,8 +9,8 @@
   --prov-light: #a6adee;
   --prov-dark: #2b0620;
   --prov-white: #ffffff;
-  --prov-whatsapp: #25D366;
-  --prov-whatsapp-hover: #1da851;
+  --color-success: #25D366;
+  --color-success-hover: #1da851;
   --prov-bg-overlay: rgba(255, 255, 255, 0.1);
   --prov-shadow: 0 4px 24px rgba(43, 6, 32, 0.10);
   --prov-shadow-hover: 0 8px 32px rgba(43, 6, 32, 0.18);
@@ -281,6 +281,8 @@ body {
   transition: all var(--prov-transition);
   border-bottom: 4px solid var(--prov-primary);
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .hub-link-card:hover {
@@ -288,6 +290,30 @@ body {
   box-shadow: var(--prov-shadow-hover);
   text-decoration: none;
   color: var(--prov-dark);
+}
+
+/* Seta indicativa de link no hover (cards do hub) */
+.hub-link-card::after {
+  content: '';
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  width: 28px;
+  height: 28px;
+  background-color: var(--prov-primary);
+  border-radius: 50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'/%3E%3C/svg%3E");
+  background-size: 16px 16px;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.hub-link-card:hover::after {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .hub-link-icon {
@@ -315,6 +341,91 @@ body {
   margin: 0;
   opacity: 0.8;
   line-height: 1.5;
+}
+
+/* ---- Comunhão de Bens (donut card) ---- */
+.comunhao-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--prov-radius);
+  box-shadow: 0 2px 12px rgba(43, 6, 32, 0.08);
+  text-decoration: none;
+  color: var(--prov-dark);
+  transition: all var(--prov-transition);
+  border-bottom: 4px solid var(--prov-primary);
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Spinner dentro do donut enquanto carrega */
+.comunhao-spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.comunhao-donut-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.comunhao-donut {
+  width: 100%;
+  height: 100%;
+}
+
+.comunhao-donut-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.comunhao-pct {
+  font-family: var(--font-cinzel);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--prov-dark);
+  line-height: 1;
+}
+
+.comunhao-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.comunhao-mes {
+  font-size: 0.85rem;
+  color: var(--prov-primary);
+  margin: 0.25rem 0 0;
+  opacity: 0.8;
+}
+
+@media (min-width: 600px) {
+  .comunhao-donut-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+
+  .comunhao-pct {
+    font-size: 1.75rem;
+  }
+
+  .comunhao-card {
+    gap: 1.5rem;
+    padding: 2rem 1.5rem;
+  }
 }
 
 /* ---- Tabs de Necessidades ---- */
@@ -407,7 +518,7 @@ body {
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 1rem;
-  background: var(--prov-whatsapp);
+  background: var(--color-success);
   color: var(--prov-white);
   border: none;
   border-radius: var(--prov-radius-pill);
@@ -422,7 +533,7 @@ body {
 }
 
 .btn-whatsapp:hover {
-  background: var(--prov-whatsapp-hover);
+  background: var(--color-success-hover);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
   color: var(--prov-white);
@@ -625,13 +736,13 @@ body {
 }
 
 .footer-whatsapp {
-  color: var(--prov-whatsapp);
+  color: var(--color-success);
   text-decoration: none;
   font-weight: 600;
 }
 
 .footer-whatsapp:hover {
-  color: var(--prov-whatsapp-hover);
+  color: var(--color-success-hover);
   text-decoration: underline;
 }
 
@@ -695,4 +806,8 @@ body {
 
 .skill-card:nth-child(9) {
   animation-delay: 0.45s;
+}
+
+.text-balance{
+  text-wrap-style: balance;
 }
