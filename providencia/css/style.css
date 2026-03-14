@@ -11,7 +11,7 @@
   --prov-white: #ffffff;
   --prov-whatsapp: #25D366;
   --prov-whatsapp-hover: #1da851;
-  --prov-bg-overlay: rgba(255, 255, 255, 0.92);
+  --prov-bg-overlay: rgba(255, 255, 255, 0.2);
   --prov-shadow: 0 4px 24px rgba(43, 6, 32, 0.10);
   --prov-shadow-hover: 0 8px 32px rgba(43, 6, 32, 0.18);
   --prov-radius: 1rem;
@@ -36,6 +36,10 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
+  /* Sticky footer: flex column */
+  display: flex;
+  flex-direction: column;
+  /* Background responsivo */
   background-color: var(--prov-light);
   background-image: url('../imagens/bg-mobile.jpg');
   background-attachment: fixed;
@@ -110,7 +114,6 @@ body {
   padding: 0.75rem 0;
   position: relative;
   z-index: 200;
-  overflow: hidden;
 }
 
 .header-inner {
@@ -121,47 +124,42 @@ body {
 }
 
 .header-logo-link {
-  display: none;
+  display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
+/* Logo branca (inverte o SVG escuro) */
 .header-logo {
-  height: 40px;
+  height: 36px;
   width: auto;
+  filter: brightness(0) invert(1);
 }
 
 .header-title {
   font-family: var(--font-cinzel);
-  font-size: clamp(1.5rem, 6vw, 1.75rem);
+  font-size: clamp(0.9rem, 3.8vw, 1.75rem)!important;
   font-weight: 600;
   color: var(--prov-white);
   margin: 0;
-  letter-spacing: 0.02em;
-  text-align: center;
-  width: 100%;
+  letter-spacing: 0;
 }
 
 @media (min-width: 768px) {
-  .header-logo-link {
-    display: flex;
-  }
-
   .header-inner {
     justify-content: space-between;
   }
 
   .header-logo {
-    height: 70px;
+    height: 60px;
   }
 
   .header-title {
     text-align: right;
-    width: auto;
   }
 }
 
-/* ---- Navegação entre Seções ---- */
+/* ---- Navegação entre Páginas ---- */
 .section-nav {
   position: sticky;
   top: 0;
@@ -190,38 +188,42 @@ body {
   background: transparent;
   color: rgba(255, 255, 255, 0.8);
   font-family: var(--font-montserrat);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--prov-transition);
   white-space: nowrap;
+  text-decoration: none;
 }
 
 .section-btn:hover {
   border-color: var(--prov-white);
   color: var(--prov-white);
+  text-decoration: none;
 }
 
 .section-btn.active {
   background: var(--prov-white);
   border-color: var(--prov-white);
   color: var(--prov-primary);
+  cursor: default;
 }
 
 .section-btn svg {
   flex-shrink: 0;
 }
 
-/* ---- Conteúdo das Seções ---- */
+/* ---- Conteúdo Principal ---- */
 .section-content {
   padding: 1.5rem 0 2rem;
-  min-height: 60vh;
+  /* Sticky footer: ocupa espaço restante */
+  flex: 1;
 }
 
 .content-card {
   background: var(--prov-bg-overlay);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-radius: var(--prov-radius);
   padding: 1.5rem 1.25rem;
   box-shadow: var(--prov-shadow);
@@ -248,9 +250,72 @@ body {
   opacity: 0.8;
 }
 
+/* ---- Hub: Cards de Navegação ---- */
+.hub-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .hub-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.hub-link-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1.5rem;
+  background: var(--prov-white);
+  border-radius: var(--prov-radius);
+  box-shadow: 0 2px 12px rgba(43, 6, 32, 0.08);
+  text-decoration: none;
+  color: var(--prov-dark);
+  transition: all var(--prov-transition);
+  border-bottom: 4px solid var(--prov-primary);
+  text-align: center;
+}
+
+.hub-link-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--prov-shadow-hover);
+  text-decoration: none;
+  color: var(--prov-dark);
+}
+
+.hub-link-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(166, 173, 238, 0.2);
+  color: var(--prov-primary);
+}
+
+.hub-link-title {
+  font-family: var(--font-cinzel);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--prov-dark);
+}
+
+.hub-link-desc {
+  font-size: 0.85rem;
+  color: var(--prov-primary);
+  margin: 0;
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
 /* ---- Tabs de Necessidades ---- */
 .tabs-wrapper {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.5rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -290,6 +355,15 @@ body {
   background: var(--prov-primary);
   border-color: var(--prov-primary);
   color: var(--prov-white);
+}
+
+/* Nome completo do local selecionado */
+.needs-local-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--prov-dark);
+  margin: 0 0 1rem;
+  padding-left: 0.25rem;
 }
 
 /* ---- Lista de Necessidades ---- */
@@ -524,11 +598,31 @@ body {
   text-align: center;
   padding: 1.25rem 0;
   font-size: 0.8rem;
-  margin-top: 2rem;
+  /* Sticky footer: sem margin-top, o flex cuida */
 }
 
 .site-footer p {
-  margin: 0;
+  margin: 0 0 0.25rem;
+}
+
+.site-footer p:last-child {
+  margin-bottom: 0;
+}
+
+.footer-contact {
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.footer-whatsapp {
+  color: var(--prov-whatsapp);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer-whatsapp:hover {
+  color: var(--prov-whatsapp-hover);
+  text-decoration: underline;
 }
 
 /* ---- Animação de entrada dos cards ---- */
@@ -543,7 +637,8 @@ body {
   }
 }
 
-.skill-card {
+.skill-card,
+.hub-link-card {
   animation: fadeInUp 0.4s ease both;
 }
 
@@ -552,9 +647,12 @@ body {
 }
 
 /* Delay escalonado para as animações */
-.skill-card:nth-child(1) { animation-delay: 0.05s; }
-.skill-card:nth-child(2) { animation-delay: 0.10s; }
-.skill-card:nth-child(3) { animation-delay: 0.15s; }
+.skill-card:nth-child(1),
+.hub-link-card:nth-child(1) { animation-delay: 0.05s; }
+.skill-card:nth-child(2),
+.hub-link-card:nth-child(2) { animation-delay: 0.10s; }
+.skill-card:nth-child(3),
+.hub-link-card:nth-child(3) { animation-delay: 0.15s; }
 .skill-card:nth-child(4) { animation-delay: 0.20s; }
 .skill-card:nth-child(5) { animation-delay: 0.25s; }
 .skill-card:nth-child(6) { animation-delay: 0.30s; }

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Necessidades | Providência - Shalom Brasília</title>
+  <meta name="description" content="Necessidades das casas comunitárias e centros de evangelização da Comunidade Shalom Brasília.">
+
+  <!-- Header do projeto pai: Bootstrap 5 CSS, Montserrat, Favicons, GA -->
+  <script src="../../js/header.js"></script>
+
+  <!-- Cinzel (títulos) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos locais -->
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+  <!-- ==================== PRELOADER ==================== -->
+  <div id="preloader" class="preloader">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="../" class="header-logo-link">
+          <img src="../imagens/logo-completa.svg" alt="Providência - Shalom" class="header-logo">
+        </a>
+        <h1 class="header-title">Providência</h1>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== NAVEGAÇÃO ==================== -->
+  <nav class="section-nav">
+    <div class="container">
+      <div class="section-nav-inner">
+        <a href="../" class="section-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Início
+        </a>
+        <span class="section-btn active">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Necessidades
+        </span>
+        <a href="../habilidades/" class="section-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Habilidades
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== CONTEÚDO: NECESSIDADES ==================== -->
+  <main class="section-content">
+    <div class="container">
+      <div class="content-card">
+        <h2 class="section-title">Necessidades das Casas</h2>
+        <p class="section-subtitle">Veja o que nossas casas comunitárias e centros de evangelização estão precisando e contribua com uma doação.</p>
+
+        <!-- Abas dinâmicas (geradas pelo JS) -->
+        <div class="tabs-wrapper">
+          <ul class="nav nav-pills" id="needs-tabs" role="tablist">
+            <!-- JS insere as abas aqui -->
+          </ul>
+        </div>
+
+        <!-- Nome completo do local selecionado -->
+        <p id="needs-local-name" class="needs-local-name"></p>
+
+        <!-- Estado de carregamento -->
+        <div id="needs-loading" class="loading-state">
+          <div class="spinner-sm"></div>
+          <p>Carregando necessidades...</p>
+        </div>
+        <!-- Estado de erro -->
+        <div id="needs-error" class="error-state" style="display:none;">
+          <p>Não foi possível carregar os dados. Tente novamente mais tarde.</p>
+        </div>
+
+        <!-- Conteúdo das abas (gerado pelo JS) -->
+        <div class="tab-content" id="needs-tab-content">
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== RODAPÉ ==================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>Comunidade Católica Shalom &mdash; Brasília</p>
+      <!-- NÚMERO DA PROVIDÊNCIA: se precisar trocar, altere aqui e em js/config.js -->
+      <p class="footer-contact">Ajustes, erros e sugestões: entre em contato com o Setor da Providência
+        <a href="https://wa.me/5561982644432" target="_blank" rel="noopener noreferrer" class="footer-whatsapp">(61) 98264-4432</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="../../js/centralScript.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/necessidades.js"></script>
+
+</body>
+
+</html>
