@@ -166,10 +166,10 @@
    */
   function getShortName(local) {
     if (local.indexOf('Casa Comunitária') === 0) {
-      return 'CC ' + local.replace('Casa Comunitária', '').trim();
+      return 'Casa ' + local.replace('Casa Comunitária', '').trim();
     }
     if (local.indexOf('Centro de Evangelização') === 0) {
-      return 'CE ' + local.replace('Centro de Evangelização', '').trim();
+      return 'Cev ' + local.replace('Centro de Evangelização', '').trim();
     }
     return local;
   }
