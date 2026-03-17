@@ -107,3 +107,57 @@ function hidePreloader() {
     }, 500);
   }
 }
+
+// ============================================
+// THEME TOGGLE (Light / Dark)
+// ============================================
+// Prioridade: localStorage > prefers-color-scheme
+// Salva escolha em localStorage('prov-theme')
+// Valores: 'light', 'dark', ou null (segue sistema)
+// ============================================
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'prov-theme';
+
+  function getSystemTheme() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  function initTheme() {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === 'dark' || saved === 'light') {
+      applyTheme(saved);
+    }
+    // Se não há preferência salva, não seta data-theme — o CSS usa prefers-color-scheme
+  }
+
+  // Aplica tema ANTES do DOMContentLoaded para evitar flash
+  initTheme();
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+
+    btn.addEventListener('click', function () {
+      var current = document.documentElement.getAttribute('data-theme');
+      var next;
+
+      if (current === 'dark') {
+        next = 'light';
+      } else if (current === 'light') {
+        next = 'dark';
+      } else {
+        // Sem atributo — está seguindo o sistema, alterna para o oposto
+        next = getSystemTheme() === 'dark' ? 'light' : 'dark';
+      }
+
+      applyTheme(next);
+      localStorage.setItem(STORAGE_KEY, next);
+    });
+  });
+})();
