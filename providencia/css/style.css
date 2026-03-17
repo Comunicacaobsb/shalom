@@ -147,6 +147,32 @@ body {
   letter-spacing: 0;
 }
 
+/* Sub-páginas: header com botão de voltar à esquerda */
+.header-inner--sub {
+  position: relative;
+}
+
+.header-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: var(--prov-white);
+  text-decoration: none;
+  transition: all var(--prov-transition);
+  flex-shrink: 0;
+}
+
+.header-back:hover {
+  border-color: var(--prov-white);
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--prov-white);
+  text-decoration: none;
+}
+
 @media (min-width: 768px) {
   .header-inner {
     justify-content: space-between;
@@ -524,6 +550,7 @@ body {
   border-radius: 4px;
   background: var(--prov-bg-overlay);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 /* ---- Botão WhatsApp ---- */
