@@ -107,6 +107,13 @@
    * Filtra os cards em tempo real conforme o usuário digita.
    * Verifica se o texto existe no nome OU nas habilidades (substring).
    */
+  /**
+   * Remove acentos para busca tolerante (ex: "joao" encontra "João").
+   */
+  function removeAccents(str) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
   function setupSearch() {
     var searchInput = document.getElementById('skills-search');
     var debounceTimer;
@@ -115,7 +122,7 @@
       clearTimeout(debounceTimer);
 
       debounceTimer = setTimeout(function () {
-        var query = searchInput.value.toLowerCase().trim();
+        var query = removeAccents(searchInput.value.toLowerCase().trim());
 
         if (!query) {
           renderSkillCards(allSkillsData);
@@ -123,8 +130,8 @@
         }
 
         var filtered = allSkillsData.filter(function (person) {
-          var name = (person.Nome_do_Irmao || '').toLowerCase();
-          var skills = (person.Habilidades || '').toLowerCase();
+          var name = removeAccents((person.Nome_do_Irmao || '').toLowerCase());
+          var skills = removeAccents((person.Habilidades || '').toLowerCase());
           return name.includes(query) || skills.includes(query);
         });
 
