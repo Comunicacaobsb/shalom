@@ -1,0 +1,9 @@
+/* ================================
+   CEV Asa Sul — Override de marca
+   Herda todo o template de ../taguatinga/css/styles.css
+   ================================ */
+
+:root {
+  --brand: #1a6b4a;
+  --brand-2: #2a9d6e;
+}

@@ -4,56 +4,184 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    <script src="../js/header.js"></script>
 
-    <meta property="og:site_name" content="Shalom Brasília">
-    <meta property="og:title" content="Shalom Brasília" />
-    <meta property="og:description" content="Acesse tudo aqui - Mais informações">
-    <meta property="og:image" itemprop="image" content="../images/shalom-asasul.jpg" />
-    <meta property="og:type" content="website" />
+  <script src="../js/header.js"></script>
+  <link rel="stylesheet" href="../taguatinga/css/styles.css">
+  <link rel="stylesheet" href="css/styles.css">
 
-    <title>Asa Sul | Shalom Brasília</title>
+  <title>Shalom Asa Sul</title>
+  <meta property="og:site_name" content="Shalom Asa Sul">
+  <meta property="og:title" content="Shalom Asa Sul" />
+  <meta name="description" content="Horários, serviços, doações, localização e contatos do Centro de Evangelização Shalom Asa Sul." />
+  <meta property="og:description" content="Horários, serviços, doações, localização e contatos do Centro de Evangelização Shalom Asa Sul." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://brasilia.comshalom.org/asasul/" />
+  <meta property="og:image" content="https://brasilia.comshalom.org/asasul/images/hero.jpg" />
+  <link rel="canonical" href="https://brasilia.comshalom.org/asasul/" />
+  <meta name="robots" content="index,follow" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Shalom Asa Sul" />
+  <meta name="twitter:description" content="Horários, serviços, doações, localização e contatos do Centro de Evangelização Shalom Asa Sul." />
+  <meta name="twitter:image" content="https://brasilia.comshalom.org/asasul/images/hero.jpg" />
+  <meta name="theme-color" content="#f5f5f7" />
+  <meta name="theme-color" content="#0e0e10" media="(prefers-color-scheme: dark)" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Shalom Asa Sul",
+    "url": "https://brasilia.comshalom.org/asasul/",
+    "logo": "https://brasilia.comshalom.org/asasul/images/hero.jpg",
+    "sameAs": ["https://instagram.com/shalomasasul"]
+  }
+  </script>
 
-  <style type="text/css">
-    :root{
-      --color-1:#111;
-      --color-2:#222;
-      --color-3:#f0f0f0;
-    }
-    body{
-      width: 100vw;
-      height: 100vh;
-      margin: 0;
-      position: relative;
-    }
-
-    div.desktop{
-      position: absolute;
-      background: #fff;
-      height: 100px;
-      width: 350px;
-      bottom: 0;
-    }
-    @media (max-width:1260px) {
-      div.desktop{
-      display: none;
-    }
-    }
-
-
-
-  
-</style>
 </head>
 
 <body>
 
-  <iframe src="https://bento.me/shalomasasul" width="100%" height="100%" frameborder="0"></iframe>
+  <header class="section">
+    <div class="container">
+      <div class="hero">
+        <div class="skeleton" style="position:absolute; inset:0; z-index:0; border-radius:20px;"></div>
+        <img class="hero-img" src="images/hero.jpg" alt="Shalom Asa Sul" loading="eager" decoding="async" onload="this.parentElement.querySelector('.skeleton').style.display='none';">
+        <div class="hero-content">
+          <h1 class="hero-title">Shalom Asa Sul</h1>
+          <p class="subtitle">Centro de Evangelização • Informações oficiais</p>
+          <div class="links-grid">
+            <a class="link-btn primary" href="#mapa">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5Z"/></svg>
+              Como chegar
+            </a>
+            <a class="link-btn primary" href="https://instagram.com/shalomasasul" target="_blank">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+              Instagram
+            </a>
+            <a class="link-btn" href="https://comshalom.org/brasilia" target="_blank">
+              <img class="icon-img" src="../favicon/favicon-32x32.png" alt="favicon">
+              Comshalom
+            </a>
+            <a class="link-btn" href="#horarios">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.65 0-3 1.35-3 3v12c0 1.66 1.35 3 3 3h14c1.66 0 3-1.34 3-3V7c0-1.65-1.34-3-3-3Zm1 15c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1V10h16v9Zm0-11H4V7c0-.55.45-1 1-1h1v2h2V6h8v2h2V6h1c.55 0 1 .45 1 1v2Z"/></svg>
+              Horários e Missas
+            </a>
+            <a class="link-btn" href="#doacoes">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4 8.04 4 9.54 4.81 10.35 6.09 11.16 4.81 12.66 4 14.2 4 16.7 4 18.7 6 18.7 8.5c0 3.78-3.4 6.86-8.55 11.5Z"/></svg>
+              Comunhão de bens
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <div class="desktop"></div>
+  <section id="horarios" class="section">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-12 col-md-4">
+          <div class="card card-pilar h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 8V4h-2v6h6v-2h-4Zm0-6a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/></svg> Funcionamento</h5>
+              <ul class="list-unstyled mb-0">
+                <li>Seg a sáb: 14h às 22h</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="card card-pilar h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M20 6h-5V4h-2v2H4v2h9v2h2V8h5V6Zm-2 6H6c-1.1 0-2 .9-2 2v6h2v-2h12v2h2v-6c0-1.1-.9-2-2-2ZM6 16v-2h12v2H6Z"/></svg> Missas</h5>
+              <ul class="list-unstyled mb-0">
+                <li>A confirmar</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="card card-pilar h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2 9.5 8.5 3 11l6.5 2.5L12 20l2.5-6.5L21 11l-6.5-2.5L12 2Z"/></svg> Adoração</h5>
+              <ul class="list-unstyled mb-0">
+                <li>A confirmar</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="doacoes" class="section">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4 8.04 4 9.54 4.81 10.35 6.09 11.16 4.81 12.66 4 14.2 4 16.7 4 18.7 6 18.7 8.5c0 3.78-3.4 6.86-8.55 11.5Z"/></svg> Comunhão de bens — Obra Asa Sul</h5>
+              <div class="grid-2">
+                <div>
+                  <h6>10%</h6>
+                  <p class="small mb-1">Dados a confirmar</p>
+                </div>
+                <div>
+                  <h6>5%</h6>
+                  <p class="small mb-1">Dados a confirmar</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="mapa" class="section">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Localização</h5>
+              <p class="small">Como chegar ao Centro de Evangelização Shalom Asa Sul.</p>
+              <iframe class="map" src="https://www.google.com/maps?q=Shalom+Asa+Sul+Brasilia&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              <div class="mt-3">
+                <a class="link-btn" href="https://maps.google.com/?q=Shalom+Asa+Sul+Brasilia" target="_blank">Abrir no Google Maps</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title title-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4Zm0 4h16v2H4V8Zm0 4h10v2H4v-2Zm0 4h10v2H4v-2Z"/></svg> Últimas notícias (comshalom)</h5>
+              <ul class="list-unstyled mb-0" id="comshalom-list">
+                <li class="skeleton skeleton-text"></li>
+                <li class="skeleton skeleton-text"></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">Copiado!</div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      Shalom Asa Sul 2026, todos os direitos reservados.
+    </div>
+  </footer>
+
+  <script src="../js/centralScript.js"></script>
+  <script src="js/main.js"></script>
 
 </body>
-
 
 </html>

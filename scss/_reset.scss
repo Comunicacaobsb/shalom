@@ -1,0 +1,52 @@
+// ================================
+// RESET / BASE
+// ================================
+
+* {
+  scrollbar-width: none;
+  scrollbar-color: transparent;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  height: 0px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+  padding: 0px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+html {
+  width: 100vw;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  width: 100vw;
+  font-family: var(--font-primary);
+  color: var(--text);
+  background-color: var(--bg);
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: var(--brand);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--brand-dark);
+  }
+}

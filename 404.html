@@ -4,90 +4,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    <script src="js/header.js"></script>
 
-    <meta property="og:site_name" content="Shalom Brasília">
-    <meta property="og:title" content="Shalom Brasília" />
-    <meta property="og:description" content="Acesse tudo aqui - Mais informações">
-    <meta property="og:image" itemprop="image" content="../images/semanasanta.png" />
-    <meta property="og:type" content="website" />
+  <script src="js/header.js"></script>
 
-    <title>Shalom Brasília</title>
+  <meta property="og:site_name" content="Shalom Brasilia">
+  <meta property="og:title" content="Shalom Brasilia" />
+  <meta property="og:description" content="Pagina nao encontrada">
+  <meta property="og:type" content="website" />
 
-  <style type="text/css">
-    :root{
-      --color-1:#111;
-      --color-2:#222;
-      --color-3:#f0f0f0;
+  <title>404 — Shalom Brasilia</title>
+
+  <style>
+    .error-page {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      gap: 0.5rem;
     }
-    body{
+    .error-page h1 {
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 800;
+      color: var(--brand);
       margin: 0;
-      background: var(--color-3);
-      font-family: 'Montserrat', sans-serif!important;
     }
-  div{
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
-  h1 {
-    
-    text-align: center;
-    margin: 0;
-    font-size: 50pt;
-    color: var(--color-1);}
-    p {
-      
-    text-align: center; font-size: 20pt;
-    color: var(--color-1);
-    margin: 0;
+    .error-page p {
+      color: var(--text-muted);
+      margin: 0;
     }
-    a{
-      padding: 0.3em 1.5em;
-    border: 1px solid var(--color-2);
-    color: var(--color-1);
-    text-decoration: none;
-    border-radius: 0.5em;
-    margin-top: 1em;
-    transition: all .3s ease-in-out;
-    position: relative;
+    .error-page a {
+      margin-top: 1rem;
     }
-    
-    a:hover{
-      background: var(--color-2);
-      color: #fff;
-    }
-    a:after{
-      content: '';
-      position: absolute;
-      background: transparent;
-      opacity: 0;
-      border-radius: 1000px;
-      height: 2px;
-      width: 2px;
-      top: 50%;
-      left: 50%;
-      transition: all .2s ease-in-out;
-      z-index: -1;
-    }
-    a:focus:after{
-      opacity: 1;
-      transform: scale(1000);
-      background: var(--color-2);
-    }
-</style>
+  </style>
 </head>
 
 <body>
-  
-  <div>
+
+  <div class="error-page">
     <h1>404</h1>
-    <p>página não encontrada</p>
-    <a class="btn btn-primary" href="https://comshalom.org/brasilia/">
-    Home
+    <p>Pagina nao encontrada</p>
+    <a class="btn-brand" href="https://comshalom.org/brasilia/">
+      Ir para Home
     </a>
   </div>
 
