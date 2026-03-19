@@ -238,6 +238,126 @@ footer {
   }
 }
 
+// ---- Site Footer (compartilhado via footer.js) ----
+.site-footer {
+  background: var(--footer-bg, #0c1524);
+  color: #e2e8f0;
+  padding: 2.5rem 0 2rem;
+  font-size: 0.85rem;
+  position: relative;
+  z-index: 1;
+
+  .footer-grid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+  }
+
+  .footer-col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  // Coluna Esquerda: Contato e Redes
+  .footer-contact {
+    a {
+      color: #e2e8f0;
+      text-decoration: none;
+      transition: color 0.2s ease;
+      &:hover { color: #fff; }
+    }
+
+    .footer-ig {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #fff;
+      svg { flex-shrink: 0; }
+      &:hover { text-decoration: underline; }
+    }
+
+    .footer-phone {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    p {
+      margin: 0;
+      line-height: 1.6;
+      font-size: 0.7rem!important;
+      color: #94a3b8;
+    }
+  }
+
+  // Coluna Central: Tema do Ano
+  .footer-motto {
+    text-align: center;
+    align-self: center;
+
+    small {
+      display: block;
+      letter-spacing: 0.18em;
+      color: #64748b;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      line-height: 1.8;
+      font-weight: 500;
+      text-wrap-style: balance;
+    }
+  }
+
+  // Coluna Direita: Institucional
+  .footer-brand {
+    text-align: right;
+
+    img {
+      display: inline-block;
+      height: 48px !important;
+      width: auto !important;
+      max-width: 200px;
+      margin-bottom: 0.5rem;
+      filter: brightness(0) invert(1) !important;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+      &:hover { opacity: 1; }
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem!important;
+      color: #64748b;
+      letter-spacing: 0.02em;
+    }
+  }
+
+  // Responsivo
+  @media (max-width: 768px) {
+    padding: 2rem 0 1.5rem;
+
+    .footer-grid {
+      flex-direction: column;
+      text-align: center;
+      gap: 1.5rem;
+    }
+
+    .footer-contact {
+      text-align: center;
+      .footer-ig { justify-content: center; }
+    }
+
+    .footer-motto { order: 2; }
+
+    .footer-brand {
+      text-align: center;
+      order: 3;
+    }
+  }
+}
+
 // Toast (para feedback de acoes como copiar PIX)
 .toast-container {
   position: fixed;

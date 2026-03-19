@@ -48,6 +48,9 @@
         <a class="nav-link" href="#hero" data-bs-dismiss="offcanvas">Início</a>
         <a class="nav-link" href="#sobre" data-bs-dismiss="offcanvas">Sobre os 25 Anos</a>
         <a class="nav-link" href="#eventos" data-bs-dismiss="offcanvas">Eventos</a>
+        <a class="nav-link" href="#adoracao" data-bs-dismiss="offcanvas">Adoração e Vigília</a>
+        <a class="nav-link" href="#providencia" data-bs-dismiss="offcanvas">Providência</a>
+        <a class="nav-link" href="#cevs" data-bs-dismiss="offcanvas">Centros de Evangelização</a>
       </nav>
     </div>
   </div>
@@ -145,124 +148,24 @@
         </div>
       </div>
 
-      <div class="row g-4">
-        <!-- Evento Destaque -->
-        <div class="col-12">
-          <div class="card card-evento card-evento-destaque">
-            <div class="card-body">
-              <div class="evento-data">
-                <span class="evento-dia">25</span>
-                <span class="evento-mes">ABR</span>
-              </div>
-              <div class="evento-info">
-                <span class="evento-badge">Evento Principal</span>
-                <h4 class="evento-titulo">Celebração dos 25 anos</h4>
-                <p class="evento-descricao">com Arcebispo Dom Paulo</p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Eventos carregados dinamicamente via Google Sheets -->
+      <div id="eventos-loader" class="text-center py-4">
+        <div class="eventos-spinner"></div>
+        <p class="text-white-50 mt-3 mb-0" style="font-size:0.9rem">Carregando eventos...</p>
+      </div>
+      <div id="eventos-grid" class="row g-4" style="display:none"></div>
 
-        <!-- Eventos Grid -->
-        <div class="col-md-6 col-lg-4">
-          <div class="card card-evento h-100">
-            <div class="card-body">
-              <div class="evento-data">
-                <span class="evento-dia">28</span>
-                <span class="evento-mes">FEV</span>
-              </div>
-              <div class="evento-info">
-                <span class="evento-badge evento-badge-especial">Especial</span>
-                <h5 class="evento-titulo">Encontro Geral da Obra</h5>
-                <p class="evento-descricao">com Moysés</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-lg-4">
-          <div class="card card-evento h-100">
-            <div class="card-body">
-              <div class="evento-data">
-                <span class="evento-dia">25-26</span>
-                <span class="evento-mes">MAI</span>
-              </div>
-              <div class="evento-info">
-                <h5 class="evento-titulo">Congresso Mariano</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-lg-4">
-          <div class="card card-evento h-100">
-            <div class="card-body">
-              <div class="evento-data">
-                <span class="evento-dia">22-26</span>
-                <span class="evento-mes">JUL</span>
-              </div>
-              <div class="evento-info">
-                <h5 class="evento-titulo">Acamp's 25 anos</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-lg-4">
-          <div class="card card-evento h-100">
-            <div class="card-body">
-              <div class="evento-data">
-                <span class="evento-dia">12-18</span>
-                <span class="evento-mes">AGO</span>
-              </div>
-              <div class="evento-info">
-                <h5 class="evento-titulo">Jornada Missionária</h5>
-                <p class="evento-descricao">Samambaia</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-lg-4">
-          <div class="card card-evento h-100">
-            <div class="card-body">
-              <div class="evento-data">
-                <span class="evento-dia">15-16</span>
-                <span class="evento-mes">NOV</span>
-              </div>
-              <div class="evento-info">
-                <h5 class="evento-titulo">Dia Mundial dos Pobres</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-lg-4">
-          <div class="card card-evento h-100">
-            <div class="card-body">
-              <div class="evento-data">
-                <span class="evento-dia">18-20</span>
-                <span class="evento-mes">NOV</span>
-              </div>
-              <div class="evento-info">
-                <h5 class="evento-titulo">Tríduo de Cristo Rei</h5>
-                <p class="evento-descricao">Missa da Festa</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12">
-          <div class="card card-evento card-evento-final">
-            <div class="card-body">
-              <div class="evento-data">
-                <span class="evento-dia">12</span>
-                <span class="evento-mes">DEZ</span>
-              </div>
-              <div class="evento-info">
-                <span class="evento-badge evento-badge-encerramento">Encerramento</span>
-                <h4 class="evento-titulo">Concerto 25 anos</h4>
-              </div>
+      <!-- Calendário expansível -->
+      <div class="row mt-4">
+        <div class="col-12 text-center">
+          <button class="btn-calendario-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#calendario-collapse" aria-expanded="false" aria-controls="calendario-collapse">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Ver calendário completo da Missão
+            <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="collapse mt-3" id="calendario-collapse">
+            <div class="calendario-wrapper">
+              <iframe class="calendario-iframe" loading="lazy" src="https://calendar.google.com/calendar/u/0/embed?src=n9c03lrse3tl4uvt381d3is5jo@group.calendar.google.com&ctz=America/Sao_Paulo"></iframe>
             </div>
           </div>
         </div>
@@ -270,20 +173,118 @@
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="footer-section py-4">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col text-center">
-          <p class="mb-0">
-            Feito com oração por
-            <img src="images/jr.png" alt="João Roque Design" class="footer-logo">
-            <strong>João Roque</strong>
-          </p>
+  <!-- Adoração e Vigília Section -->
+  <section id="adoracao" class="adoracao-section py-5">
+    <div class="container py-5">
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-8 text-center">
+          <h2 class="font-title text-principal mb-3">Adoração e Vigília</h2>
+          <p class="text-muted">Momentos de oração e encontro com o Senhor</p>
+        </div>
+      </div>
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-6">
+          <a href="#" class="adoracao-card">
+            <div class="adoracao-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L9.5 8.5 3 11l6.5 2.5L12 20l2.5-6.5L21 11l-6.5-2.5L12 2Z"/></svg>
+            </div>
+            <h3 class="adoracao-name">Adoração ao Santíssimo</h3>
+            <p class="adoracao-desc">Em breve mais informações</p>
+          </a>
+        </div>
+        <div class="col-md-6">
+          <a href="https://vigiliash.web.app/app/pages/agenda-vigilias.html?t=YzJoaGJHOXRYMkp5WVhOcGJHbGg7CgkJCVUyaGhiRzl0SUVKeVlYUHRiR2xoOwoJCQliV2x6YzJGdg==$aba=ni_calendario" target="_blank" rel="noopener" class="adoracao-card">
+            <div class="adoracao-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </div>
+            <h3 class="adoracao-name">Vigília de Oração</h3>
+            <p class="adoracao-desc">Ver agenda de vigílias</p>
+          </a>
         </div>
       </div>
     </div>
-  </footer>
+  </section>
+
+  <!-- Providência Section -->
+  <section id="providencia" class="providencia-section py-5">
+    <div class="container py-5">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <h2 class="font-title text-white mb-3">Providência</h2>
+          <p class="text-white-50 mb-4">A Providência é a expressão concreta da comunhão de bens. Aqui você encontra as necessidades das casas comunitárias e os talentos dos irmãos disponíveis para servir.</p>
+          <a href="../providencia/" class="btn btn-providencia">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Acessar Providência
+          </a>
+        </div>
+        <div class="col-lg-6">
+          <div class="providencia-img-wrapper">
+            <img src="../providencia/imagens/logo-completa.svg" alt="Providência" class="providencia-img">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Centros de Evangelização Section -->
+  <section id="cevs" class="cevs-section py-5">
+    <div class="container py-5">
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-8 text-center">
+          <h2 class="font-title text-principal mb-3">Nossos CEVs</h2>
+          <p class="text-muted">Centros de Evangelização em Brasília</p>
+        </div>
+      </div>
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-4">
+          <a href="../asasul/" class="cev-card">
+            <div class="cev-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <h3 class="cev-name">Asa Sul</h3>
+            <p class="cev-desc">Centro de Evangelização</p>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="../taguatinga/" class="cev-card">
+            <div class="cev-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <h3 class="cev-name">Taguatinga</h3>
+            <p class="cev-desc">Centro de Evangelização</p>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="../santamaria/" class="cev-card">
+            <div class="cev-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <h3 class="cev-name">Santa Maria</h3>
+            <p class="cev-desc">Centro de Evangelização</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Instagram Section -->
+  <section id="instagram" class="instagram-section py-5">
+    <div class="container py-5">
+      <div class="row justify-content-center mb-4">
+        <div class="col-lg-8 text-center">
+          <h2 class="font-title text-principal mb-3">Siga-nos</h2>
+          <p class="text-muted">Acompanhe as novidades no Instagram</p>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="instagram-embed-wrapper">
+            <iframe src="https://www.instagram.com/shalombrasilia/embed" class="instagram-embed" loading="lazy" allowtransparency="true" frameborder="0" scrolling="no"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
@@ -292,6 +293,9 @@
 
   <!-- Custom JS -->
   <script src="js/main.js"></script>
+
+  <!-- Footer compartilhado -->
+  <script src="../js/footer.js"></script>
 
 </body>
 

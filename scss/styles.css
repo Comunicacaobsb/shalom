@@ -623,6 +623,117 @@ footer .position-absolute {
   bottom: 0;
 }
 
+.site-footer {
+  background: var(--footer-bg, #0c1524);
+  color: #e2e8f0;
+  padding: 2.5rem 0 2rem;
+  font-size: 0.85rem;
+  position: relative;
+  z-index: 1;
+}
+.site-footer .footer-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+}
+.site-footer .footer-col {
+  flex: 1;
+  min-width: 0;
+}
+.site-footer .footer-contact a {
+  color: #e2e8f0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.site-footer .footer-contact a:hover {
+  color: #fff;
+}
+.site-footer .footer-contact .footer-ig {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+}
+.site-footer .footer-contact .footer-ig svg {
+  flex-shrink: 0;
+}
+.site-footer .footer-contact .footer-ig:hover {
+  text-decoration: underline;
+}
+.site-footer .footer-contact .footer-phone {
+  font-weight: 700;
+  color: #fff;
+}
+.site-footer .footer-contact p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 0.7rem !important;
+  color: #94a3b8;
+}
+.site-footer .footer-motto {
+  text-align: center;
+  align-self: center;
+}
+.site-footer .footer-motto small {
+  display: block;
+  letter-spacing: 0.18em;
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  line-height: 1.8;
+  font-weight: 500;
+  text-wrap-style: balance;
+}
+.site-footer .footer-brand {
+  text-align: right;
+}
+.site-footer .footer-brand img {
+  display: inline-block;
+  height: 48px !important;
+  width: auto !important;
+  max-width: 200px;
+  margin-bottom: 0.5rem;
+  filter: brightness(0) invert(1) !important;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+.site-footer .footer-brand img:hover {
+  opacity: 1;
+}
+.site-footer .footer-brand p {
+  margin: 0;
+  font-size: 0.9rem !important;
+  color: #64748b;
+  letter-spacing: 0.02em;
+}
+@media (max-width: 768px) {
+  .site-footer {
+    padding: 2rem 0 1.5rem;
+  }
+  .site-footer .footer-grid {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  .site-footer .footer-contact {
+    text-align: center;
+  }
+  .site-footer .footer-contact .footer-ig {
+    justify-content: center;
+  }
+  .site-footer .footer-motto {
+    order: 2;
+  }
+  .site-footer .footer-brand {
+    text-align: center;
+    order: 3;
+  }
+}
+
 .toast-container {
   position: fixed;
   bottom: 1.5rem;

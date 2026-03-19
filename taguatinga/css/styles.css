@@ -35,7 +35,7 @@ body {
   background: var(--bg);
 }
 
-.container { max-width: 880px; }
+/* Container usa largura padrão do Bootstrap no desktop */
 
 /* --- Section system --- */
 .section {

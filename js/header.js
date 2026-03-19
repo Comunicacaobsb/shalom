@@ -119,7 +119,7 @@
         'font-size:0;line-height:0;padding:0;' +
       '}' +
       '.theme-toggle:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(0,0,0,.18);}' +
-      '.theme-toggle svg{width:20px;height:20px;fill:currentColor;}' +
+      '.theme-toggle svg{width:20px;height:20px;}' +
       '@media print{.theme-toggle{display:none;}}';
     head.appendChild(toggleCSS);
 
@@ -145,11 +145,11 @@
       var target = btn || document.querySelector('.theme-toggle');
       if (!target) return;
       if (theme === 'dark') {
-        // Sol (mudar para claro)
-        target.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0-4a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1Zm0 17a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1ZM4 12a1 1 0 0 1-1 1H2a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1Zm17 0a1 1 0 0 1 1 0h1a1 1 0 0 1 0 2h-1a1 1 0 0 1-1-1ZM6.34 6.34a1 1 0 0 1 0-1.41l.7-.71a1 1 0 1 1 1.42 1.42l-.71.7a1 1 0 0 1-1.41 0Zm11.32 11.32a1 1 0 0 1 0-1.41l.7-.71a1 1 0 1 1 1.42 1.42l-.71.7a1 1 0 0 1-1.41 0ZM6.34 17.66a1 1 0 0 1-1.41 0l-.71-.7a1 1 0 1 1 1.42-1.42l.7.71a1 1 0 0 1 0 1.41ZM17.66 6.34a1 1 0 0 1-1.41 0l-.71-.7a1 1 0 0 1 1.42-1.42l.7.71a1 1 0 0 1 0 1.41Z"/></svg>';
+        // Sol — indica que está em dark, clique para light
+        target.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
       } else {
-        // Lua (mudar para escuro)
-        target.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.5-.04-.99-.13-1.47A7.5 7.5 0 0 1 10.47 4.13 8.96 8.96 0 0 0 12 3Z"/></svg>';
+        // Lua — indica que está em light, clique para dark
+        target.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
       }
     }
 
