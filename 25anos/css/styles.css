@@ -57,10 +57,23 @@ body {
 
 .text-principal {
   color: var(--cor-principal);
+  text-wrap-style: balance;
 }
 
 .text-white-50 {
   color: rgba(255, 255, 255, 0.7);
+}
+
+.text-white-70 {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Subtítulo padronizado para todas as seções */
+.section-subtitle {
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0;
 }
 
 b{
@@ -214,21 +227,22 @@ b{
 }
 
 .btn-outline-primary {
-  
-    --bs-btn-color: var(--cor-principal);
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--cor-principal);
     --bs-btn-border-color: var(--cor-principal);
     --bs-btn-hover-color: #fff;
-    --bs-btn-hover-bg: var(--cor-principal);
-    --bs-btn-hover-border-color: var(--cor-principal);
-    --bs-btn-focus-shadow-rgb: 13, 110, 253;
+    --bs-btn-hover-bg: #163a6a;
+    --bs-btn-hover-border-color: #163a6a;
+    --bs-btn-focus-shadow-rgb: 32, 79, 140;
     --bs-btn-active-color: #fff;
-    --bs-btn-active-bg: var(--cor-principal);
-    --bs-btn-active-border-color: var(--cor-principal);
+    --bs-btn-active-bg: #163a6a;
+    --bs-btn-active-border-color: #163a6a;
     --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-    --bs-btn-disabled-color: var(--cor-principal);
-    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: var(--cor-principal);
     --bs-btn-disabled-border-color: var(--cor-principal);
     --bs-gradient: none;
+    font-weight: 600;
 }
 
 .scroll-indicator {
@@ -694,15 +708,16 @@ b{
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  /* padding: 2rem; */
 }
 
 .providencia-img {
-  max-width: 280px;
+  max-width: 320px;
   width: 100%;
   height: auto;
-  filter: brightness(0) invert(1);
-  opacity: 0.8;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  opacity: 0.9;
 }
 
 /* --------------------------------------------------------------------------
@@ -1088,10 +1103,6 @@ b{
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.7) 100%);
   }
 
-  :root:not([data-theme="light"]) .hero-subtitle {
-    color: rgba(255, 255, 255, 0.85);
-  }
-
   :root:not([data-theme="light"]) .blockquote-revelacao {
     background-color: #162032;
     color: var(--preto);
@@ -1102,20 +1113,49 @@ b{
     color: var(--azul-claro);
   }
 
-  :root:not([data-theme="light"]) .sobre-section h4 {
-    color: var(--preto);
+  :root:not([data-theme="light"]) .text-principal {
+    color: #93bbf0;
+  }
+
+  :root:not([data-theme="light"]) .section-subtitle {
+    color: #94a3b8;
+  }
+
+  :root:not([data-theme="light"]) .eventos-section .section-subtitle {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  :root:not([data-theme="light"]) .providencia-section .section-subtitle {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  :root:not([data-theme="light"]) .eventos-section .card-evento {
+    box-shadow: none;
   }
 
   :root:not([data-theme="light"]) .hero-logo {
     filter: brightness(0) invert(1);
   }
 
+  :root:not([data-theme="light"]) .hero-subtitle {
+    color: rgba(241, 245, 249, 0.9);
+  }
+
   :root:not([data-theme="light"]) .btn-outline-primary {
-    --bs-btn-color: #fff;
-    --bs-btn-border-color: rgba(255, 255, 255, 0.5);
-    --bs-btn-hover-bg: rgba(255, 255, 255, 0.15);
-    --bs-btn-hover-border-color: #fff;
+    --bs-btn-bg: rgba(255, 255, 255, 0.12);
+    --bs-btn-color: #e2e8f0;
+    --bs-btn-border-color: rgba(255, 255, 255, 0.35);
+    --bs-btn-hover-bg: var(--cor-principal);
+    --bs-btn-hover-border-color: var(--cor-principal);
     --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #163a6a;
+    --bs-btn-active-border-color: #163a6a;
+    --bs-btn-active-color: #fff;
+  }
+
+  :root:not([data-theme="light"]) .cev-card::after,
+  :root:not([data-theme="light"]) .adoracao-card::after {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393bbf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='7' y1='17' x2='17' y2='7'/%3E%3Cpolyline points='7 7 17 7 17 17'/%3E%3C/svg%3E") no-repeat center;
   }
 
   :root:not([data-theme="light"]) .footer-section {
@@ -1157,7 +1197,7 @@ b{
   }
 
   :root:not([data-theme="light"]) .providencia-img {
-    opacity: 0.9;
+    opacity: 0.85;
   }
 
   :root:not([data-theme="light"]) .instagram-section {
@@ -1189,10 +1229,6 @@ b{
   filter: brightness(0) invert(1);
 }
 
-[data-theme="dark"] .hero-subtitle {
-  color: rgba(255, 255, 255, 0.85);
-}
-
 [data-theme="dark"] .blockquote-revelacao {
   background-color: #162032;
   color: var(--preto);
@@ -1203,16 +1239,41 @@ b{
   color: var(--azul-claro);
 }
 
-[data-theme="dark"] .sobre-section h4 {
-  color: var(--preto);
+[data-theme="dark"] .text-principal {
+  color: #93bbf0;
+}
+
+[data-theme="dark"] .section-subtitle {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .eventos-section .section-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] .providencia-section .section-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="dark"] .eventos-section .card-evento {
+  box-shadow: none;
 }
 
 [data-theme="dark"] .btn-outline-primary {
-  --bs-btn-color: #fff;
-  --bs-btn-border-color: rgba(255, 255, 255, 0.5);
-  --bs-btn-hover-bg: rgba(255, 255, 255, 0.15);
-  --bs-btn-hover-border-color: #fff;
+  --bs-btn-bg: rgba(255, 255, 255, 0.12);
+  --bs-btn-color: #e2e8f0;
+  --bs-btn-border-color: rgba(255, 255, 255, 0.35);
+  --bs-btn-hover-bg: var(--cor-principal);
+  --bs-btn-hover-border-color: var(--cor-principal);
   --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: #163a6a;
+  --bs-btn-active-border-color: #163a6a;
+  --bs-btn-active-color: #fff;
+}
+
+[data-theme="dark"] .cev-card::after,
+[data-theme="dark"] .adoracao-card::after {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393bbf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='7' y1='17' x2='17' y2='7'/%3E%3Cpolyline points='7 7 17 7 17 17'/%3E%3C/svg%3E") no-repeat center;
 }
 
 [data-theme="dark"] .footer-section {
