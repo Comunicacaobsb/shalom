@@ -76,6 +76,12 @@ body {
   margin-bottom: 0;
 }
 
+/* Seções com fundo escuro precisam de subtítulo claro sempre */
+.eventos-section .section-subtitle,
+.providencia-section .section-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+}
+
 b{
   font-weight: bold;
 }
