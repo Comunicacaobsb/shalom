@@ -84,7 +84,9 @@
       border-radius: .75rem;
       padding: .75rem 1rem;
       text-align: center;
-      min-width: 120px;
+      flex: 1;
+      min-width: 0;
+      max-width: 200px;
       box-shadow: var(--box-shadow-1, 0 2px 8px rgba(0,0,0,.1));
     }
     .stat-card .stat-value {
@@ -267,6 +269,82 @@
       padding: .1rem .5rem;
       border-radius: .75rem;
       font-weight: 600;
+    }
+
+    /* — Week indicators — */
+    .week-dots {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .week-dot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px; height: 22px;
+      border-radius: 4px;
+      font-size: .6rem;
+      font-weight: 700;
+      line-height: 1;
+      border: 1px solid var(--border, #e5e7eb);
+    }
+    .week-dot.empty {
+      background: var(--cinza-50, #f0f0f0);
+      color: var(--cinza-300, #a3a3a3);
+      border-style: dashed;
+    }
+    .week-dot.partial {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fbbf24;
+    }
+    .week-dot.full {
+      background: #d1fae5;
+      color: #065f46;
+      border-color: #34d399;
+    }
+    .week-label {
+      font-size: var(--font-size-minor, .76rem);
+      color: var(--text-muted, #777);
+      margin-right: 2px;
+    }
+
+    /* Mobile slot week detail */
+    .slot-weeks {
+      display: flex;
+      gap: 3px;
+      margin-top: 4px;
+      align-items: center;
+    }
+
+    /* Desktop grid week dots */
+    .grid-cell .cell-weeks {
+      display: flex;
+      gap: 2px;
+      margin-top: 2px;
+    }
+    .grid-cell .cell-weeks .wd {
+      width: 14px; height: 14px;
+      border-radius: 3px;
+      font-size: .5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .grid-cell .cell-weeks .wd.empty {
+      background: rgba(0,0,0,.06);
+      color: rgba(0,0,0,.25);
+    }
+    .grid-cell .cell-weeks .wd.partial {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .grid-cell .cell-weeks .wd.full {
+      background: #d1fae5;
+      color: #065f46;
     }
 
     /* — Color levels — */
@@ -464,7 +542,7 @@
     const META_ADORADORES = 2;
 
     // WhatsApp da responsável (com código do país, sem +)
-    const WHATSAPP_NUMERO = '5561999999999';
+    const WHATSAPP_NUMERO = '5561982644432';
 
     // Mensagem pré-preenchida (use {dia} e {horario} como variáveis)
     const WHATSAPP_MSG = 'Olá! Gostaria de me comprometer com a Adoração Perpétua no horário de {horario} na {dia}. Como faço para me inscrever?';
@@ -589,6 +667,30 @@
       return h.replace(':00', 'h');
     }
 
+    function getWeeks(slot) {
+      return [
+        parseInt(slot.sem1) || 0,
+        parseInt(slot.sem2) || 0,
+        parseInt(slot.sem3) || 0,
+        parseInt(slot.sem4) || 0,
+        parseInt(slot.sem5) || 0
+      ];
+    }
+
+    function weekDotsHTML(slot, size) {
+      const weeks = getWeeks(slot);
+      const labels = ['1ª', '2ª', '3ª', '4ª', '5ª'];
+      const isSmall = size === 'small';
+      const dotClass = isSmall ? 'wd' : 'week-dot';
+
+      return weeks.map((count, i) => {
+        let cls = 'empty';
+        if (count >= META_ADORADORES) cls = 'full';
+        else if (count > 0) cls = 'partial';
+        return `<span class="${dotClass} ${cls}" title="${labels[i]} semana: ${count} pessoa(s)">${count}</span>`;
+      }).join('');
+    }
+
     function render(data) {
       // Group by day
       const byDay = {};
@@ -648,7 +750,7 @@
           </div>
           <div class="stat-card">
             <div class="stat-value">${META_ADORADORES}</div>
-            <div class="stat-label">Meta por horário</div>
+            <div class="stat-label text-balance">Meta de pessoas por horário</div>
           </div>
         </div>`;
 
@@ -713,9 +815,9 @@
           const timeLabel = `${formatHour(slot.hora_inicio)} às ${formatHour(slot.hora_fim)}`;
           const url = isClickable ? whatsappURL(d, timeLabel) : '#';
 
-          html += `<${isClickable ? 'a' : 'div'} class="grid-cell ${lvClass(pct)} ${isClickable ? 'clickable' : ''}" ${isClickable ? `href="${url}" target="_blank" rel="noopener"` : ''} title="${d} ${timeLabel}: ${pct}% — ~${avg} pessoa(s)/sem, ${wk}/5 semanas cobertas">
+          html += `<${isClickable ? 'a' : 'div'} class="grid-cell ${lvClass(pct)} ${isClickable ? 'clickable' : ''}" ${isClickable ? `href="${url}" target="_blank" rel="noopener"` : ''} title="${d} ${timeLabel}: ${pct}%">
             <span class="cell-pct">${pct}%</span>
-            <span class="cell-people">${wk}/5 sem</span>
+            <div class="cell-weeks">${weekDotsHTML(slot, 'small')}</div>
           </${isClickable ? 'a' : 'div'}>`;
         });
       });
@@ -760,8 +862,9 @@
                 <div class="slot-bar">
                   <div class="slot-bar-fill ${fillClass(pctSlot)}" style="width:${pctSlot}%"></div>
                 </div>
-                <div class="slot-detail">
-                  <span>~${avg} pessoa(s)/sem · ${wk}/5 semanas</span>
+                <div class="slot-weeks">
+                  <span class="week-label">Sem:</span>
+                  ${weekDotsHTML(slot, 'normal')}
                 </div>
               </div>
               <span class="slot-pct ${textClass(pctSlot)}">${pctSlot}%</span>
