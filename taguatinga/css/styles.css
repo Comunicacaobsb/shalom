@@ -73,6 +73,7 @@ body {
   display: flex;
   align-items: flex-end;
   box-shadow: var(--cev-shadow-lg);
+  margin-top: 2rem;
 }
 .hero-img {
   position: absolute; top: 0; left: 0;
