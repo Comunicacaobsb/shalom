@@ -44,6 +44,10 @@ body {
   overflow-x: hidden;
 }
 
+.text-balance{
+  text-wrap: balance;
+}
+
 /* --------------------------------------------------------------------------
    Typography
    -------------------------------------------------------------------------- */
@@ -599,9 +603,7 @@ b{
    -------------------------------------------------------------------------- */
 .cevs-section {
   position: relative;
-  background: rgba(226, 231, 230, 0.1);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: var(--cor-principal);
   z-index: 1;
 }
 
@@ -724,6 +726,57 @@ b{
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   opacity: 0.9;
+}
+
+/* --------------------------------------------------------------------------
+   Reciclagem 2026 Section
+   -------------------------------------------------------------------------- */
+.reciclagem-section {
+  position: relative;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.reciclagem-detalhe {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.btn-reciclagem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.8rem;
+  background: var(--cor-principal);
+  color: #fff;
+  border: 2px solid var(--cor-principal);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-reciclagem:hover {
+  background: transparent;
+  color: var(--cor-principal);
+}
+
+.reciclagem-img-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reciclagem-img {
+  max-width: 380px;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 /* --------------------------------------------------------------------------
@@ -938,6 +991,10 @@ b{
 
   .providencia-img {
     max-width: 180px;
+  }
+
+  .reciclagem-img {
+    max-width: 240px;
   }
 
   .card-pilar .card-title {
@@ -1172,9 +1229,16 @@ b{
     color: rgba(255, 255, 255, 0.6);
   }
 
-  :root:not([data-theme="light"]) .cevs-section,
+  :root:not([data-theme="light"]) .cevs-section {
+    background: #0b1a33;
+  }
+
   :root:not([data-theme="light"]) .adoracao-section {
     background: rgba(30, 41, 59, 0.1);
+  }
+
+  :root:not([data-theme="light"]) .cevs-section .section-subtitle {
+    color: rgba(255, 255, 255, 0.5) !important;
   }
 
   :root:not([data-theme="light"]) .text-muted {
@@ -1204,6 +1268,29 @@ b{
 
   :root:not([data-theme="light"]) .providencia-img {
     opacity: 0.85;
+  }
+
+  :root:not([data-theme="light"]) .reciclagem-section {
+    background: rgba(30, 41, 59, 0.1);
+  }
+
+  :root:not([data-theme="light"]) .reciclagem-detalhe {
+    color: #94a3b8;
+  }
+
+  :root:not([data-theme="light"]) .reciclagem-img {
+    opacity: 0.85;
+  }
+
+  :root:not([data-theme="light"]) .btn-reciclagem {
+    background: transparent;
+    border-color: #e2e8f0;
+    color: #e2e8f0;
+  }
+
+  :root:not([data-theme="light"]) .btn-reciclagem:hover {
+    background: #e2e8f0;
+    color: #0f172a;
   }
 
   :root:not([data-theme="light"]) .instagram-section {
@@ -1290,9 +1377,16 @@ b{
   color: rgba(255, 255, 255, 0.6);
 }
 
-[data-theme="dark"] .cevs-section,
+[data-theme="dark"] .cevs-section {
+  background: #0b1a33;
+}
+
 [data-theme="dark"] .adoracao-section {
   background: rgba(30, 41, 59, 0.1);
+}
+
+[data-theme="dark"] .cevs-section .section-subtitle {
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
 [data-theme="dark"] .text-muted {
@@ -1322,6 +1416,29 @@ b{
 
 [data-theme="dark"] .providencia-img {
   opacity: 0.9;
+}
+
+[data-theme="dark"] .reciclagem-section {
+  background: rgba(30, 41, 59, 0.1);
+}
+
+[data-theme="dark"] .reciclagem-detalhe {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .reciclagem-img {
+  opacity: 0.85;
+}
+
+[data-theme="dark"] .btn-reciclagem {
+  background: transparent;
+  border-color: #e2e8f0;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .btn-reciclagem:hover {
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
 [data-theme="dark"] .instagram-section {

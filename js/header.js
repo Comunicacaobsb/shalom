@@ -86,6 +86,46 @@
     "gtag('config', 'G-YXNT4YQP1H');";
   head.appendChild(gtagConfig);
 
+  // ---- Botão Início (voltar à página principal) ----
+  (function initHomeButton() {
+    var homeCSS = document.createElement('style');
+    homeCSS.textContent =
+      '.home-btn{' +
+        'position:fixed;top:1.25rem;left:1.25rem;z-index:9990;' +
+        'width:44px;height:44px;border-radius:50%;border:1px solid var(--border,#e5e7eb);' +
+        'background:var(--bg-card,#fff);color:var(--text,#111);' +
+        'box-shadow:0 4px 14px rgba(0,0,0,.12);' +
+        'cursor:pointer;display:flex;align-items:center;justify-content:center;' +
+        'transition:transform .2s ease,box-shadow .2s ease,background .2s ease;' +
+        'text-decoration:none;padding:0;' +
+      '}' +
+      '.home-btn:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(0,0,0,.18);color:var(--text,#111);}' +
+      '.home-btn svg{width:20px;height:20px;}' +
+      '@media print{.home-btn{display:none;}}';
+    head.appendChild(homeCSS);
+
+    function createHomeBtn() {
+      // Não exibe na página raiz/25anos (que já tem seu próprio menu)
+      var path = window.location.pathname;
+      if (path === '/' || path === '/index.html' || path.indexOf('/25anos') !== -1) return;
+
+      var a = document.createElement('a');
+      a.className = 'home-btn';
+      a.href = basePath + '25anos/';
+      a.setAttribute('aria-label', 'Voltar ao início');
+      a.setAttribute('title', 'Início');
+      // Ícone home (Feather style)
+      a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+      document.body.appendChild(a);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', createHomeBtn);
+    } else {
+      createHomeBtn();
+    }
+  })();
+
   // ---- Theme Toggle (dark/light) ----
   (function initTheme() {
     var STORAGE_KEY = 'shalom-theme';
