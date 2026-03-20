@@ -1,23 +1,5 @@
 /* Santa Maria — brand overrides */
 :root {
-  --brand: #2e7d32;
-  --brand-2: #1b5e20;
-}
-
-.hero {
-  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
-  color: #fff;
-}
-
-.card-pilar {
-  background-color: var(--brand) !important;
-}
-
-.link-btn.primary {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.link-btn.primary:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  --brand: #204f8c;
+  --brand-2: #2a6bc4;
 }

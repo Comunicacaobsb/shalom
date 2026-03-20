@@ -24,6 +24,11 @@
     fetchCSV(
       PROVIDENCIA_CONFIG.csvHabilidades,
       function (data) {
+        data.sort(function (a, b) {
+          var nA = (a.Nome_do_Irmao || '').trim().toLowerCase();
+          var nB = (b.Nome_do_Irmao || '').trim().toLowerCase();
+          return nA.localeCompare(nB, 'pt-BR');
+        });
         allSkillsData = data;
         renderSkillCards(data);
         document.getElementById('skills-loading').style.display = 'none';

@@ -185,8 +185,8 @@ body {
 .header-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  justify-content: flex-end;
+  gap: 1.5rem;
 }
 
 .header-logo-link {
