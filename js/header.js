@@ -151,8 +151,8 @@
     toggleCSS.textContent =
       '.theme-toggle{' +
         'position:fixed;bottom:1.25rem;left:1.25rem;z-index:9990;' +
-        'width:44px;height:44px;border-radius:50%;border:1px solid var(--border,#e5e7eb);' +
-        'background:var(--bg-card,#fff);color:var(--text,#111);' +
+        'width:44px;height:44px;border-radius:50%;border:1px solid #e5e7eb;' +
+        'background:#fff;color:#111;' +
         'box-shadow:0 4px 14px rgba(0,0,0,.12);' +
         'cursor:pointer;display:flex;align-items:center;justify-content:center;' +
         'transition:transform .2s ease,box-shadow .2s ease,background .2s ease;' +
@@ -160,6 +160,7 @@
       '}' +
       '.theme-toggle:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(0,0,0,.18);}' +
       '.theme-toggle svg{width:20px;height:20px;}' +
+      '[data-theme="dark"] .theme-toggle{background:#1e293b;color:#e2e8f0;border-color:#334155;}' +
       '@media print{.theme-toggle{display:none;}}';
     head.appendChild(toggleCSS);
 

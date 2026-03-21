@@ -936,24 +936,40 @@ body {
 
 /* Botão de toggle tema */
 .theme-toggle {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  z-index: 9990;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border, #e5e7eb);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  background: #fff;
+  color: #111;
+  box-shadow: 0 4px 14px rgba(0,0,0,.12);
   cursor: pointer;
-  transition: all var(--prov-transition);
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
   flex-shrink: 0;
-  /* margin-left: auto; */
   padding: 0;
+  font-size: 0;
+  line-height: 0;
 }
 
 .theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,.18);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media print {
+  .theme-toggle { display: none; }
 }
 
 /* Ícones: sol = modo claro ativo, lua = modo escuro ativo */
@@ -963,6 +979,10 @@ body {
 /* Quando dark mode está ativo, mostra lua e esconde sol */
 html[data-theme="dark"] .theme-icon--light { display: none; }
 html[data-theme="dark"] .theme-icon--dark { display: block; }
+html[data-theme="dark"] .theme-toggle { background: #1e293b; color: #e2e8f0; border-color: #334155; }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .theme-toggle { background: #1e293b; color: #e2e8f0; border-color: #334155; }
+}
 
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) .theme-icon--light { display: none; }
