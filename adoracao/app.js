@@ -223,15 +223,15 @@ function render(data) {
     <div class="stats-bar">
       <div class="stat-card">
         <div class="stat-value ${textClass(overallPct)}">${overallPct}%</div>
-        <div class="stat-label">Preenchido</div>
+        <div class="stat-label">${overallPct}% dos horários já preenchidos conforme a meta</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" style="color:${slotsNeedHelp > 0 ? '#ef4444' : '#22c55e'}">${slotsNeedHelp}</div>
-        <div class="stat-label">Precisam de você</div>
+        <div class="stat-label">Jesus precisa de você em ${slotsNeedHelp} horário${slotsNeedHelp !== 1 ? 's' : ''}</div>
       </div>
       <div class="stat-card">
         <div class="stat-value">${META_ADORADORES}</div>
-        <div class="stat-label">Meta/horário</div>
+        <div class="stat-label">Meta de ${META_ADORADORES} pessoa${META_ADORADORES !== 1 ? 's' : ''} por horário</div>
       </div>
     </div>`;
 

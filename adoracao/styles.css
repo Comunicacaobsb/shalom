@@ -562,3 +562,112 @@ body {
 .slot-list{
   padding: 0!important;
 }
+
+/* — Dark mode overrides — */
+[data-theme="dark"] .grid-cell.lv-0   { background: rgba(239,68,68,.15);  color: #fca5a5; }
+[data-theme="dark"] .grid-cell.lv-25  { background: rgba(249,115,22,.15); color: #fdba74; }
+[data-theme="dark"] .grid-cell.lv-50  { background: rgba(234,179,8,.15);  color: #fde047; }
+[data-theme="dark"] .grid-cell.lv-75  { background: rgba(132,204,22,.15); color: #bef264; }
+[data-theme="dark"] .grid-cell.lv-100 { background: rgba(34,197,94,.15);  color: #86efac; }
+
+[data-theme="dark"] .grid-cell.cell-blocked {
+  background: rgba(255,255,255,.08) !important;
+  color: #64748b;
+}
+
+[data-theme="dark"] .grid-time {
+  background: var(--bg-card, rgba(30,41,59,.72));
+  border-color: var(--border, #334155);
+}
+
+/* Desktop week dots — dark */
+[data-theme="dark"] .grid-cell .cell-weeks .wd.empty {
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.3);
+  border-color: rgba(255,255,255,.12);
+}
+[data-theme="dark"] .grid-cell .cell-weeks .wd.partial {
+  background: rgba(251,191,36,.18);
+  color: #fde68a;
+  border-color: rgba(251,191,36,.4);
+}
+[data-theme="dark"] .grid-cell .cell-weeks .wd.full {
+  background: rgba(34,197,94,.18);
+  color: #86efac;
+  border-color: rgba(34,197,94,.4);
+}
+
+/* Mobile week chips — dark */
+[data-theme="dark"] .week-chip.empty {
+  background: rgba(255,255,255,.06);
+  color: #94a3b8;
+  border-color: rgba(255,255,255,.12);
+}
+[data-theme="dark"] .week-chip.partial {
+  background: rgba(251,191,36,.18);
+  color: #fde68a;
+  border-color: rgba(251,191,36,.4);
+}
+[data-theme="dark"] .week-chip.full {
+  background: rgba(34,197,94,.18);
+  color: #86efac;
+  border-color: rgba(34,197,94,.4);
+}
+
+/* Slot bar background — dark */
+[data-theme="dark"] .slot-bar {
+  background: rgba(255,255,255,.1);
+}
+
+/* Legend dots keep their fill colors; no override needed */
+
+/* prefers-color-scheme fallback (when no data-theme is set) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .grid-cell.lv-0   { background: rgba(239,68,68,.15);  color: #fca5a5; }
+  :root:not([data-theme="light"]) .grid-cell.lv-25  { background: rgba(249,115,22,.15); color: #fdba74; }
+  :root:not([data-theme="light"]) .grid-cell.lv-50  { background: rgba(234,179,8,.15);  color: #fde047; }
+  :root:not([data-theme="light"]) .grid-cell.lv-75  { background: rgba(132,204,22,.15); color: #bef264; }
+  :root:not([data-theme="light"]) .grid-cell.lv-100 { background: rgba(34,197,94,.15);  color: #86efac; }
+
+  :root:not([data-theme="light"]) .grid-cell.cell-blocked {
+    background: rgba(255,255,255,.08) !important;
+    color: #64748b;
+  }
+  :root:not([data-theme="light"]) .grid-time {
+    background: var(--bg-card, rgba(30,41,59,.72));
+    border-color: var(--border, #334155);
+  }
+  :root:not([data-theme="light"]) .grid-cell .cell-weeks .wd.empty {
+    background: rgba(255,255,255,.06);
+    color: rgba(255,255,255,.3);
+    border-color: rgba(255,255,255,.12);
+  }
+  :root:not([data-theme="light"]) .grid-cell .cell-weeks .wd.partial {
+    background: rgba(251,191,36,.18);
+    color: #fde68a;
+    border-color: rgba(251,191,36,.4);
+  }
+  :root:not([data-theme="light"]) .grid-cell .cell-weeks .wd.full {
+    background: rgba(34,197,94,.18);
+    color: #86efac;
+    border-color: rgba(34,197,94,.4);
+  }
+  :root:not([data-theme="light"]) .week-chip.empty {
+    background: rgba(255,255,255,.06);
+    color: #94a3b8;
+    border-color: rgba(255,255,255,.12);
+  }
+  :root:not([data-theme="light"]) .week-chip.partial {
+    background: rgba(251,191,36,.18);
+    color: #fde68a;
+    border-color: rgba(251,191,36,.4);
+  }
+  :root:not([data-theme="light"]) .week-chip.full {
+    background: rgba(34,197,94,.18);
+    color: #86efac;
+    border-color: rgba(34,197,94,.4);
+  }
+  :root:not([data-theme="light"]) .slot-bar {
+    background: rgba(255,255,255,.1);
+  }
+}
