@@ -88,3 +88,32 @@ asasul/
 
 Dados: tabela `events` (um registro por evento) e tabela `settings`
 (registro `schedules` com o JSON dos horários). Imagens no bucket público `eventos`.
+
+---
+
+## Compartilhar eventos + prévia (og:image dinâmica)
+
+Cada evento tem um botão **Compartilhar** (no card e na página do evento). No celular
+abre o menu nativo (WhatsApp, etc.); no computador copia o link.
+
+Para a **prévia do link mostrar a arte do evento** no WhatsApp/Facebook, existe uma
+página estática por evento em `asasul/e/<slug>/index.html`, com a `og:image` do evento
+gravada direto no HTML. Isso é necessário porque o GitHub Pages é estático e os robôs
+de prévia **não executam JavaScript** — a `og:image` precisa estar no HTML entregue.
+
+Gere/atualize essas páginas rodando, dentro da pasta `asasul/`:
+
+```
+node scripts/build-event-pages.mjs
+```
+
+Rode isso **sempre que criar ou editar eventos em `js/data.js`**, antes do commit.
+O botão Compartilhar aponta para `/asasul/e/<slug>/`, que também renderiza o evento
+normalmente ao abrir.
+
+> **Eventos gerenciados pelo Supabase:** como as páginas de prévia são estáticas, um
+> evento criado pelo painel só terá a prévia com a arte depois que essas páginas forem
+> regeradas. Opções: (a) rodar o gerador (adaptado para ler do Supabase) e commitar; ou
+> (b) colocar o domínio atrás de um Cloudflare Worker que injeta a `og:image` na hora
+> (prévia 100% dinâmica, sem regerar nada). Posso montar qualquer uma das duas quando
+> você ativar o Supabase.

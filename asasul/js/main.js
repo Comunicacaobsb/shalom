@@ -88,98 +88,151 @@ function showToast(msg) {
 
   /* ===================== CARROSSEL DE EVENTOS =====================
      Foco na imagem + botão "Saiba mais". Vários cards por vez no desktop.
-     Rolagem nativa (swipe) com scroll-snap + autoplay com barra de progresso.
+     Rotação INFINITA (loop contínuo) via clones + transform. Swipe + autoplay.
   */
   function initCarousel(eventos) {
     var track = $("#carTrack");
     if (!track || !eventos.length) return;
     var dotsWrap = $("#carDots"), bar = $("#carBar");
     var prevBtn = $("#carPrev"), nextBtn = $("#carNext");
-    var controls = document.querySelector(".carousel__controls");
+    var controls = document.querySelector(".carousel__top");
     var progress = document.querySelector(".carousel__progress");
     var AUTO_MS = 6000;
+    var N = eventos.length;
+    var loop = N > 1;
     function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" })[c]; }); }
 
-    track.innerHTML = eventos.map(function (ev, i) {
+    function buildSlide(ev, eager) {
       var href = "evento.html?id=" + encodeURIComponent(ev.id);
       var fallback = '<div class="poster-fallback"><div><h4>' + esc(ev.titulo) + '</h4><small>' + esc(ev.badge || "Shalom Asa Sul") + '</small></div></div>';
       var img = ev.imagem
-        ? '<img src="' + esc(ev.imagem) + '" alt="' + esc(ev.titulo) + '" loading="' + (i === 0 ? "eager" : "lazy") + '" onerror="var p=this.parentElement;this.style.display=\'none\';p.insertAdjacentHTML(\'beforeend\', this.dataset.fb)" data-fb="' + esc(fallback).replace(/"/g, "&quot;") + '">'
+        ? '<img src="' + esc(ev.imagem) + '" alt="' + esc(ev.titulo) + '" loading="' + (eager ? "eager" : "lazy") + '" onerror="var p=this.parentElement;this.style.display=\'none\';p.insertAdjacentHTML(\'beforeend\', this.dataset.fb)" data-fb="' + esc(fallback).replace(/"/g, "&quot;") + '">'
         : fallback;
       return '' +
-      '<div class="slide" role="group" aria-roledescription="slide" aria-label="' + (i + 1) + ' de ' + eventos.length + '">' +
+      '<div class="slide" role="group" aria-roledescription="slide" aria-label="' + esc(ev.titulo) + '">' +
         '<article class="event-card">' +
           '<a class="event-card__media" href="' + href + '" aria-label="' + esc(ev.titulo) + '">' + img + '</a>' +
-          '<a class="btn btn--primary event-card__cta" href="' + href + '">' + esc(ev.acao || "Saiba mais") + '</a>' +
+          '<div class="event-card__row">' +
+            '<a class="btn btn--primary event-card__cta" href="' + href + '">' + esc(ev.acao || "Saiba mais") + '</a>' +
+            '<button class="btn btn--ghost btn--icon" type="button" data-share="' + esc(ev.id) + '" data-share-title="' + esc(ev.titulo) + '" aria-label="Compartilhar ' + esc(ev.titulo) + '">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>' +
+            '</button>' +
+          '</div>' +
         '</article>' +
       '</div>';
-    }).join("");
+    }
 
-    function stepSize() {
+    // Monta os slides. Com loop: [cópia] + [reais] + [cópia] para rotação infinita.
+    var real = eventos.map(function (ev, i) { return buildSlide(ev, i === 0); });
+    var clone = eventos.map(function (ev) { return buildSlide(ev, false); });
+    track.innerHTML = loop ? (clone.join("") + real.join("") + clone.join("")) : real.join("");
+
+    // compartilhar (inclui clones — mesmo slug)
+    $$("[data-share]", track).forEach(function (b) {
+      b.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (window.shareEvent) window.shareEvent(b.getAttribute("data-share"), b.getAttribute("data-share-title"));
+      });
+    });
+
+    var p = loop ? N : 0;   // posição atual (índice de slide na fita)
+
+    function step() {
       var s = track.querySelector(".slide");
       if (!s) return track.clientWidth || 1;
       var gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 0;
       return s.getBoundingClientRect().width + gap;
     }
-    function perView() { return Math.max(1, Math.round(track.clientWidth / stepSize())); }
-    function maxIndex() { return Math.max(0, eventos.length - perView()); }
-    function current() { return Math.min(maxIndex(), Math.round(track.scrollLeft / stepSize())); }
+    function apply(animate) {
+      track.classList.toggle("animate", !!animate && !reduceMotion);
+      track.style.transform = "translateX(" + (-p * step()) + "px)";
+      updateDots();
+    }
+    function wrap() {
+      if (!loop) return;
+      if (p >= 2 * N) { p -= N; apply(false); }
+      else if (p < N) { p += N; apply(false); }
+    }
+    track.addEventListener("transitionend", function (e) { if (e.propertyName === "transform") wrap(); });
 
+    function next() { p += 1; apply(true); }
+    function prev() { p -= 1; apply(true); }
+    function goReal(i) { p = (loop ? N : 0) + i; apply(true); }
+
+    // dots (um por evento real)
     var dots = [];
-    function buildDots() {
-      var n = maxIndex() + 1;
-      dotsWrap.innerHTML = "";
-      for (var i = 0; i < n; i++) {
-        var b = document.createElement("button");
-        b.setAttribute("role", "tab");
-        b.setAttribute("aria-label", "Ir para a posição " + (i + 1));
-        b.setAttribute("data-i", i);
-        dotsWrap.appendChild(b);
-      }
-      dots = $$("button", dotsWrap);
-      dots.forEach(function (d) { d.addEventListener("click", function () { goTo(+d.getAttribute("data-i")); restart(); }); });
-      // esconde controles quando não há o que rolar
-      var scrollable = maxIndex() > 0;
-      if (controls) controls.style.display = scrollable ? "" : "none";
-      if (progress) progress.style.display = scrollable ? "" : "none";
-      syncDots();
+    dotsWrap.innerHTML = "";
+    for (var i = 0; i < N; i++) {
+      var b = document.createElement("button");
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-label", "Ir para o evento " + (i + 1));
+      b.setAttribute("data-i", i);
+      dotsWrap.appendChild(b);
     }
-    function goTo(i) {
-      i = Math.max(0, Math.min(i, maxIndex()));
-      track.scrollTo({ left: i * stepSize(), behavior: reduceMotion ? "auto" : "smooth" });
-    }
-    function syncDots() {
-      var c = current();
-      dots.forEach(function (d, i) { d.setAttribute("aria-current", String(i === c)); });
+    dots = $$("button", dotsWrap);
+    dots.forEach(function (d) { d.addEventListener("click", function () { goReal(+d.getAttribute("data-i")); restart(); }); });
+    function updateDots() {
+      var cur = loop ? (((p - N) % N) + N) % N : p;
+      dots.forEach(function (d, i) { d.setAttribute("aria-current", String(i === cur)); });
     }
 
-    if (nextBtn) nextBtn.addEventListener("click", function () { var c = current(); goTo(c >= maxIndex() ? 0 : c + 1); restart(); });
-    if (prevBtn) prevBtn.addEventListener("click", function () { var c = current(); goTo(c <= 0 ? maxIndex() : c - 1); restart(); });
+    var showControls = loop;
+    if (controls) controls.style.display = showControls ? "" : "none";
+    if (progress) progress.style.display = showControls ? "" : "none";
 
-    var st = null;
-    track.addEventListener("scroll", function () { clearTimeout(st); st = setTimeout(syncDots, 80); }, { passive: true });
+    if (nextBtn) nextBtn.addEventListener("click", function () { next(); restart(); });
+    if (prevBtn) prevBtn.addEventListener("click", function () { prev(); restart(); });
 
     // autoplay + barra de progresso
     var raf = null, startTime = 0;
     function tick(now) {
       if (!startTime) startTime = now;
-      var p = Math.min(1, (now - startTime) / AUTO_MS);
-      if (bar) bar.style.width = (p * 100) + "%";
-      if (p >= 1) { startTime = now; var c = current(); goTo(c >= maxIndex() ? 0 : c + 1); }
+      var pr = Math.min(1, (now - startTime) / AUTO_MS);
+      if (bar) bar.style.width = (pr * 100) + "%";
+      if (pr >= 1) { startTime = now; next(); }
       raf = requestAnimationFrame(tick);
     }
-    function start() { if (reduceMotion || maxIndex() < 1) return; stop(); startTime = 0; raf = requestAnimationFrame(tick); }
+    function start() { if (reduceMotion || !loop) return; stop(); startTime = 0; raf = requestAnimationFrame(tick); }
     function stop() { if (raf) cancelAnimationFrame(raf); raf = null; if (bar) bar.style.width = "0%"; }
     function restart() { stop(); start(); }
 
-    ["mouseenter", "focusin", "pointerdown", "touchstart"].forEach(function (e) { track.addEventListener(e, stop, { passive: true }); });
-    ["mouseleave", "touchend", "pointerup"].forEach(function (e) { track.addEventListener(e, start, { passive: true }); });
+    ["mouseenter", "focusin"].forEach(function (e) { track.addEventListener(e, stop); });
+    ["mouseleave", "focusout"].forEach(function (e) { track.addEventListener(e, start); });
     document.addEventListener("visibilitychange", function () { document.hidden ? stop() : start(); });
 
-    var rt = null;
-    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(buildDots, 150); });
+    // swipe (um passo por gesto)
+    var dragging = false, x0 = 0, dx = 0;
+    track.style.touchAction = "pan-y";
+    track.addEventListener("pointerdown", function (e) { dragging = true; x0 = e.clientX; dx = 0; track.classList.remove("animate"); stop(); });
+    track.addEventListener("pointermove", function (e) {
+      if (!dragging) return;
+      dx = e.clientX - x0;
+      track.style.transform = "translateX(" + (-p * step() + dx) + "px)";
+    });
+    function release() {
+      if (!dragging) return; dragging = false;
+      var th = step() * 0.15;
+      if (dx <= -th) next(); else if (dx >= th) prev(); else apply(true);
+      start();
+    }
+    track.addEventListener("pointerup", release);
+    track.addEventListener("pointercancel", release);
+    track.addEventListener("pointerleave", release);
+    // evita que o clique dispare logo após arrastar
+    track.addEventListener("click", function (e) { if (Math.abs(dx) > 6) { e.preventDefault(); e.stopPropagation(); } }, true);
 
-    buildDots(); start();
+    // teclado
+    track.setAttribute("tabindex", "0");
+    track.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { e.preventDefault(); next(); restart(); }
+      if (e.key === "ArrowLeft")  { e.preventDefault(); prev(); restart(); }
+    });
+
+    var rt = null;
+    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { apply(false); }, 150); });
+
+    apply(false);
+    start();
   }
 
   if (window.SHALOM && SHALOM.loadEvents) {

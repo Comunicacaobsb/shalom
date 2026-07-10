@@ -157,15 +157,10 @@ ul { margin: 0; padding: 0; list-style: none; }
 /* ---------- Carrossel de eventos (foco na imagem + botão) ---------- */
 .events { background: var(--paper-3); position: relative; overflow: hidden; }
 .carousel { position: relative; }
-.carousel__viewport { }
-.carousel__track {
-  display: flex; gap: 1rem; overflow-x: auto;
-  scroll-snap-type: x mandatory; scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch; scrollbar-width: none;
-  padding-bottom: .2rem;
-}
-.carousel__track::-webkit-scrollbar { display: none; }
-.slide { flex: 0 0 100%; scroll-snap-align: start; }
+.carousel__viewport { overflow: hidden; }
+.carousel__track { display: flex; gap: 1rem; will-change: transform; }
+.carousel__track.animate { transition: transform .6s var(--ease); }
+.slide { flex: 0 0 100%; }
 @media (min-width: 640px) { .slide { flex-basis: calc((100% - 1rem) / 2); } }
 @media (min-width: 980px) { .slide { flex-basis: calc((100% - 2rem) / 3); } }
 
@@ -180,9 +175,12 @@ ul { margin: 0; padding: 0; list-style: none; }
 .event-card__media .poster-fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 1.4rem; color: #fff; }
 .event-card__media .poster-fallback h4 { font-size: clamp(1.3rem,5vw,1.8rem); text-shadow: 0 2px 20px rgba(0,0,0,.3); }
 .event-card__media .poster-fallback small { display:block; margin-top:.5rem; letter-spacing:.14em; text-transform:uppercase; font-size:.66rem; opacity:.85; }
-.event-card__cta { width: 100%; justify-content: center; }
+.event-card__row { display: flex; gap: .5rem; }
+.event-card__cta { flex: 1; justify-content: center; }
+.btn--icon { flex: none; width: 46px; padding-left: 0; padding-right: 0; justify-content: center; }
+.btn--icon svg { width: 19px; height: 19px; }
 
-.carousel__controls { display: flex; align-items: center; justify-content: space-between; margin-top: 1.3rem; gap: 1rem; }
+.carousel__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; gap: 1rem; }
 .carousel__dots { display: flex; gap: .45rem; flex-wrap: wrap; }
 .carousel__dots button { width: 8px; height: 8px; padding: 0; border-radius: 50%; background: #c6cdd6; border: none; transition: width .3s var(--ease), background .3s; }
 .carousel__dots button[aria-current="true"] { width: 24px; border-radius: var(--r-pill); background: var(--blue); }
@@ -191,7 +189,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .carousel__arrows button:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
 .carousel__arrows button:active { transform: scale(.94); }
 .carousel__arrows svg { width: 20px; height: 20px; }
-.carousel__progress { height: 3px; background: rgba(37,96,168,.16); border-radius: 3px; margin-top: .9rem; overflow: hidden; }
+.carousel__progress { height: 3px; background: rgba(37,96,168,.16); border-radius: 3px; margin-top: .85rem; overflow: hidden; }
 .carousel__progress i { display: block; height: 100%; width: 0; background: var(--blue); border-radius: 3px; }
 
 /* ---------- Mapa ---------- */
@@ -226,8 +224,11 @@ ul { margin: 0; padding: 0; list-style: none; }
 @media (min-width: 860px) { .ig { grid-template-columns: 1fr 1fr; } }
 .ig__copy h2 { font-size: clamp(1.8rem, 6vw, 2.7rem); }
 .ig__copy p { color: var(--ink-soft); margin: .8rem 0 1.4rem; max-width: 44ch; }
-.ig__embed { border-radius: var(--r-xl); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--paper-2); min-height: 480px; }
-.ig__embed iframe { width: 100%; min-height: 600px; border: 0; display: block; }
+/* altura fixa + overflow hidden para cortar o espaço em branco do embed do IG.
+   Ajuste o "height" se quiser mostrar mais/menos do feed. */
+.ig__embed { border-radius: var(--r-xl); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--paper-2); height: 470px; }
+.ig__embed iframe { width: 100%; height: 720px; border: 0; display: block; }
+@media (min-width: 860px) { .ig__embed { height: 440px; } }
 
 /* ---------- Comunhão de bens (última seção) ---------- */
 .tithe { background: linear-gradient(160deg, var(--blue-ink) 0%, #0a1f3d 100%); color: #fff; position: relative; overflow: hidden; }

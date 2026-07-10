@@ -9,8 +9,26 @@
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" })[c]; }); }
 
-  var id = new URLSearchParams(location.search).get("id");
+  var id = new URLSearchParams(location.search).get("id") || window.__EVENT_ID__ || null;
   var root = $("#evRoot");
+
+  function setMeta(name, val, attr) {
+    attr = attr || "property";
+    var sel = 'meta[' + attr + '="' + name + '"]';
+    var m = document.head.querySelector(sel);
+    if (!m) { m = document.createElement("meta"); m.setAttribute(attr, name); document.head.appendChild(m); }
+    m.setAttribute("content", val);
+  }
+  function setOG(ev) {
+    var img = ev.imagem ? new URL(ev.imagem, document.baseURI).href : "";
+    var title = ev.titulo + " — Shalom Asa Sul";
+    var desc = String(ev.resumo || "").replace(/\s+/g, " ").trim();
+    setMeta("og:title", title); setMeta("og:description", desc);
+    setMeta("og:type", "website"); setMeta("og:url", location.href);
+    setMeta("twitter:card", "summary_large_image", "name");
+    setMeta("twitter:title", title, "name"); setMeta("twitter:description", desc, "name");
+    if (img) { setMeta("og:image", img); setMeta("twitter:image", img, "name"); }
+  }
 
   function missing() {
     document.title = "Evento não encontrado — Shalom Asa Sul";
@@ -23,6 +41,7 @@
   function render(ev) {
     if (!ev) { missing(); return; }
     document.title = ev.titulo + " — Shalom Asa Sul";
+    setOG(ev);
 
     var fallback = '<div class="poster-fallback"><div><h4>' + esc(ev.titulo) + '</h4></div></div>';
     var poster = ev.imagem
@@ -57,10 +76,21 @@
           '</div>' +
           '<div class="ev-desc">' + descHTML + '</div>' +
           '<div class="ev-actions">' + extLink +
+            '<button class="btn btn--ghost" id="evShare" type="button">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>' +
+              'Compartilhar</button>' +
             '<a class="btn btn--ghost" href="index.html#eventos">Ver outros eventos</a>' +
           '</div>' +
         '</div>' +
       '</div>';
+
+    function wireShare(el) {
+      if (!el) return;
+      el.style.display = "";
+      el.addEventListener("click", function () { if (window.shareEvent) window.shareEvent(ev.id, ev.titulo); });
+    }
+    wireShare(document.getElementById("evShare"));
+    wireShare(document.getElementById("evShareTop"));
   }
 
   if (window.SHALOM && SHALOM.loadEvent) {
