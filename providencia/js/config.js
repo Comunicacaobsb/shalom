@@ -12,6 +12,8 @@
 // Lembre-se de também atualizar o número no rodapé de cada HTML.
 // ============================================
 
+ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzbHdla3F6dXFyYmh3cXF1a2p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NDM0OTgsImV4cCI6MjA5OTIxOTQ5OH0.nMTt-mXjGz6pAYIUxFN_0Wse9vO2Ipt3fT8R3o7P9iw
+
 var PROVIDENCIA_CONFIG = {
 
   // ============================================

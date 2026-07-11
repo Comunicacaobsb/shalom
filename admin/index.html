@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="color-scheme" content="light" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Painel — Comunidade Shalom Brasília</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <!-- ===================== LOGIN ===================== -->
+  <div class="login" id="loginView">
+    <form class="login-card" id="loginForm">
+      <span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom"></span>
+      <h1>Painel da comunidade</h1>
+      <p>Entre para gerenciar o conteúdo das páginas da Comunidade Shalom Brasília.</p>
+      <div id="cfgWarn" class="notice notice--warn hidden">
+        O Supabase ainda não foi configurado. Preencha <code>js/config.js</code> para ativar o login.
+      </div>
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" autocomplete="username" required placeholder="voce@exemplo.com" />
+      </div>
+      <div class="field">
+        <label for="password">Senha</label>
+        <input type="password" id="password" autocomplete="current-password" required placeholder="••••••••" />
+      </div>
+      <div id="loginMsg" class="msg msg--err" style="margin-bottom:.8rem"></div>
+      <button class="btn btn--primary" id="loginBtn" type="submit" style="width:100%;justify-content:center">Entrar</button>
+    </form>
+  </div>
+
+  <!-- ===================== APP ===================== -->
+  <div id="appView" class="hidden">
+    <header class="topbar">
+      <div class="wrap">
+        <div class="topbar-left">
+          <span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom"></span>
+          <label class="site-picker">
+            <span>Página</span>
+            <select id="siteSelect" aria-label="Selecionar página"></select>
+          </label>
+        </div>
+        <div class="topbar-user">
+          <span id="userEmail"></span>
+          <button class="btn btn--sm" id="logoutBtn">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" data-tab="eventos">Eventos</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="horarios">Horários &amp; Serviços</button>
+      </div>
+
+      <!-- ---- EVENTOS ---- -->
+      <section id="tab-eventos" class="panel-card">
+        <div class="section-title">
+          <h2>Eventos &amp; encontros <span class="site-chip" id="siteChip"></span></h2>
+          <button class="btn btn--primary" id="newEventBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Novo evento
+          </button>
+        </div>
+        <div class="ev-list" id="eventList"><p class="center" style="color:var(--ink-faint)">Carregando…</p></div>
+      </section>
+
+      <!-- ---- HORÁRIOS ---- -->
+      <section id="tab-horarios" class="panel-card hidden">
+        <div class="section-title">
+          <h2>Horários &amp; serviços <span class="site-chip" id="siteChip2"></span></h2>
+          <button class="btn btn--primary" id="saveSchedBtn">Salvar horários</button>
+        </div>
+        <p style="color:var(--ink-soft);font-size:.9rem;margin-top:-.6rem">Uma linha = um item. Deixe em branco para "A confirmar".</p>
+        <div class="sched-grid" id="schedGrid"></div>
+        <div class="center" style="margin-top:1.2rem"><span id="schedMsg" class="msg"></span></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===================== MODAL DE EVENTO ===================== -->
+  <div class="modal hidden" id="eventModal">
+    <div class="modal__card">
+      <div class="modal__head">
+        <h2 id="modalTitle">Novo evento</h2>
+        <button class="icon-btn" id="modalClose" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <input type="hidden" id="ev-id" />
+        <div class="field">
+          <label for="ev-title">Título</label>
+          <input type="text" id="ev-title" placeholder="Ex.: Encontro Vida Plena" />
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="ev-badge">Etiqueta (badge)</label>
+            <input type="text" id="ev-badge" placeholder="Ex.: Encontro, Missa especial" />
+          </div>
+          <div class="field">
+            <label for="ev-slug">Endereço (slug)</label>
+            <input type="text" id="ev-slug" placeholder="ex.: vida-plena" />
+            <p class="hint">Usado no link: evento.html?id=<b>slug</b>. Gerado do título.</p>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="ev-date">Data / frequência</label>
+            <input type="text" id="ev-date" placeholder="Ex.: 29 e 30 de agosto" />
+          </div>
+          <div class="field">
+            <label for="ev-location">Local</label>
+            <input type="text" id="ev-location" placeholder="Ex.: Shalom Asa Sul, 507 Sul" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Imagem / arte do evento</label>
+          <div class="uploader">
+            <div class="uploader__preview" id="ev-preview">sem imagem</div>
+            <div>
+              <input type="file" id="ev-image-file" accept="image/*" style="display:none" />
+              <button type="button" class="btn btn--sm" id="ev-upload-btn">Enviar imagem</button>
+              <button type="button" class="btn btn--sm btn--danger" id="ev-image-clear" style="margin-top:.4rem">Remover</button>
+              <p class="hint" id="ev-upload-status">JPG ou PNG. Recomendado retrato (4:5).</p>
+              <input type="hidden" id="ev-image-url" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="ev-summary">Texto curto (aparece no card)</label>
+          <textarea id="ev-summary" placeholder="1–2 linhas que resumem o evento."></textarea>
+        </div>
+
+        <div class="field">
+          <label>Descrição completa (página do evento)</label>
+          <div id="ev-editor"></div>
+          <p class="hint">Use títulos, listas e negrito. Aparece ao clicar em "Saiba mais".</p>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="ev-link-text">Botão de inscrição — texto</label>
+            <input type="text" id="ev-link-text" placeholder="Ex.: Quero me inscrever" />
+          </div>
+          <div class="field">
+            <label for="ev-link-url">Botão de inscrição — link</label>
+            <input type="text" id="ev-link-url" placeholder="https://… (deixe vazio se não houver)" />
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="ev-position">Ordem no carrossel</label>
+            <input type="number" id="ev-position" value="0" />
+          </div>
+          <div class="field">
+            <label for="ev-published">Situação</label>
+            <select id="ev-published">
+              <option value="true">Publicado (visível no site)</option>
+              <option value="false">Rascunho (oculto)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal__foot">
+        <span id="modalMsg" class="msg"></span>
+        <div style="display:flex;gap:.6rem;margin-left:auto">
+          <button class="btn" id="modalCancel">Cancelar</button>
+          <button class="btn btn--primary" id="modalSave">Salvar evento</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-mini" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

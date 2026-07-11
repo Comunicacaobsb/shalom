@@ -1,17 +1,23 @@
 /* =====================================================================
-   SHALOM — camada de dados (Supabase com fallback estático)
+   SHALOM — camada de dados compartilhada (Supabase, com escopo por site)
    ---------------------------------------------------------------------
-   Expõe window.SHALOM com:
+   A página define window.SHALOM_SITE (ex.: "asasul", "taguatinga", ...)
+   antes de carregar este script. Todo o conteúdo é filtrado por esse site.
+
+   window.SHALOM:
      .ready            -> true se o Supabase está configurado
+     .site             -> id do site atual
      .client()         -> cliente Supabase (ou null)
-     .loadEvents()     -> Promise<Array>  (formato dos cards)
+     .loadEvents()     -> Promise<Array>  (formato dos cards, só do site)
      .loadEvent(slug)  -> Promise<Object|null>
-     .loadSchedules()  -> Promise<Object|null>  {funcionamento:[], missa:[], ...}
-   Se o Supabase não estiver configurado ou falhar, cai para js/data.js.
+     .loadSchedules()  -> Promise<Object|null>
+   Sem Supabase (ou em falha), cai para os dados locais da página
+   (window.SHALOM_EVENTOS / window.SHALOM_SCHEDULES do data.js).
    ===================================================================== */
 window.SHALOM = (function () {
   "use strict";
 
+  var SITE = window.SHALOM_SITE || "asasul";
   var cfg = window.SHALOM_SUPABASE || {};
   var configured =
     cfg.url && cfg.anonKey &&
@@ -28,7 +34,6 @@ window.SHALOM = (function () {
     return _client;
   }
 
-  // Converte uma linha do banco no formato usado pelos cards/página
   function mapEvent(row) {
     return {
       id: row.slug,
@@ -38,7 +43,7 @@ window.SHALOM = (function () {
       local: row.location || "",
       imagem: row.image_url || "",
       resumo: row.summary || "",
-      descricao: row.description || "",       // HTML (editor rico)
+      descricao: row.description || "",
       descricaoHtml: true,
       link: row.link_url ? { texto: row.link_text || "Saiba mais", url: row.link_url } : null,
       acao: "Saiba mais"
@@ -50,7 +55,7 @@ window.SHALOM = (function () {
   function loadEvents() {
     var c = client();
     if (!c) return Promise.resolve(fallbackEvents());
-    return c.from("events").select("*").eq("published", true).order("position", { ascending: true })
+    return c.from("events").select("*").eq("site", SITE).eq("published", true).order("position", { ascending: true })
       .then(function (res) {
         if (res.error || !res.data || !res.data.length) return fallbackEvents();
         return res.data.map(mapEvent);
@@ -60,28 +65,20 @@ window.SHALOM = (function () {
 
   function loadEvent(slug) {
     var c = client();
-    if (!c) {
-      var f = fallbackEvents().filter(function (e) { return e.id === slug; })[0];
-      return Promise.resolve(f || null);
-    }
-    return c.from("events").select("*").eq("slug", slug).limit(1)
+    var local = function () { return fallbackEvents().filter(function (e) { return e.id === slug; })[0] || null; };
+    if (!c) return Promise.resolve(local());
+    return c.from("events").select("*").eq("site", SITE).eq("slug", slug).limit(1)
       .then(function (res) {
-        if (res.error || !res.data || !res.data.length) {
-          var f = fallbackEvents().filter(function (e) { return e.id === slug; })[0];
-          return f || null;
-        }
+        if (res.error || !res.data || !res.data.length) return local();
         return mapEvent(res.data[0]);
       })
-      .catch(function () {
-        var f = fallbackEvents().filter(function (e) { return e.id === slug; })[0];
-        return f || null;
-      });
+      .catch(local);
   }
 
   function loadSchedules() {
     var c = client();
     if (!c) return Promise.resolve(null);
-    return c.from("settings").select("value").eq("key", "schedules").limit(1)
+    return c.from("settings").select("value").eq("site", SITE).eq("key", "schedules").limit(1)
       .then(function (res) {
         if (res.error || !res.data || !res.data.length) return null;
         return res.data[0].value || null;
@@ -91,6 +88,7 @@ window.SHALOM = (function () {
 
   return {
     ready: configured,
+    site: SITE,
     client: client,
     loadEvents: loadEvents,
     loadEvent: loadEvent,
