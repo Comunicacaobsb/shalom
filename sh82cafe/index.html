@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0a0a0a" />
+
+  <title>SH-82 Café — Cardápio</title>
+  <meta name="description" content="Cardápio digital do SH-82 Café. Escolha seus itens, veja o total e apresente no balcão." />
+  <meta property="og:site_name" content="SH-82 Café" />
+  <meta property="og:title" content="SH-82 Café — Cardápio" />
+  <meta property="og:description" content="Cardápio digital do SH-82 Café." />
+  <meta property="og:type" content="website" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Fontes próprias desta página: Montserrat (sans) + Yellowtail (script
+       para o "café" do logo). skipFonts abaixo evita o Montserrat duplicado
+       do header.js. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Yellowtail&display=swap" />
+
+  <!-- Integração padrão do repo. skipFonts/skipBaseCSS: esta página tem
+       fontes e CSS próprios (identidade escura), então não carregamos o
+       Montserrat nem o scss/styles.css globais. -->
+  <script>
+    window.SHALOM_SITE = "sh82cafe";
+    window.skipFonts = true;
+    window.skipBaseCSS = true;
+  </script>
+  <script src="../js/header.js"></script>
+
+  <!-- IMPORTANTE: o cardapio.css vem DEPOIS do header.js. O header.js injeta
+       o Bootstrap CSS na hora em que executa; declarar nosso CSS em seguida
+       garante que ele apareça mais tarde na cascata e vença os defaults. -->
+  <link rel="stylesheet" href="css/cardapio.css" />
+
+  <!-- SDK do Supabase (CDN) + config compartilhada do repo. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config.js"></script>
+</head>
+
+<body class="sh82">
+  <div class="app">
+    <!-- ---------- Cabeçalho / marca ---------- -->
+    <header class="topo">
+      <!-- Reprodução tipográfica do logo (cápsula "SH 82 café").
+           Quando a arte final chegar, basta trocar esta cápsula por uma
+           imagem (ex.: uma tag img apontando para o logo em SVG). -->
+      <span class="marca-capsula" aria-label="SH-82 Café">
+        <span class="marca-sh" aria-hidden="true">SH</span>
+        <span class="marca-num" aria-hidden="true">82</span>
+        <span class="marca-cafe" aria-hidden="true">café</span>
+      </span>
+      <p class="marca-sub" id="marcaSub" hidden></p>
+    </header>
+
+    <!-- ---------- Chips de categoria (sticky) ---------- -->
+    <nav class="chips" id="chips" aria-label="Categorias" hidden></nav>
+
+    <!-- ---------- Conteúdo (skeleton até o JS renderizar) ---------- -->
+    <main id="conteudo" class="skeleton">
+      <div class="sk sk-titulo"></div>
+      <div class="sk sk-card"></div>
+      <div class="sk sk-card"></div>
+      <div class="sk sk-titulo"></div>
+      <div class="sk sk-card"></div>
+      <div class="sk sk-card"></div>
+    </main>
+  </div>
+
+  <!-- ---------- Barra inferior do carrinho (fixa) ---------- -->
+  <div class="barra-carrinho" id="barraCarrinho">
+    <div class="barra-conteudo">
+      <div class="barra-resumo">
+        <span class="barra-itens" id="barraItens">0 itens</span>
+        <span class="barra-total" id="barraTotal">R$ 0,00</span>
+      </div>
+      <button class="barra-ver" id="barraVerPedido" type="button">Ver pedido</button>
+    </div>
+  </div>
+
+  <!-- ---------- Bottom-sheet: resumo do pedido ---------- -->
+  <div class="folha-overlay" id="folhaOverlay"></div>
+  <aside class="folha" id="folha" role="dialog" aria-modal="true"
+         aria-labelledby="folhaTitulo" aria-hidden="true">
+    <div class="folha-topo">
+      <h2 class="folha-titulo" id="folhaTitulo">Seu pedido</h2>
+      <button class="folha-fechar" id="folhaFechar" type="button" aria-label="Fechar resumo">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+
+    <div class="folha-corpo" id="folhaCorpo"></div>
+
+    <div class="folha-rodape">
+      <div class="folha-total-linha">
+        <span class="folha-total-rotulo">Total</span>
+        <span class="folha-total-valor" id="folhaTotal">R$ 0,00</span>
+      </div>
+      <p class="folha-aviso">Apresente este resumo no balcão para fazer seu pedido 😉</p>
+      <button class="folha-limpar" id="folhaLimpar" type="button">Limpar pedido</button>
+    </div>
+  </aside>
+
+  <!-- ---------- Dados (mock) + lógica ---------- -->
+  <script src="js/data.js"></script>
+  <script src="js/menu.js"></script>
+</body>
+</html>

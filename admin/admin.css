@@ -48,7 +48,7 @@ img{max-width:100%;display:block}
 
 /* forms */
 label{display:block;font-size:.82rem;font-weight:700;margin:0 0 .35rem;color:var(--ink)}
-input[type=text],input[type=email],input[type=password],input[type=number],textarea,select{
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=search],input[type=date],textarea,select{
   width:100%;padding:.7rem .85rem;border:1px solid var(--line);border-radius:var(--r-sm);font:inherit;font-size:.95rem;background:var(--paper-2);color:var(--ink);transition:border-color .15s,box-shadow .15s}
 .site-picker select{width:auto}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
@@ -111,3 +111,104 @@ main{padding:1.8rem 0 5rem}
 .center{text-align:center}
 .toast-mini{position:fixed;left:50%;bottom:1.5rem;transform:translate(-50%,20px);z-index:90;background:var(--ink);color:#fff;padding:.7rem 1.1rem;border-radius:var(--r-pill);font-size:.9rem;font-weight:700;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.25s}
 .toast-mini.show{opacity:1;transform:translate(-50%,0)}
+
+/* =====================================================================
+   Login Google
+   ===================================================================== */
+.btn--google{background:var(--paper-2);color:var(--ink);border-color:var(--line);box-shadow:0 1px 2px rgba(23,32,46,.07)}
+.btn--google:hover{background:var(--paper);color:var(--ink);border-color:var(--line)}
+.btn--google svg{width:18px;height:18px;flex:none}
+.or-divider{display:flex;align-items:center;gap:.8rem;margin:1.3rem 0}
+.or-divider::before,.or-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.or-divider span{color:var(--ink-faint);font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.no-access-email{font-size:.85rem;color:var(--ink-faint);margin-top:.6rem}
+
+/* =====================================================================
+   Cardápio (café, categorias, produtos, disponibilidade)
+   ===================================================================== */
+/* ---- Informações do café ---- */
+.cafe-info{border:1px solid var(--line);border-radius:var(--r);background:var(--paper-2);margin-bottom:1.6rem;overflow:hidden}
+.cafe-info>summary{cursor:pointer;font-weight:700;font-size:.95rem;padding:.9rem 1rem;list-style:none;display:flex;align-items:center;gap:.55rem;color:var(--ink)}
+.cafe-info>summary::-webkit-details-marker{display:none}
+.cafe-info>summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--ink-faint);border-bottom:2px solid var(--ink-faint);transform:rotate(-45deg);transition:transform .2s;flex:none}
+.cafe-info[open]>summary::before{transform:rotate(45deg)}
+.cafe-info__grid{display:grid;gap:1rem;padding:.2rem 1rem 0}
+@media(min-width:640px){.cafe-info__grid{grid-template-columns:1fr 1fr}}
+.cafe-info__grid .field{margin-bottom:0}
+.cafe-info__foot{display:flex;align-items:center;justify-content:flex-end;gap:1rem;padding:1rem;flex-wrap:wrap}
+
+/* ---- Blocos (categorias / produtos) ---- */
+.menu-block{margin-top:1.8rem;padding-top:1.6rem;border-top:1px solid var(--line)}
+.menu-block__head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem;flex-wrap:wrap}
+.menu-block__title{font-size:1.05rem;font-weight:800;letter-spacing:-.01em;margin:0 0 .9rem}
+.menu-block__head .menu-block__title{margin:0}
+
+/* ---- Categorias ---- */
+.cat-add{display:flex;gap:.6rem;margin-bottom:1rem}
+.cat-add input{flex:1}
+.cat-list{display:grid;gap:.5rem}
+.cat-row{display:flex;align-items:center;gap:.7rem;background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:.55rem .35rem .55rem .8rem}
+.cat-row__name{font-weight:700;font-size:.95rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-row__actions{display:flex;gap:.3rem;flex:none;margin-left:auto}
+.is-off{opacity:.5;text-decoration:line-through;text-decoration-color:var(--ink-faint)}
+
+/* ---- Produtos ---- */
+.prod-search{max-width:260px}
+.prod-list{display:grid;gap:1.5rem}
+.prod-group{display:grid;gap:.55rem}
+.prod-group__title{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin:0 0 .15rem;display:flex;align-items:center;gap:.5rem}
+.prod-row{display:flex;align-items:center;gap:.9rem;background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r);padding:.6rem .55rem .6rem .6rem}
+.prod-row__thumb{width:52px;height:52px;border-radius:var(--r-sm);object-fit:cover;flex:none;background:var(--paper)}
+.prod-row__thumb--ph{display:grid;place-items:center;background:linear-gradient(150deg,var(--blue-deep),#12345F);color:#fff;font-weight:800;font-size:1.15rem}
+.prod-row__main{flex:1;min-width:0}
+.prod-row__main h3{font-size:.98rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prod-row__meta{font-size:.8rem;color:var(--ink-faint);display:flex;align-items:center;flex-wrap:wrap;gap:.35rem;margin-top:.2rem}
+.prod-row__actions{display:flex;gap:.3rem;flex:none}
+.badge-info{background:var(--blue-soft);color:var(--blue-deep)}
+
+/* ---- Imagem quadrada no modal de produto ---- */
+.uploader__preview--sq{width:110px;height:110px}
+
+/* ---- Disponibilidade ---- */
+.avail-presets{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.85rem}
+.radio-pill{display:inline-flex;align-items:center;gap:.45rem;margin:0;padding:.45rem .9rem;border:1px solid var(--line);border-radius:var(--r-pill);background:var(--paper-2);color:var(--ink-soft);font-size:.85rem;font-weight:700;cursor:pointer;user-select:none;transition:.15s}
+.radio-pill:hover{border-color:var(--blue);color:var(--blue)}
+.radio-pill input{width:auto;margin:0;accent-color:var(--blue)}
+.radio-pill:has(input:checked){background:var(--blue-soft);border-color:var(--blue);color:var(--blue-deep)}
+.avail-body{margin:.2rem 0 .6rem}
+.avail-body .field{margin-bottom:0}
+.weekday-chips{display:flex;flex-wrap:wrap;gap:.45rem}
+.wd-chip{width:38px;height:38px;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--paper-2);color:var(--ink-soft);font-weight:800;font-size:.85rem;cursor:pointer;display:grid;place-items:center;transition:.15s}
+.wd-chip:hover{border-color:var(--blue);color:var(--blue)}
+.wd-chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.avail-preview{font-size:.82rem;color:var(--ink-soft);font-weight:600;margin:.35rem 0 0;min-height:1.1rem}
+
+/* =====================================================================
+   Usuários & permissões (só master)
+   ===================================================================== */
+.user-list{display:grid;gap:.8rem}
+.user-row{display:flex;align-items:flex-start;gap:1rem;background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r);padding:.9rem 1rem}
+.user-row__avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;flex:none;background:var(--paper)}
+.user-row__avatar--ph{display:grid;place-items:center;background:linear-gradient(150deg,var(--blue),var(--blue-deep));color:#fff;font-weight:800;font-size:1.2rem}
+.user-row__main{flex:1;min-width:0}
+.user-row__name{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;font-size:1rem;font-weight:700}
+.user-row__email{font-size:.82rem;color:var(--ink-faint);margin-top:.1rem;overflow:hidden;text-overflow:ellipsis}
+.user-row__sites{display:flex;flex-wrap:wrap;gap:.5rem .9rem;margin-top:.65rem}
+.chk{display:inline-flex;align-items:center;gap:.4rem;margin:0;font-size:.85rem;font-weight:600;color:var(--ink-soft);cursor:pointer}
+.chk input{width:auto;margin:0;accent-color:var(--blue)}
+.master-toggle{display:inline-flex;align-items:center;gap:.45rem;flex:none;margin:0;padding:.4rem .85rem;border:1px solid var(--line);border-radius:var(--r-pill);background:var(--paper);color:var(--ink-soft);font-size:.82rem;font-weight:700;white-space:nowrap;cursor:pointer;transition:.15s}
+.master-toggle:has(input:checked){background:var(--blue-soft);border-color:var(--blue);color:var(--blue-deep)}
+.master-toggle input,.uMaster{width:auto;margin:0;accent-color:var(--blue)}
+
+/* =====================================================================
+   Responsivo (< 640px) — empilhar no celular
+   ===================================================================== */
+@media(max-width:640px){
+  .prod-search{max-width:none;width:100%}
+  .cat-row__actions,.prod-row__actions{flex-wrap:wrap;justify-content:flex-end}
+  .cafe-info__foot{justify-content:stretch}
+  .cafe-info__foot .btn{width:100%;justify-content:center}
+  .user-row{flex-wrap:wrap}
+  .user-row__main{flex-basis:100%;order:3}
+  .master-toggle{margin-left:auto}
+}

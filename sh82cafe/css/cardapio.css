@@ -1,0 +1,675 @@
+/* =====================================================================
+   SH-82 Café — Cardápio (identidade PROVISÓRIA preto/branco)
+   ---------------------------------------------------------------------
+   Baseada no logo: cápsula arredondada branca sobre preto, "SH 82" em
+   sans bold condensada + "café" em script. Tudo em formas pill/cápsula.
+   TODA cor, raio, espaçamento e fonte vive em custom properties no :root
+   para retematizar quando a identidade final chegar — basta trocar as
+   variáveis (ou envolver num data-theme) sem mexer no resto do CSS.
+   Paleta: preto, branco e cinzas (um cinza levemente quente). Nada mais.
+   Mobile-first; desktop = coluna central estreita (--maxw).
+   ===================================================================== */
+
+:root {
+  /* ---- Cores (preto / branco / cinzas quentes) ---- */
+  --bg:            #0a0a0a;   /* fundo preto */
+  --bg-elev:       #141312;   /* superfícies elevadas (cards) */
+  --bg-elev-2:     #1c1b19;   /* superfícies mais altas (steppers, chips) */
+  --bg-elev-3:     #262523;   /* hover / pressionado */
+  --text:          #f5f3ef;   /* branco quente */
+  --text-muted:    #b0aca4;   /* cinza claro — AA sobre o fundo */
+  --text-dim:      #8f8b83;   /* cinza médio — AA para textos pequenos */
+  --line:          rgba(245, 243, 239, 0.10);
+  --line-forte:    rgba(245, 243, 239, 0.20);
+  --accent:        #f5f3ef;   /* acento = branco quente (cápsula do logo) */
+  --sobre-accent:  #0a0a0a;   /* texto sobre o acento */
+
+  /* ---- Raios (formas pill/cápsula ecoando o logo) ---- */
+  --r-pill:  999px;
+  --r-lg:    26px;
+  --r-md:    18px;
+  --r-sm:    12px;
+
+  /* ---- Espaçamento ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---- Layout ---- */
+  --maxw: 560px;
+  --toque: 44px;             /* área mínima de toque */
+  --chips-altura: 60px;      /* usado no scroll-margin das seções */
+
+  /* ---- Tipografia ---- */
+  --font-sans:   "Montserrat", system-ui, -apple-system, sans-serif;
+  --font-script: "Yellowtail", "Segoe Script", cursive;
+
+  /* ---- Sombra / atmosfera ---- */
+  --sombra:      0 8px 30px rgba(0, 0, 0, 0.45);
+  --sombra-barra: 0 -6px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ---- Reset enxuto (a página usa skipBaseCSS; o Bootstrap CSS do
+        header.js ainda entra, então reforçamos o essencial) ---- */
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body.sh82 {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Textura sutil: leve vinheta radial para dar profundidade ao preto. */
+  background-image:
+    radial-gradient(120% 80% at 50% -10%, rgba(245, 243, 239, 0.06), transparent 60%);
+  background-attachment: fixed;
+  min-height: 100dvh;
+}
+
+/* A página é sempre escura por design → o botão de tema global (injetado
+   pelo header.js) não faz sentido aqui e seria confuso; ocultamos.
+   O botão "Início" do header.js é mantido. Só mexemos no NOSSO CSS. */
+.theme-toggle { display: none !important; }
+
+img { max-width: 100%; display: block; }
+button { font-family: inherit; }
+
+/* Coluna central única. */
+.app {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--sp-4);
+}
+
+/* =====================================================================
+   CABEÇALHO / MARCA
+   ===================================================================== */
+.topo {
+  text-align: center;
+  padding: calc(var(--sp-8) + env(safe-area-inset-top, 0px)) 0 var(--sp-5);
+}
+
+/* Cápsula branca com "SH 82 café" — reprodução tipográfica do logo.
+   Estrutura pronta para virar <img src="logo.svg"> depois. */
+.marca-capsula {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.28em;
+  background: var(--accent);
+  color: var(--sobre-accent);
+  padding: 0.42em 0.9em 0.5em;
+  border-radius: var(--r-pill);
+  box-shadow: var(--sombra);
+  line-height: 1;
+}
+.marca-sh,
+.marca-num {
+  font-weight: 800;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+  /* Aproxima o ar "condensado" do logo sem depender de uma fonte extra. */
+  transform: scaleX(0.9);
+  transform-origin: left;
+}
+.marca-num { margin-left: -0.12em; }
+.marca-cafe {
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 1.9rem;
+  line-height: 0.8;
+  margin-left: 0.05em;
+  transform: rotate(-4deg);
+}
+
+.marca-sub {
+  margin: var(--sp-4) auto 0;
+  max-width: 34ch;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+.marca-aviso {
+  display: inline-block;
+  margin-top: var(--sp-2);
+  padding: 4px 12px;
+  border: 1px solid var(--line-forte);
+  border-radius: var(--r-pill);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* =====================================================================
+   CHIPS DE CATEGORIA (sticky)
+   ===================================================================== */
+.chips {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: var(--sp-3) var(--sp-4);
+  margin: 0 auto;
+  max-width: var(--maxw);
+  /* Fundo com blur para "flutuar" sobre o conteúdo ao rolar. */
+  background: rgba(10, 10, 10, 0.82);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.chips::-webkit-scrollbar { display: none; }
+
+.chip {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--line-forte);
+  border-radius: var(--r-pill);
+  background: var(--bg-elev-2);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.chip:hover { color: var(--text); border-color: var(--line-forte); }
+.chip--ativo {
+  background: var(--accent);
+  color: var(--sobre-accent);
+  border-color: var(--accent);
+}
+
+/* =====================================================================
+   SEÇÕES / GRADE DE PRODUTOS
+   ===================================================================== */
+#conteudo { padding-bottom: var(--sp-8); }
+
+.secao {
+  padding-top: var(--sp-6);
+  scroll-margin-top: var(--chips-altura);
+}
+.secao-titulo {
+  margin: 0 0 var(--sp-4);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+
+/* ---- Card de produto (formato cápsula/pill horizontal) ---- */
+.card {
+  display: flex;
+  gap: var(--sp-4);
+  align-items: stretch;
+  padding: var(--sp-3);
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.card:hover { border-color: var(--line-forte); }
+
+/* Moldura da imagem (ou placeholder) — pill arredondado ecoando o logo. */
+.prod-img {
+  flex: 0 0 76px;
+  width: 76px;
+  height: 76px;
+  border-radius: var(--r-md);
+  background: var(--bg-elev-2) center/cover no-repeat;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.prod-img--vazia {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(120% 120% at 30% 20%, var(--bg-elev-3), var(--bg-elev-2));
+}
+.prod-img--vazia svg { width: 100%; height: 100%; }
+.ph-anel {
+  fill: none;
+  stroke: var(--line-forte);
+  stroke-width: 1.5;
+}
+.ph-inicial {
+  fill: var(--text-muted);
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 26px;
+  transform: scaleX(0.9);
+  transform-origin: 32px 32px;
+}
+
+.card-corpo {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.selo {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--bg-elev-3);
+  border: 1px solid var(--line-forte);
+  color: var(--text);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 2px;
+}
+.card-nome {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.card-desc {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.card-rodape {
+  margin-top: auto;
+  padding-top: var(--sp-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.card-preco {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* =====================================================================
+   STEPPERS (− qtd +) e botão Adicionar
+   ===================================================================== */
+.btn-add {
+  min-height: 38px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--sobre-accent);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.18s ease;
+}
+.btn-add:hover { opacity: 0.9; }
+.btn-add:active { transform: scale(0.96); }
+
+.stepper--ativo {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--line-forte);
+  border-radius: var(--r-pill);
+  padding: 3px;
+}
+.passo {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s ease;
+}
+.passo:hover { background: var(--bg-elev-3); }
+.passo:active { background: var(--line-forte); }
+.qtd {
+  min-width: 22px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* Área de toque acessível para os botões pequenos. */
+.passo, .btn-add, .chip, .folha-remover { touch-action: manipulation; }
+
+/* =====================================================================
+   "EM OUTROS DIAS" (colapsável)
+   ===================================================================== */
+.outros-dias {
+  margin: var(--sp-6) 0 var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--bg-elev);
+  overflow: hidden;
+}
+.outros-cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  min-height: var(--toque);
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+  color: var(--text);
+}
+.outros-cab::-webkit-details-marker { display: none; }
+.outros-cab::after {
+  content: "▾";
+  color: var(--text-dim);
+  transition: transform 0.2s ease;
+}
+.outros-dias[open] .outros-cab::after { transform: rotate(180deg); }
+.outros-cont {
+  margin-left: auto;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--r-pill);
+  background: var(--bg-elev-3);
+  border: 1px solid var(--line-forte);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.outros-cab::after { order: 3; }
+.outros-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--sp-4) var(--sp-2);
+}
+.outro-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--line);
+}
+.outro-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.outro-nome { font-weight: 600; color: var(--text); }
+.outro-quando { font-size: 0.8rem; color: var(--text-dim); }
+.outro-preco { color: var(--text-muted); font-weight: 700; white-space: nowrap; }
+
+.vazio {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--sp-8) 0;
+}
+
+/* =====================================================================
+   BARRA INFERIOR DO CARRINHO (fixa)
+   ===================================================================== */
+.barra-carrinho {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 60;
+  transform: translateY(120%);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  padding: var(--sp-3) var(--sp-4) calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));
+  background: rgba(20, 19, 18, 0.92);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line-forte);
+  box-shadow: var(--sombra-barra);
+}
+.barra-carrinho.visivel { transform: translateY(0); }
+.barra-conteudo {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.barra-resumo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  min-width: 0;
+}
+.barra-itens { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+.barra-total { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; }
+.barra-ver {
+  margin-left: auto;
+  min-height: var(--toque);
+  padding: 0 var(--sp-5);
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--sobre-accent);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.18s ease;
+}
+.barra-ver:hover { opacity: 0.92; }
+.barra-ver:active { transform: scale(0.97); }
+
+/* Reserva de espaço para a barra não cobrir o fim do conteúdo. */
+body.com-barra #conteudo { padding-bottom: 96px; }
+
+/* =====================================================================
+   BOTTOM-SHEET (resumo do pedido)
+   ===================================================================== */
+.folha-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+.folha-overlay.visivel { opacity: 1; visibility: visible; }
+
+.folha {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 80;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  background: var(--bg-elev);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  border: 1px solid var(--line-forte);
+  border-bottom: none;
+  box-shadow: var(--sombra-barra);
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.2, 0.85, 0.2, 1);
+  max-height: 88dvh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.folha.aberta { transform: translateY(0); }
+
+.folha-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4) var(--sp-4) var(--sp-3);
+}
+/* "Alça" decorativa do sheet. */
+.folha-topo::before {
+  content: "";
+  position: absolute;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 40px; height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--line-forte);
+}
+.folha-titulo { margin: 0; font-size: 1.2rem; font-weight: 800; }
+.folha-fechar {
+  width: var(--toque); height: var(--toque);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--bg-elev-2);
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.folha-fechar:hover { background: var(--bg-elev-3); }
+
+.folha-corpo {
+  overflow-y: auto;
+  padding: 0 var(--sp-4);
+  -webkit-overflow-scrolling: touch;
+}
+.folha-lista { list-style: none; margin: 0; padding: 0; }
+.folha-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "info stepper"
+    "remover stepper";
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--line);
+}
+.folha-item:first-child { border-top: none; }
+.folha-item-info { grid-area: info; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.folha-item-nome { font-weight: 600; }
+.folha-item-preco { color: var(--text-muted); font-size: 0.85rem; }
+.folha-item .stepper { grid-area: stepper; }
+.folha-remover {
+  grid-area: remover;
+  justify-self: start;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.folha-remover:hover { color: var(--text-muted); }
+
+.folha-rodape {
+  padding: var(--sp-4);
+  border-top: 1px solid var(--line-forte);
+}
+.folha-total-linha {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--sp-4);
+}
+.folha-total-rotulo { color: var(--text-muted); font-size: 0.95rem; font-weight: 500; }
+.folha-total-valor { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.02em; }
+
+.folha-aviso {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--bg-elev-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+.folha-limpar {
+  width: 100%;
+  min-height: var(--toque);
+  border: 1px solid var(--line-forte);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.folha-limpar:hover { color: var(--text); border-color: var(--text-dim); }
+
+/* Trava o scroll do body quando o sheet está aberto. */
+body.sem-scroll { overflow: hidden; }
+
+/* =====================================================================
+   SKELETON (carregamento)
+   ===================================================================== */
+.skeleton .sk {
+  border-radius: var(--r-lg);
+  background: linear-gradient(100deg, var(--bg-elev) 30%, var(--bg-elev-2) 50%, var(--bg-elev) 70%);
+  background-size: 200% 100%;
+  animation: sk-brilho 1.3s ease-in-out infinite;
+}
+.sk-card { height: 104px; margin-bottom: var(--sp-3); }
+.sk-titulo { height: 24px; width: 40%; margin: var(--sp-6) 0 var(--sp-4); border-radius: var(--r-pill); }
+@keyframes sk-brilho {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =====================================================================
+   FOCO VISÍVEL (acessibilidade)
+   ===================================================================== */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* Respeita quem prefere menos movimento. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* =====================================================================
+   DESKTOP — coluna central estreita (é um cardápio de celular; no desktop
+   só mantemos a mesma coluna centralizada e um respiro maior).
+   ===================================================================== */
+@media (min-width: 600px) {
+  .topo { padding-top: var(--sp-8); }
+  .card { padding: var(--sp-4); }
+  .prod-img { flex-basis: 88px; width: 88px; height: 88px; }
+}
+
+/* =====================================================================
+   BLINDAGEM DE CASCATA — o header.js injeta o CSS do Bootstrap DEPOIS
+   deste arquivo, e o body{color:#212529} do Bootstrap escurece tudo que
+   herdava cor. Cor explícita nos textos que dependiam de herança.
+   ===================================================================== */
+.secao-titulo,
+.card-nome,
+.card-preco,
+.qtd,
+.barra-total,
+.folha-titulo,
+.folha-item-nome {
+  color: var(--text);
+}
