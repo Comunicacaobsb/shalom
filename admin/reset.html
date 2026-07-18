@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="color-scheme" content="light" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Redefinir senha — Comunidade Shalom Brasília</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <div class="login" id="resetView">
+    <form class="login-card" id="resetForm">
+      <span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom"></span>
+      <h1>Redefinir senha</h1>
+
+      <!-- Estado: sem token de recuperação válido -->
+      <div id="stateInvalid" class="hidden">
+        <p>Este link de redefinição é inválido ou já expirou. Peça um novo na
+          tela de login.</p>
+        <a class="btn btn--primary" href="./" style="width:100%;justify-content:center;text-decoration:none">Voltar ao login</a>
+      </div>
+
+      <!-- Estado: Supabase não configurado -->
+      <div id="stateCfg" class="hidden">
+        <div class="notice notice--warn">
+          O Supabase ainda não foi configurado. Preencha <code>js/config.js</code>.
+        </div>
+      </div>
+
+      <!-- Estado: pronto para definir nova senha -->
+      <div id="stateForm" class="hidden">
+        <p>Defina uma nova senha para <strong id="resetEmail">sua conta</strong>.</p>
+        <div class="field">
+          <label for="pass1">Nova senha</label>
+          <input type="password" id="pass1" autocomplete="new-password" required minlength="6" placeholder="mínimo 6 caracteres" />
+        </div>
+        <div class="field">
+          <label for="pass2">Confirmar nova senha</label>
+          <input type="password" id="pass2" autocomplete="new-password" required minlength="6" placeholder="repita a senha" />
+        </div>
+        <div id="resetMsg" class="msg msg--err" style="margin-bottom:.8rem"></div>
+        <button class="btn btn--primary" id="resetBtn" type="submit" style="width:100%;justify-content:center">Salvar nova senha</button>
+      </div>
+
+      <!-- Estado: sucesso -->
+      <div id="stateDone" class="hidden">
+        <div class="notice notice--ok">Senha atualizada com sucesso.</div>
+        <a class="btn btn--primary" href="./" style="width:100%;justify-content:center;text-decoration:none;margin-top:.8rem">Ir para o login</a>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    var $ = function (s) { return document.querySelector(s); };
+    function show(id) {
+      ["stateInvalid", "stateCfg", "stateForm", "stateDone"].forEach(function (k) {
+        $("#" + k).classList.toggle("hidden", k !== id);
+      });
+    }
+    function setMsg(t, ok) {
+      var el = $("#resetMsg");
+      el.textContent = t || "";
+      el.className = "msg " + (ok ? "msg--ok" : "msg--err");
+    }
+
+    /* ----- Configuração do Supabase (mesmo teste do resto do painel) ----- */
+    var cfg = window.SHALOM_SUPABASE || {};
+    var configured = cfg.url && cfg.anonKey &&
+      cfg.url.indexOf("http") === 0 &&
+      cfg.url.indexOf("COLE_AQUI") === -1 &&
+      cfg.anonKey.indexOf("COLE_AQUI") === -1;
+
+    if (!configured || !window.supabase) { show("stateCfg"); return; }
+
+    var sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+    var ready = false;   // sessão de recuperação estabelecida?
+
+    /* O supabase-js lê o token do #hash da URL automaticamente e dispara
+       o evento PASSWORD_RECOVERY quando o link de recuperação é aberto. */
+    sb.auth.onAuthStateChange(function (event, session) {
+      if (event === "PASSWORD_RECOVERY" || (session && !ready)) {
+        ready = true;
+        if (session && session.user && session.user.email) {
+          $("#resetEmail").textContent = session.user.email;
+        }
+        show("stateForm");
+      }
+    });
+
+    /* Fallback: se o evento já passou, checamos a sessão direto.
+       Damos um tempo curto para o parse do hash acontecer. */
+    setTimeout(function () {
+      sb.auth.getSession().then(function (res) {
+        var s = res.data && res.data.session;
+        if (s && !ready) {
+          ready = true;
+          if (s.user && s.user.email) $("#resetEmail").textContent = s.user.email;
+          show("stateForm");
+        } else if (!ready) {
+          // Sem token/sessão de recuperação → link inválido ou expirado.
+          show("stateInvalid");
+        }
+      });
+    }, 1200);
+
+    /* ----- Salvar nova senha ----- */
+    $("#resetForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!ready) return;
+      var p1 = $("#pass1").value, p2 = $("#pass2").value;
+      setMsg("");
+      if (p1.length < 6) { setMsg("A senha precisa ter ao menos 6 caracteres."); return; }
+      if (p1 !== p2) { setMsg("As senhas não conferem."); return; }
+
+      var btn = $("#resetBtn");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Salvando…';
+      sb.auth.updateUser({ password: p1 })
+        .then(function (res) {
+          btn.disabled = false; btn.textContent = "Salvar nova senha";
+          if (res.error) { setMsg(res.error.message || "Não foi possível salvar a senha."); return; }
+          show("stateDone");
+        })
+        .catch(function () {
+          btn.disabled = false; btn.textContent = "Salvar nova senha";
+          setMsg("Não foi possível salvar a senha agora.");
+        });
+    });
+  })();
+  </script>
+</body>
+</html>

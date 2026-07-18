@@ -153,6 +153,22 @@
   $("#logoutBtn").addEventListener("click", function(){ if(sb) sb.auth.signOut(); });
   $("#noAccessLogout").addEventListener("click", function(){ if(sb) sb.auth.signOut(); });
 
+  /* ---------- Esqueci minha senha ---------- */
+  $("#forgotBtn").addEventListener("click", function(){
+    if (!sb) return;
+    var msg = $("#loginMsg");
+    var email = ($("#email").value || "").trim();
+    if (!email) { setMsg(msg, "Digite seu e-mail acima e clique de novo."); return; }
+    // redireciona para a página de reset ao lado deste index (mesma pasta /admin/)
+    var redirectTo = new URL("reset.html", location.href).href;
+    sb.auth.resetPasswordForEmail(email, { redirectTo: redirectTo })
+      .then(function(res){
+        if (res && res.error) setMsg(msg, "Não foi possível enviar o e-mail de redefinição.");
+        else setMsg(msg, "Enviamos um link de redefinição para " + email + ".", true);
+      })
+      .catch(function(){ setMsg(msg, "Não foi possível enviar o e-mail agora."); });
+  });
+
   /* ---------- seletor de página (site) ---------- */
   var siteSelect = $("#siteSelect");
   var activeTab = "eventos";
