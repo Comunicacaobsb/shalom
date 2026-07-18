@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acamp's 2026.2 · 22 a 26 de julho · Juventude Shalom Brasília</title>
+<meta name="description" content="O acampamento de jovens da Shalom Brasília. 5 dias na Chácara Shalom com lazer, shows, novas amizades e uma experiência com o amor de Deus. Impossível descrever.">
+<meta property="og:title" content="Acamp's 2026.2 · Impossível descrever">
+<meta property="og:description" content="22 a 26 de julho, Chácara Shalom (Novo Gama, GO). Garanta sua vaga no acampamento de jovens da Shalom Brasília.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="images/hero-acampamento.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Fontes de marca hospedadas localmente: não dependem de Google Fonts/CDN. */
+  @font-face{
+    font-family:'Archivo Black';font-style:normal;font-weight:400;font-display:swap;
+    src:url('fonts/archivo-black-latin-ext.woff2') format('woff2');
+    unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+  }
+  @font-face{
+    font-family:'Archivo Black';font-style:normal;font-weight:400;font-display:swap;
+    src:url('fonts/archivo-black-latin.woff2') format('woff2');
+    unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+  }
+  @font-face{
+    font-family:'Permanent Marker';font-style:normal;font-weight:400;font-display:swap;
+    src:url('fonts/permanent-marker-latin.woff2') format('woff2');
+    unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+  }
+
+  :root{
+    /* Identidade Acamp's (arte do Canva) */
+    --laranja:#A85E1C;          /* superfície principal (AA p/ texto branco) */
+    --laranja-claro:#C9772E;    /* formas tom-sobre-tom */
+    --laranja-fundo:#B4651F;
+    --teal:#2E8C7D;
+    --teal-escuro:#1E7264;
+    --teal-noite:#154F45;
+    --creme:#F6EEDF;
+    --creme-ink:#472B10;
+    --branco:#FFFFFF;
+
+    --font-display:'Archivo Black', sans-serif;
+    --font-script:'Permanent Marker', cursive;
+    --font-body:'Manrope', Arial, sans-serif;
+
+    --r-card:16px;
+    --r-pill:999px;
+
+    --z-nav:10;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+
+  body{
+    font-family:var(--font-body);
+    background:var(--laranja);
+    color:var(--branco);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  ::selection{background:var(--teal);color:var(--branco)}
+
+  a{color:inherit}
+
+  /* ---------- Botões ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    font-family:var(--font-body);font-weight:800;font-size:1.05rem;
+    padding:.95rem 1.9rem;border-radius:var(--r-pill);
+    text-decoration:none;border:none;cursor:pointer;
+    transition:transform .18s cubic-bezier(.16,1,.3,1), box-shadow .18s cubic-bezier(.16,1,.3,1);
+  }
+  .btn:active{transform:translateY(1px) scale(.98)}
+  .btn-primario{
+    background:var(--creme);color:var(--creme-ink);
+    box-shadow:0 4px 0 var(--teal-noite);
+  }
+  .btn-primario:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--teal-noite)}
+  .btn-teal{
+    background:var(--teal);color:var(--branco);
+    box-shadow:0 4px 0 var(--teal-noite);
+  }
+  .btn-teal:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--teal-noite)}
+  .btn-contorno{
+    background:transparent;color:var(--branco);
+    border:2px solid rgba(255,255,255,.85);
+  }
+  .btn-contorno:hover{background:rgba(255,255,255,.12)}
+
+  /* ---------- Nav ---------- */
+  header{
+    position:sticky;top:0;z-index:var(--z-nav);
+    background:var(--laranja);
+    border-bottom:2px solid rgba(255,255,255,.15);
+  }
+  .nav{
+    max-width:1200px;margin:0 auto;height:64px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 1.25rem;
+  }
+  .nav-logo{
+    font-family:var(--font-display);font-size:1.35rem;letter-spacing:.01em;
+    color:var(--creme);text-decoration:none;
+    text-shadow:2px 2px 0 var(--teal-escuro);
+  }
+  .nav .btn{padding:.55rem 1.3rem;font-size:.95rem}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    min-height:calc(100dvh - 64px);
+    display:flex;align-items:center;
+    overflow:hidden;
+    padding:2.5rem 1.25rem 4rem;
+  }
+  /* texto gigante tom-sobre-tom, como na arte */
+  .hero-eco{
+    position:absolute;inset:0;z-index:0;
+    display:flex;flex-direction:column;justify-content:center;
+    font-family:var(--font-display);
+    font-size:clamp(4rem, 14vw, 11rem);
+    line-height:.88;color:var(--laranja-claro);
+    user-select:none;pointer-events:none;
+    padding-left:2vw;
+    opacity:.55;
+  }
+  .hero-onda{
+    position:absolute;left:0;right:0;bottom:-2px;z-index:1;pointer-events:none;
+  }
+  .hero-grade{
+    position:relative;z-index:2;
+    max-width:1200px;margin:0 auto;width:100%;
+    display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);
+    gap:3rem;align-items:center;
+  }
+  .hero-kicker{
+    font-weight:800;font-size:.9rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--creme);opacity:.95;margin-bottom:1.1rem;
+  }
+  .logo-acamps{width:min(560px,100%);height:auto;display:block}
+  .hero-script{
+    font-family:var(--font-script);
+    font-size:clamp(1.6rem, 4vw, 2.6rem);
+    color:var(--branco);
+    transform:rotate(-2.5deg);
+    display:inline-block;
+    margin:.4rem 0 1.2rem;
+  }
+  .hero-sub{
+    font-size:1.1rem;font-weight:500;max-width:34rem;
+    margin-bottom:1.8rem;
+  }
+  .hero-datas{
+    display:inline-flex;align-items:center;gap:.9rem;margin-bottom:1.8rem;
+    flex-wrap:wrap;
+  }
+  .selo-data{
+    font-family:var(--font-display);font-size:1.25rem;line-height:1.1;
+    background:var(--teal);color:var(--branco);
+    padding:.5rem .9rem;border-radius:8px;
+    transform:rotate(-2deg);
+    box-shadow:3px 3px 0 var(--teal-noite);
+  }
+  .selo-local{font-weight:800;font-size:1.05rem}
+  .selo-local span{display:block;font-weight:500;opacity:.9;font-size:.95rem}
+  .hero-ctas{display:flex;gap:1rem;flex-wrap:wrap}
+
+  .hero-foto{position:relative;justify-self:end;width:min(440px,100%)}
+  .hero-foto img{
+    width:100%;height:auto;display:block;
+    border-radius:var(--r-card);
+    border:10px solid var(--branco);
+    outline:4px solid var(--teal);
+    transform:rotate(3deg);
+    box-shadow:12px 14px 0 rgba(21,79,69,.35);
+  }
+  .hero-foto figcaption{
+    position:absolute;bottom:-1.4rem;left:-0.6rem;
+    font-family:var(--font-script);font-size:1.25rem;color:var(--branco);
+    transform:rotate(-4deg);
+    text-shadow:2px 2px 0 var(--teal-noite);
+  }
+
+  /* ---------- Countdown ---------- */
+  .contagem{
+    background:var(--teal-escuro);
+    padding:2.6rem 1.25rem;
+  }
+  .contagem-inner{max-width:1200px;margin:0 auto;text-align:center}
+  .contagem h2{
+    font-family:var(--font-script);font-weight:400;
+    font-size:clamp(1.4rem,3.5vw,2rem);
+    margin-bottom:1.2rem;transform:rotate(-1.5deg);
+  }
+  .contagem-grade{
+    display:flex;justify-content:center;gap:clamp(.8rem,3vw,2.2rem);
+    flex-wrap:wrap;
+  }
+  .contagem-bloco{min-width:86px}
+  .contagem-num{
+    font-family:var(--font-display);
+    font-size:clamp(2.4rem,6vw,4rem);line-height:1;
+    color:var(--creme);
+    font-variant-numeric:tabular-nums;
+  }
+  .contagem-rotulo{
+    font-size:.85rem;font-weight:700;text-transform:uppercase;
+    letter-spacing:.12em;opacity:.85;margin-top:.3rem;
+  }
+  .contagem-vivo{
+    font-family:var(--font-display);
+    font-size:clamp(1.8rem,5vw,3rem);color:var(--creme);
+  }
+
+  /* ---------- Inscrição ---------- */
+  .inscricao{padding:clamp(4rem,9vw,6.5rem) 1.25rem}
+  .inscricao-inner{max-width:1100px;margin:0 auto}
+  .inscricao h2{
+    font-family:var(--font-display);
+    font-size:clamp(2rem,5.5vw,3.4rem);
+    color:var(--creme);line-height:1.05;
+    text-shadow:3px 3px 0 var(--teal-escuro);
+    margin-bottom:.6rem;text-wrap:balance;
+  }
+  .inscricao-intro{max-width:36rem;font-size:1.05rem;margin-bottom:2.8rem}
+  .fichas{
+    display:grid;grid-template-columns:1fr 1fr;gap:2rem;
+    align-items:start;
+  }
+  .ficha{
+    border-radius:var(--r-card);
+    padding:2rem 1.8rem;
+  }
+  .ficha-participante{
+    background:var(--creme);color:var(--creme-ink);
+    box-shadow:8px 8px 0 var(--teal-noite);
+    transform:rotate(-.6deg);
+  }
+  .ficha-servo{
+    background:var(--teal-escuro);color:var(--branco);
+    box-shadow:8px 8px 0 rgba(21,79,69,.45);
+    transform:rotate(.6deg);
+  }
+  .ficha h3{
+    font-family:var(--font-display);
+    font-size:clamp(1.5rem,3vw,2rem);line-height:1.05;
+    margin-bottom:.35rem;
+  }
+  .ficha-quem{font-size:.98rem;font-weight:500;margin-bottom:1.1rem;opacity:.92}
+  .ficha-valores{
+    font-weight:800;font-size:1rem;
+    margin-bottom:1.5rem;
+  }
+  .ficha-valores small{display:block;font-weight:500;font-size:.85rem;opacity:.85}
+  .opcoes{display:flex;flex-direction:column;gap:.7rem;list-style:none}
+  .opcao{
+    display:block;text-decoration:none;
+    border-radius:12px;
+    padding:.9rem 1.1rem;
+    font-weight:800;font-size:1rem;line-height:1.35;
+    transition:transform .18s cubic-bezier(.16,1,.3,1);
+  }
+  .opcao:hover{transform:translateY(-2px)}
+  .opcao:active{transform:translateY(1px) scale(.99)}
+  .opcao small{display:block;font-weight:500;font-size:.85rem;margin-top:.15rem}
+  .opcao-principal{
+    background:var(--teal);color:var(--branco);
+    box-shadow:0 4px 0 var(--teal-noite);
+  }
+  .ficha-participante .opcao-secundaria{
+    color:var(--creme-ink);
+    border:2px solid rgba(71,43,16,.35);
+  }
+  .ficha-participante .opcao-secundaria:hover{background:rgba(71,43,16,.07)}
+  .ficha-servo .opcao-principal{
+    background:var(--creme);color:var(--creme-ink);
+    box-shadow:0 4px 0 rgba(0,0,0,.28);
+  }
+  .ficha-servo .opcao-secundaria{
+    color:var(--branco);
+    border:2px solid rgba(255,255,255,.5);
+  }
+  .ficha-servo .opcao-secundaria:hover{background:rgba(255,255,255,.1)}
+  .ficha-script{
+    font-family:var(--font-script);font-size:1.15rem;
+    display:inline-block;transform:rotate(-2deg);
+    margin-bottom:.9rem;
+  }
+
+  /* ---------- Grupos WhatsApp ---------- */
+  .grupos{
+    background:var(--teal-escuro);
+    padding:clamp(2.8rem,6vw,4rem) 1.25rem;
+  }
+  .grupos-inner{
+    max-width:1100px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:1.5rem;flex-wrap:wrap;
+  }
+  .grupos h2{
+    font-family:var(--font-display);
+    font-size:clamp(1.4rem,3vw,1.9rem);line-height:1.15;
+    color:var(--creme);max-width:24rem;text-wrap:balance;
+  }
+  .grupos p{font-size:.98rem;opacity:.9;max-width:24rem}
+  .grupos-botoes{display:flex;gap:.9rem;flex-wrap:wrap}
+
+  /* ---------- Programação ---------- */
+  .programa{padding:clamp(4rem,9vw,7rem) 1.25rem}
+  .programa-inner{max-width:1100px;margin:0 auto}
+  .programa h2{
+    font-family:var(--font-display);
+    font-size:clamp(2rem,5.5vw,3.4rem);
+    color:var(--creme);line-height:1.05;
+    text-shadow:3px 3px 0 var(--teal-escuro);
+    margin-bottom:.6rem;
+    text-wrap:balance;
+  }
+  .programa-intro{max-width:36rem;font-size:1.05rem;margin-bottom:3.5rem}
+  .programa-lista{display:flex;flex-direction:column;gap:2.6rem}
+  .programa-item{max-width:780px}
+  .programa-item:nth-child(even){margin-left:auto;text-align:right}
+  .programa-marca{
+    display:inline-block;
+    font-family:var(--font-display);
+    font-size:clamp(1.7rem,4.5vw,3rem);
+    line-height:1.05;
+    color:var(--branco);
+    background:var(--teal);
+    padding:.35rem .8rem;
+    border-radius:6px;
+    transform:rotate(-1.8deg);
+    box-shadow:4px 4px 0 var(--teal-noite);
+    margin-bottom:.7rem;
+  }
+  .programa-item:nth-child(even) .programa-marca{transform:rotate(1.8deg)}
+  .programa-item p{font-size:1.08rem;font-weight:500;max-width:34rem}
+  .programa-item:nth-child(even) p{margin-left:auto}
+
+  /* animação de entrada */
+  .revela{opacity:1}
+  @media (prefers-reduced-motion: no-preference){
+    .revela{opacity:0;transform:translateY(22px);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
+    .revela.visivel{opacity:1;transform:none}
+  }
+
+  /* ---------- Local ---------- */
+  .local{
+    background:var(--creme);color:var(--creme-ink);
+    padding:clamp(4rem,9vw,7rem) 1.25rem;
+  }
+  .local-inner{
+    max-width:1100px;margin:0 auto;
+    display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);
+    gap:3rem;align-items:center;
+  }
+  .local h2{
+    font-family:var(--font-display);
+    font-size:clamp(2rem,5.5vw,3.2rem);line-height:1.05;
+    margin-bottom:1rem;text-wrap:balance;
+  }
+  .local address{
+    font-style:normal;font-size:1.08rem;font-weight:500;
+    margin-bottom:1.6rem;max-width:30rem;
+  }
+  .local address strong{font-weight:800}
+  .local-mapa{
+    border-radius:var(--r-card);
+    border:8px solid var(--branco);
+    outline:4px solid var(--teal);
+    transform:rotate(-1.5deg);
+    box-shadow:10px 12px 0 rgba(30,114,100,.25);
+    overflow:hidden;
+  }
+  .local-mapa iframe{display:block;width:100%;height:380px;border:0}
+
+  /* ---------- FAQ ---------- */
+  .faq{padding:clamp(4rem,9vw,7rem) 1.25rem}
+  .faq-inner{max-width:760px;margin:0 auto}
+  .faq h2{
+    font-family:var(--font-display);
+    font-size:clamp(2rem,5.5vw,3.2rem);
+    color:var(--creme);text-shadow:3px 3px 0 var(--teal-escuro);
+    margin-bottom:2.2rem;line-height:1.05;
+  }
+  .faq details{
+    background:rgba(255,255,255,.08);
+    border:2px solid rgba(255,255,255,.25);
+    border-radius:var(--r-card);
+    margin-bottom:1rem;
+    overflow:hidden;
+  }
+  .faq details[open]{background:rgba(255,255,255,.14)}
+  .faq summary{
+    cursor:pointer;list-style:none;
+    padding:1.1rem 1.3rem;
+    font-weight:800;font-size:1.05rem;
+    display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  }
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{
+    content:"+";font-family:var(--font-display);font-size:1.3rem;
+    color:var(--creme);transition:transform .25s cubic-bezier(.16,1,.3,1);
+  }
+  .faq details[open] summary::after{transform:rotate(45deg)}
+  .faq details p{padding:0 1.3rem 1.2rem;font-size:1rem}
+  .faq details a{color:var(--creme);font-weight:700}
+  .faq .checklist{
+    list-style:none;
+    padding:0 1.3rem 1.2rem;
+    columns:2;column-gap:2rem;
+    font-size:.98rem;
+  }
+  .faq .checklist li{
+    break-inside:avoid;
+    padding:.2rem 0 .2rem 1.2rem;
+    position:relative;
+  }
+  .faq .checklist li::before{
+    content:"";position:absolute;left:0;top:.62rem;
+    width:.55rem;height:.55rem;border-radius:2px;
+    background:var(--teal);
+  }
+  .faq-mais{margin-top:1.4rem;font-size:1rem}
+  .faq-mais a{color:var(--creme);font-weight:800}
+
+  /* ---------- CTA final ---------- */
+  .fim{
+    background:var(--teal-escuro);
+    padding:clamp(5rem,11vw,8rem) 1.25rem;
+    text-align:center;
+  }
+  .fim-inner{max-width:820px;margin:0 auto}
+  .fim .script{
+    font-family:var(--font-script);
+    font-size:clamp(1.5rem,4vw,2.2rem);
+    transform:rotate(-2deg);display:inline-block;
+    margin-bottom:.8rem;
+  }
+  .fim h2{
+    font-family:var(--font-display);
+    font-size:clamp(2.4rem,7vw,4.5rem);
+    color:var(--creme);line-height:1;
+    margin-bottom:1.2rem;text-wrap:balance;
+  }
+  .fim p{font-size:1.1rem;font-weight:500;max-width:32rem;margin:0 auto 2.2rem}
+  .fim-ctas{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+  /* ---------- Footer ---------- */
+  footer{
+    background:var(--teal-noite);
+    padding:2.5rem 1.25rem;
+    font-size:.95rem;
+  }
+  .footer-inner{
+    max-width:1100px;margin:0 auto;
+    display:flex;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;
+    align-items:center;
+  }
+  .footer-inner a{font-weight:700;text-decoration-thickness:2px;text-underline-offset:3px}
+  .footer-marca{font-family:var(--font-display);font-size:1.1rem;color:var(--creme)}
+
+  /* ---------- Responsivo ---------- */
+  @media (max-width: 860px){
+    .hero{padding-top:2rem}
+    .hero-grade{grid-template-columns:1fr;gap:3.2rem}
+    .hero-foto{justify-self:center;width:min(360px,88%)}
+    .local-inner{grid-template-columns:1fr}
+    .programa-item:nth-child(even){margin-left:0;text-align:left}
+    .programa-item:nth-child(even) p{margin-left:0}
+    .fichas{grid-template-columns:1fr}
+    .ficha-participante,.ficha-servo{transform:none}
+    .faq .checklist{columns:1}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav" aria-label="Principal">
+    <a class="nav-logo" href="#">ACAMP'S</a>
+    <a class="btn btn-teal" href="#inscricao">Garantir minha vaga</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ====== HERO ====== -->
+  <section class="hero">
+    <div class="hero-eco" aria-hidden="true">
+      <span>IMPOSSÍVEL</span>
+      <span>DESCREVER</span>
+    </div>
+
+    <div class="hero-grade">
+      <div>
+        <p class="hero-kicker">Jubileu da Missão · Shalom Brasília</p>
+
+        <!-- Logotipo Acamp's (recriação tipográfica da arte) -->
+        <svg class="logo-acamps" viewBox="0 0 560 130" role="img" aria-label="Acamp's 2026.2">
+          <g font-family="'Archivo Black',sans-serif" font-size="92" font-weight="900">
+            <text x="10" y="96" fill="none" stroke="#1E7264" stroke-width="18" stroke-linejoin="round" paint-order="stroke">ACAMP'S</text>
+            <text x="10" y="96" fill="none" stroke="#2E8C7D" stroke-width="10" stroke-linejoin="round" paint-order="stroke">ACAMP'S</text>
+            <text x="10" y="96" fill="#F6EEDF">ACAMP'S</text>
+          </g>
+          <!-- bandeirinha -->
+          <g transform="translate(185,2) rotate(8)">
+            <line x1="0" y1="0" x2="0" y2="26" stroke="#F6EEDF" stroke-width="4" stroke-linecap="round"/>
+            <path d="M2 2 L34 8 L2 16 Z" fill="#2E8C7D" stroke="#F6EEDF" stroke-width="2.5" stroke-linejoin="round"/>
+          </g>
+          <text x="10" y="124" font-family="'Manrope',sans-serif" font-weight="800" font-size="22" letter-spacing="6" fill="#F6EEDF">2026.2</text>
+        </svg>
+
+        <span class="hero-script">impossível descrever</span>
+
+        <p class="hero-sub">5 dias de acampamento, amigos novos, shows e um encontro real com Deus. O resto, só vivendo pra entender.</p>
+
+        <div class="hero-datas">
+          <span class="selo-data">22 A 26<br>JULHO</span>
+          <p class="selo-local">Chácara Shalom<span>Novo Gama · GO</span></p>
+        </div>
+
+        <div class="hero-ctas">
+          <a class="btn btn-primario" href="#inscricao">Garantir minha vaga</a>
+          <a class="btn btn-contorno" href="#programa">Ver o que rola</a>
+        </div>
+      </div>
+
+      <figure class="hero-foto">
+        <img src="images/hero-acampamento.webp" alt="Jovens chegando com mochilas para o acampamento" width="1536" height="1024">
+        <figcaption>bora?</figcaption>
+      </figure>
+    </div>
+
+    <svg class="hero-onda" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true" height="70">
+      <path d="M0,45 C240,80 480,10 720,35 C960,60 1200,20 1440,45 L1440,70 L0,70 Z" fill="#1E7264"/>
+    </svg>
+  </section>
+
+  <!-- ====== CONTAGEM ====== -->
+  <section class="contagem" aria-label="Contagem regressiva">
+    <div class="contagem-inner">
+      <h2 id="contagem-titulo">falta pouco!</h2>
+      <div class="contagem-grade" id="contagem-grade">
+        <div class="contagem-bloco"><div class="contagem-num" id="cd-dias">--</div><div class="contagem-rotulo">dias</div></div>
+        <div class="contagem-bloco"><div class="contagem-num" id="cd-horas">--</div><div class="contagem-rotulo">horas</div></div>
+        <div class="contagem-bloco"><div class="contagem-num" id="cd-min">--</div><div class="contagem-rotulo">min</div></div>
+        <div class="contagem-bloco"><div class="contagem-num" id="cd-seg">--</div><div class="contagem-rotulo">seg</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== INSCRIÇÃO ====== -->
+  <section class="inscricao" id="inscricao">
+    <div class="inscricao-inner">
+      <h2>Garanta sua vaga</h2>
+      <p class="inscricao-intro">Escolha seu caminho: pelo PIX não tem taxa; no cartão ou boleto a plataforma cobra taxa e dá pra parcelar em até 4x.</p>
+
+      <div class="fichas">
+        <div class="ficha ficha-participante revela">
+          <h3>PARTICIPANTE</h3>
+          <p class="ficha-quem">Pra você que vai viver o Acamp's pela primeira vez ou voltar como acampante.</p>
+          <p class="ficha-valores">1º lote R$ 260 · 2º lote R$ 300
+            <small>Todas as refeições principais inclusas</small>
+          </p>
+          <ul class="opcoes">
+            <li><a class="opcao opcao-principal" href="https://docs.google.com/forms/d/e/1FAIpQLSeNF6fia7ugmG_AftvH5wJZeDBKfF-w1MN4yTrI8OOchHzUQQ/viewform" target="_blank" rel="noopener">Inscrição via PIX<small>Sem taxa</small></a></li>
+            <li><a class="opcao opcao-secundaria" href="https://www.e-inscricao.com/pjjbsb/acamps2026-2" target="_blank" rel="noopener">Inscrição no cartão ou boleto<small>Com taxa da plataforma · até 4x</small></a></li>
+            <li><a class="opcao opcao-secundaria" href="https://docs.google.com/forms/d/e/1FAIpQLScmIhMFVNYHHFYiQioMOXPM1sIG0rp8q6N7kCGavd9QO3zwgg/viewform" target="_blank" rel="noopener">Só o fim de semana<small>Via PIX, sem taxa</small></a></li>
+          </ul>
+        </div>
+
+        <div class="ficha ficha-servo revela">
+          <span class="ficha-script">bora renovar nosso "sim"?</span>
+          <h3>SERVO</h3>
+          <p class="ficha-quem">Pra você que vai servir os jovens nesse Acamp's. Start na intercessão, apenas começou!</p>
+          <p class="ficha-valores">1º lote R$ 210 · 2º lote R$ 220
+            <small>Todas as refeições principais inclusas</small>
+          </p>
+          <ul class="opcoes">
+            <li><a class="opcao opcao-principal" href="https://docs.google.com/forms/d/e/1FAIpQLSd63yRYvjK9GXwXGP_DFrm68OMHJBu3fLwWK2HE6Vai9p0_Zw/viewform" target="_blank" rel="noopener">Inscrição via PIX<small>Sem taxa</small></a></li>
+            <li><a class="opcao opcao-secundaria" href="https://www.e-inscricao.com/pjjbsb/acamps20262sev" target="_blank" rel="noopener">Inscrição no cartão ou boleto<small>Com taxa da plataforma · até 4x</small></a></li>
+            <li><a class="opcao opcao-secundaria" href="https://docs.google.com/forms/d/e/1FAIpQLSc112B1eM6_szxxj6QgL5gAdhrdtDLoQS4OB3IesW6fD2yc-w/viewform" target="_blank" rel="noopener">Fim de semana e diária<small>Via PIX, sem taxa</small></a></li>
+            <li><a class="opcao opcao-secundaria" href="https://docs.google.com/forms/d/e/1FAIpQLScBt-R5yMPNjA5F3ddsK5J1dqt3Zkw8I_jWEfAFQmovcC7Rqw/viewform" target="_blank" rel="noopener">Inscrição CV</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== GRUPOS ====== -->
+  <section class="grupos">
+    <div class="grupos-inner">
+      <div>
+        <h2>Já se inscreveu? Entra no grupo!</h2>
+        <p>É por lá que saem os avisos: local de saída dos ônibus, lista do que levar e tudo que muda até o dia 22.</p>
+      </div>
+      <div class="grupos-botoes">
+        <a class="btn btn-primario" href="https://chat.whatsapp.com/Lg8VCHVuAmr3siT1B1lARw" target="_blank" rel="noopener">Grupo de participantes</a>
+        <a class="btn btn-contorno" href="https://chat.whatsapp.com/EJ2MD4pV781LSpr7nMk5TY" target="_blank" rel="noopener">Grupo de responsáveis</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== PROGRAMAÇÃO ====== -->
+  <section class="programa" id="programa">
+    <div class="programa-inner">
+      <h2>As melhores férias da sua vida têm programação especial</h2>
+      <p class="programa-intro">Do nascer do sol ao último show da noite, cada dia foi pensado pra você viver o Acamp's inteiro.</p>
+
+      <div class="programa-lista">
+        <div class="programa-item revela">
+          <span class="programa-marca">LAZER</span>
+          <p>Gincanas, esporte, piscina e aquela competição saudável que vira história pra contar.</p>
+        </div>
+        <div class="programa-item revela">
+          <span class="programa-marca">SHOWS</span>
+          <p>Música ao vivo e noites que ninguém vai querer que acabem.</p>
+        </div>
+        <div class="programa-item revela">
+          <span class="programa-marca">NOVAS AMIZADES</span>
+          <p>Você chega sem conhecer quase ninguém e volta pra casa com uma família nova.</p>
+        </div>
+        <div class="programa-item revela">
+          <span class="programa-marca">EXPERIÊNCIA COM O AMOR DE DEUS</span>
+          <p>Momentos de oração e adoração que são o coração de tudo. É por isso que é impossível descrever.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== LOCAL ====== -->
+  <section class="local" id="local">
+    <div class="local-inner">
+      <div>
+        <h2>Onde vai ser</h2>
+        <address>
+          <strong>Chácara Shalom</strong><br>
+          Rua Ângelo Gonçalves dos Santos, Quadra 11, lotes 1, 2 e 20<br>
+          Novo Gama · GO, 72861-184
+        </address>
+        <a class="btn btn-teal" href="https://maps.app.goo.gl/J4BmP29uWckfD4uS6" target="_blank" rel="noopener">Como chegar</a>
+      </div>
+      <div class="local-mapa revela">
+        <iframe
+          src="https://www.google.com/maps?q=Ch%C3%A1cara%20Shalom%2C%20Rua%20%C3%82ngelo%20Gon%C3%A7alves%20dos%20Santos%2C%20Novo%20Gama%20-%20GO%2C%2072861-184&output=embed"
+          title="Mapa da Chácara Shalom em Novo Gama, GO"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FAQ ====== -->
+  <section class="faq" id="faq">
+    <div class="faq-inner">
+      <h2>Dúvidas rápidas</h2>
+
+      <details>
+        <summary>O que é o Acamp's?</summary>
+        <p>O acampamento de jovens da Comunidade Católica Shalom, realizado desde 1989. São dias de programação intensa: lazer, formação, Seminário de Vida no Espírito Santo, Missa, shows e teatro. Milhares de jovens já tiveram a vida transformada por essa experiência de Deus, e é por isso que a gente insiste: impossível descrever.</p>
+      </details>
+
+      <details>
+        <summary>Quanto custa e como pago?</summary>
+        <p>Participante: 1º lote R$ 260 e 2º lote R$ 300. Servo: 1º lote R$ 210 e 2º lote R$ 220. Dá pra pagar por PIX ou transferência (sem taxa) e por cartão em até 4x ou boleto (com taxa da plataforma). Todas as refeições principais estão inclusas.</p>
+      </details>
+
+      <details>
+        <summary>O que eu levo? Se liga no check-list da mala</summary>
+        <ul class="checklist">
+          <li>Barraca, colchão e lona</li>
+          <li>Kit fome: prato, talher e copo</li>
+          <li>Roupa para piscina</li>
+          <li>Roupa para a Missa</li>
+          <li>Roupa de frio (a noite esfria!)</li>
+          <li>Material de higiene pessoal</li>
+          <li>Roupas para o lazer</li>
+          <li>Protetor solar e repelente</li>
+          <li>Lanterna</li>
+          <li>Garrafa de água</li>
+          <li>Guarda-chuva</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>Não tenho barraca, lona ou colchão. E agora?</summary>
+        <p>Tenta providenciar o que conseguir; qualquer um dos itens já ajuda. Como somos muitos, não conseguimos garantir para todos, mas fala com a gente no <a href="https://wa.me/5561992151257?text=Oi!%20Preciso%20de%20ajuda%20com%20barraca%20para%20o%20Acamp's" target="_blank" rel="noopener">WhatsApp</a> uns 20 dias antes que tentamos te ajudar. A lona protege a barraca da chuva e do frio: o ideal é uma embaixo e outra por cima.</p>
+      </details>
+
+      <details>
+        <summary>Como funciona o transporte?</summary>
+        <p>O local e o horário de saída dos ônibus são avisados no grupo do WhatsApp que você entra ao concluir a inscrição. Mora perto? Pode ir direto pra Chácara, é só marcar essa opção no formulário.</p>
+      </details>
+
+      <details>
+        <summary>Preciso levar dinheiro?</summary>
+        <p>As refeições principais já estão inclusas na inscrição. Lá dentro tem lojinha e lanchonete, então vale levar um dinheiro ou cartão se quiser comprar algo a mais.</p>
+      </details>
+
+      <details>
+        <summary>Tomo remédio com horário. Como faço?</summary>
+        <p>O acampamento tem ambulatório. É só entregar sua medicação com as orientações de uso anotadas e os servos responsáveis levam os remédios até você.</p>
+      </details>
+
+      <details>
+        <summary>E se eu desistir? Tem reembolso?</summary>
+        <p>Avisando até 7 dias antes do evento, você recebe 80% do valor de volta (20% cobrem custos administrativos). A menos de 7 dias do início, não há devolução. Inscrições pela e-inscricao seguem a política de reembolso da própria plataforma. Os detalhes estão no Termo de Adesão do formulário.</p>
+      </details>
+
+      <p class="faq-mais">Ficou com mais alguma dúvida? Veja o <a href="https://sites.google.com/comshalom.org/acamps252/in%C3%ADcio" target="_blank" rel="noopener">FAQ completo</a> ou <a href="https://wa.me/5561992151257?text=Oi!%20Quero%20saber%20mais%20sobre%20o%20Acamp's" target="_blank" rel="noopener">chama no WhatsApp</a>.</p>
+    </div>
+  </section>
+
+  <!-- ====== CTA FINAL ====== -->
+  <section class="fim">
+    <div class="fim-inner">
+      <span class="script">impossível descrever.</span>
+      <h2>SÓ VIVENDO.</h2>
+      <p>As vagas são limitadas e a contagem já começou. Garanta a sua e vem viver o Acamp's 2026.2.</p>
+      <div class="fim-ctas">
+        <a class="btn btn-primario" href="#inscricao">Garantir minha vaga</a>
+        <a class="btn btn-contorno" href="https://wa.me/5561992151257?text=Oi!%20Quero%20saber%20mais%20sobre%20o%20Acamp's" target="_blank" rel="noopener">Tirar dúvidas no WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-marca">ACAMP'S 2026.2</span>
+    <span>Juventude Shalom · Comunidade Católica Shalom Brasília</span>
+    <span>
+      <a href="https://instagram.com/acamps2k26.2" target="_blank" rel="noopener">@acamps2k26.2</a>
+      &nbsp;·&nbsp;
+      <a href="https://instagram.com/juventudebrasilia" target="_blank" rel="noopener">@juventudebrasilia</a>
+      &nbsp;·&nbsp;
+      <a href="https://wa.me/5561992151257" target="_blank" rel="noopener">WhatsApp</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+  /* ===== Contagem regressiva ===== */
+  const INICIO = new Date("2026-07-22T00:00:00-03:00");
+  const FIM    = new Date("2026-07-27T00:00:00-03:00"); /* fim do dia 26 */
+  const titulo = document.getElementById("contagem-titulo");
+  const grade  = document.getElementById("contagem-grade");
+
+  function pad(n){ return String(n).padStart(2,"0"); }
+
+  function tique(){
+    const agora = new Date();
+    if (agora >= FIM){
+      titulo.textContent = "o Acamp's 2026.2 já aconteceu. até a próxima!";
+      grade.style.display = "none";
+      return;
+    }
+    if (agora >= INICIO){
+      titulo.textContent = "é agora!";
+      grade.innerHTML = '<div class="contagem-vivo">O ACAMP\'S ESTÁ ACONTECENDO</div>';
+      return;
+    }
+    const dif = INICIO - agora;
+    const seg = Math.floor(dif/1000);
+    document.getElementById("cd-dias").textContent  = pad(Math.floor(seg/86400));
+    document.getElementById("cd-horas").textContent = pad(Math.floor(seg%86400/3600));
+    document.getElementById("cd-min").textContent   = pad(Math.floor(seg%3600/60));
+    document.getElementById("cd-seg").textContent   = pad(seg%60);
+    setTimeout(tique, 1000);
+  }
+  tique();
+
+  /* ===== Revelação ao rolar (IntersectionObserver) ===== */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting){ e.target.classList.add("visivel"); io.unobserve(e.target); }
+    });
+  }, { threshold: .25 });
+  document.querySelectorAll(".revela").forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
