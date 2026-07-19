@@ -11,20 +11,22 @@
 <meta property="og:url" content="https://brasilia.comshalom.org/acamps/">
 <meta property="og:site_name" content="Shalom Brasília">
 <meta property="og:locale" content="pt_BR">
-<meta property="og:image" content="https://brasilia.comshalom.org/acamps/images/og-acamps-2026-2-canva.png">
-<meta property="og:image:secure_url" content="https://brasilia.comshalom.org/acamps/images/og-acamps-2026-2-canva.png">
+<meta property="og:image" content="https://brasilia.comshalom.org/acamps/images/og-acamps.png">
+<meta property="og:image:secure_url" content="https://brasilia.comshalom.org/acamps/images/og-acamps.png">
 <meta property="og:image:type" content="image/png">
-<meta property="og:image:width" content="1080">
-<meta property="og:image:height" content="1350">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Acamp's 2026.2 — impossível descrever">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Acamp's 2026.2 — 22 a 26 de julho">
 <meta name="twitter:description" content="Cinco dias de amizade, shows e um encontro real com Deus. Garanta sua vaga no Acamp's 2026.2.">
-<meta name="twitter:image" content="https://brasilia.comshalom.org/acamps/images/og-acamps-2026-2-canva.png">
+<meta name="twitter:image" content="https://brasilia.comshalom.org/acamps/images/og-acamps.png">
+<meta name="twitter:image:alt" content="Acamp's 2026.2 — impossível descrever">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
-  /* Fontes de marca hospedadas localmente: não dependem de Google Fonts/CDN. */
+  /* Fallbacks locais enquanto os webfonts licenciados da identidade não são disponibilizados. */
   @font-face{
     font-family:'Archivo Black';font-style:normal;font-weight:400;font-display:swap;
     src:url('fonts/archivo-black-latin-ext.woff2') format('woff2');
@@ -42,20 +44,20 @@
   }
 
   :root{
-    /* Identidade Acamp's (arte do Canva) */
-    --laranja:#A85E1C;          /* superfície principal (AA p/ texto branco) */
-    --laranja-claro:#C9772E;    /* formas tom-sobre-tom */
-    --laranja-fundo:#B4651F;
-    --teal:#2E8C7D;
-    --teal-escuro:#1E7264;
-    --teal-noite:#154F45;
-    --creme:#F6EEDF;
-    --creme-ink:#472B10;
+    /* Identidade Acamp's 2026.2 */
+    --laranja:#D6832E;
+    --laranja-claro:#E7A45D;
+    --laranja-fundo:#D86524;
+    --teal:#6DAB9D;
+    --teal-escuro:#4A6E63;
+    --teal-noite:#31574E;
+    --creme:#FFF8F0;
+    --creme-ink:#273E39;
     --branco:#FFFFFF;
 
-    --font-display:'Archivo Black', sans-serif;
-    --font-script:'Permanent Marker', cursive;
-    --font-body:'Manrope', Arial, sans-serif;
+    --font-display:'Archivo Black',sans-serif;
+    --font-script:'Permanent Marker',cursive;
+    --font-body:'Manrope',Arial,sans-serif;
 
     --r-card:16px;
     --r-pill:999px;
@@ -75,14 +77,15 @@
     overflow-x:hidden;
   }
 
-  ::selection{background:var(--teal);color:var(--branco)}
+  ::selection{background:var(--teal);color:var(--creme-ink)}
 
   a{color:inherit}
+  a:focus-visible{outline:3px solid var(--teal);outline-offset:4px}
 
   /* ---------- Botões ---------- */
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
-    font-family:var(--font-body);font-weight:800;font-size:1.05rem;
+    font-family:var(--font-display);font-weight:400;font-size:1rem;letter-spacing:.015em;
     padding:.95rem 1.9rem;border-radius:var(--r-pill);
     text-decoration:none;border:none;cursor:pointer;
     transition:transform .18s cubic-bezier(.16,1,.3,1), box-shadow .18s cubic-bezier(.16,1,.3,1);
@@ -90,11 +93,11 @@
   .btn:active{transform:translateY(1px) scale(.98)}
   .btn-primario{
     background:var(--creme);color:var(--creme-ink);
-    box-shadow:0 4px 0 var(--teal-noite);
+    box-shadow:0 4px 0 var(--teal-escuro);
   }
-  .btn-primario:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--teal-noite)}
+  .btn-primario:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--teal-escuro)}
   .btn-teal{
-    background:var(--teal);color:var(--branco);
+    background:var(--teal);color:var(--creme-ink);
     box-shadow:0 4px 0 var(--teal-noite);
   }
   .btn-teal:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--teal-noite)}
@@ -108,19 +111,19 @@
   header{
     position:sticky;top:0;z-index:var(--z-nav);
     background:var(--laranja);
-    border-bottom:2px solid rgba(255,255,255,.15);
+    border-bottom:2px solid rgba(109,171,157,.65);
   }
   .nav{
     max-width:1200px;margin:0 auto;height:64px;
     display:flex;align-items:center;justify-content:space-between;
-    padding:0 1.25rem;
+    gap:.75rem;padding:0 1.25rem;
   }
   .nav-logo{
-    font-family:var(--font-display);font-size:1.35rem;letter-spacing:.01em;
-    color:var(--creme);text-decoration:none;
-    text-shadow:2px 2px 0 var(--teal-escuro);
+    display:block;flex:0 1 clamp(130px,18vw,178px);width:clamp(130px,18vw,178px);line-height:0;
+    text-decoration:none;
   }
-  .nav .btn{padding:.55rem 1.3rem;font-size:.95rem}
+  .nav-logo img{display:block;width:100%;height:auto}
+  .nav .btn{flex:0 0 auto;padding:.55rem 1.3rem;font-size:.95rem;white-space:nowrap}
 
   /* ---------- Hero ---------- */
   .hero{
@@ -128,21 +131,20 @@
     min-height:calc(100dvh - 64px);
     display:flex;align-items:center;
     overflow:hidden;
-    padding:2.5rem 1.25rem 4rem;
+    background:var(--laranja);
+    padding:clamp(3rem,7vw,5.5rem) 1.25rem clamp(8rem,12vw,11rem);
   }
-  /* texto gigante tom-sobre-tom, como na arte */
   .hero-eco{
-    position:absolute;inset:0;z-index:0;
-    display:flex;flex-direction:column;justify-content:center;
-    font-family:var(--font-display);
-    font-size:clamp(4rem, 14vw, 11rem);
-    line-height:.88;color:var(--laranja-claro);
-    user-select:none;pointer-events:none;
-    padding-left:2vw;
-    opacity:.55;
+    position:absolute;z-index:0;top:12%;left:50%;
+    width:min(calc(100% - 2.5rem),75rem);transform:translateX(-50%) rotate(-4deg);
+    opacity:.85;pointer-events:none;user-select:none;
   }
-  .hero-onda{
-    position:absolute;left:0;right:0;bottom:-2px;z-index:1;pointer-events:none;
+  .hero-eco img{display:block;width:100%;height:auto}
+  .hero-transicao{
+    position:absolute;left:0;right:0;bottom:-1px;z-index:1;
+    display:block;width:100%;height:clamp(100px,16vw,220px);
+    object-fit:cover;object-position:center bottom;
+    pointer-events:none;
   }
   .hero-grade{
     position:relative;z-index:2;
@@ -154,7 +156,7 @@
     font-weight:800;font-size:.9rem;letter-spacing:.14em;text-transform:uppercase;
     color:var(--creme);opacity:.95;margin-bottom:1.1rem;
   }
-  .logo-acamps{width:min(560px,100%);height:auto;display:block}
+  .logo-acamps{width:min(600px,100%);height:auto;display:block;margin-bottom:clamp(1.3rem,3vw,2rem)}
   .hero-script{
     font-family:var(--font-script);
     font-size:clamp(1.6rem, 4vw, 2.6rem);
@@ -173,7 +175,7 @@
   }
   .selo-data{
     font-family:var(--font-display);font-size:1.25rem;line-height:1.1;
-    background:var(--teal);color:var(--branco);
+    background:var(--teal-escuro);color:var(--creme);
     padding:.5rem .9rem;border-radius:8px;
     transform:rotate(-2deg);
     box-shadow:3px 3px 0 var(--teal-noite);
@@ -182,14 +184,10 @@
   .selo-local span{display:block;font-weight:500;opacity:.9;font-size:.95rem}
   .hero-ctas{display:flex;gap:1rem;flex-wrap:wrap}
 
-  .hero-foto{position:relative;justify-self:end;width:min(440px,100%)}
+  .hero-foto{position:relative;justify-self:end;width:min(560px,100%)}
   .hero-foto img{
     width:100%;height:auto;display:block;
-    border-radius:var(--r-card);
-    border:10px solid var(--branco);
-    outline:4px solid var(--teal);
-    transform:rotate(3deg);
-    box-shadow:12px 14px 0 rgba(21,79,69,.35);
+    filter:drop-shadow(12px 16px 0 rgba(49,87,78,.28));
   }
   .hero-foto figcaption{
     position:absolute;bottom:-1.4rem;left:-0.6rem;
@@ -200,7 +198,7 @@
 
   /* ---------- Countdown ---------- */
   .contagem{
-    background:var(--teal-escuro);
+    background:var(--laranja-fundo);
     padding:2.6rem 1.25rem;
   }
   .contagem-inner{max-width:1200px;margin:0 auto;text-align:center}
@@ -250,12 +248,12 @@
   }
   .ficha-participante{
     background:var(--creme);color:var(--creme-ink);
-    box-shadow:8px 8px 0 var(--teal-noite);
+    box-shadow:8px 8px 0 var(--teal-escuro);
     transform:rotate(-.6deg);
   }
   .ficha-servo{
     background:var(--teal-escuro);color:var(--branco);
-    box-shadow:8px 8px 0 rgba(21,79,69,.45);
+    box-shadow:8px 8px 0 rgba(49,87,78,.45);
     transform:rotate(.6deg);
   }
   .ficha h3{
@@ -281,14 +279,14 @@
   .opcao:active{transform:translateY(1px) scale(.99)}
   .opcao small{display:block;font-weight:500;font-size:.85rem;margin-top:.15rem}
   .opcao-principal{
-    background:var(--teal);color:var(--branco);
+    background:var(--teal);color:var(--creme-ink);
     box-shadow:0 4px 0 var(--teal-noite);
   }
   .ficha-participante .opcao-secundaria{
     color:var(--creme-ink);
-    border:2px solid rgba(71,43,16,.35);
+    border:2px solid rgba(39,62,57,.35);
   }
-  .ficha-participante .opcao-secundaria:hover{background:rgba(71,43,16,.07)}
+  .ficha-participante .opcao-secundaria:hover{background:rgba(39,62,57,.07)}
   .ficha-servo .opcao-principal{
     background:var(--creme);color:var(--creme-ink);
     box-shadow:0 4px 0 rgba(0,0,0,.28);
@@ -306,7 +304,7 @@
 
   /* ---------- Grupos WhatsApp ---------- */
   .grupos{
-    background:var(--teal-escuro);
+    background:var(--laranja-fundo);
     padding:clamp(2.8rem,6vw,4rem) 1.25rem;
   }
   .grupos-inner{
@@ -323,8 +321,13 @@
   .grupos-botoes{display:flex;gap:.9rem;flex-wrap:wrap}
 
   /* ---------- Programação ---------- */
-  .programa{padding:clamp(4rem,9vw,7rem) 1.25rem}
-  .programa-inner{max-width:1100px;margin:0 auto}
+  .programa{position:relative;overflow:hidden;padding:clamp(4rem,9vw,7rem) 1.25rem}
+  .programa-inner{position:relative;z-index:1;max-width:1100px;margin:0 auto}
+  .programa-indescritivel{
+    position:absolute;z-index:0;top:3rem;right:-5rem;
+    width:min(37vw,29rem);height:auto;opacity:.28;
+    pointer-events:none;user-select:none;
+  }
   .programa h2{
     font-family:var(--font-display);
     font-size:clamp(2rem,5.5vw,3.4rem);
@@ -342,8 +345,7 @@
     font-family:var(--font-display);
     font-size:clamp(1.7rem,4.5vw,3rem);
     line-height:1.05;
-    color:var(--branco);
-    background:var(--teal);
+    background:var(--teal);color:var(--creme-ink);
     padding:.35rem .8rem;
     border-radius:6px;
     transform:rotate(-1.8deg);
@@ -386,7 +388,7 @@
     border:8px solid var(--branco);
     outline:4px solid var(--teal);
     transform:rotate(-1.5deg);
-    box-shadow:10px 12px 0 rgba(30,114,100,.25);
+    box-shadow:10px 12px 0 rgba(74,110,99,.25);
     overflow:hidden;
   }
   .local-mapa iframe{display:block;width:100%;height:380px;border:0}
@@ -480,6 +482,7 @@
   /* ---------- Responsivo ---------- */
   @media (max-width: 860px){
     .hero{padding-top:2rem}
+    .hero-eco{top:5.25rem;left:50%;width:calc(100% - 1.5rem);transform:translateX(-50%);opacity:.85}
     .hero-grade{grid-template-columns:1fr;gap:3.2rem}
     .hero-foto{justify-self:center;width:min(360px,88%)}
     .local-inner{grid-template-columns:1fr}
@@ -488,6 +491,13 @@
     .fichas{grid-template-columns:1fr}
     .ficha-participante,.ficha-servo{transform:none}
     .faq .checklist{columns:1}
+    .programa-indescritivel{top:2rem;right:-4.5rem;width:18rem;opacity:.18}
+  }
+  @media (max-width: 480px){
+    .nav{height:58px;gap:.5rem;padding:0 .75rem}
+    .nav-logo{flex-basis:min(34vw,130px);width:min(34vw,130px)}
+    .nav .btn{padding:.5rem .72rem;font-size:.72rem;letter-spacing:0}
+    .hero{min-height:calc(100dvh - 58px)}
   }
 </style>
 </head>
@@ -495,7 +505,9 @@
 
 <header>
   <nav class="nav" aria-label="Principal">
-    <a class="nav-logo" href="#">ACAMP'S</a>
+    <a class="nav-logo" href="#" aria-label="Acamp's 2026.2">
+      <img src="images/logo-acamps.png" alt="Acamp's">
+    </a>
     <a class="btn btn-teal" href="#inscricao">Garantir minha vaga</a>
   </nav>
 </header>
@@ -505,28 +517,14 @@
   <!-- ====== HERO ====== -->
   <section class="hero">
     <div class="hero-eco" aria-hidden="true">
-      <span>IMPOSSÍVEL</span>
-      <span>DESCREVER</span>
+      <img src="images/impossivel-descrever.png" alt="">
     </div>
 
     <div class="hero-grade">
       <div>
         <p class="hero-kicker">Jubileu da Missão · Shalom Brasília</p>
 
-        <!-- Logotipo Acamp's (recriação tipográfica da arte) -->
-        <svg class="logo-acamps" viewBox="0 0 560 130" role="img" aria-label="Acamp's 2026.2">
-          <g font-family="'Archivo Black',sans-serif" font-size="92" font-weight="900">
-            <text x="10" y="96" fill="none" stroke="#1E7264" stroke-width="18" stroke-linejoin="round" paint-order="stroke">ACAMP'S</text>
-            <text x="10" y="96" fill="none" stroke="#2E8C7D" stroke-width="10" stroke-linejoin="round" paint-order="stroke">ACAMP'S</text>
-            <text x="10" y="96" fill="#F6EEDF">ACAMP'S</text>
-          </g>
-          <!-- bandeirinha -->
-          <g transform="translate(185,2) rotate(8)">
-            <line x1="0" y1="0" x2="0" y2="26" stroke="#F6EEDF" stroke-width="4" stroke-linecap="round"/>
-            <path d="M2 2 L34 8 L2 16 Z" fill="#2E8C7D" stroke="#F6EEDF" stroke-width="2.5" stroke-linejoin="round"/>
-          </g>
-          <text x="10" y="124" font-family="'Manrope',sans-serif" font-weight="800" font-size="22" letter-spacing="6" fill="#F6EEDF">2026.2</text>
-        </svg>
+        <img class="logo-acamps" src="images/logo-acamps.png" alt="Acamp's 2026.2" width="1011" height="304">
 
         <span class="hero-script">impossível descrever</span>
 
@@ -544,14 +542,12 @@
       </div>
 
       <figure class="hero-foto">
-        <img src="images/hero-acampamento.webp" alt="Jovens chegando com mochilas para o acampamento" width="1536" height="1024">
+        <img src="images/fotos-bandeira.png" alt="Jovens do Acamp's em um momento de amizade" width="975" height="610">
         <figcaption>bora?</figcaption>
       </figure>
     </div>
 
-    <svg class="hero-onda" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true" height="70">
-      <path d="M0,45 C240,80 480,10 720,35 C960,60 1200,20 1440,45 L1440,70 L0,70 Z" fill="#1E7264"/>
-    </svg>
+    <img class="hero-transicao" src="images/transition.png" alt="" aria-hidden="true" width="1379" height="356">
   </section>
 
   <!-- ====== CONTAGEM ====== -->
@@ -621,6 +617,7 @@
 
   <!-- ====== PROGRAMAÇÃO ====== -->
   <section class="programa" id="programa">
+    <img class="programa-indescritivel" src="images/indescritivel.png" alt="" aria-hidden="true" width="827" height="958">
     <div class="programa-inner">
       <h2>As melhores férias da sua vida têm programação especial</h2>
       <p class="programa-intro">Do nascer do sol ao último show da noite, cada dia foi pensado pra você viver o Acamp's inteiro.</p>
