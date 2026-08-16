@@ -110,5 +110,119 @@ Programação — quinta-feira, 30/07:
 Onde: Shalom Asa Sul. Traga suas intenções e viva esse encontro com a Misericórdia.`,
     link: null,
     acao: "Ver programação"
+  },
+  {
+    id: "beraka-casais",
+    titulo: "Beraká — Retiro para casais",
+    badge: "Retiro para casais",
+    data: "26 e 27 de setembro de 2026",
+    local: "SGAS 606, Bloco D, Lote 42 — Brasília/DF",
+    imagem: "images/eventos/beraka-casais.png",
+    resumo: "Um retiro para casais fortalecerem a vida a dois sobre a rocha que é Jesus.",
+    descricao:
+`BERAKÁ — Retiro para casais
+
+Jesus é a rocha onde edifico a minha casa. (Mateus 7,24)
+
+Quando: 26 e 27 de setembro de 2026.
+Onde: SGAS 606, Bloco D, Lote 42 — Brasília/DF.
+Público: casais.
+
+Enquanto os casais vivem o retiro, o Beraká Kids oferece uma programação própria e simultânea para crianças de 5 a 10 anos.
+
+Informações:
+William: (21) 98875-0530
+Viviane: (61) 99399-0480
+Instagram: @shalombrasilia
+Instagram: https://www.instagram.com/shalombrasilia/
+
+Realização: Projeto Família Shalom, Comunidade Católica Shalom e Shalom Brasília — 25 anos.
+
+Inscrições e informações: https://comshalom.org/beraka/`,
+    link: { texto: "Saiba mais e inscreva-se", url: "https://comshalom.org/beraka/" },
+    acao: "Ver detalhes",
+    featuredLocal: true
+  },
+  {
+    id: "beraka-kids",
+    titulo: "Beraká Kids",
+    badge: "Crianças de 5 a 10 anos",
+    data: "26 e 27 de setembro de 2026",
+    local: "SGAS 606, Bloco D, Lote 42 — Brasília/DF",
+    imagem: "images/eventos/beraka-kids.png",
+    resumo: "Uma programação própria para crianças de 5 a 10 anos durante o retiro Beraká.",
+    descricao:
+`BERAKÁ KIDS — para crianças de 5 a 10 anos
+
+Jesus é a rocha onde edifico a minha casa. (Mateus 7,24)
+
+Quando: 26 e 27 de setembro de 2026.
+Onde: SGAS 606, Bloco D, Lote 42 — Brasília/DF.
+Público: crianças de 5 a 10 anos.
+
+O Beraká Kids acontece simultaneamente ao Beraká para casais, com programação própria, preparada para as crianças enquanto seus pais vivem o retiro.
+
+Informações:
+William: (21) 98875-0530
+Viviane: (61) 99399-0480
+Instagram: @shalombrasilia
+Instagram: https://www.instagram.com/shalombrasilia/
+
+Realização: Projeto Família Shalom, Comunidade Católica Shalom e Shalom Brasília — 25 anos.
+
+Inscrições e informações: https://comshalom.org/beraka/`,
+    link: { texto: "Saiba mais e inscreva-se", url: "https://comshalom.org/beraka/" },
+    acao: "Ver detalhes",
+    featuredLocal: true
+  },
+  {
+    id: "curada-historia-de-vida",
+    titulo: "Retiro Curada — História de Vida",
+    badge: "Retiro",
+    data: "04 a 07 de setembro",
+    local: "Retiro Santo Antônio",
+    imagem: "images/eventos/curada-historia-de-vida.png",
+    resumo: "Um retiro para encontrar cura e um novo olhar para a própria história de vida.",
+    descricao:
+`RETIRO CURADA — história de vida
+
+Quando: 04 a 07 de setembro.
+Onde: Retiro Santo Antônio.
+Valor: R$ 550,00.
+
+Mais informações:
+Islane: (61) 98274-8634
+
+Realização: Shalom Brasília — 25 anos e Comunidade Católica Shalom.
+
+WhatsApp: https://wa.me/556182748634`,
+    link: { texto: "Mais informações", url: "https://wa.me/556182748634" },
+    acao: "Ver detalhes",
+    featuredLocal: true
+  },
+  {
+    id: "es-precioso",
+    titulo: "Curso És Precioso",
+    badge: "Curso",
+    data: "15 a 17 de setembro, às 19h30",
+    local: "Shalom Asa Sul — Auditório Kyrios",
+    imagem: "images/eventos/es-precioso.png",
+    resumo: "Curso És Precioso no Shalom Asa Sul, com opção de inscrição com livro.",
+    descricao:
+`CURSO ÉS PRECIOSO
+
+Data: 15 a 17 de setembro.
+Horário: às 19h30.
+Local: Shalom Asa Sul — Auditório Kyrios.
+
+Inscrição: R$ 30,00.
+Inscrição + livro: R$ 65,00.
+
+Mais informações: (61) 98274-8634
+Realização: Shalom Asa Sul e Comunidade Católica Shalom.
+WhatsApp: https://wa.me/556182748634`,
+    link: { texto: "Mais informações", url: "https://wa.me/556182748634" },
+    acao: "Ver detalhes",
+    featuredLocal: true
   }
 ];
