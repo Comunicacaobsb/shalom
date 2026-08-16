@@ -9,76 +9,121 @@
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" />
   <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
+  <!--
+    THESIS: O painel torna visível a estrutura do site e conduz cada pessoa do mapa geral à área de trabalho específica de uma página, sem misturar conteúdo local com administração global.
+    OWN-WORLD: Mesa editorial serena da Comunidade Shalom Brasília — rail azul profundo, superfícies brancas/azul-claro planas, Manrope, ícones SVG lineares consistentes, hierarquia por escala/ritmo/contraste, sem decoração gratuita.
+    STORY: Entrar ou criar identidade → compreender o mapa do site → localizar páginas editáveis → abrir uma página → escolher somente um módulo suportado → editar; Usuários e acessos vive fora desse fluxo.
+    FIRST VIEWPORT: Navegação global claramente separada, breadcrumb e título contextual, mapa/resumo real das páginas e próximos caminhos reconhecíveis em segundos; não usar hero de métricas nem grade de cards genéricos.
+    FORM: Hub-and-spoke com rotas hash, sidebar desktop e navegação compacta mobile, listas estruturais densas e workspaces de largura útil; seed key 21fbb4b9.
+    Audience: coordinators and content editors. Public pages remain viewable separately.
+  -->
 
   <!-- ===================== LOGIN ===================== -->
   <main class="login" id="loginView">
-    <form class="login-card" id="loginForm">
+    <form class="login-card" id="loginForm" aria-describedby="loginIntro">
       <span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom"></span>
-      <h1>Painel da comunidade</h1>
-      <p>Entre para gerenciar o conteúdo das páginas da Comunidade Shalom Brasília.</p>
+      <h1 id="loginHeading">Entrar no painel</h1>
+      <p id="loginIntro">Acesse para cuidar do conteúdo das páginas da comunidade.</p>
       <div id="cfgWarn" class="notice notice--warn hidden">
         O Supabase ainda não foi configurado. Preencha <code>js/config.js</code> para ativar o login.
       </div>
-      <button type="button" class="btn btn--google" id="googleBtn" style="width:100%;justify-content:center">
-        <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
-          <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.71-1.57 2.68-3.89 2.68-6.62z"/>
-          <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/>
-          <path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/>
-          <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.47.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
-        </svg>
-        Entrar com Google
-      </button>
-      <div class="or-divider"><span>ou</span></div>
+      <div class="auth-switch" role="group" aria-label="Acesso ao painel">
+        <button type="button" class="auth-switch__button is-selected" id="loginModeBtn" aria-pressed="true">Entrar</button>
+        <button type="button" class="auth-switch__button" id="signupModeBtn" aria-pressed="false">Criar conta</button>
+      </div>
+      <div class="field" id="nameField" hidden>
+        <label for="name">Nome completo</label>
+        <input type="text" id="name" autocomplete="name" placeholder="Como devemos chamar você?" />
+      </div>
       <div class="field">
         <label for="email">E-mail</label>
         <input type="email" id="email" autocomplete="username" required placeholder="voce@exemplo.com" />
       </div>
       <div class="field">
         <label for="password">Senha</label>
-        <input type="password" id="password" autocomplete="current-password" required placeholder="••••••••" />
+        <input type="password" id="password" autocomplete="current-password" required minlength="8" placeholder="Mínimo de 8 caracteres" />
+      </div>
+      <div class="field" id="confirmPasswordField" hidden>
+        <label for="confirmPassword">Confirmar senha</label>
+        <input type="password" id="confirmPassword" autocomplete="new-password" minlength="8" placeholder="Digite a senha novamente" />
       </div>
       <div id="loginMsg" class="msg msg--err" style="margin-bottom:.8rem"></div>
       <button class="btn btn--primary" id="loginBtn" type="submit" style="width:100%;justify-content:center">Entrar</button>
       <button type="button" class="link-sm" id="forgotBtn">Esqueci minha senha</button>
+      <p class="auth-note" id="signupNote" hidden>Criar uma conta não libera edição automaticamente. Após confirmar seu e-mail, um administrador aprovará as páginas que você poderá gerenciar.</p>
     </form>
   </main>
 
   <!-- ===================== APP ===================== -->
   <div id="appView" class="hidden">
-    <header class="topbar">
-      <div class="wrap">
-        <div class="topbar-left">
-          <span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom"></span>
-          <div class="site-picker">
-            <span id="sitePickerLabel">Página</span>
-            <div class="choice-menu" id="siteMenu">
-              <button class="choice-menu__trigger" id="siteSelect" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="siteOptions" aria-labelledby="sitePickerLabel">Selecionar página</button>
-              <div class="choice-menu__options" id="siteOptions" role="listbox" tabindex="-1" hidden></div>
-            </div>
-          </div>
-        </div>
-        <div class="topbar-user">
-          <span id="userEmail"></span>
-          <button class="btn btn--sm" id="logoutBtn">Sair</button>
-        </div>
+    <aside class="admin-rail" id="adminRail" aria-label="Navegação principal">
+      <div class="rail-brand"><span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom"></span><span>Administração</span></div>
+      <nav class="rail-nav">
+        <a href="#overview" data-route="overview"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg></span>Visão geral</a>
+        <a href="#sitemap" data-route="sitemap"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M12 7v5M12 12H6v5M12 12h6v5"/></svg></span>Mapa do site</a>
+        <a href="#pages" data-route="pages"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>Páginas editáveis</a>
+        <a href="#users" data-route="users" id="usersNav" class="hidden"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 21c.7-3.5 3-5 7-5s6.3 1.5 7 5"/></svg></span>Usuários e acessos</a>
+      </nav>
+      <div class="rail-footer">
+        <a href="#account" data-route="account"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 21c.7-3.5 3-5 7-5s6.3 1.5 7 5"/></svg></span>Minha conta</a>
+        <button class="rail-logout" id="logoutBtn">Sair <span id="userEmail"></span></button>
       </div>
+    </aside>
+    <header class="mobile-topbar">
+      <button class="btn btn--sm" id="mobileNavBtn" aria-label="Abrir navegação" aria-expanded="false">Menu</button>
+      <span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom"></span>
+      <button class="btn btn--sm" id="mobileLogoutBtn">Sair</button>
     </header>
 
-    <main class="wrap">
-      <div class="tabs" role="tablist">
-        <button class="tab" role="tab" aria-selected="true" data-tab="eventos">Eventos</button>
-        <button class="tab" role="tab" aria-selected="false" data-tab="horarios">Horários &amp; Serviços</button>
-        <button class="tab" role="tab" aria-selected="false" data-tab="cardapio">Cardápio</button>
-        <button class="tab hidden" role="tab" aria-selected="false" data-tab="usuarios" id="tabUsuarios">Usuários</button>
+    <main class="admin-main">
+      <div class="admin-context">
+        <div class="breadcrumbs" id="breadcrumbs"><a href="#overview">Administração</a><span aria-hidden="true">/</span><span>Visão geral</span></div>
+        <div class="context-actions" aria-hidden="true"></div>
+      </div>
+      <section class="admin-view" id="route-overview" data-view="overview">
+        <div class="view-heading"><div><h1>Visão geral</h1><p class="lead">Encontre rapidamente uma página e continue de onde parou.</p></div></div>
+        <div class="overview-editorial" id="overviewGrid"></div>
+        <div class="section-heading"><div><h2>Próximos caminhos</h2><p>O mapa mostra o que existe; as páginas editáveis mostram onde você pode atuar.</p></div></div>
+        <div class="structural-links"><a href="#sitemap">Explorar o mapa do site</a><a href="#pages">Abrir páginas editáveis</a></div>
+      </section>
+      <section class="admin-view hidden" id="route-sitemap" data-view="sitemap">
+        <div class="view-heading"><div><h1>Mapa do site</h1><p class="lead">A estrutura conhecida da Comunidade Shalom Brasília, com o limite de cada integração.</p></div></div>
+        <div class="site-map" id="siteMap"></div>
+      </section>
+      <section class="admin-view hidden" id="route-pages" data-view="pages">
+        <div class="view-heading"><div><h1>Páginas editáveis</h1><p class="lead">Abra uma página para ver somente os módulos que ela suporta.</p></div><div class="page-filter" role="group" aria-label="Filtrar páginas"><button class="segmented__button is-selected" data-page-filter="all">Todas</button><button class="segmented__button" data-page-filter="editable">Com edição</button></div></div>
+        <div class="editable-pages" id="editablePages"></div>
+      </section>
+      <section class="admin-view hidden" id="route-page" data-view="page">
+        <div class="view-heading page-workspace-heading"><div><h1 id="workspaceTitle">Página</h1><p class="lead" id="workspaceDescription"></p></div><a class="btn btn--sm" id="workspacePublicLink" target="_blank" rel="noopener">Ver página pública</a></div>
+        <div class="workspace-switcher" id="workspaceSwitcher" role="navigation" aria-label="Módulos da página"></div>
+        <div class="workspace-modules" id="workspaceModules"></div>
+      </section>
+      <section class="admin-view hidden" id="route-users" data-view="users">
+        <div class="view-heading"><div><h1>Usuários e acessos</h1><p class="lead">Identidade e autorização são coisas diferentes: criar conta não concede edição.</p></div></div>
+        <div class="access-notice notice notice--info">Atribua páginas somente depois que a pessoa confirmar a conta. O RLS do Supabase continua sendo a proteção real.</div>
+        <div id="userList" class="user-list"></div>
+      </section>
+      <section class="admin-view hidden" id="route-account" data-view="account">
+        <div class="view-heading"><div><h1>Minha conta</h1><p class="lead">Dados da sessão atual e acesso ao painel.</p></div></div>
+        <div class="account-panel panel-card"><dl><div><dt>E-mail</dt><dd id="accountEmail"></dd></div><div><dt>Nível</dt><dd id="accountRole"></dd></div></dl><button class="btn btn--danger" id="accountLogoutBtn">Sair do painel</button></div>
+      </section>
+
+      <div class="page-selector-legacy" aria-hidden="true">
+        <div class="site-picker"><span id="sitePickerLabel">Página</span><div class="choice-menu" id="siteMenu"><button class="choice-menu__trigger" id="siteSelect" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="siteOptions" aria-labelledby="sitePickerLabel">Selecionar página</button><div class="choice-menu__options" id="siteOptions" role="listbox" tabindex="-1" hidden></div></div></div>
+      </div>
+
+      <div class="legacy-editor-workspace hidden" id="legacyEditorWorkspace">
+        <div class="breadcrumbs"><a href="#pages">Páginas editáveis</a><span aria-hidden="true">/</span><span id="legacyWorkspaceLabel">Página</span></div>
       </div>
 
       <!-- ---- EVENTOS ---- -->
-      <section id="tab-eventos" class="panel-card">
+      <section id="tab-eventos" class="panel-card legacy-panel" role="tabpanel" aria-labelledby="workspace-events-link">
         <div class="section-title">
           <h2>Eventos &amp; encontros <span class="site-chip" id="siteChip"></span></h2>
           <button class="btn btn--primary" id="newEventBtn">
@@ -90,7 +135,7 @@
       </section>
 
       <!-- ---- HORÁRIOS ---- -->
-      <section id="tab-horarios" class="panel-card hidden">
+      <section id="tab-horarios" class="panel-card hidden legacy-panel" role="tabpanel" aria-labelledby="workspace-schedules-link">
         <div class="section-title">
           <h2>Horários &amp; serviços <span class="site-chip" id="siteChip2"></span></h2>
           <button class="btn btn--primary" id="saveSchedBtn">Salvar horários</button>
@@ -101,7 +146,7 @@
       </section>
 
       <!-- ---- CARDÁPIO ---- -->
-      <section id="tab-cardapio" class="panel-card hidden">
+      <section id="tab-cardapio" class="panel-card hidden legacy-panel" role="tabpanel" aria-labelledby="workspace-menu-link">
         <div class="section-title">
           <h2>Cardápio <span class="site-chip" id="siteChip3"></span></h2>
           <button class="btn btn--primary" id="newProductBtn">
@@ -144,14 +189,6 @@
         </div>
       </section>
 
-      <!-- ---- USUÁRIOS ---- -->
-      <section id="tab-usuarios" class="panel-card hidden">
-        <div class="section-title">
-          <h2>Usuários &amp; permissões</h2>
-        </div>
-        <p class="hint" style="margin-top:-.6rem">A pessoa precisa entrar uma vez no painel para aparecer aqui.</p>
-        <div id="userList" class="user-list"></div>
-      </section>
     </main>
   </div>
 
@@ -169,7 +206,7 @@
   </div>
 
   <!-- ===================== MODAL DE EVENTO ===================== -->
-  <div class="modal hidden" id="eventModal">
+  <div class="modal hidden" id="eventModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal__card">
       <div class="modal__head">
         <h2 id="modalTitle">Novo evento</h2>
@@ -280,7 +317,7 @@
   </div>
 
   <!-- ===================== MODAL DE PRODUTO ===================== -->
-  <div class="modal hidden" id="productModal">
+  <div class="modal hidden" id="productModal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
     <div class="modal__card">
       <div class="modal__head">
         <h2 id="pmTitle">Novo produto</h2>

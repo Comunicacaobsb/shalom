@@ -17,7 +17,7 @@ exemplo do seu `js/data.js` — nada quebra.
 │   ├── share.js      → compartilhar evento (compartilhado)
 │   ├── header.js, footer.js, cev-data.js  (já existiam)
 ├── admin/
-│   ├── index.html    → painel único (login + seletor de página)
+│   ├── index.html    → painel hub (login + mapa + workspaces)
 │   ├── admin.js / admin.css
 │   ├── supabase-setup.sql
 │   └── ADMIN-SETUP.md (este arquivo)
@@ -30,11 +30,9 @@ exemplo do seu `js/data.js` — nada quebra.
    (a Project URL já está lá). A chave anon é pública — pode ir para o GitHub.
 2. Em **SQL Editor → New query**, cole todo o `admin/supabase-setup.sql` e **Run**.
    Cria `sites`, `events`, `settings` (com escopo por página), o RLS e o bucket `eventos`.
-3. **Login e permissões:** siga a seção **5. Níveis de acesso**. O login passa a ser via
-   **Google** (com "Allow new users to sign up" **ativado**) e a permissão de edição é
-   concedida na aba **Usuários**. O cadastro por e-mail/senha em
-   **Authentication → Users → Add user** continua servindo para login, mas por si só não
-   dá mais acesso de escrita.
+3. **Login e permissões:** siga a seção **5. Níveis de acesso**. O painel usa e-mail e
+   senha, com criação de conta, confirmação por e-mail e aprovação por página. Criar uma
+   conta não concede acesso de edição; o master atribui páginas em **Usuários e acessos**.
 4. Commit + push. Painel em `https://brasilia.comshalom.org/admin/`.
 
 ## 2. Como usar
@@ -82,38 +80,41 @@ A regra antiga ("qualquer pessoa logada = editor") foi **substituída** por nív
 acesso guardados no banco (migração `supabase/migrations/20260718100000_cardapio_permissoes.sql`).
 
 ### Como funciona
-- **`profiles`** — quem faz login ganha um perfil, criado automaticamente por um trigger
-  em `auth.users` (copia nome e avatar do Google). O campo `is_master` marca o Admin Master.
+- **`profiles`** — quem confirma uma conta ganha um perfil, criado automaticamente por um
+  trigger em `auth.users` (copia o nome informado no cadastro). O campo `is_master` marca o Admin Master.
 - **Admin Master** — pode tudo em todas as páginas e ainda promove/rebaixa outros masters e
   concede acesso por página. Bootstrap automático: `joao.roquesh@gmail.com` vira master no
-  primeiro login.
+  primeiro login confirmado.
 - **Editores por página (`page_permissions`)** — cada linha `(user_id, site)` dá a um usuário
   permissão de **escrita** naquele site. Sem linha e não sendo master → só leitura.
 - **Funções `is_master()` / `can_edit(site)`** (SECURITY DEFINER) fazem a checagem, e o RLS
   usa elas: em `sites` só o master escreve; `events`, `settings`, `menu_categories`,
   `menu_products` e o bucket `cardapio` exigem `can_edit(site)`. A leitura pública não muda.
-- Quem gateia o acesso é a **permissão de edição**, não o login em si: qualquer pessoa pode
-  entrar com Google (isso é só identidade). Sem permissão, ela vê "Sua conta ainda não tem
-  acesso de edição. Peça a um administrador."
+- Quem gateia o acesso é a **permissão de edição**, não o login em si. Criar uma conta é
+  apenas criar uma identidade; sem confirmação e aprovação, a pessoa vê "Sua conta ainda não
+  tem acesso de edição. Peça a um administrador."
 
 > ⚠️ **Editores atuais por e-mail/senha perdem a escrita** assim que esta migração roda —
-> até o master conceder acesso a cada um na aba **Usuários** do painel. (A leitura pública
+> até o master conceder acesso a cada um em **Usuários e acessos**. (A leitura pública
 > das páginas continua igual.)
 
 ### Passo a passo da configuração (uma vez, no Supabase)
 1. **anon key** — preencha a chave em `js/config.js` (Project Settings → API → "anon public").
    Sem ela, as páginas seguem no fallback de `data.js` e o login não funciona.
-2. **Google como provedor** — Authentication → Sign In / Providers → habilite **Google**
-   (Client ID/Secret do Google Cloud Console). No Google Cloud, o redirect autorizado é
-   `https://kslwekqzuqrbhwqqukjz.supabase.co/auth/v1/callback`. **Ative** "Allow new users to
-   sign up" — qualquer um pode logar; quem controla a edição é a permissão, não o cadastro.
+2. **E-mail** — em Authentication → Providers, mantenha Email habilitado. Para produção,
+   exija confirmação de e-mail e configure SMTP transacional; o SMTP padrão do Supabase serve
+   apenas para testes e tem limites baixos.
 3. **URLs** — Authentication → URL Configuration → **Site URL**: `https://brasilia.comshalom.org`.
-   **Redirect URLs**: `https://brasilia.comshalom.org/**` e `http://localhost:*/**` (testes locais).
-4. **Aplicar a migração** — um push na `main` roda a migração automaticamente. O Admin Master
-   é definido no **primeiro login** de `joao.roquesh@gmail.com` com Google.
-5. **Conceder permissões** — na aba **Usuários** (visível só para o master), promova editores e
-   marque os sites que cada um pode editar. A pessoa precisa ter entrado **uma vez com Google**
-   para aparecer na lista.
+   **Redirect URLs**: `https://brasilia.comshalom.org/admin/**` e `http://localhost:*/admin/**`.
+4. **Aplicar as migrações** — o push/merge na `main` publica os arquivos no GitHub Pages
+   e, enquanto a integração nativa Supabase–GitHub estiver ativa para a branch de produção,
+   também aplica as migrations no projeto Supabase. Em um setup novo ou sem essa integração,
+   aplique explicitamente os arquivos de `supabase/migrations/` usando a rotina autorizada
+   de deploy (por exemplo, `supabase db push` com o projeto vinculado). O Admin Master é
+   definido após o primeiro login confirmado de `joao.roquesh@gmail.com`.
+5. **Conceder permissões** — em **Usuários e acessos** (visível só para o master), promova
+   editores e marque os sites que cada um pode editar. A pessoa precisa confirmar o e-mail e
+   entrar uma vez para aparecer na lista.
 
 ## Observação
 Os antigos `asasul/js/config.js`, `asasul/js/store.js`, `asasul/js/share.js` e

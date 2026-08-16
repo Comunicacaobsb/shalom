@@ -21,14 +21,37 @@
 
   var sb = null;
   if (configured && window.supabase) sb = window.supabase.createClient(cfg.url, cfg.anonKey);
-  if (configured) {
-    fetch(cfg.url.replace(/\/$/,"")+"/auth/v1/settings", { headers:{ apikey:cfg.anonKey } }).then(function(r){ return r.ok ? r.json() : null; }).then(function(settings){
-      if (settings && settings.external && settings.external.google === false) { var gb=$("#googleBtn"), od=$(".or-divider"); if(gb) gb.hidden=true; if(od) od.hidden=true; }
-    }).catch(function(){ /* login por e-mail continua disponível */ });
-  }
+  // Social login is intentionally unavailable until provider governance is ready.
+  // Keep this deterministic in the UI; never depend on a remote settings request.
 
   var site = "asasul";          // página atualmente selecionada
   var siteName = "Asa Sul";
+  var authMode = "login";
+  var routeName = "overview";
+  var routeSite = "";
+  var routeModule = "";
+  var SITE_CATALOG = [
+    {id:"root", name:"Raiz / 25 anos", path:"../25anos/", status:"published", type:"readonly", modules:[]},
+    {id:"asasul", name:"Shalom Asa Sul", path:"../asasul/", status:"published", type:"editable", modules:["events","schedules"], children:[
+      {name:"Vida Plena",path:"../asasul/e/vida-plena/"},
+      {name:"Kyrios",path:"../asasul/e/kyrios/"},
+      {name:"Amare",path:"../asasul/e/amare/"},
+      {name:"Missa da Misericórdia",path:"../asasul/e/missa-misericordia/"},
+      {name:"Beraká para casais",path:"../asasul/e/beraka-casais/"},
+      {name:"Beraká Kids",path:"../asasul/e/beraka-kids/"},
+      {name:"Curada: História de Vida",path:"../asasul/e/curada-historia-de-vida/"},
+      {name:"És Precioso",path:"../asasul/e/es-precioso/"}
+    ]},
+    {id:"taguatinga", name:"Shalom Taguatinga", path:"../taguatinga/", status:"published", type:"readonly", modules:[]},
+    {id:"santamaria", name:"Shalom Santa Maria", path:"../santamaria/", status:"published", type:"readonly", modules:[]},
+    {id:"sh82cafe", name:"SH-82 Café", path:"../sh82cafe/", status:"published", type:"editable", modules:["menu"]},
+    {id:"providencia", name:"Providência", path:"../providencia/", status:"published", type:"readonly", modules:[], children:[{name:"Habilidades",path:"../providencia/habilidades/"},{name:"Necessidades",path:"../providencia/necessidades/"}]},
+    {id:"adoracao", name:"Adoração", path:"../adoracao/", status:"published", type:"app", modules:[]},
+    {id:"acamps", name:"Acamps", path:"../acamps/", status:"published", type:"readonly", modules:[]},
+    {id:"eventos", name:"Eventos", path:"../eventos/", status:"development", type:"app", modules:[]},
+    {id:"inscricoes", name:"Inscrições", path:"../inscricoes/", status:"development", type:"app", modules:[]},
+  ];
+  var MODULE_LABELS = { events:"Eventos e encontros", schedules:"Horários e serviços", menu:"Cardápio" };
 
   /* ---------- helpers ---------- */
   function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"})[c];}); }
@@ -90,8 +113,11 @@
     loginView.classList.add("hidden"); noAccessView.classList.add("hidden");
     appView.classList.remove("hidden");
     $("#userEmail").textContent = email||"";
-    $("#tabUsuarios").classList.toggle("hidden", !me.isMaster);
-    loadSites();
+    var usersNav=$("#usersNav"); if (usersNav) usersNav.classList.toggle("hidden", !me.isMaster);
+    $("#accountEmail").textContent = email||"";
+    $("#accountRole").textContent = me.isMaster ? "Administrador master" : "Editor de páginas autorizadas";
+    renderCatalog();
+    loadSites().then(function(){ renderRoute(); });
   }
   function showNoAccess(email){
     appView.classList.add("hidden"); loginView.classList.add("hidden");
@@ -103,7 +129,7 @@
     loginView.classList.remove("hidden");
   }
 
-  if (!configured) { $("#cfgWarn").classList.remove("hidden"); $("#loginBtn").disabled = true; $("#googleBtn").disabled = true; }
+  if (!configured) { $("#cfgWarn").classList.remove("hidden"); $("#loginBtn").disabled = true; }
 
   // Carrega o profile próprio + permissões de página. Define me.isMaster / me.allowedSites.
   function bootPermissions(){
@@ -145,20 +171,45 @@
     var btn=$("#loginBtn"); var msg=$("#loginMsg");
     setMsg(msg,"");
     btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Entrando…';
-    sb.auth.signInWithPassword({ email:$("#email").value.trim(), password:$("#password").value })
+    var email=$("#email").value.trim(), password=$("#password").value;
+    var operation = authMode === "signup"
+      ? sb.auth.signUp({ email:email, password:password, options:{ data:{ full_name:$("#name").value.trim() }, emailRedirectTo:new URL("./", location.href).href } })
+      : sb.auth.signInWithPassword({ email:email, password:password });
+    operation
       .then(function(res){
-        btn.disabled=false; btn.textContent="Entrar";
-        if (res.error) setMsg(msg, "E-mail ou senha inválidos.");
+        btn.disabled=false; btn.textContent=authMode === "signup" ? "Criar conta" : "Entrar";
+        if (res.error) {
+          // Do not reveal whether an e-mail exists in the system.
+          setMsg(msg, authMode === "signup" ? "Não foi possível criar a conta. Confira os dados e tente novamente." : "E-mail ou senha inválidos.");
+          return;
+        }
+        if (authMode === "signup") {
+          setMsg(msg, "Conta criada. Confirme seu e-mail; depois um administrador aprovará seu acesso.", true);
+          $("#loginForm").reset();
+        }
       })
-      .catch(function(){ btn.disabled=false; btn.textContent="Entrar"; setMsg(msg,"Não foi possível entrar agora."); });
+      .catch(function(){ btn.disabled=false; btn.textContent=authMode === "signup" ? "Criar conta" : "Entrar"; setMsg(msg,authMode === "signup" ? "Não foi possível criar a conta agora." : "Não foi possível entrar agora."); });
   });
 
-  $("#googleBtn").addEventListener("click", function(){
-    if (!sb) return;
-    sb.auth.signInWithOAuth({ provider:"google", options:{ redirectTo: location.origin + location.pathname } })
-      .then(function(res){ if (res && res.error) setMsg($("#loginMsg"), "Não foi possível entrar com o Google."); })
-      .catch(function(){ setMsg($("#loginMsg"), "Não foi possível entrar com o Google."); });
+  function setAuthMode(mode){
+    authMode=mode;
+    var signup=mode === "signup";
+    $("#loginHeading").textContent=signup ? "Criar conta" : "Entrar no painel";
+    $("#loginIntro").textContent=signup ? "Crie sua identidade para solicitar acesso às páginas." : "Acesse para cuidar do conteúdo das páginas da comunidade.";
+    $("#loginBtn").textContent=signup ? "Criar conta" : "Entrar";
+    $("#forgotBtn").hidden=signup;
+    $("#nameField").hidden=!signup; $("#confirmPasswordField").hidden=!signup; $("#signupNote").hidden=!signup;
+    $("#name").required=signup; $("#confirmPassword").required=signup; $("#password").autocomplete=signup ? "new-password" : "current-password";
+    $("#loginModeBtn").classList.toggle("is-selected",!signup); $("#signupModeBtn").classList.toggle("is-selected",signup);
+    $("#loginModeBtn").setAttribute("aria-pressed",String(!signup)); $("#signupModeBtn").setAttribute("aria-pressed",String(signup));
+    setMsg($("#loginMsg"),"");
+  }
+  $("#loginModeBtn").addEventListener("click",function(){setAuthMode("login");});
+  $("#signupModeBtn").addEventListener("click",function(){setAuthMode("signup");});
+  $("#confirmPassword").addEventListener("input",function(){
+    if(authMode === "signup" && $("#password").value !== this.value) this.setCustomValidity("As senhas precisam ser iguais."); else this.setCustomValidity("");
   });
+  $("#password").addEventListener("input",function(){ $("#confirmPassword").dispatchEvent(new Event("input")); });
 
   $("#logoutBtn").addEventListener("click", function(){ if(sb) sb.auth.signOut(); });
   $("#noAccessLogout").addEventListener("click", function(){ if(sb) sb.auth.signOut(); });
@@ -179,13 +230,79 @@
       .catch(function(){ setMsg(msg, "Não foi possível enviar o e-mail agora."); });
   });
 
+  /* ---------- hub-and-spoke routing and catalog ---------- */
+  function catalogFor(id){ return SITE_CATALOG.filter(function(item){ return item.id===id; })[0]; }
+  function canEditCatalogItem(item){ return !!(item && item.modules && item.modules.length && (me.isMaster || me.allowedSites.indexOf(item.id)!==-1)); }
+  function statusLabel(status){ return status === "published" ? "Publicada" : status === "development" ? "Em desenvolvimento" : "Arquivada"; }
+  function typeLabel(type){ return type === "editable" ? "Editável" : type === "app" ? "App separado" : "Somente visualização"; }
+  function publicHref(item){ return item.path || "../"; }
+  function renderCatalog(){
+    var map=$("#siteMap"), pages=$("#editablePages"), overview=$("#overviewGrid");
+    if(!map || !pages) return;
+    map.innerHTML=SITE_CATALOG.filter(function(i){return !i.parent;}).map(function(item){
+      var children=(item.children||[]).map(function(c){return '<li><a href="'+esc(c.path)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a></li>';}).join("");
+      return '<article class="site-map-row"><div class="site-map-main"><div><h2>'+esc(item.name)+'</h2><p>'+esc(statusLabel(item.status))+' · '+esc(typeLabel(item.type))+'</p></div></div><div class="site-map-actions"><span class="module-summary">'+(item.modules.length ? item.modules.map(function(m){return esc(MODULE_LABELS[m]);}).join(" · ") : "Sem módulo conectado")+'</span><a class="btn btn--sm" href="'+esc(publicHref(item))+'" target="_blank" rel="noopener">Ver página</a>'+(canEditCatalogItem(item)?'<a class="btn btn--sm btn--primary" href="#page/'+esc(item.id)+'">Abrir edição</a>':'')+'</div>'+(children?'<ul class="site-map-children">'+children+'</ul>':'')+'</article>';
+    }).join("");
+    var editable=SITE_CATALOG.filter(function(i){return canEditCatalogItem(i);});
+    pages.innerHTML=editable.length ? editable.map(function(item){return '<a class="editable-page-row" href="#page/'+esc(item.id)+'"><div><h2>'+esc(item.name)+'</h2><p>'+esc(statusLabel(item.status))+' · '+item.modules.length+' módulo'+(item.modules.length===1?'':'s')+'</p></div><div class="module-chips">'+item.modules.map(function(m){return '<span class="module-chip">'+esc(MODULE_LABELS[m])+'</span>';}).join("")+'</div><span class="row-action">Abrir</span></a>';}).join(""):'<div class="empty-state"><h2>Nenhuma página editável disponível</h2><p>Quando uma página for autorizada para sua conta, ela aparecerá aqui.</p></div>';
+    if(overview){ overview.innerHTML=editable.length ? '<div class="editorial-list"><h2>Páginas autorizadas para você</h2>'+editable.map(function(item){return '<a href="#page/'+esc(item.id)+'"><span><strong>'+esc(item.name)+'</strong><small>'+item.modules.map(function(m){return esc(MODULE_LABELS[m]);}).join(" · ")+'</small></span><span class="row-action">Abrir</span></a>';}).join("")+'</div>' : '<div class="empty-state"><h2>Nenhuma página autorizada</h2><p>Um administrador precisa conceder acesso a uma página antes da edição.</p></div>'; }
+  }
+  function renderPageWorkspace(id, module){
+    var item=catalogFor(id); if(!item || !canEditCatalogItem(item)){ route("pages"); return; }
+    if(routeModule && item.modules.indexOf(routeModule)===-1){ route("page/"+item.id); return; }
+    site=id; siteName=item.name; updateChips(); routeSite=id; routeModule=module||"";
+    $("#workspaceTitle").textContent=item.name; $("#workspaceDescription").textContent="Escolha somente um módulo suportado por esta página.";
+    $("#workspacePublicLink").href=publicHref(item);
+    var switcher=$("#workspaceSwitcher"), modules=$("#workspaceModules");
+    switcher.innerHTML=item.modules.map(function(m){return '<a id="workspace-'+m+'-link" class="workspace-module-link '+(routeModule===m?'is-selected':'')+'" href="#page/'+esc(item.id)+'/'+esc(m)+'">'+esc(MODULE_LABELS[m])+'</a>';}).join("");
+    modules.innerHTML=item.modules.map(function(m){return '<div class="workspace-module '+(routeModule===m?'is-current':'')+'" data-workspace-module="'+esc(m)+'"><div><h2>'+esc(MODULE_LABELS[m])+'</h2><p>Edite os dados publicados nesta página.</p></div><a class="btn btn--primary" href="#page/'+esc(item.id)+'/'+esc(m)+'">Abrir editor</a></div>';}).join("");
+    $("#legacyWorkspaceLabel").textContent=item.name;
+    $$(".legacy-panel").forEach(function(p){p.classList.remove("is-editor-visible");p.classList.add("hidden");});
+    if(routeModule){
+      var target=routeModule === "events" ? $("#tab-eventos") : routeModule === "schedules" ? $("#tab-horarios") : $("#tab-cardapio");
+      if(target){ target.classList.remove("hidden"); target.classList.add("is-editor-visible"); target.setAttribute("aria-hidden","false"); }
+      if(routeModule === "events") loadEvents(); if(routeModule === "schedules") loadSchedules(); if(routeModule === "menu") loadMenu();
+      modules.innerHTML='<div class="active-editor-note"><a href="#page/'+esc(item.id)+'">Voltar para '+esc(item.name)+'</a><p>Editor de '+esc(MODULE_LABELS[routeModule])+'.</p></div>';
+    }
+  }
+  function route(next){ location.hash=next.charAt(0)==="#"?next:"#"+next; }
+  function renderRoute(){
+    if(!appView || appView.classList.contains("hidden")) return;
+    var raw=location.hash.replace(/^#/,'')||"overview", bits=raw.split("/");
+    routeName=bits[0]||"overview"; routeSite=bits[1]||""; routeModule=bits[2]||"";
+    if(routeName==="page"){
+      $$(".admin-view").forEach(function(v){v.classList.toggle("hidden",v.dataset.view!=="page");});
+      renderPageWorkspace(routeSite,routeModule); updateBreadcrumbs("Páginas editáveis / "+(catalogFor(routeSite)||{name:"Página"}).name);
+      $$('[data-route]').forEach(function(a){var active=a.dataset.route==="pages";a.classList.toggle("is-active",active);if(active)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
+      return;
+    }
+    $$(".legacy-panel").forEach(function(p){p.classList.remove("is-editor-visible");p.classList.add("hidden");});
+    if(routeName==="users" && !me.isMaster){ route("pages"); return; }
+    var allowed=["overview","sitemap","pages","users","account"].indexOf(routeName)!==-1?routeName:"overview";
+    $$(".admin-view").forEach(function(v){v.classList.toggle("hidden",v.dataset.view!==allowed);});
+    if(allowed==="sitemap"||allowed==="pages"||allowed==="overview") renderCatalog();
+    if(allowed==="users") loadUsers();
+    updateBreadcrumbs({overview:"Visão geral",sitemap:"Mapa do site",pages:"Páginas editáveis",users:"Usuários e acessos",account:"Minha conta"}[allowed]);
+    $$("[data-route]").forEach(function(a){var active=a.dataset.route===allowed;a.classList.toggle("is-active",active);if(active)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
+  }
+  function updateBreadcrumbs(label){ var b=$("#breadcrumbs"); if(b) b.innerHTML='<a href="#overview">Administração</a><span aria-hidden="true">/</span><span>'+esc(label||"Visão geral")+'</span>'; }
+  window.addEventListener("hashchange",renderRoute);
+  $$("[data-route]").forEach(function(a){a.addEventListener("click",function(){if($("#adminRail")) $("#adminRail").classList.remove("is-open");$("#mobileNavBtn").setAttribute("aria-expanded","false");});});
+  $("#mobileNavBtn").addEventListener("click",function(){var rail=$("#adminRail"), open=rail.classList.toggle("is-open");this.setAttribute("aria-expanded",String(open));});
+  $("#mobileLogoutBtn").addEventListener("click",function(){if(sb) sb.auth.signOut();});
+  $("#accountLogoutBtn").addEventListener("click",function(){if(sb) sb.auth.signOut();});
+  $$('[data-page-filter]').forEach(function(btn){ btn.addEventListener("click",function(){
+    $$('[data-page-filter]').forEach(function(other){other.classList.toggle("is-selected",other===btn);});
+    var rows=$$(".editable-page-row"); rows.forEach(function(row){row.hidden=btn.dataset.pageFilter==="editable" ? !row.querySelector(".module-chip") : false;});
+  }); });
+
   /* ---------- seletor de página (site) ---------- */
   var siteSelect = $("#siteSelect"), siteOptions = $("#siteOptions"), siteRows = [];
   var activeTab = "eventos";
   function updateChips(){ $("#siteChip").textContent = siteName; $("#siteChip2").textContent = siteName; var c3=$("#siteChip3"); if(c3) c3.textContent = siteName; }
   function loadSites(){
-    if (!sb) return;
-    sb.from("sites").select("id,name").order("name").then(function(res){
+    if (!sb) return Promise.resolve([]);
+    return sb.from("sites").select("id,name").order("name").then(function(res){
       var rows = (res.data && res.data.length) ? res.data : [{ id:"asasul", name:"Asa Sul" }];
       // Não-master só vê os sites que tem permissão. Master vê todos.
       if (!me.isMaster) rows = rows.filter(function(r){ return me.allowedSites.indexOf(r.id) !== -1; });
@@ -193,11 +310,14 @@
       siteRows = rows;
       siteOptions.innerHTML = rows.map(function(r){ return '<button type="button" class="choice-menu__option" role="option" data-site="'+esc(r.id)+'" aria-selected="false">'+esc(r.name)+'</button>'; }).join("");
       // mantém asasul como padrão se existir (e permitido)
-      var def = rows.filter(function(r){return r.id==="asasul";})[0] || rows[0];
+      var hashParts = (location.hash || "").replace(/^#/, "").split("/");
+      var requestedId = hashParts[0] === "page" ? hashParts[1] : routeSite;
+      var requested = requestedId && rows.filter(function(r){return r.id===requestedId;})[0];
+      var def = requested || rows.filter(function(r){return r.id==="asasul";})[0] || rows[0];
       site = def.id; siteName = def.name; siteSelect.textContent = siteName;
       siteOptions.querySelectorAll("[data-site]").forEach(function(b){ b.setAttribute("aria-selected", String(b.dataset.site===site)); });
-      updateChips(); buildSchedGrid(); loadEvents(); loadSchedules();
-      if (activeTab==="cardapio") loadMenu();
+      updateChips(); buildSchedGrid();
+      return rows;
     });
   }
   function chooseSite(next){
@@ -206,8 +326,7 @@
     site = chosen.id; siteName = chosen.name; siteSelect.textContent = siteName;
     siteOptions.querySelectorAll("[data-site]").forEach(function(b){ b.setAttribute("aria-selected", String(b.dataset.site===site)); });
     siteOptions.hidden=true; siteSelect.setAttribute("aria-expanded","false");
-    updateChips(); loadEvents(); loadSchedules();
-    if (activeTab==="cardapio") loadMenu();
+    updateChips(); route("page/"+site);
   }
   function toggleChoice(trigger, options, open){
     options.hidden=!open; trigger.setAttribute("aria-expanded",String(open));
@@ -305,10 +424,10 @@
         '<div class="ev-row__main"><h3>'+esc(ev.title)+'</h3>'+
           '<div class="ev-row__meta">'+esc(ev.date_text||"")+(ev.date_text&&ev.location?" · ":"")+esc(ev.location||"")+' &nbsp; '+pub+esc(timing)+'</div></div>'+
         '<div class="ev-row__actions">'+
-          '<button class="icon-btn" data-up="'+i+'" title="Subir" '+(i===0?"disabled":"")+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>'+
-          '<button class="icon-btn" data-down="'+i+'" title="Descer" '+(i===currentEvents.length-1?"disabled":"")+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>'+
-          '<button class="icon-btn" data-edit="'+ev.id+'" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
-          '<button class="icon-btn" data-del="'+ev.id+'" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>'+
+          '<button class="icon-btn" data-up="'+i+'" title="Subir" aria-label="Subir evento" '+(i===0?"disabled":"")+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>'+
+          '<button class="icon-btn" data-down="'+i+'" title="Descer" aria-label="Descer evento" '+(i===currentEvents.length-1?"disabled":"")+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>'+
+          '<button class="icon-btn" data-edit="'+ev.id+'" title="Editar" aria-label="Editar evento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
+          '<button class="icon-btn" data-del="'+ev.id+'" title="Excluir" aria-label="Excluir evento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>'+
         '</div></div>';
     }).join("");
 
@@ -354,6 +473,15 @@
     $("#ev-image-url").value=url||"";
   }
 
+  var lastModalFocus=null;
+  function focusModal(el){
+    lastModalFocus=document.activeElement; el.classList.remove("hidden"); var first=el.querySelector("input:not([type=hidden]), textarea, button:not([disabled])"); if(first) setTimeout(function(){first.focus();},0);
+  }
+  function trapModalFocus(el,e){
+    if(e.key!=="Tab" || el.classList.contains("hidden")) return;
+    var nodes=$$("input:not([type=hidden]), textarea, button:not([disabled]), a[href]",el).filter(function(n){return n.offsetParent!==null;}); if(!nodes.length)return;
+    var first=nodes[0], last=nodes[nodes.length-1]; if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();} else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  }
   function openModal(ev){
     ensureQuill();
     setMsg($("#modalMsg"),"");
@@ -375,17 +503,18 @@
     setPublishedChoice($("#ev-published").value);
     setPreview(ev ? ev.image_url : "");
     if (quill) quill.root.innerHTML = ev ? (ev.description||"") : "";
-    modal.classList.remove("hidden");
+    focusModal(modal);
   }
   function toLocalInput(value){ var d=new Date(value); if(!isFinite(d.getTime())) return ""; var a=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(d), o={}; a.forEach(function(x){o[x.type]=x.value;}); return o.year+"-"+o.month+"-"+o.day+"T"+o.hour+":"+o.minute; }
   function toIsoOrNull(value){ return spDateTimeToIso(value); }
   function setPublishedChoice(value){ $("#ev-published").value=String(value)==="true" ? "true" : "false"; $$("[data-published]").forEach(function(b){ b.classList.toggle("is-selected",b.dataset.published===$("#ev-published").value); b.setAttribute("aria-pressed",String(b.dataset.published===$("#ev-published").value)); }); }
-  function closeModal(){ modal.classList.add("hidden"); }
+  function closeModal(){ modal.classList.add("hidden"); if(lastModalFocus&&lastModalFocus.focus) lastModalFocus.focus(); }
 
   $("#newEventBtn").addEventListener("click", function(){ openModal(null); });
   $("#modalClose").addEventListener("click", closeModal);
   $("#modalCancel").addEventListener("click", closeModal);
   modal.addEventListener("click", function(e){ if (e.target===modal) closeModal(); });
+  modal.addEventListener("keydown", function(e){ if(e.key==="Escape") closeModal(); else trapModalFocus(modal,e); });
 
   $("#ev-title").addEventListener("input", function(){
     var slugEl=$("#ev-slug");
@@ -535,13 +664,13 @@
         '<span class="cat-row__name'+(c.active?'':' is-off')+'">'+esc(c.name)+'</span>'+
         (c.active?'':'<span class="badge-pill badge-off">Inativa</span>')+
         '<div class="cat-row__actions">'+
-          '<button class="icon-btn" data-cup="'+i+'" title="Subir" '+(i===0?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>'+
-          '<button class="icon-btn" data-cdown="'+i+'" title="Descer" '+(i===menuCats.length-1?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>'+
-          '<button class="icon-btn" data-crename="'+esc(c.id)+'" title="Renomear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
-          '<button class="icon-btn" data-ctoggle="'+esc(c.id)+'" title="'+(c.active?'Desativar':'Ativar')+'">'+(c.active?
+          '<button class="icon-btn" data-cup="'+i+'" title="Subir" aria-label="Subir categoria" '+(i===0?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>'+
+          '<button class="icon-btn" data-cdown="'+i+'" title="Descer" aria-label="Descer categoria" '+(i===menuCats.length-1?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>'+
+          '<button class="icon-btn" data-crename="'+esc(c.id)+'" title="Renomear" aria-label="Renomear categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
+          '<button class="icon-btn" data-ctoggle="'+esc(c.id)+'" title="'+(c.active?'Desativar':'Ativar')+'" aria-label="'+(c.active?'Desativar':'Ativar')+' categoria">'+(c.active?
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>':
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/></svg>')+'</button>'+
-          '<button class="icon-btn" data-cdel="'+esc(c.id)+'" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>'+
+          '<button class="icon-btn" data-cdel="'+esc(c.id)+'" title="Excluir" aria-label="Excluir categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>'+
         '</div></div>';
     }).join("");
     $$("[data-cup]",host).forEach(function(b){ b.addEventListener("click",function(){ moveCat(+b.dataset.cup,-1); }); });
@@ -610,10 +739,10 @@
       '<div class="prod-row__main"><h3>'+esc(p.name)+'</h3>'+
         '<div class="prod-row__meta">'+fmtBRL(p.price)+(badges?' &nbsp; '+badges:'')+'</div></div>'+
       '<div class="prod-row__actions">'+
-        '<button class="icon-btn" data-pup="'+esc(p.id)+'" title="Subir" '+(idx===0?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>'+
-        '<button class="icon-btn" data-pdown="'+esc(p.id)+'" title="Descer" '+(idx===items.length-1?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>'+
-        '<button class="icon-btn" data-pedit="'+esc(p.id)+'" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
-        '<button class="icon-btn" data-pdel="'+esc(p.id)+'" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>'+
+        '<button class="icon-btn" data-pup="'+esc(p.id)+'" title="Subir" aria-label="Subir produto" '+(idx===0?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>'+
+        '<button class="icon-btn" data-pdown="'+esc(p.id)+'" title="Descer" aria-label="Descer produto" '+(idx===items.length-1?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>'+
+        '<button class="icon-btn" data-pedit="'+esc(p.id)+'" title="Editar" aria-label="Editar produto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
+        '<button class="icon-btn" data-pdel="'+esc(p.id)+'" title="Excluir" aria-label="Excluir produto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>'+
       '</div></div>';
   }
   function renderProds(){
@@ -684,7 +813,7 @@
   function buildWeekdayChips(){
     var host=$("#weekdayChips"); if(!host || host.dataset.built) return;
     host.dataset.built="1";
-    host.innerHTML = WD_SHORT.map(function(l,i){ return '<button type="button" class="wd-chip" data-dow="'+i+'" title="'+cap(WD_FULL[i])+'">'+l+'</button>'; }).join("");
+    host.innerHTML = WD_SHORT.map(function(l,i){ return '<button type="button" class="wd-chip" data-dow="'+i+'" title="'+cap(WD_FULL[i])+'" aria-label="Selecionar '+cap(WD_FULL[i])+'">'+l+'</button>'; }).join("");
     $$(".wd-chip",host).forEach(function(c){ c.addEventListener("click",function(){ c.classList.toggle("on"); updateAvailUI(); }); });
   }
   function currentPreset(){ var r=$('input[name="pm-avail"]:checked'); return r?r.value:"sempre"; }
@@ -738,14 +867,15 @@
     }
     var radio=$('input[name="pm-avail"][value="'+preset+'"]'); if(radio) radio.checked=true;
     updateAvailUI();
-    productModal.classList.remove("hidden");
+    focusModal(productModal);
   }
-  function closeProductModal(){ productModal.classList.add("hidden"); }
+  function closeProductModal(){ productModal.classList.add("hidden"); if(lastModalFocus&&lastModalFocus.focus) lastModalFocus.focus(); }
 
   $("#newProductBtn").addEventListener("click", function(){ openProductModal(null); });
   $("#pmClose").addEventListener("click", closeProductModal);
   $("#pmCancel").addEventListener("click", closeProductModal);
   productModal.addEventListener("click", function(e){ if(e.target===productModal) closeProductModal(); });
+  productModal.addEventListener("keydown", function(e){ if(e.key==="Escape") closeProductModal(); else trapModalFocus(productModal,e); });
   $("#pm-name").addEventListener("input", function(){ var s=$("#pm-slug"); if(!s.dataset.touched) s.value=slugify(this.value); });
   $("#pm-slug").addEventListener("input", function(){ this.dataset.touched="1"; this.value=slugify(this.value); });
 

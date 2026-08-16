@@ -63,8 +63,8 @@ on conflict (site, key) do nothing;
 
 -- =====================================================================
 --  SEGURANÇA (Row Level Security)
---  Visitante LÊ (eventos publicados + configurações). Só logado ESCREVE.
---  (Níveis de acesso por página entram num próximo passo, com tabela de papéis.)
+--  Visitante LÊ conteúdo público. Escrita só é habilitada pela migration de
+--  permissões, usando can_edit(site). Este setup não cria policies abertas.
 -- =====================================================================
 alter table public.sites    enable row level security;
 alter table public.events   enable row level security;
@@ -73,7 +73,6 @@ alter table public.settings enable row level security;
 drop policy if exists "sites_read" on public.sites;
 create policy "sites_read" on public.sites for select to anon, authenticated using (true);
 drop policy if exists "sites_auth_write" on public.sites;
-create policy "sites_auth_write" on public.sites for all to authenticated using (true) with check (true);
 
 drop policy if exists "events_public_read" on public.events;
 create policy "events_public_read" on public.events for select to anon using (
@@ -82,14 +81,11 @@ create policy "events_public_read" on public.events for select to anon using (
   and (unpublish_at is null or unpublish_at > now())
 );
 drop policy if exists "events_auth_read" on public.events;
-create policy "events_auth_read" on public.events for select to authenticated using (true);
 drop policy if exists "events_auth_write" on public.events;
-create policy "events_auth_write" on public.events for all to authenticated using (true) with check (true);
 
 drop policy if exists "settings_public_read" on public.settings;
 create policy "settings_public_read" on public.settings for select to anon, authenticated using (true);
 drop policy if exists "settings_auth_write" on public.settings;
-create policy "settings_auth_write" on public.settings for all to authenticated using (true) with check (true);
 
 -- =====================================================================
 --  STORAGE — bucket público para as artes dos eventos (compartilhado;
@@ -103,8 +99,6 @@ drop policy if exists "eventos_public_read" on storage.objects;
 create policy "eventos_public_read" on storage.objects
   for select to anon, authenticated using (bucket_id = 'eventos');
 drop policy if exists "eventos_auth_write" on storage.objects;
-create policy "eventos_auth_write" on storage.objects
-  for all to authenticated using (bucket_id = 'eventos') with check (bucket_id = 'eventos');
 
--- Pronto. Crie os editores em Authentication → Users → Add user
--- e desative o cadastro público em Authentication → Sign In / Providers.
+-- Pronto. Aplique também a migration de permissões antes de conceder edição.
+-- O painel usa e-mail/senha, confirmação por e-mail e aprovação por página.
