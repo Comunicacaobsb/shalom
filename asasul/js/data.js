@@ -117,7 +117,7 @@ Onde: Shalom Asa Sul. Traga suas intenções e viva esse encontro com a Miseric�
     badge: "Retiro para casais",
     data: "26 e 27 de setembro de 2026",
     local: "SGAS 606, Bloco D, Lote 42 — Brasília/DF",
-    imagem: "images/eventos/beraka-casais.png",
+    imagem: "images/eventos/beraka-casais.webp",
     resumo: "Um retiro para casais fortalecerem a vida a dois sobre a rocha que é Jesus.",
     descricao:
 `BERAKÁ — Retiro para casais
@@ -149,7 +149,7 @@ Inscrições e informações: https://comshalom.org/beraka/`,
     badge: "Crianças de 5 a 10 anos",
     data: "26 e 27 de setembro de 2026",
     local: "SGAS 606, Bloco D, Lote 42 — Brasília/DF",
-    imagem: "images/eventos/beraka-kids.png",
+    imagem: "images/eventos/beraka-kids.webp",
     resumo: "Uma programação própria para crianças de 5 a 10 anos durante o retiro Beraká.",
     descricao:
 `BERAKÁ KIDS — para crianças de 5 a 10 anos
@@ -181,7 +181,7 @@ Inscrições e informações: https://comshalom.org/beraka/`,
     badge: "Retiro",
     data: "04 a 07 de setembro",
     local: "Retiro Santo Antônio",
-    imagem: "images/eventos/curada-historia-de-vida.png",
+    imagem: "images/eventos/curada-historia-de-vida.webp",
     resumo: "Um retiro para encontrar cura e um novo olhar para a própria história de vida.",
     descricao:
 `RETIRO CURADA — história de vida
@@ -206,7 +206,7 @@ WhatsApp: https://wa.me/556182748634`,
     badge: "Curso",
     data: "15 a 17 de setembro, às 19h30",
     local: "Shalom Asa Sul — Auditório Kyrios",
-    imagem: "images/eventos/es-precioso.png",
+    imagem: "images/eventos/es-precioso.webp",
     resumo: "Curso És Precioso no Shalom Asa Sul, com opção de inscrição com livro.",
     descricao:
 `CURSO ÉS PRECIOSO
