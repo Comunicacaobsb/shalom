@@ -244,11 +244,23 @@ function showToast(msg) {
   /* ===================== NOTÍCIAS (comshalom — WordPress REST) ===================== */
   var list = $("#comshalom-list");
   if (list) {
-    var API = "https://comshalom.org/wp-json/wp/v2/posts?per_page=3&_embed=1";
+    // A página oficial /brasilia/ é alimentada pela taxonomia mission (termo
+    // Brasília, id 36). Consultar apenas essa taxonomia evita notícias globais,
+    // de outros países e versões em outros idiomas.
+    var API = "https://comshalom.org/wp-json/wp/v2/posts?mission=36&per_page=3&orderby=date&order=desc&_embed=1";
     var PLACEHOLDER = "../images/shalom-brasilia.jpg"; // imagem de reserva on-brand
 
     function fmt(d) { try { return new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }); } catch (e) { return ""; } }
     function strip(html) { var d = document.createElement("div"); d.innerHTML = html || ""; return (d.textContent || "").trim(); }
+    function unique(items) {
+      var seen = Object.create(null);
+      return items.filter(function (item) {
+        var key = String(item.id || item.link || item.title || "").toLowerCase();
+        if (!key || seen[key]) return false;
+        seen[key] = true;
+        return true;
+      });
+    }
 
     function render(items) {
       list.classList.remove("skeleton");
@@ -282,7 +294,7 @@ function showToast(msg) {
       .then(function (posts) {
         clearTimeout(to);
         if (!Array.isArray(posts) || !posts.length) throw new Error("vazio");
-        var items = posts.map(function (p) {
+        var items = unique(posts.map(function (p) {
           var img = PLACEHOLDER;
           try { var m = p._embedded && p._embedded["wp:featuredmedia"]; if (m && m[0] && m[0].source_url) img = m[0].source_url; } catch (e) {}
           var ex = strip(p.excerpt && p.excerpt.rendered);
@@ -292,9 +304,10 @@ function showToast(msg) {
             excerpt: ex,
             date: fmt(p.date),
             link: p.link || "https://comshalom.org/brasilia",
-            img: img
+            img: img,
+            id: p.id
           };
-        });
+        }));
         render(items);
       })
       .catch(function () { clearTimeout(to); showFallback(); });

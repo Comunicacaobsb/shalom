@@ -2,7 +2,7 @@
    Painel Comunidade Shalom — estilos (compartilhado, raiz /admin/)
    ===================================================================== */
 :root{
-  --paper:#F5F6F8; --paper-2:#FFF; --ink:#17202E; --ink-soft:#4A5568; --ink-faint:#8A93A3;
+  --paper:#F5F6F8; --paper-2:#FFF; --ink:#17202E; --ink-soft:#4A5568; --ink-faint:#667085;
   --line:#E3E6EA; --blue:#2560A8; --blue-deep:#204F8C; --blue-soft:#E9F0FA; --gold:#C9A24A;
   --danger:#C0392B; --ok:#1E8E5A;
   --r:14px; --r-sm:10px; --r-pill:999px;
@@ -24,7 +24,7 @@ img{max-width:100%;display:block}
 .topbar-left{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
 .brand-logo{display:inline-block;width:120px;height:30px;background-color:var(--blue-deep);-webkit-mask:url(../images/logo-shlaom.svg) left center/contain no-repeat;mask:url(../images/logo-shlaom.svg) left center/contain no-repeat}
 .site-picker{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--ink-soft);font-weight:700}
-.site-picker select{padding:.5rem .7rem;border:1px solid var(--line);border-radius:var(--r-sm);font:inherit;font-size:.9rem;font-weight:600;background:var(--paper-2);color:var(--ink)}
+.choice-menu{position:relative;min-width:180px}.choice-menu--full{width:100%;margin-top:.35rem}.choice-menu__trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.5rem .7rem;border:1px solid var(--line);border-radius:var(--r-sm);font:inherit;font-size:.9rem;font-weight:600;background:var(--paper-2);color:var(--ink);cursor:pointer;text-align:left}.choice-menu__trigger::after{content:"";width:7px;height:7px;border-right:2px solid var(--ink-faint);border-bottom:2px solid var(--ink-faint);transform:rotate(45deg);margin-top:-4px}.choice-menu__trigger:focus,.choice-menu__option:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}.choice-menu__options{position:absolute;z-index:8;top:calc(100% + .3rem);left:0;right:0;display:grid;gap:.15rem;padding:.3rem;background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--shadow-lg);max-height:220px;overflow:auto}.choice-menu__options[hidden]{display:none}.choice-menu__option{border:0;background:transparent;color:var(--ink);padding:.55rem .65rem;border-radius:6px;text-align:left;font:inherit;font-size:.88rem;cursor:pointer}.choice-menu__option:hover,.choice-menu__option[aria-selected=true]{background:var(--blue-soft);color:var(--blue-deep)}
 .topbar-user{display:flex;align-items:center;gap:.8rem;font-size:.88rem;color:var(--ink-soft)}
 .site-chip{display:inline-block;font-size:.72rem;font-weight:700;background:var(--blue-soft);color:var(--blue-deep);padding:.2rem .6rem;border-radius:var(--r-pill);vertical-align:middle;margin-left:.4rem}
 
@@ -38,6 +38,7 @@ img{max-width:100%;display:block}
 .btn--sm{padding:.4rem .7rem;font-size:.82rem}
 .btn svg{width:16px;height:16px}
 .btn:disabled{opacity:.55;cursor:not-allowed}
+.segmented{display:flex;gap:.35rem;flex-wrap:wrap}.segmented__button{border:1px solid var(--line);background:var(--paper-2);color:var(--ink-soft);padding:.55rem .8rem;border-radius:var(--r-sm);font:inherit;font-size:.85rem;font-weight:700;cursor:pointer}.segmented__button:hover,.segmented__button.is-selected{background:var(--blue-soft);border-color:var(--blue);color:var(--blue-deep)}
 
 /* login */
 .login{min-height:100dvh;display:grid;place-items:center;padding:1.5rem}
@@ -48,9 +49,9 @@ img{max-width:100%;display:block}
 
 /* forms */
 label{display:block;font-size:.82rem;font-weight:700;margin:0 0 .35rem;color:var(--ink)}
-input[type=text],input[type=email],input[type=password],input[type=number],input[type=search],input[type=date],textarea,select{
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=search],input[type=date],input[type=datetime-local],textarea{
   width:100%;padding:.7rem .85rem;border:1px solid var(--line);border-radius:var(--r-sm);font:inherit;font-size:.95rem;background:var(--paper-2);color:var(--ink);transition:border-color .15s,box-shadow .15s}
-.site-picker select{width:auto}
+.site-picker .choice-menu__trigger{width:auto;min-width:160px}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
 textarea{resize:vertical;min-height:80px;line-height:1.5}
 .field{margin-bottom:1rem}

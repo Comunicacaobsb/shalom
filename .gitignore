@@ -1,3 +1,15 @@
 .DS_Store
 *.css.map
 AGENTS.md
+inscricoes/node_modules/
+inscricoes/dist/
+inscricoes/playwright-report/
+inscricoes/test-results/
+supabase/.temp/
+.vite/
+
+# Fontes locais sem licença de redistribuição/publicação
+acamps/fonts/Neue_Haas_Grotesk_Collection.zip
+acamps/fonts/Neue_Haas_Grotesk_Collection/
+acamps/fonts/subway_scrib.zip
+acamps/fonts/subway_scrib/

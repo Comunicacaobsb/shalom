@@ -55,12 +55,16 @@ window.SHALOM = (function () {
   function loadEvents() {
     var c = client();
     if (!c) return Promise.resolve(fallbackEvents());
-    return c.from("events").select("*").eq("site", SITE).eq("published", true).order("position", { ascending: true })
+    var now = new Date().toISOString();
+    return c.from("events").select("*").eq("site", SITE).eq("published", true)
+      .or("publish_at.is.null,publish_at.lte." + now)
+      .or("unpublish_at.is.null,unpublish_at.gt." + now)
+      .order("position", { ascending: true })
       .then(function (res) {
-        if (res.error || !res.data || !res.data.length) return fallbackEvents();
+        if (res.error) throw res.error;
         return res.data.map(mapEvent);
       })
-      .catch(function () { return fallbackEvents(); });
+      .catch(function () { return []; });
   }
 
   function loadEvent(slug) {
@@ -69,10 +73,10 @@ window.SHALOM = (function () {
     if (!c) return Promise.resolve(local());
     return c.from("events").select("*").eq("site", SITE).eq("slug", slug).limit(1)
       .then(function (res) {
-        if (res.error || !res.data || !res.data.length) return local();
+        if (res.error || !res.data || !res.data.length) return null;
         return mapEvent(res.data[0]);
       })
-      .catch(local);
+      .catch(function () { return null; });
   }
 
   function loadSchedules() {

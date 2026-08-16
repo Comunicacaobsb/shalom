@@ -16,7 +16,7 @@
 <body>
 
   <!-- ===================== LOGIN ===================== -->
-  <div class="login" id="loginView">
+  <main class="login" id="loginView">
     <form class="login-card" id="loginForm">
       <span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom"></span>
       <h1>Painel da comunidade</h1>
@@ -46,7 +46,7 @@
       <button class="btn btn--primary" id="loginBtn" type="submit" style="width:100%;justify-content:center">Entrar</button>
       <button type="button" class="link-sm" id="forgotBtn">Esqueci minha senha</button>
     </form>
-  </div>
+  </main>
 
   <!-- ===================== APP ===================== -->
   <div id="appView" class="hidden">
@@ -54,10 +54,13 @@
       <div class="wrap">
         <div class="topbar-left">
           <span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom"></span>
-          <label class="site-picker">
-            <span>Página</span>
-            <select id="siteSelect" aria-label="Selecionar página"></select>
-          </label>
+          <div class="site-picker">
+            <span id="sitePickerLabel">Página</span>
+            <div class="choice-menu" id="siteMenu">
+              <button class="choice-menu__trigger" id="siteSelect" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="siteOptions" aria-labelledby="sitePickerLabel">Selecionar página</button>
+              <div class="choice-menu__options" id="siteOptions" role="listbox" tabindex="-1" hidden></div>
+            </div>
+          </div>
         </div>
         <div class="topbar-user">
           <span id="userEmail"></span>
@@ -146,7 +149,7 @@
         <div class="section-title">
           <h2>Usuários &amp; permissões</h2>
         </div>
-        <p class="hint" style="margin-top:-.6rem">A pessoa precisa entrar uma vez com Google para aparecer aqui.</p>
+        <p class="hint" style="margin-top:-.6rem">A pessoa precisa entrar uma vez no painel para aparecer aqui.</p>
         <div id="userList" class="user-list"></div>
       </section>
     </main>
@@ -154,7 +157,7 @@
 
   <!-- ===================== SEM ACESSO ===================== -->
   <div id="noAccessView" class="hidden">
-    <div class="login">
+    <main class="login">
       <div class="login-card center">
         <span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom" style="margin-inline:auto"></span>
         <h1>Sem acesso de edição</h1>
@@ -162,7 +165,7 @@
         <p class="no-access-email">Conectado como <b id="noAccessEmail"></b></p>
         <button class="btn" id="noAccessLogout" style="width:100%;justify-content:center">Sair</button>
       </div>
-    </div>
+    </main>
   </div>
 
   <!-- ===================== MODAL DE EVENTO ===================== -->
@@ -180,7 +183,7 @@
           <label for="ev-title">Título</label>
           <input type="text" id="ev-title" placeholder="Ex.: Encontro Vida Plena" />
         </div>
-        <div class="row2">
+          <div class="row2">
           <div class="field">
             <label for="ev-badge">Etiqueta (badge)</label>
             <input type="text" id="ev-badge" placeholder="Ex.: Encontro, Missa especial" />
@@ -244,11 +247,25 @@
             <input type="number" id="ev-position" value="0" />
           </div>
           <div class="field">
-            <label for="ev-published">Situação</label>
-            <select id="ev-published">
-              <option value="true">Publicado (visível no site)</option>
-              <option value="false">Rascunho (oculto)</option>
-            </select>
+            <label>Situação</label>
+            <input type="hidden" id="ev-published" value="true" />
+            <div class="segmented" role="group" aria-label="Situação do evento">
+              <button type="button" class="segmented__button" data-published="true">Publicado</button>
+              <button type="button" class="segmented__button" data-published="false">Rascunho</button>
+            </div>
+            <p class="hint">Publicado aparece na página, respeitando as datas agendadas.</p>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="ev-publish-at">Publicar em — horário de Brasília (opcional)</label>
+            <input type="datetime-local" id="ev-publish-at" />
+            <p class="hint">Antes deste horário, o evento permanece oculto.</p>
+          </div>
+          <div class="field">
+            <label for="ev-unpublish-at">Retirar em — horário de Brasília (opcional)</label>
+            <input type="datetime-local" id="ev-unpublish-at" />
+            <p class="hint">A partir deste horário, o evento deixa de aparecer.</p>
           </div>
         </div>
       </div>
@@ -295,7 +312,11 @@
         <div class="row2">
           <div class="field">
             <label for="pm-category">Categoria</label>
-            <select id="pm-category"></select>
+            <input type="hidden" id="pm-category" value="" />
+            <div class="choice-menu choice-menu--full" id="categoryMenu">
+              <button class="choice-menu__trigger" id="pm-category-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="pm-category-options">Sem categoria</button>
+              <div class="choice-menu__options" id="pm-category-options" role="listbox" tabindex="-1" hidden></div>
+            </div>
           </div>
           <div class="field">
             <label for="pm-badge">Selo (badge)</label>
@@ -340,10 +361,11 @@
         <div class="row2">
           <div class="field">
             <label for="pm-active">Situação</label>
-            <select id="pm-active">
-              <option value="true">Ativo (visível no cardápio)</option>
-              <option value="false">Inativo (oculto)</option>
-            </select>
+            <input type="hidden" id="pm-active" value="true" />
+            <div class="segmented" role="group" aria-label="Situação do produto">
+              <button type="button" class="segmented__button" data-active="true">Ativo</button>
+              <button type="button" class="segmented__button" data-active="false">Inativo</button>
+            </div>
           </div>
           <div class="field">
             <label for="pm-position">Ordem</label>

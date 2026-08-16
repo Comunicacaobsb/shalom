@@ -32,6 +32,8 @@ create table if not exists public.events (
   link_text   text,
   link_url    text,
   published   boolean not null default true,
+  publish_at  timestamptz,
+  unpublish_at timestamptz,
   position    int not null default 0,
   updated_at  timestamptz not null default now(),
   unique (site, slug)                         -- slug único por página
@@ -74,7 +76,11 @@ drop policy if exists "sites_auth_write" on public.sites;
 create policy "sites_auth_write" on public.sites for all to authenticated using (true) with check (true);
 
 drop policy if exists "events_public_read" on public.events;
-create policy "events_public_read" on public.events for select to anon using (published = true);
+create policy "events_public_read" on public.events for select to anon using (
+  published = true
+  and (publish_at is null or publish_at <= now())
+  and (unpublish_at is null or unpublish_at > now())
+);
 drop policy if exists "events_auth_read" on public.events;
 create policy "events_auth_read" on public.events for select to authenticated using (true);
 drop policy if exists "events_auth_write" on public.events;

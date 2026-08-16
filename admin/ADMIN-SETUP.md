@@ -41,7 +41,10 @@ exemplo do seu `js/data.js` — nada quebra.
 Acesse `/admin/`, entre, e **escolha a página** no seletor do topo. Depois:
 - **Eventos:** criar/editar/excluir, upload de imagem, texto curto (card),
   descrição completa (títulos/listas/negrito), link de inscrição, publicar/rascunho,
-  ordem no carrossel. Vale só para a página selecionada.
+  ordem no carrossel. Também é possível definir **Publicar em** e **Retirar em**;
+  o banco filtra automaticamente o evento pelo horário de Brasília/UTC, sem deploy.
+  Vale só para a página selecionada. Eventos existentes da Asa Sul aparecem na lista
+  e podem ser editados ou excluídos.
 - **Horários & Serviços:** um campo por categoria, uma linha = um item.
 
 As mudanças aparecem na respectiva página em tempo real.
