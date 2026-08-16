@@ -241,36 +241,40 @@ function showToast(msg) {
     initCarousel(window.SHALOM_EVENTOS || []);
   }
 
-  /* ===================== NOTÍCIAS (comshalom — WordPress REST) ===================== */
+  /* ===================== NOTÍCIAS (feed local da página Brasília) ===================== */
   var list = $("#comshalom-list");
   if (list) {
-    // A página oficial /brasilia/ é alimentada pela taxonomia mission (termo
-    // Brasília, id 36). Consultar apenas essa taxonomia evita notícias globais,
-    // de outros países e versões em outros idiomas.
-    var API = "https://comshalom.org/wp-json/wp/v2/posts?mission=36&per_page=3&orderby=date&order=desc&_embed=1";
+    // O feed é gerado a partir dos três primeiros cards da página oficial
+    // https://comshalom.org/brasilia/ e servido same-origin.
+    var API = "data/noticias.json?cb=" + new Date().toISOString().slice(0, 13).replace(/[-T:]/g, "");
     var PLACEHOLDER = "../images/shalom-brasilia.jpg"; // imagem de reserva on-brand
+    var HOST_RE = /(^|\.)comshalom\.org$/i;
 
     function fmt(d) { try { return new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }); } catch (e) { return ""; } }
-    function strip(html) { var d = document.createElement("div"); d.innerHTML = html || ""; return (d.textContent || "").trim(); }
-    function unique(items) {
-      var seen = Object.create(null);
-      return items.filter(function (item) {
-        var key = String(item.id || item.link || item.title || "").toLowerCase();
-        if (!key || seen[key]) return false;
-        seen[key] = true;
-        return true;
+    function esc(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, function (c) {
+        return ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#39;" })[c];
       });
+    }
+    function safeUrl(value) {
+      try {
+        var url = new URL(String(value || ""), window.location.href);
+        return url.protocol === "https:" && HOST_RE.test(url.hostname) ? url.href : "";
+      } catch (e) { return ""; }
+    }
+    function validItem(item) {
+      return item && Number.isInteger(item.id) && item.id > 0 && typeof item.title === "string" && item.title && safeUrl(item.link) && safeUrl(item.img);
     }
 
     function render(items) {
       list.classList.remove("skeleton");
       list.innerHTML = items.map(function (n) {
-        return '<li><a class="news-card" href="' + n.link + '" target="_blank" rel="noopener">' +
-          '<div class="news-card__media"><img src="' + n.img + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'' + PLACEHOLDER + '\'"></div>' +
+        return '<li><a class="news-card" href="' + esc(safeUrl(n.link)) + '" target="_blank" rel="noopener">' +
+          '<div class="news-card__media"><img src="' + esc(safeUrl(n.img)) + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'' + esc(PLACEHOLDER) + '\'"></div>' +
           '<div class="news-card__body">' +
-            (n.date ? '<span class="news-card__date">' + n.date + '</span>' : "") +
-            '<h3>' + n.title + '</h3>' +
-            (n.excerpt ? '<p>' + n.excerpt + '</p>' : "") +
+            (n.date ? '<span class="news-card__date">' + esc(fmt(n.date)) + '</span>' : "") +
+            '<h3>' + esc(n.title) + '</h3>' +
+            (n.excerpt ? '<p>' + esc(n.excerpt) + '</p>' : "") +
             '<span class="news-card__more">Ler no comshalom →</span>' +
           '</div></a></li>';
       }).join("");
@@ -289,25 +293,11 @@ function showToast(msg) {
 
     var ctrl = new AbortController();
     var to = setTimeout(function () { ctrl.abort(); }, 8000);
-    fetch(API, { signal: ctrl.signal, headers: { "Accept": "application/json" } })
+    fetch(API, { signal: ctrl.signal, cache: "no-store", headers: { "Accept": "application/json" } })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-      .then(function (posts) {
+      .then(function (items) {
         clearTimeout(to);
-        if (!Array.isArray(posts) || !posts.length) throw new Error("vazio");
-        var items = unique(posts.map(function (p) {
-          var img = PLACEHOLDER;
-          try { var m = p._embedded && p._embedded["wp:featuredmedia"]; if (m && m[0] && m[0].source_url) img = m[0].source_url; } catch (e) {}
-          var ex = strip(p.excerpt && p.excerpt.rendered);
-          if (ex.length > 120) ex = ex.slice(0, 120).replace(/\s+\S*$/, "") + "…";
-          return {
-            title: strip(p.title && p.title.rendered) || "Notícia",
-            excerpt: ex,
-            date: fmt(p.date),
-            link: p.link || "https://comshalom.org/brasilia",
-            img: img,
-            id: p.id
-          };
-        }));
+        if (!Array.isArray(items) || items.length !== 3 || items.some(function (item) { return !validItem(item); })) throw new Error("feed inválido");
         render(items);
       })
       .catch(function () { clearTimeout(to); showFallback(); });
