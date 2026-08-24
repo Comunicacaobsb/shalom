@@ -1,0 +1,336 @@
+/* ARQUIVO GERADO por scripts/gerar-tokens.mjs a partir de tokens/tokens.json — NÃO EDITE À MÃO; edite o JSON e regenere */
+
+/* ===========================================================================
+   Shalom DS — tema de evento: Jubileu de 25 anos da Missão Brasília
+   Mote: "Fecundos pelo Coração do Kyrios"
+
+   Expressa, dentro do sistema, a identidade que hoje vive solta em
+   /25anos/css/styles.css (dourado #c3a236, vermelho #e93324, bege #c5c3a8,
+   Lato + Rock Salt).
+
+   O que o tema pode fazer:
+     - declarar primitivos próprios (prefixo --sh-jub-);
+     - remapear a camada semântica;
+     - trocar fonte display/accent e forma semântica.
+   O que o tema NÃO pode fazer:
+     - alterar as rampas base (--sh-navy-*, --sh-ember-*, ...);
+     - escrever regras de componente.
+
+   Substituições feitas em relação à página atual, com motivo:
+     - #204f8c  -> --sh-navy-700 (#184e7f). Mesma matiz OKLCH (256 vs 250),
+       ΔL 0.014. Diferença imperceptível; elimina o sexto azul do ecossistema.
+     - Rock Salt -> Caveat. Rock Salt é estática, sem itálico e com desenho
+       pobre de acentuação — "Coração" e "Fecundos" ficam ruins. Caveat é
+       variável (400–700), OFL, com Latin Extended completo.
+     - Lato -> --sh-font-text base (Figtree). A fonte de texto é decisão do
+       sistema, não do tema.
+     - #e93324 sobre branco marca 4.23:1 e reprova em AA. Fica reservado a
+       preenchimentos e display; para texto e botão o tema usa #9b1e14, que já
+       existe na própria página como --vermelho-escuro (8.11:1).
+
+   Uso:  <html data-sh-theme="jubileu-25">
+         <section data-sh-theme="jubileu-25">   (escopo local também vale)
+   =========================================================================== */
+
+@layer sh.theme {
+  [data-sh-theme="jubileu-25"] {
+    /* ------------------------------------------------- primitivos do tema */
+    --sh-jub-gold:            #c3a236;
+    --sh-jub-gold-hover:      #a98c26;
+    --sh-jub-gold-line:       #8d7300;
+    --sh-jub-gold-text:       #725b00;
+    --sh-jub-gold-light:      #f8e995;
+    --sh-jub-gold-bright:     #e0bd4a;
+    --sh-jub-red:             #e93324;
+    --sh-jub-red-deep:        #9b1e14;
+    --sh-jub-parchment:       #f9f5e8;
+    --sh-jub-parchment-deep:  #f0ebdb;
+    --sh-jub-parchment-mid:   #f4f0e3;
+    --sh-jub-sand:            #c5c3a8;
+    --sh-jub-ink:             #2f2c22;
+    --sh-jub-ink-soft:        #615c4b;
+    --sh-jub-line:            #8d8877;
+    --sh-jub-sky:             #b9e6eb;
+    --sh-jub-coral:           #fa8869;
+
+    /* ------------------------------------------------- tipografia do tema */
+    --sh-font-accent: 'Caveat', 'Fraunces', 'Fraunces Fallback', cursive;
+
+    /* 600 e não 500. O jubileu sempre quis um display mais leve que o da base,
+       e com a Newsreader 500 dava conta. A Montserrat 500 é uma fonte de
+       texto: em corpo de display ela perde a presença de título e o cartaz
+       fica sem hierarquia. 600 mantém a intenção — um passo abaixo dos 700 da
+       base — sem virar parágrafo grande. DEC-029. */
+    --sh-font-display-weight: 600;
+
+    /* ------------------------------------------------------ forma e ritmo */
+    --sh-radius-control:  var(--sh-radius-xs);
+    --sh-radius-surface:  var(--sh-radius-sm);
+    --sh-radius-media:    var(--sh-radius-sm);
+
+    /* -------------------------------------------------------------- marca */
+    /* O tema NÃO troca o desenho da marca — quem injeta o SVG é a página
+       (ver docs-site/componentes/logo.html § "A marca por tema"). O que o
+       tema pode fazer é o que faz aqui: acertar a MEDIDA para o desenho que
+       aquela página vai injetar.
+
+       Motivo do 3rem: o lockup do jubileu (assets/brand/jubileu-25/
+       logo-completa.svg) é horizontal de proporção ~3:1, com traço
+       manuscrito fino e o emblema "25 com ramo de oliveira" cheio de
+       detalhe. No padrão de 2rem do sh-logo ele fecha em ~96×32px e vira
+       mancha. A 3rem fecha em ~144×48px, que é onde o ramo ainda se lê.
+       --mark segue o mesmo salto, pelo mesmo motivo (o emblema sozinho tem
+       270 comandos de curva).
+
+       Quem usar a marca-mãe dentro de uma página do jubileu (é o caso do
+       rodapé institucional) sobrescreve --sh-logo-size no próprio elemento:
+       o token de camada 3 continua aceitando ajuste local. */
+    --sh-logo-size:       3rem;
+    --sh-logo-full-size:  3rem;
+    --sh-logo-mark-size:  3rem;
+
+    --sh-shadow-hue:  45;
+    --sh-shadow-rgb:  60 48 12;
+
+    /* Vidro. O jubileu segue o véu, e o véu dele já é dourado porque
+       --sh-surface-scrim sai de --sh-shadow-rgb, remapeado logo acima. As
+       linhas abaixo repetem esse mesmo valor por extenso pelo motivo de sempre
+       nesta base: substituição de custom property acontece onde a propriedade é
+       DECLARADA. Se o tema estiver numa subárvore (e não no <html>), o
+       rgb(var(--sh-shadow-rgb)) escrito em :root resolve com o navy da raiz.
+       Escrito aqui, resolve com o dourado do tema em qualquer profundidade.
+       No escuro o tema PRECISA declarar de novo, e este é o ponto que quase
+       passou batido: @layer sh.theme vem DEPOIS de sh.tokens, e camada vence
+       especificidade. Sem as linhas dos blocos escuros lá embaixo, o dourado
+       daqui atravessaria o modo escuro inteiro enquanto o véu já era navy —
+       medido, o texto sobre o vidro caía de 9,77 para 4,23:1. Vidro e véu têm
+       de ser a mesma tinta em todo cenário. */
+    --sh-glass-veil:         rgb(60 48 12 / 0.74);
+    --sh-glass-veil-hover:   rgb(60 48 12 / 0.81);
+    --sh-glass-veil-active:  rgb(60 48 12 / 0.88);
+    --sh-glass-solid:        rgb(60 48 12 / 1);
+
+    /* CORREÇÃO DE CONTRASTE encontrada na medição do vidro. O jubileu herdava
+       o alfa 0,62 do véu da base, mas com a tinta DELE: a base vela com um
+       navy quase preto (#0b203d), o jubileu com um dourado escuro (#3c300c),
+       bem mais claro. Mesmo alfa, véu mais fraco — sobre foto branca o
+       --sh-text-on-scrim caía para 3,70:1, contra os 4,70 da base. A 0,70 o
+       composto fecha em 5,05:1. O vidro do tema acompanha, quatro pontos
+       acima, como manda a família --sh-glass-*. */
+    --sh-surface-scrim: rgb(60 48 12 / 0.70);
+
+    /* -------------------------------------------------- semântica (claro) */
+    --sh-surface-page:           var(--sh-jub-parchment);
+    --sh-surface-sunken:         var(--sh-jub-parchment-deep);
+    --sh-surface-default:        var(--sh-white);
+    --sh-surface-raised:         var(--sh-white);
+    --sh-surface-subtle:         var(--sh-jub-parchment-mid);
+    --sh-surface-inverse:        var(--sh-navy-800);
+    --sh-surface-brand:          var(--sh-navy-700);
+    --sh-surface-brand-subtle:   #e6eef7;
+    --sh-surface-accent:         var(--sh-jub-gold);
+    --sh-surface-accent-subtle:  var(--sh-jub-gold-light);
+    --sh-surface-accent-border:  var(--sh-jub-gold-line);
+    --sh-surface-selected:       var(--sh-jub-gold-light);
+    --sh-surface-hover:          var(--sh-jub-parchment-deep);
+    --sh-surface-active:         #e7e0cc;
+
+    --sh-text-strong:       var(--sh-navy-900);  /* 14.95 sobre pergaminho */
+    --sh-text-default:      var(--sh-jub-ink);  /* 12.80 */
+    --sh-text-muted:        var(--sh-jub-ink-soft);  /* 6.13 */
+    --sh-text-placeholder:  var(--sh-jub-ink-soft);
+    --sh-text-accent:       var(--sh-jub-gold-text);  /* 5.99 */
+    --sh-text-on-accent:    #231c00;  /* 6.90 sobre o dourado */
+    --sh-text-danger:       var(--sh-jub-red-deep);
+
+    --sh-border-subtle:   #e7e2d2;
+    --sh-border-default:  var(--sh-jub-sand);
+    --sh-border-control:  var(--sh-jub-line);  /* 3.25 sobre pergaminho */
+    --sh-border-strong:   var(--sh-jub-ink-soft);
+    --sh-border-accent:   var(--sh-jub-gold-line);
+
+    --sh-action-accent-bg:         var(--sh-jub-gold);
+    --sh-action-accent-bg-hover:   var(--sh-jub-gold-hover);
+    --sh-action-accent-bg-active:  var(--sh-jub-gold-text);
+    --sh-action-accent-fg:         #231c00;
+    --sh-action-accent-border:     var(--sh-jub-gold-line);  /* 4.20 sobre page */
+
+    --sh-action-danger-bg:         var(--sh-jub-red-deep);
+    --sh-action-danger-bg-hover:   #7d150d;
+    --sh-action-danger-bg-active:  #650f08;
+    --sh-action-danger-border:     var(--sh-jub-red-deep);
+
+    /* O brilho do esqueleto é a luz do jubileu: dourado claro, não âmbar. */
+    --sh-surface-sheen: linear-gradient(100deg, transparent 0%, var(--sh-jub-gold-light) 50%, transparent 100%);
+
+    /* gold-hover e não gold. O ouro do jubileu (#c3a236) mede 2,46 sobre o
+       cartão branco e 2,25 sobre o pergaminho — a silhueta some no papel
+       claro, que é justamente onde o tema vive. gold-hover (#a98c26) é o mesmo
+       ouro um passo mais fundo, já presente na paleta do tema, e sobe para
+       3,25 e 2,98. Não se usou gold-line (4,20) porque ali o ouro já vira
+       bronze oliva e o brilho do jubileu se perde. No escuro continua
+       folgado: 5,72 sobre #161309. DEC-029. */
+    --sh-dove-ink:        var(--sh-jub-gold-hover);
+    --sh-dove-watermark:  var(--sh-jub-sand);
+    --sh-dove-opacity:    0.12;
+  }
+
+  /* --------------------------------------- 1. automático (o sistema pede) */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) [data-sh-theme="jubileu-25"],
+    :root:not([data-theme="light"])[data-sh-theme="jubileu-25"] {
+      --sh-surface-page:           #161309;
+      --sh-surface-sunken:         #0d0b04;
+      --sh-surface-default:        #221d0f;
+      --sh-surface-raised:         #2e2716;
+      --sh-surface-subtle:         #221d0f;
+      --sh-surface-inverse:        var(--sh-jub-parchment);
+      --sh-surface-brand:          var(--sh-jub-gold-light);
+      --sh-surface-brand-subtle:   #2e2716;
+      --sh-surface-sheen:          linear-gradient(100deg, transparent 0%, var(--sh-jub-gold-bright) 50%, transparent 100%);
+      --sh-surface-accent:         var(--sh-jub-gold-bright);
+      --sh-surface-accent-subtle:  #2e2716;
+      --sh-surface-accent-border:  #f0d071;
+      --sh-surface-selected:       #2e2716;
+      --sh-surface-hover:          rgb(255 248 220 / 0.06);
+      --sh-surface-active:         rgb(255 248 220 / 0.12);
+
+      --sh-text-strong:       #faf6ea;
+      --sh-text-default:      #e8e2d0;
+      --sh-text-muted:        #b5ae98;
+      --sh-text-placeholder:  #b5ae98;
+      --sh-text-accent:       var(--sh-jub-gold-bright);
+      --sh-text-brand:        var(--sh-jub-gold-bright);
+      --sh-text-on-accent:    #231c00;
+      --sh-text-danger:       var(--sh-jub-coral);
+
+      /* A marca no escuro é gold-light, superfície CLARA: o conjunto on-brand
+         desce para as tintas do próprio tema em vez do navy herdado. */
+      --sh-text-on-brand-muted:       var(--sh-jub-ink-soft);
+      --sh-text-on-brand-link:        var(--sh-jub-red-deep);
+      --sh-text-on-brand-link-hover:  #231c00;
+
+      --sh-border-subtle:           #2e2716;
+      --sh-border-default:          #3d3520;
+      --sh-border-control:          #787159;
+      --sh-border-strong:           #948d76;
+      --sh-border-accent:           #f0d071;
+      --sh-border-brand:            var(--sh-jub-gold-bright);
+      --sh-border-on-brand:         var(--sh-jub-gold-line);
+      --sh-border-on-brand-strong:  var(--sh-jub-gold-text);
+      --sh-focus-on-brand:          #231c00;
+
+      --sh-action-accent-bg:         var(--sh-jub-gold-bright);
+      --sh-action-accent-bg-hover:   #f0d071;
+      --sh-action-accent-bg-active:  var(--sh-jub-gold-light);
+      --sh-action-accent-fg:         #231c00;
+      --sh-action-accent-border:     #f0d071;
+
+      /* fg vem de --sh-action-danger-fg herdado (dark.css: --sh-danger-950,
+         #2a0203) */
+      --sh-action-danger-bg:         var(--sh-jub-coral);
+      --sh-action-danger-bg-hover:   #fcaf9a;
+      --sh-action-danger-bg-active:  #fdd6cc;
+      --sh-action-danger-border:     var(--sh-jub-coral);
+      --sh-shadow-rgb:               12 9 3;
+
+      /* Vidro navy, igual ao véu que tokens/dark.css declara por extenso.
+         Obrigatório aqui: sh.theme vence sh.tokens por ordem de camada. */
+      --sh-glass-veil:         rgb(2 9 24 / 0.76);
+      --sh-glass-veil-hover:   rgb(2 9 24 / 0.83);
+      --sh-glass-veil-active:  rgb(2 9 24 / 0.90);
+      --sh-glass-solid:        rgb(2 9 24 / 1);
+
+      /* #5c5030 e não #3d3520: a 0.18 sobre as superfícies escuras do tema o
+         valor antigo compunha 1,040 a 1,060 — a marca d'água mais fraca dos
+         seis cenários depois que o escuro base subiu para 1,077. Mesmo
+         oliva, dois passos mais claro, e os três fundos escuros do jubileu
+         passam a 1,101 / 1,118 / 1,103. */
+      --sh-dove-watermark:  #5c5030;
+      --sh-dove-opacity:    0.18;
+    }
+  }
+
+  /* ---------------------------------------- 2. escolhido (a pessoa pediu) */
+  [data-theme="dark"] [data-sh-theme="jubileu-25"],
+  [data-theme="dark"][data-sh-theme="jubileu-25"] {
+    --sh-surface-page:           #161309;
+    --sh-surface-sunken:         #0d0b04;
+    --sh-surface-default:        #221d0f;
+    --sh-surface-raised:         #2e2716;
+    --sh-surface-subtle:         #221d0f;
+    --sh-surface-inverse:        var(--sh-jub-parchment);
+    --sh-surface-brand:          var(--sh-jub-gold-light);
+    --sh-surface-brand-subtle:   #2e2716;
+    --sh-surface-sheen:          linear-gradient(100deg, transparent 0%, var(--sh-jub-gold-bright) 50%, transparent 100%);
+    --sh-surface-accent:         var(--sh-jub-gold-bright);
+    --sh-surface-accent-subtle:  #2e2716;
+    --sh-surface-accent-border:  #f0d071;
+    --sh-surface-selected:       #2e2716;
+    --sh-surface-hover:          rgb(255 248 220 / 0.06);
+    --sh-surface-active:         rgb(255 248 220 / 0.12);
+
+    --sh-text-strong:       #faf6ea;
+    --sh-text-default:      #e8e2d0;
+    --sh-text-muted:        #b5ae98;
+    --sh-text-placeholder:  #b5ae98;
+    --sh-text-accent:       var(--sh-jub-gold-bright);
+    --sh-text-brand:        var(--sh-jub-gold-bright);
+    --sh-text-on-accent:    #231c00;
+    --sh-text-danger:       var(--sh-jub-coral);
+
+    /* A marca no escuro é gold-light, superfície CLARA: o conjunto on-brand
+       desce para as tintas do próprio tema em vez do navy herdado. */
+    --sh-text-on-brand-muted:       var(--sh-jub-ink-soft);
+    --sh-text-on-brand-link:        var(--sh-jub-red-deep);
+    --sh-text-on-brand-link-hover:  #231c00;
+
+    --sh-border-subtle:           #2e2716;
+    --sh-border-default:          #3d3520;
+    --sh-border-control:          #787159;
+    --sh-border-strong:           #948d76;
+    --sh-border-accent:           #f0d071;
+    --sh-border-brand:            var(--sh-jub-gold-bright);
+    --sh-border-on-brand:         var(--sh-jub-gold-line);
+    --sh-border-on-brand-strong:  var(--sh-jub-gold-text);
+    --sh-focus-on-brand:          #231c00;
+
+    --sh-action-accent-bg:         var(--sh-jub-gold-bright);
+    --sh-action-accent-bg-hover:   #f0d071;
+    --sh-action-accent-bg-active:  var(--sh-jub-gold-light);
+    --sh-action-accent-fg:         #231c00;
+    --sh-action-accent-border:     #f0d071;
+
+    /* fg vem de --sh-action-danger-fg herdado (dark.css: --sh-danger-950,
+       #2a0203) */
+    --sh-action-danger-bg:         var(--sh-jub-coral);
+    --sh-action-danger-bg-hover:   #fcaf9a;
+    --sh-action-danger-bg-active:  #fdd6cc;
+    --sh-action-danger-border:     var(--sh-jub-coral);
+    --sh-shadow-rgb:               12 9 3;
+
+    /* Vidro navy, igual ao véu que tokens/dark.css declara por extenso.
+       Obrigatório aqui: sh.theme vence sh.tokens por ordem de camada. */
+    --sh-glass-veil:         rgb(2 9 24 / 0.76);
+    --sh-glass-veil-hover:   rgb(2 9 24 / 0.83);
+    --sh-glass-veil-active:  rgb(2 9 24 / 0.90);
+    --sh-glass-solid:        rgb(2 9 24 / 1);
+
+    /* #5c5030 e não #3d3520: a 0.18 sobre as superfícies escuras do tema o
+       valor antigo compunha 1,040 a 1,060 — a marca d'água mais fraca dos
+       seis cenários depois que o escuro base subiu para 1,077. Mesmo
+       oliva, dois passos mais claro, e os três fundos escuros do jubileu
+       passam a 1,101 / 1,118 / 1,103. */
+    --sh-dove-watermark:  #5c5030;
+    --sh-dove-opacity:    0.18;
+  }
+}
+
+/* ===========================================================================
+   Fonte do tema — JÁ AUTO-HOSPEDADA.
+
+   Caveat (wght 400–700) vive em assets/fonts/, declarada em
+   assets/fonts/fonts.css junto com as do sistema. A página não precisa de
+   <link> nenhum, e o woff2 só desce quando o tema está ativo e o acento é
+   usado. Nenhuma requisição a fonts.googleapis.com.
+   =========================================================================== */

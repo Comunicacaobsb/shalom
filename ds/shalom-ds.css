@@ -1,0 +1,6 @@
+/* Atalho de compatibilidade — NÃO é o Shalom DS.
+   O sistema vive em ./v2/shalom-ds.css. Este arquivo só existe para que
+   páginas escritas antes da trilha versionada continuem de pé.
+   Página nova aponta direto para /ds/v2/shalom-ds.css.
+   Gerado por distribuicao/publicar-ds.sh. Não edite. */
+@import url("./v2/shalom-ds.css");

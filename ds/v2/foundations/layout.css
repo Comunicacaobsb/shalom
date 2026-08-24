@@ -1,0 +1,263 @@
+/* ==========================================================================
+   Shalom DS — layout
+   Substitui .container / .row / .col-* do Bootstrap.
+
+   Duas famílias:
+     1. Primitivos de composição (stack, cluster, sidebar, switcher, cover,
+        center, reel, frame) — resolvem 90% das seções sem media query.
+     2. Grade explícita (.sh-grid + --sh-grid-span) para quando a coluna
+        importa de verdade.
+
+   Breakpoints: 480 / 768 / 1024 / 1280. Media queries não leem custom
+   properties, então os valores estão escritos à mão aqui e no tokens.json.
+   Para componentes, prefira @container: o cartão não precisa saber o
+   tamanho da janela, só o do próprio espaço.
+   ========================================================================== */
+
+@layer sh.layout {
+
+  /* ------------------------------------------------------------ containers */
+
+  .sh-container,
+  .sh-container-prose,
+  .sh-container-text,
+  .sh-container-wide,
+  .sh-container-admin {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: var(--sh-gutter);
+  }
+  .sh-container        { max-width: calc(var(--sh-container) + var(--sh-gutter) * 2); }
+  .sh-container-prose  { max-width: calc(var(--sh-container-prose) + var(--sh-gutter) * 2); }
+  .sh-container-text   { max-width: calc(var(--sh-container-text) + var(--sh-gutter) * 2); }
+  .sh-container-wide   { max-width: calc(var(--sh-container-wide) + var(--sh-gutter) * 2); }
+  .sh-container-admin  { max-width: calc(var(--sh-container-admin) + var(--sh-gutter) * 2); }
+  .sh-container-full   { width: 100%; padding-inline: var(--sh-gutter); }
+
+  /* Escapa do container e volta a ser largura total, sem overflow lateral. */
+  .sh-bleed {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+  }
+
+  /* -------------------------------------------------------------- seções */
+
+  .sh-section {
+    padding-block: var(--sh-space-section);
+  }
+  .sh-section--tight { padding-block: var(--sh-space-10); }
+  .sh-section--flush { padding-block: 0; }
+
+  .sh-section--page    { background-color: var(--sh-surface-page); }
+  .sh-section--subtle  { background-color: var(--sh-surface-subtle); }
+  .sh-section--sunken  { background-color: var(--sh-surface-sunken); }
+  .sh-section--inverse { background-color: var(--sh-surface-inverse); color: var(--sh-text-inverse); }
+  .sh-section--brand   { background-color: var(--sh-surface-brand); color: var(--sh-text-on-brand); }
+
+  /* ------------------------------------------- primitivos de composição */
+
+  /* Empilha e distribui o mesmo respiro entre irmãos. */
+  .sh-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-stack-gap, var(--sh-space-4));
+  }
+  .sh-stack > * { margin-block: 0; }
+  /* Empurra um filho para o fim (rodapé de cartão de altura igual). */
+  .sh-stack > .sh-stack__push { margin-block-start: auto; }
+
+  /* Enfileira e quebra sozinho. Para tags, ações, metadados. */
+  .sh-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-cluster-gap, var(--sh-space-3));
+    align-items: var(--sh-cluster-align, center);
+    justify-content: var(--sh-cluster-justify, flex-start);
+  }
+
+  /* Duas colunas que viram uma quando o espaço acaba. Sem media query. */
+  .sh-sidebar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-sidebar-gap, var(--sh-space-8));
+  }
+  .sh-sidebar > :first-child {
+    flex-basis: var(--sh-sidebar-width, 20rem);
+    flex-grow: 1;
+  }
+  .sh-sidebar > :last-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-inline-size: var(--sh-sidebar-min, 55%);
+  }
+  .sh-sidebar--end > :first-child { order: 2; }
+  .sh-sidebar--end > :last-child  { order: 1; }
+
+  /* Itens de mesmo peso que trocam de linha para coluna por conta própria. */
+  .sh-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-switcher-gap, var(--sh-space-6));
+  }
+  .sh-switcher > * {
+    flex-grow: 1;
+    flex-basis: calc((var(--sh-switcher-threshold, 34rem) - 100%) * 999);
+  }
+
+  /* Herói: conteúdo centrado com topo e base opcionais. */
+  .sh-cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--sh-space-6);
+    min-block-size: var(--sh-cover-height, 100svh);
+    padding-block: var(--sh-space-10);
+  }
+  .sh-cover > .sh-cover__top    { margin-block-end: auto; }
+  .sh-cover > .sh-cover__bottom { margin-block-start: auto; }
+
+  .sh-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--sh-space-4);
+  }
+
+  /* Carrossel honesto: rolagem nativa com encaixe, sem JS. */
+  .sh-reel {
+    display: flex;
+    gap: var(--sh-space-4);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+    padding-block-end: var(--sh-space-2);
+    scrollbar-width: thin;
+  }
+  .sh-reel > * {
+    flex: 0 0 var(--sh-reel-item, min(20rem, 82%));
+    scroll-snap-align: start;
+  }
+
+  /* Mídia com proporção fixa e recorte previsível. */
+  .sh-frame {
+    position: relative;
+    aspect-ratio: var(--sh-frame-ratio, 16 / 9);
+    overflow: hidden;
+    border-radius: var(--sh-radius-media);
+    background-color: var(--sh-surface-sunken);
+  }
+  .sh-frame > img,
+  .sh-frame > video,
+  .sh-frame > iframe {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .sh-frame--square   { --sh-frame-ratio: 1 / 1; }
+  .sh-frame--portrait { --sh-frame-ratio: 4 / 5; }
+  .sh-frame--poster   { --sh-frame-ratio: 3 / 4; }
+  .sh-frame--wide     { --sh-frame-ratio: 21 / 9; }
+
+  /* --------------------------------------------------------------- grade */
+
+  .sh-grid {
+    display: grid;
+    gap: var(--sh-grid-gap);
+    grid-template-columns: repeat(var(--sh-grid-cols, 1), minmax(0, 1fr));
+  }
+  /* Grade que se adapta sem breakpoint: informe a largura mínima do item. */
+  .sh-grid--auto {
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--sh-grid-min, 17rem), 100%), 1fr));
+  }
+  .sh-grid > [data-sh-span] { grid-column: span var(--sh-span, 1); }
+
+  /* O :not() é obrigatório. Sem ele estas duas regras têm a mesma
+     especificidade de .sh-grid--auto e são declaradas depois: acima de 768px a
+     grade "sem breakpoint" era anulada e voltava a --sh-grid-cols. Excluir o
+     modificador aqui preserva a API — quem declara --sh-grid-cols-md/lg em uma
+     .sh-grid comum continua idêntico; quem pediu --auto passa a recebê-lo em
+     todas as larguras, que é o que o modificador promete. */
+  @media (min-width: 48rem) {   /* md — 768px */
+    .sh-grid:not(.sh-grid--auto) { grid-template-columns: repeat(var(--sh-grid-cols-md, var(--sh-grid-cols, 1)), minmax(0, 1fr)); }
+  }
+  @media (min-width: 64rem) {   /* lg — 1024px */
+    .sh-grid:not(.sh-grid--auto) { grid-template-columns: repeat(var(--sh-grid-cols-lg, var(--sh-grid-cols-md, var(--sh-grid-cols, 1))), minmax(0, 1fr)); }
+  }
+
+  /* ------------------------------------------- consultas de contêiner */
+  /* Marque o pai e o componente responde ao espaço real que recebeu. */
+  .sh-cq        { container-type: inline-size; }
+  .sh-cq--card  { container: sh-card / inline-size; }
+  .sh-cq--panel { container: sh-panel / inline-size; }
+
+  /* ----------------------------------------------- utilitários mínimos */
+  /* A regra: só entra utilitário que um componente não resolveria melhor. */
+
+  .sh-visually-hidden:not(:focus):not(:active) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* O contorno não é enfeite: --sh-surface-brand é a única superfície do
+     sistema que muda de claridade por tema, e no acamp's claro ela é o creme
+     sobre a página laranja — 2,79:1 de silhueta, abaixo dos 3:1 que a WCAG
+     1.4.11 exige de um controle. --sh-focus-color é a tinta que o sistema JÁ
+     garante legível contra a página nos seis cenários (6,36 no pior caso,
+     acamp's claro; 10,40 no melhor) e é o par certo aqui por natureza: o
+     skip-link só existe quando está focado. Nos temas em que o preenchimento
+     já resolve, o fio some dentro dele — nada muda na tela. */
+  .sh-skip-link {
+    position: absolute;
+    inset-block-start: var(--sh-space-2);
+    inset-inline-start: var(--sh-space-2);
+    z-index: var(--sh-layer-tooltip);
+    padding: var(--sh-space-3) var(--sh-space-4);
+    border: var(--sh-border-width-hair) solid var(--sh-focus-color);
+    border-radius: var(--sh-radius-control);
+    background-color: var(--sh-surface-brand);
+    color: var(--sh-text-on-brand);
+    font-weight: var(--sh-weight-semibold);
+    transform: translateY(-200%);
+    transition: transform var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-skip-link:focus-visible { transform: translateY(0); }
+
+  .sh-sticky {
+    position: sticky;
+    inset-block-start: var(--sh-sticky-offset, 0);
+    z-index: var(--sh-layer-sticky);
+  }
+
+  .sh-scroll-x {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sh-hide         { display: none; }
+  .sh-hide-md      { display: none; }
+  @media (min-width: 48rem) { .sh-hide-md { display: revert; } .sh-show-md-only { display: none; } }
+  @media (min-width: 64rem) { .sh-hide-lg { display: none; } }
+
+  .sh-flow > * + * { margin-block-start: var(--sh-flow-space, var(--sh-space-4)); }
+
+  .sh-full-bleed-media { inline-size: 100%; block-size: auto; }
+
+  /* Alvo de toque mínimo. Cresce a área clicável sem crescer o desenho. */
+  .sh-touch {
+    position: relative;
+  }
+  .sh-touch::after {
+    content: '';
+    position: absolute;
+    inset: 50% 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: max(100%, var(--sh-touch-target));
+    translate: -50% -50%;
+  }
+}

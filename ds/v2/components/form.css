@@ -1,0 +1,1612 @@
+/* ==========================================================================
+   Shalom DS — Lote B — Formulários
+   sh-fieldset · sh-checkbox · sh-radio · sh-switch · sh-segmented ·
+   sh-option-card · sh-select · sh-quantity · sh-search · sh-file ·
+   sh-form-actions
+
+   Contrato deste arquivo (o mesmo de components/foundation.css)
+   -------------------------------------------------------------
+   1. Só a camada semântica é consumida para COR. Escalas compartilhadas sem
+      equivalente semântico (espaço, tipo, duração, largura de borda, ícone)
+      vêm dos primitivos.
+   2. Nenhum seletor cita [data-sh-theme]. Os seis cenários saem deste CSS.
+   3. Estado vem do DOM: :checked, :indeterminate, [disabled], [aria-invalid],
+      [aria-selected], [aria-expanded], [data-state]. Nenhuma classe is-*.
+   4. Cada componente expõe tokens de camada 3 com valor padrão apontando para
+      a camada 2. Configurar de fora é setar a custom property.
+   5. Zero !important.
+
+   ---------------------------------------------------------------------------
+   REGRA DE CONTRASTE DOS INDICADORES — a decisão estrutural deste lote
+   ---------------------------------------------------------------------------
+   Todo indicador "ligado" (caixa marcada, ponto do rádio, trilho do switch,
+   opção selecionada) é desenhado com TRÊS tokens, nunca dois:
+
+       preenchimento  --sh-action-primary-bg
+       limite         --sh-action-primary-border   ← obrigatório
+       glifo          --sh-action-primary-fg
+
+   O limite não é decoração. Em acamp's claro o primário é o creme (#fff8f0)
+   e a superfície de painel também é creme: preenchimento contra fundo mede
+   1.00:1. É o mesmo motivo pelo qual .sh-btn--accent exige contorno em
+   foundation.css (01-identidade.md §2.5). Com o limite, o par medido passa a
+   ser --sh-action-primary-border × superfície, que mede ≥3:1 nos seis
+   cenários (menor valor: 6.68 em base escuro).
+
+   Pelo mesmo motivo, seleção NUNCA é comunicada só por --sh-surface-selected:
+   esse token mede ~1.1:1 contra --sh-surface-default em cinco dos seis
+   cenários. O que carrega a seleção é o limite (+ o glifo, + o peso do
+   rótulo); o preenchimento apenas reforça.
+
+   ---------------------------------------------------------------------------
+   REGRA DO CONTROLE OCULTO
+   ---------------------------------------------------------------------------
+   Checkbox, radio, switch, segmented, option-card, select e file mantêm o
+   controle NATIVO no DOM. Ele é recortado (position/clip-path), nunca
+   display:none nem visibility:hidden — continua focável, continua no form,
+   continua na árvore de acessibilidade. Quem desenha é o elemento irmão;
+   quem recebe :focus-visible é o desenho, via `input:focus-visible + desenho`.
+
+   Consequência boa: setas do grupo de rádio, Espaço para marcar, envio do
+   form e validação de restrição são do navegador — este lote não reimplementa
+   nada disso.
+
+   ---------------------------------------------------------------------------
+   COMPOSIÇÃO COM O LOTE 0
+   ---------------------------------------------------------------------------
+   Todo controle vive dentro de .sh-field. O erro é do campo:
+       <div class="sh-field" data-state="error">   +   aria-invalid no controle
+   e .sh-field__error já existe, já tem aria-live e já some com :empty. Este
+   arquivo não recria mecanismo de erro; só ensina os controles a reagirem a
+   [data-state="error"] do campo e a [aria-invalid] próprio.
+
+   Especificação: docs/03-inventario-componentes.md §Lote B
+   ========================================================================== */
+
+@layer sh.components {
+
+  /* ======================================================================
+     sh-fieldset — <fieldset> e <legend> reais.
+
+     <fieldset class="sh-fieldset sh-fieldset--boxed">
+       <legend class="sh-fieldset__legend">Dados do participante</legend>
+       <p class="sh-fieldset__hint">Como constam no documento.</p>
+       <div class="sh-fieldset__body"> … campos … </div>
+     </fieldset>
+
+     min-inline-size: 0 não é enfeite: <fieldset> nasce com min-width
+     min-content e, sem isso, um filho longo (tabela, input) empurra a página
+     inteira para o lado no celular.
+     ====================================================================== */
+
+  .sh-fieldset {
+    display: block;
+    min-inline-size: 0;
+    margin: 0;
+    padding: var(--sh-fieldset-padding, 0);
+    border: var(--sh-fieldset-border-width, 0) solid
+            var(--sh-fieldset-border-color, var(--sh-border-subtle));
+    border-radius: var(--sh-radius-surface);
+  }
+
+  .sh-fieldset__legend {
+    padding-inline: var(--sh-fieldset-legend-inset, 0);
+    font-size: var(--sh-font-size-lg);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    letter-spacing: var(--sh-tracking-tight);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-fieldset__hint {
+    margin-block-start: var(--sh-space-1);
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-fieldset__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-fieldset-gap, var(--sh-space-5));
+    margin-block-start: var(--sh-space-4);
+    min-inline-size: 0;
+  }
+
+  /* Grupo de opções: espaçamento apertado, porque são irmãos de uma pergunta
+     só e não campos independentes. */
+  .sh-fieldset__body--options { gap: var(--sh-fieldset-gap, var(--sh-space-2)); }
+
+  .sh-fieldset--boxed {
+    --sh-fieldset-padding: var(--sh-space-5);
+    --sh-fieldset-border-width: var(--sh-border-width-hair);
+    --sh-fieldset-legend-inset: var(--sh-space-2);
+    background-color: var(--sh-fieldset-bg, transparent);
+  }
+  .sh-fieldset--boxed > .sh-fieldset__legend {
+    margin-inline-start: calc(var(--sh-space-2) * -1);
+  }
+
+  .sh-fieldset--sunken {
+    --sh-fieldset-padding: var(--sh-space-5);
+    --sh-fieldset-bg: var(--sh-surface-sunken);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-sunken);
+  }
+
+  .sh-fieldset--flush { --sh-fieldset-padding: 0; --sh-fieldset-border-width: 0; }
+
+  .sh-fieldset[disabled] > .sh-fieldset__legend,
+  .sh-fieldset[disabled] > .sh-fieldset__hint {
+    color: var(--sh-text-disabled);
+  }
+
+  /* ======================================================================
+     sh-checkbox · sh-radio · sh-switch
+
+     <label class="sh-checkbox">
+       <input class="sh-checkbox__input" type="checkbox" name="termos">
+       <span class="sh-checkbox__box"></span>
+       <span class="sh-checkbox__label">Li e aceito o regulamento</span>
+       <span class="sh-checkbox__hint">Abre em uma nova aba.</span>
+     </label>
+
+     O bloco É o <label>: todo o retângulo — caixa, rótulo e dica — aciona o
+     controle, e o retângulo tem no mínimo 44px de altura.
+     O desenho (__box / __track) é irmão do input, nunca filho.
+     ====================================================================== */
+
+  .sh-checkbox,
+  .sh-radio,
+  .sh-switch {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--sh-choice-gap, var(--sh-space-3));
+    row-gap: var(--sh-space-1);
+    align-content: center;
+    align-items: start;
+    min-block-size: var(--sh-touch-target);
+    padding-block: var(--sh-space-1);
+    color: var(--sh-text-default);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Recorte do controle nativo. Focável, no form e na árvore de
+     acessibilidade — o que display:none destruiria. */
+  .sh-checkbox__input,
+  .sh-radio__input,
+  .sh-switch__input,
+  .sh-segmented__input,
+  .sh-option-card__input,
+  .sh-file__input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .sh-checkbox__label,
+  .sh-radio__label,
+  .sh-switch__label {
+    grid-column: 2;
+    font-size: var(--sh-choice-font-size, var(--sh-font-size-md));
+    line-height: var(--sh-leading-snug);
+  }
+
+  .sh-checkbox__hint,
+  .sh-radio__hint,
+  .sh-switch__hint {
+    grid-column: 2;
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-muted);
+  }
+
+  /* ------------------------------------------------- desenho: caixa e disco */
+
+  .sh-checkbox__box,
+  .sh-radio__box {
+    grid-column: 1;
+    grid-row: 1;
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: var(--sh-choice-size, 1.25rem);
+    block-size: var(--sh-choice-size, 1.25rem);
+    /* Alinha opticamente com a primeira linha do rótulo, sem depender de
+       align-items: center (que quebraria assim que houver __hint). */
+    margin-block-start: calc((1.28em - var(--sh-choice-size, 1.25rem)) / 2);
+    /* --sh-border-strong, e não --sh-border-control, por medição: a caixa de
+       20px também aparece sobre --sh-surface-sunken, onde o limite de
+       controle cai para 2.97:1 no tema base claro. Registrado no relatório. */
+    border: var(--sh-border-width-thin) solid
+            var(--sh-choice-border, var(--sh-border-strong));
+    background-color: var(--sh-choice-bg, var(--sh-surface-default));
+    color: var(--sh-choice-ink, var(--sh-action-primary-fg));
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color     var(--sh-duration-fast) var(--sh-ease-standard),
+      box-shadow       var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  /* Um checkbox nunca pode virar círculo: em acamp's --sh-radius-control é
+     pílula, e caixa redonda com marca de seleção é indistinguível de rádio.
+     min() respeita o tema até o limite em que a forma ainda comunica.
+     Proposta de token semântico: --sh-radius-indicator (ver relatório). */
+  .sh-checkbox__box {
+    border-radius: var(--sh-radius-indicator,
+                       min(var(--sh-radius-control), var(--sh-radius-xs)));
+  }
+  .sh-radio__box { border-radius: var(--sh-radius-pill); }
+
+  /* Marca: ✓ construída com duas bordas, para não exigir SVG no HTML do
+     autor e para herdar a cor por currentColor. */
+  .sh-checkbox__box::after {
+    content: '';
+    inline-size: 0.3125rem;
+    block-size: 0.625rem;
+    margin-block-start: -0.15em;
+    border: solid currentColor;
+    border-width: 0 var(--sh-border-width-thick) var(--sh-border-width-thick) 0;
+    rotate: 45deg;
+    scale: 0;
+    transition: scale var(--sh-duration-fast) var(--sh-ease-emphasis);
+  }
+
+  .sh-radio__box::after {
+    content: '';
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: var(--sh-radius-pill);
+    background-color: currentColor;
+    scale: 0;
+    transition: scale var(--sh-duration-fast) var(--sh-ease-emphasis);
+  }
+
+  /* ---------------------------------------------------- estados: marcado */
+
+  .sh-checkbox__input:checked + .sh-checkbox__box,
+  .sh-checkbox__input:indeterminate + .sh-checkbox__box,
+  .sh-radio__input:checked + .sh-radio__box {
+    --sh-choice-bg: var(--sh-action-primary-bg);
+    --sh-choice-border: var(--sh-action-primary-border);
+    --sh-choice-ink: var(--sh-action-primary-fg);
+  }
+
+  .sh-checkbox__input:checked + .sh-checkbox__box::after,
+  .sh-radio__input:checked + .sh-radio__box::after { scale: 1; }
+
+  /* Indeterminado: traço, não meia-marca. A forma tem de dizer "parcial". */
+  .sh-checkbox__input:indeterminate + .sh-checkbox__box::after {
+    inline-size: 0.625rem;
+    block-size: 0;
+    margin-block-start: 0;
+    border-width: 0 0 var(--sh-border-width-thick) 0;
+    rotate: 0deg;
+    scale: 1;
+  }
+
+  /* ------------------------------------------------------- estados: foco */
+
+  .sh-checkbox__input:focus-visible + .sh-checkbox__box,
+  .sh-radio__input:focus-visible + .sh-radio__box,
+  .sh-switch__input:focus-visible + .sh-switch__track {
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  /* ------------------------------------------------------ estados: hover */
+
+  @media (hover: hover) {
+    .sh-checkbox:hover .sh-checkbox__input:not(:disabled):not(:checked):not(:indeterminate) + .sh-checkbox__box,
+    .sh-radio:hover .sh-radio__input:not(:disabled):not(:checked) + .sh-radio__box {
+      --sh-choice-border: var(--sh-border-strong);
+      --sh-choice-bg: var(--sh-surface-hover);
+    }
+    .sh-checkbox:hover .sh-checkbox__input:not(:disabled):checked + .sh-checkbox__box,
+    .sh-checkbox:hover .sh-checkbox__input:not(:disabled):indeterminate + .sh-checkbox__box,
+    .sh-radio:hover .sh-radio__input:not(:disabled):checked + .sh-radio__box {
+      --sh-choice-bg: var(--sh-action-primary-bg-hover);
+    }
+  }
+
+  /* ----------------------------------------------------- estados: active */
+
+  .sh-checkbox:active .sh-checkbox__input:not(:disabled) + .sh-checkbox__box,
+  .sh-radio:active .sh-radio__input:not(:disabled) + .sh-radio__box {
+    scale: 0.92;
+  }
+
+  /* ------------------------------------------------------- estados: erro */
+  /* Cor + espessura + o texto do .sh-field__error (com ícone). Nunca só a
+     borda vermelha: erro que só muda de cor não é erro comunicado. */
+
+  .sh-checkbox__input[aria-invalid="true"] + .sh-checkbox__box,
+  .sh-radio__input[aria-invalid="true"] + .sh-radio__box,
+  .sh-field[data-state="error"] .sh-checkbox__box,
+  .sh-field[data-state="error"] .sh-radio__box,
+  .sh-fieldset[data-state="error"] .sh-checkbox__box,
+  .sh-fieldset[data-state="error"] .sh-radio__box {
+    --sh-choice-border: var(--sh-border-danger);
+    border-width: var(--sh-border-width-thick);
+  }
+
+  /* --------------------------------------------------- estados: desabilitado */
+
+  .sh-checkbox__input:disabled + .sh-checkbox__box,
+  .sh-radio__input:disabled + .sh-radio__box {
+    --sh-choice-bg: var(--sh-surface-disabled);
+    --sh-choice-border: var(--sh-border-disabled);
+    --sh-choice-ink: var(--sh-text-disabled);
+  }
+  .sh-checkbox__input:disabled:checked + .sh-checkbox__box,
+  .sh-checkbox__input:disabled:indeterminate + .sh-checkbox__box,
+  .sh-radio__input:disabled:checked + .sh-radio__box {
+    --sh-choice-bg: var(--sh-action-disabled-bg);
+    --sh-choice-border: var(--sh-action-disabled-border);
+    --sh-choice-ink: var(--sh-action-disabled-fg);
+  }
+
+  .sh-checkbox:has(.sh-checkbox__input:disabled),
+  .sh-radio:has(.sh-radio__input:disabled),
+  .sh-switch:has(.sh-switch__input:disabled) {
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+  .sh-checkbox:has(.sh-checkbox__input:disabled) .sh-checkbox__hint,
+  .sh-radio:has(.sh-radio__input:disabled) .sh-radio__hint,
+  .sh-switch:has(.sh-switch__input:disabled) .sh-switch__hint {
+    color: var(--sh-text-disabled);
+  }
+
+  /* ------------------------------------------------------------ variantes */
+
+  .sh-checkbox--sm,
+  .sh-radio--sm,
+  .sh-switch--sm {
+    --sh-choice-size: 1rem;
+    --sh-choice-font-size: var(--sh-font-size-sm);
+    --sh-choice-gap: var(--sh-space-2);
+  }
+
+  /* --inline não desiste dos 44px: reduz só o respiro horizontal. */
+  .sh-checkbox--inline,
+  .sh-radio--inline,
+  .sh-switch--inline {
+    display: inline-grid;
+    padding-inline-end: var(--sh-space-3);
+  }
+
+  /* --card: a opção inteira é o alvo e tem limite próprio. */
+  .sh-checkbox--card,
+  .sh-radio--card,
+  .sh-switch--card {
+    padding: var(--sh-space-4);
+    /* --sh-border-indicator, não --sh-border-default: o limite de um cartão de
+       escolha NÃO é decorativo — é o que diz onde termina uma opção e começa a
+       outra, então cai em 1.4.11 e precisa de 3:1. --sh-border-default é
+       neutral-300 (1,55:1 sobre a superfície, marcado como decorativo na
+       camada semântica); --sh-border-indicator segue --sh-border-strong, que o
+       escuro e os dois temas já remapeiam. */
+    border: var(--sh-border-width-hair) solid
+            var(--sh-choice-card-border, var(--sh-border-indicator));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-choice-card-bg, var(--sh-surface-default));
+    transition:
+      border-color var(--sh-duration-fast) var(--sh-ease-standard),
+      background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-checkbox--card:has(.sh-checkbox__input:checked),
+  .sh-radio--card:has(.sh-radio__input:checked),
+  .sh-switch--card:has(.sh-switch__input:checked) {
+    --sh-choice-card-border: var(--sh-action-primary-border);
+    --sh-choice-card-bg: var(--sh-surface-selected);
+    outline: var(--sh-border-width-hair) solid var(--sh-action-primary-border);
+    outline-offset: calc(var(--sh-border-width-hair) * -2);
+  }
+  @media (hover: hover) {
+    .sh-checkbox--card:hover:not(:has(:disabled)),
+    .sh-radio--card:hover:not(:has(:disabled)),
+    .sh-switch--card:hover:not(:has(:disabled)) {
+      --sh-choice-card-border: var(--sh-border-strong);
+    }
+  }
+
+  /* ============================================================ sh-switch */
+  /* <label class="sh-switch">
+       <input class="sh-switch__input" type="checkbox" role="switch">
+       <span class="sh-switch__track"><span class="sh-switch__thumb"></span></span>
+       <span class="sh-switch__label">Receber lembretes por WhatsApp</span>
+       <span class="sh-switch__state" aria-hidden="true">
+         <span class="sh-switch__on">Ligado</span><span class="sh-switch__off">Desligado</span>
+       </span>
+     </label>
+
+     O estado vai por TEXTO, não só por posição do botão. O texto é
+     aria-hidden porque role="switch" já anuncia ligado/desligado — mantê-lo
+     no nome acessível duplicaria o anúncio ("… Desligado, desmarcado"). */
+
+  .sh-switch__track {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    flex: none;
+    inline-size: var(--sh-switch-track-w, 2.75rem);
+    block-size: var(--sh-switch-track-h, 1.5rem);
+    margin-block-start: calc((1.28em - var(--sh-switch-track-h, 1.5rem)) / 2);
+    border: var(--sh-border-width-hair) solid
+            var(--sh-switch-border, var(--sh-border-strong));
+    border-radius: var(--sh-radius-pill);
+    /* Desligado: o trilho É o cinza forte e o botão é a superfície — o par
+       medido passa a ser --sh-border-strong × --sh-surface-default, ≥4.8:1
+       nos seis cenários, nos dois sentidos (trilho/fundo e botão/trilho). */
+    background-color: var(--sh-switch-bg, var(--sh-border-strong));
+    transition:
+      background-color var(--sh-duration-base) var(--sh-ease-standard),
+      border-color     var(--sh-duration-base) var(--sh-ease-standard),
+      box-shadow       var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  /* A posição lógica permanece fixa; o deslocamento do polegar usa translate,
+     evitando animar inset e o reflow associado. */
+  .sh-switch__thumb {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: var(--sh-switch-pad, 0.1875rem);
+    inline-size: var(--sh-switch-thumb, 1rem);
+    block-size: var(--sh-switch-thumb, 1rem);
+    translate: 0 -50%;
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-switch-thumb-bg, var(--sh-surface-default));
+    transition:
+      translate var(--sh-duration-base) var(--sh-ease-standard),
+      background-color var(--sh-duration-base) var(--sh-ease-standard);
+  }
+
+  .sh-switch__input:checked + .sh-switch__track {
+    --sh-switch-bg: var(--sh-action-primary-bg);
+    --sh-switch-border: var(--sh-action-primary-border);
+    --sh-switch-thumb-bg: var(--sh-action-primary-fg);
+  }
+  .sh-switch__input:checked + .sh-switch__track > .sh-switch__thumb {
+    translate: calc(100% - var(--sh-switch-thumb, 1rem) - (var(--sh-switch-pad, 0.1875rem) * 2)) -50%;
+  }
+
+  @media (hover: hover) {
+    .sh-switch:hover .sh-switch__input:not(:disabled):checked + .sh-switch__track {
+      --sh-switch-bg: var(--sh-action-primary-bg-hover);
+    }
+    .sh-switch:hover .sh-switch__input:not(:disabled):not(:checked) + .sh-switch__track {
+      --sh-switch-bg: var(--sh-border-strong);
+      --sh-switch-border: var(--sh-border-strong);
+    }
+  }
+  .sh-switch:active .sh-switch__input:not(:disabled) + .sh-switch__track > .sh-switch__thumb {
+    inline-size: calc(var(--sh-switch-thumb, 1rem) * 1.15);
+  }
+
+  .sh-switch__input:disabled + .sh-switch__track {
+    --sh-switch-bg: var(--sh-action-disabled-bg);
+    --sh-switch-border: var(--sh-action-disabled-border);
+    --sh-switch-thumb-bg: var(--sh-action-disabled-fg);
+  }
+
+  .sh-switch__input[aria-invalid="true"] + .sh-switch__track,
+  .sh-field[data-state="error"] .sh-switch__track {
+    --sh-switch-border: var(--sh-border-danger);
+    border-width: var(--sh-border-width-thick);
+  }
+
+  .sh-switch__state {
+    grid-column: 2;
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-muted);
+  }
+  .sh-switch__on { display: none; }
+  .sh-switch__input:checked ~ .sh-switch__state .sh-switch__on { display: inline; }
+  .sh-switch__input:checked ~ .sh-switch__state .sh-switch__off { display: none; }
+  .sh-switch__input:checked ~ .sh-switch__state { color: var(--sh-text-brand); }
+
+  .sh-switch--sm {
+    --sh-switch-track-w: 2.25rem;
+    --sh-switch-track-h: 1.25rem;
+    --sh-switch-thumb: 0.8125rem;
+  }
+
+  /* ======================================================================
+     sh-segmented — 2 a 4 opções curtas, exclusivas.
+
+     <div class="sh-segmented" role="radiogroup" aria-labelledby="perfil-lbl">
+       <label class="sh-segmented__option">
+         <input class="sh-segmented__input" type="radio" name="perfil" value="p" checked>
+         <span class="sh-segmented__label">Participante</span>
+       </label>
+       …
+     </div>
+
+     Rádios nativos de mesmo `name`: setas, Home/End e o foco itinerante são
+     do navegador. Nenhuma linha de JS.
+
+     Envolve em vez de cortar: com quatro opções em 390px, as opções passam a
+     ocupar linhas inteiras. Por isso cada opção tem raio próprio dentro de um
+     trilho com padding — nada de cirurgia de border-radius no primeiro/último.
+     ====================================================================== */
+
+  .sh-segmented {
+    display: flex;
+    flex-wrap: wrap;
+    /* Entre linhas o vão é 8px, não 4px: os expansores de 44px de duas linhas
+       vizinhas se sobreporiam num vão de 4px e o alvo exclusivo de cada opção
+       cairia para 40px. Medido em 390px com o grupo quebrado em duas linhas. */
+    column-gap: 0;
+    row-gap: var(--sh-space-2);
+    padding: var(--sh-space-1);
+    /* O trilho é o limite visual do grupo inteiro: --sh-border-default é
+       decorativo (1.55:1 no base claro) e não serve aqui. */
+    border: var(--sh-border-width-hair) solid var(--sh-segmented-track-border, var(--sh-border-strong));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-sunken);
+  }
+
+  .sh-segmented__option {
+    position: relative;
+    display: flex;
+    flex: 1 1 var(--sh-segmented-min, 7rem);
+    gap: var(--sh-space-2);
+    align-items: center;
+    justify-content: center;
+    min-block-size: calc(var(--sh-touch-target) - var(--sh-space-2));
+    padding-block: var(--sh-space-2);
+    padding-inline: var(--sh-space-3);
+    /* Um único trilho compartilhado: cada opção só acrescenta um separador
+       vertical real, sem desenhar uma caixa completa por item. */
+    border: 0;
+    border-inline-start: var(--sh-border-width-hair) solid var(--sh-border-strong);
+    border-radius: 0;
+    background-color: var(--sh-segmented-bg, transparent);
+    color: var(--sh-segmented-fg, var(--sh-text-default));
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background-color var(--sh-duration-base) var(--sh-ease-standard),
+      box-shadow       var(--sh-duration-base) var(--sh-ease-standard),
+      color            var(--sh-duration-fast) var(--sh-ease-standard),
+      translate        var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  /* Desenha 36px, clica 44px — o mesmo expansor de .sh-chip e .sh-btn--sm em
+     foundation.css. O excedente cabe no padding do trilho, então não invade a
+     opção vizinha. */
+  .sh-segmented__option::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: max(100%, var(--sh-touch-target));
+    translate: -50% -50%;
+  }
+
+  .sh-segmented__icon { --sh-icon-size: var(--sh-icon-size-sm); }
+
+  /* Selecionado = superfície elevada + limite interno. A sombra cria a
+     separação sem repetir uma caixa pesada em cada opção. O limite continua
+     presente para preservar o contraste de estado exigido pela WCAG 1.4.11. */
+  .sh-segmented__option:has(.sh-segmented__input:checked) {
+    --sh-segmented-bg: var(--sh-surface-default);
+    --sh-segmented-border: var(--sh-action-primary-border);
+    --sh-segmented-fg: var(--sh-text-strong);
+    box-shadow:
+      inset 0 0 0 var(--sh-border-width-hair) var(--sh-segmented-border),
+      var(--sh-shadow-sm);
+  }
+
+  .sh-segmented__option:has(.sh-segmented__input:focus-visible) {
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+
+  @media (hover: hover) {
+    .sh-segmented__option:hover:not(:has(:checked)):not(:has(:disabled)) {
+      --sh-segmented-bg: var(--sh-surface-hover);
+      --sh-segmented-fg: var(--sh-text-strong);
+    }
+  }
+  .sh-segmented__option:active:not(:has(:disabled)) { translate: 0 1px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sh-segmented__option { transition-duration: 0.01ms; }
+  }
+
+  .sh-segmented__option:has(.sh-segmented__input:disabled) {
+    --sh-segmented-fg: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+
+  .sh-segmented--stretch .sh-segmented__option { --sh-segmented-min: 0; }
+  .sh-segmented--lg .sh-segmented__option {
+    min-block-size: var(--sh-touch-target);
+    font-size: var(--sh-font-size-md);
+  }
+
+  .sh-field[data-state="error"] .sh-segmented,
+  .sh-fieldset[data-state="error"] .sh-segmented {
+    border-color: var(--sh-border-danger);
+    border-width: var(--sh-border-width-thick);
+  }
+
+  /* ======================================================================
+     sh-option-card — a opção com peso: título, descrição, preço e selo.
+     Substitui <select> na maioria dos casos reais (tipo de ingresso, forma
+     de pagamento, participante ou servo).
+
+     <label class="sh-option-card">
+       <input class="sh-option-card__input" type="radio" name="lote" value="1">
+       <span class="sh-option-card__indicator"></span>
+       <span class="sh-option-card__body">
+         <span class="sh-option-card__title">Lote 1 — Participante</span>
+         <span class="sh-option-card__text">Hospedagem e cinco refeições.</span>
+         <span class="sh-option-card__meta">Até 30 de junho</span>
+       </span>
+       <span class="sh-option-card__price">R$ 380,00</span>
+     </label>
+
+     O indicador segue o type do input: redondo em radio, quadrado em
+     checkbox. Quem escolhe é o HTML, não uma classe.
+     ====================================================================== */
+
+  .sh-option-card {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2) var(--sh-space-4);
+    align-items: start;
+    padding: var(--sh-option-card-padding, var(--sh-space-4));
+    /* Mesma regra de sh-radio--card: o limite separa opções, não decora. */
+    border: var(--sh-border-width-hair) solid
+            var(--sh-option-card-border, var(--sh-border-indicator));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-option-card-bg, var(--sh-surface-default));
+    color: var(--sh-text-default);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color     var(--sh-duration-fast) var(--sh-ease-standard),
+      box-shadow       var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  .sh-option-card__indicator {
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    margin-block-start: 0.125rem;
+    border: var(--sh-border-width-thin) solid
+            var(--sh-choice-border, var(--sh-border-strong));
+    border-radius: var(--sh-radius-indicator,
+                       min(var(--sh-radius-control), var(--sh-radius-xs)));
+    background-color: var(--sh-choice-bg, var(--sh-surface-default));
+    color: var(--sh-choice-ink, var(--sh-action-primary-fg));
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color     var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-option-card__input[type="radio"] + .sh-option-card__indicator {
+    border-radius: var(--sh-radius-pill);
+  }
+  .sh-option-card__indicator::after {
+    content: '';
+    inline-size: 0.3125rem;
+    block-size: 0.625rem;
+    margin-block-start: -0.15em;
+    border: solid currentColor;
+    border-width: 0 var(--sh-border-width-thick) var(--sh-border-width-thick) 0;
+    rotate: 45deg;
+    scale: 0;
+    transition: scale var(--sh-duration-fast) var(--sh-ease-emphasis);
+  }
+  .sh-option-card__input[type="radio"] + .sh-option-card__indicator::after {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    margin-block-start: 0;
+    border: 0;
+    border-radius: var(--sh-radius-pill);
+    background-color: currentColor;
+    rotate: 0deg;
+  }
+  .sh-option-card__input:checked + .sh-option-card__indicator {
+    --sh-choice-bg: var(--sh-action-primary-bg);
+    --sh-choice-border: var(--sh-action-primary-border);
+    --sh-choice-ink: var(--sh-action-primary-fg);
+  }
+  .sh-option-card__input:checked + .sh-option-card__indicator::after { scale: 1; }
+
+  .sh-option-card__body {
+    display: flex;
+    flex: 1 1 var(--sh-option-card-body-min, 12rem);
+    flex-direction: column;
+    gap: var(--sh-space-1);
+    min-inline-size: 0;
+  }
+
+  .sh-option-card__title {
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+  }
+  .sh-option-card__text {
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-relaxed);
+    color: var(--sh-text-default);
+  }
+  .sh-option-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2) var(--sh-space-3);
+    align-items: center;
+    font-size: var(--sh-font-size-xs);
+    color: var(--sh-text-muted);
+  }
+  .sh-option-card__price {
+    flex: none;
+    margin-inline-start: auto;
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-md);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-strong);
+    white-space: nowrap;
+  }
+
+  .sh-option-card:has(.sh-option-card__input:checked) {
+    --sh-option-card-border: var(--sh-action-primary-border);
+    --sh-option-card-bg: var(--sh-surface-selected);
+    outline: var(--sh-border-width-hair) solid var(--sh-action-primary-border);
+    outline-offset: calc(var(--sh-border-width-hair) * -2);
+  }
+  .sh-option-card:has(.sh-option-card__input:focus-visible) {
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  @media (hover: hover) {
+    .sh-option-card:hover:not(:has(:disabled)) {
+      --sh-option-card-border: var(--sh-border-strong);
+    }
+  }
+  .sh-option-card:active:not(:has(:disabled)) { translate: 0 1px; }
+
+  .sh-option-card:has(.sh-option-card__input:disabled) {
+    --sh-option-card-bg: var(--sh-surface-disabled);
+    --sh-option-card-border: var(--sh-border-disabled);
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+  .sh-option-card:has(.sh-option-card__input:disabled) .sh-option-card__title,
+  .sh-option-card:has(.sh-option-card__input:disabled) .sh-option-card__price,
+  .sh-option-card:has(.sh-option-card__input:disabled) .sh-option-card__text,
+  .sh-option-card:has(.sh-option-card__input:disabled) .sh-option-card__meta {
+    color: var(--sh-text-disabled);
+  }
+  .sh-option-card__input:disabled + .sh-option-card__indicator {
+    --sh-choice-bg: var(--sh-surface-disabled);
+    --sh-choice-border: var(--sh-border-disabled);
+  }
+
+  .sh-field[data-state="error"] .sh-option-card,
+  .sh-fieldset[data-state="error"] .sh-option-card {
+    --sh-option-card-border: var(--sh-border-danger);
+  }
+
+  .sh-option-card--compact { --sh-option-card-padding: var(--sh-space-3); }
+
+  /* Lista de option-cards: o espaçamento é do grupo, não do cartão. */
+  .sh-option-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-option-list-gap, var(--sh-space-3));
+    min-inline-size: 0;
+  }
+
+  /* ======================================================================
+     sh-select 2.0 — listbox própria. O contrato normativo usa hidden + opções
+     declarativas. O branch de select abaixo é compatibilidade de migração 1.x,
+     não é documentação nem fonte normativa.
+
+     O autor escreve:
+
+       <div class="sh-select" data-sh-select>
+         <input type="hidden" id="uf" name="uf" value="df">
+         <div data-sh-option data-sh-value="df">Distrito Federal</div>
+       </div>
+
+     js/shalom-ds-form.js constrói o resto. Sem JS, o produto deve oferecer
+     fallback textual ou controles alternativos apropriados ao fluxo.
+
+     Anatomia gerada (documentada para quem for depurar):
+       hidden     input type="hidden", fonte do valor e alvo do submit
+       __trigger  role="combobox" aria-expanded aria-controls aria-activedescendant
+       __value    texto do valor corrente          __caret  seta
+       __popover  camada flutuante                 __search campo de filtro
+       __listbox  role="listbox"                   __group  role="group"
+       __option   role="option" aria-selected      __check  marca da opção
+       __empty    "nenhuma opção encontrada"
+     ====================================================================== */
+
+  .sh-select {
+    position: relative;
+    display: block;
+    min-inline-size: 0;
+  }
+
+  /* Compatibilidade 1.x: mantém o select legado utilizável sem o runtime. */
+  .sh-select__native {
+    inline-size: 100%;
+    min-block-size: var(--sh-touch-target);
+  }
+
+  /* Compatibilidade 1.x: o select legado é ocultado após enhancement. */
+  .sh-select[data-sh-enhanced] > .sh-select__native {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .sh-select__trigger {
+    display: flex;
+    gap: var(--sh-space-2);
+    align-items: center;
+    justify-content: space-between;
+    inline-size: 100%;
+    min-block-size: var(--sh-select-size, var(--sh-touch-target));
+    padding-block: var(--sh-space-2);
+    padding-inline: var(--sh-select-padding-inline, var(--sh-space-3));
+    border: var(--sh-border-width-hair) solid
+            var(--sh-select-border, var(--sh-border-control));
+    border-radius: var(--sh-radius-field);
+    background-color: var(--sh-select-bg, var(--sh-surface-default));
+    color: var(--sh-text-default);
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-select-font-size, var(--sh-font-size-md));
+    line-height: var(--sh-leading-normal);
+    text-align: start;
+    cursor: pointer;
+    transition:
+      border-color     var(--sh-duration-fast) var(--sh-ease-standard),
+      background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  .sh-select__value {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Sem escolha ainda: o texto é um marcador, e se comporta como um. */
+  .sh-select__trigger[data-placeholder="true"] .sh-select__value {
+    color: var(--sh-text-placeholder);
+  }
+
+  .sh-select__caret {
+    --sh-icon-size: var(--sh-icon-size-md);
+    flex: none;
+    color: var(--sh-text-muted);
+    transition: rotate var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-select__trigger[aria-expanded="true"] .sh-select__caret { rotate: 180deg; }
+
+  @media (hover: hover) {
+    .sh-select__trigger:hover:not([disabled]) {
+      --sh-select-border: var(--sh-border-strong);
+    }
+  }
+  .sh-select__trigger:focus-visible {
+    outline: none;
+    border-color: var(--sh-action-primary-border);
+    box-shadow: var(--sh-focus-ring);
+  }
+  .sh-select__trigger[aria-expanded="true"] {
+    --sh-select-border: var(--sh-action-primary-border);
+  }
+  .sh-select__trigger:active:not([disabled]) {
+    background-color: var(--sh-surface-hover);
+  }
+  .sh-select__trigger[disabled] {
+    --sh-select-bg: var(--sh-surface-disabled);
+    --sh-select-border: var(--sh-border-disabled);
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+  .sh-select__trigger[aria-invalid="true"],
+  .sh-field[data-state="error"] .sh-select__trigger {
+    --sh-select-border: var(--sh-border-danger);
+    outline: var(--sh-border-width-hair) solid var(--sh-border-danger);
+    outline-offset: calc(var(--sh-border-width-hair) * -2);
+  }
+
+  /* ------------------------------------------------------------ popover */
+
+  .sh-select__popover {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: calc(100% + var(--sh-space-1));
+    z-index: var(--sh-layer-dropdown);
+    display: flex;
+    flex-direction: column;
+    max-block-size: var(--sh-select-popover-max, 17rem);
+    overflow: hidden;
+    border: var(--sh-border-width-hair) solid var(--sh-border-default);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-raised);
+    box-shadow: var(--sh-shadow-lg);
+  }
+  /* Abre para cima quando não há espaço embaixo (medido no JS). */
+  .sh-select__popover[data-placement="top"] {
+    inset-block-start: auto;
+    inset-block-end: calc(100% + var(--sh-space-1));
+  }
+
+  .sh-select__search {
+    flex: none;
+    inline-size: 100%;
+    min-block-size: var(--sh-touch-target);
+    padding-block: var(--sh-space-2);
+    padding-inline: var(--sh-space-3);
+    border: 0;
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    background-color: var(--sh-surface-raised);
+    color: var(--sh-text-default);
+    font-size: var(--sh-font-size-sm);
+  }
+  .sh-select__search:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+
+  .sh-select__listbox {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--sh-space-1);
+    margin: 0;
+    list-style: none;
+  }
+  .sh-select__listbox:focus-visible { outline: none; box-shadow: none; }
+
+  .sh-select__group { padding-block: var(--sh-space-1); }
+  .sh-select__group-label {
+    padding-block: var(--sh-space-1);
+    padding-inline: var(--sh-space-3);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+    color: var(--sh-text-muted);
+  }
+
+  .sh-select__option {
+    display: flex;
+    gap: var(--sh-space-2);
+    align-items: center;
+    min-block-size: var(--sh-touch-target);
+    padding-block: var(--sh-space-2);
+    padding-inline: var(--sh-space-3);
+    border: var(--sh-border-width-hair) solid var(--sh-option-border, transparent);
+    border-radius: var(--sh-radius-control);
+    background-color: var(--sh-option-bg, transparent);
+    color: var(--sh-option-fg, var(--sh-text-default));
+    font-size: var(--sh-font-size-md);
+    line-height: var(--sh-leading-snug);
+    cursor: pointer;
+  }
+  .sh-select__option-label {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  /* A marca é o que distingue selecionado de apenas ativo — a diferença não
+     pode ser só o fundo. */
+  .sh-select__check {
+    --sh-icon-size: var(--sh-icon-size-md);
+    flex: none;
+    visibility: hidden;
+    color: var(--sh-text-brand);
+  }
+  .sh-select__option[aria-selected="true"] > .sh-select__check { visibility: visible; }
+
+  .sh-select__option[aria-selected="true"] {
+    --sh-option-bg: var(--sh-surface-selected);
+    --sh-option-border: var(--sh-action-primary-border);
+    --sh-option-fg: var(--sh-text-strong);
+    font-weight: var(--sh-weight-semibold);
+  }
+
+  /* Opção ativa (aria-activedescendant): o foco visual do teclado. Traço
+     grosso + superfície, para não depender de matiz. */
+  .sh-select__option[data-active="true"] {
+    --sh-option-bg: var(--sh-surface-hover);
+    --sh-option-border: var(--sh-action-primary-border);
+    --sh-option-fg: var(--sh-text-strong);
+    outline: var(--sh-border-width-thick) solid var(--sh-action-primary-border);
+    outline-offset: calc(var(--sh-border-width-thick) * -1);
+  }
+
+  @media (hover: hover) {
+    .sh-select__option:hover:not([aria-disabled="true"]) {
+      --sh-option-bg: var(--sh-surface-hover);
+    }
+  }
+  .sh-select__option[aria-disabled="true"] {
+    --sh-option-fg: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+
+  .sh-select__empty {
+    padding: var(--sh-space-4);
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-muted);
+    text-align: center;
+  }
+
+  /* --sm desenha 36px e clica 44px, o mesmo par de .sh-btn--sm: o excedente
+     cai sobre o espaçamento do formulário, nunca sobre outro alvo (medido:
+     47px de distância entre dois gatilhos --sm empilhados). Sem o ::after o
+     gatilho media 39px de altura e reprovava o alvo de toque. */
+  .sh-select--sm .sh-select__trigger {
+    --sh-select-size: 2.25rem;
+    --sh-select-font-size: var(--sh-font-size-sm);
+    position: relative;
+  }
+  .sh-select--sm .sh-select__trigger::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: var(--sh-touch-target);
+    translate: -50% -50%;
+  }
+  .sh-select--lg .sh-select__trigger {
+    --sh-select-size: 3.25rem;
+    --sh-select-font-size: var(--sh-font-size-lg);
+  }
+
+  /* ======================================================================
+     sh-quantity — stepper, extraído do sh82cafe/.
+
+     <div class="sh-quantity" data-sh-quantity>
+       <button type="button" class="sh-quantity__minus" aria-label="Diminuir quantidade de Pão de queijo">…</button>
+       <input class="sh-quantity__value" type="number" inputmode="numeric"
+              min="0" max="10" step="1" value="1" aria-label="Quantidade de Pão de queijo">
+       <button type="button" class="sh-quantity__plus" aria-label="Aumentar quantidade de Pão de queijo">…</button>
+       <span class="sh-quantity__status sh-visually-hidden" role="status" aria-live="polite"></span>
+     </div>
+
+     O <input type="number"> é real e editável: quem sabe que quer 12 digita
+     12. Os botões são conveniência, não a única entrada.
+     ====================================================================== */
+
+  .sh-quantity {
+    display: inline-flex;
+    /* .sh-field é coluna flex com align-items: stretch. Sem isto o stepper
+       esticaria na largura do campo, que é o oposto do que ele é. */
+    align-self: start;
+    align-items: center;
+    gap: var(--sh-space-1);
+    padding: var(--sh-space-1);
+    border: var(--sh-border-width-hair) solid
+            var(--sh-quantity-border, var(--sh-border-control));
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-quantity-bg, var(--sh-surface-default));
+    transition: border-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  .sh-quantity__minus,
+  .sh-quantity__plus {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-quantity-btn, 2.25rem);
+    block-size: var(--sh-quantity-btn, 2.25rem);
+    border: var(--sh-border-width-hair) solid var(--sh-action-secondary-border);
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-action-secondary-bg);
+    color: var(--sh-action-secondary-fg);
+    cursor: pointer;
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  /* Desenha 36px (32px em --sm), clica 44px. O excedente cai sobre o padding
+     do bloco e sobre o campo, nunca sobre o outro botão. */
+  .sh-quantity__minus::after,
+  .sh-quantity__plus::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: max(100%, var(--sh-touch-target));
+    translate: -50% -50%;
+  }
+
+  .sh-quantity__minus > .sh-icon,
+  .sh-quantity__plus > .sh-icon { --sh-icon-size: var(--sh-icon-size-md); }
+
+  @media (hover: hover) {
+    .sh-quantity__minus:hover:not([disabled]),
+    .sh-quantity__plus:hover:not([disabled]) {
+      background-color: var(--sh-action-secondary-bg-hover);
+    }
+  }
+  .sh-quantity__minus:focus-visible,
+  .sh-quantity__plus:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  .sh-quantity__minus:active:not([disabled]),
+  .sh-quantity__plus:active:not([disabled]) {
+    background-color: var(--sh-action-secondary-bg-active);
+  }
+  .sh-quantity__minus[disabled],
+  .sh-quantity__plus[disabled] {
+    border-color: var(--sh-action-disabled-border);
+    background-color: var(--sh-action-disabled-bg);
+    color: var(--sh-action-disabled-fg);
+    cursor: not-allowed;
+  }
+
+  /* <input> não aceita ::after — o truque de "desenha pequeno, clica grande"
+     que --minus/--plus usam não existe aqui. A caixa de acerto de um campo
+     nativo É a própria caixa, então ela cresce para 44px e a margem negativa
+     devolve a diferença ao layout: o stepper continua com a MESMA altura
+     (4 + 36 + 4 = 44px) e o campo passa a ocupá-la inteira.
+     Em --sm o campo acompanha o botão (32px) e não estica: ali os 44px não
+     cabem sem desmanchar a variante densa — ver a nota em .sh-quantity--sm. */
+  .sh-quantity__value {
+    inline-size: var(--sh-quantity-field, 2.75rem);
+    min-block-size: var(--sh-quantity-field-size, var(--sh-touch-target));
+    margin-block: calc(
+      (var(--sh-quantity-btn, 2.25rem) - var(--sh-quantity-field-size, var(--sh-touch-target))) / 2
+    );
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--sh-text-strong);
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-md);
+    font-variant-numeric: tabular-nums lining-nums;
+    font-weight: var(--sh-weight-semibold);
+    text-align: center;
+    appearance: textfield;
+  }
+  .sh-quantity__value::-webkit-outer-spin-button,
+  .sh-quantity__value::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+  .sh-quantity__value:focus-visible {
+    outline: none;
+    border-radius: var(--sh-radius-control);
+    box-shadow: var(--sh-focus-ring);
+  }
+  .sh-quantity__value[disabled] { color: var(--sh-text-disabled); cursor: not-allowed; }
+
+  /* Ativo = já entrou no carrinho. Estado do bloco, lido de [data-state]. */
+  .sh-quantity[data-state="active"] {
+    --sh-quantity-border: var(--sh-action-primary-border);
+    --sh-quantity-bg: var(--sh-surface-selected);
+  }
+  .sh-quantity[data-state="active"] .sh-quantity__value { color: var(--sh-text-strong); }
+
+  .sh-quantity:has(.sh-quantity__value[disabled]) {
+    --sh-quantity-bg: var(--sh-surface-disabled);
+    --sh-quantity-border: var(--sh-border-disabled);
+  }
+
+  .sh-quantity[aria-invalid="true"],
+  .sh-field[data-state="error"] .sh-quantity {
+    --sh-quantity-border: var(--sh-border-danger);
+    border-width: var(--sh-border-width-thick);
+  }
+
+  /* Variante densa: 4 + 32 + 4 = 40px de altura total. O campo acompanha o
+     botão em vez de esticar para 44px — esticar aqui faria o campo transbordar
+     o próprio bloco. Os DOIS botões (a afordância principal) continuam com
+     44×44 de área real via ::after; o campo fica em 32px e se apoia na exceção
+     de espaçamento da WCAG 2.5.8, declarada com data-a11y-isento no HTML que
+     usa a variante. */
+  .sh-quantity--sm {
+    --sh-quantity-btn: 2rem;
+    --sh-quantity-field: 2.25rem;
+    --sh-quantity-field-size: 2rem;
+  }
+  .sh-quantity--block { display: flex; align-self: stretch; justify-content: space-between; }
+  .sh-quantity--block .sh-quantity__value { flex: 1; }
+
+  /* ======================================================================
+     sh-search
+
+     <div class="sh-search">
+       <svg class="sh-icon sh-search__icon" aria-hidden="true">…</svg>
+       <input class="sh-input sh-search__input" type="search" placeholder="Buscar inscrição"
+              aria-describedby="busca-status">
+       <button type="button" class="sh-search__clear" data-sh-search-clear aria-label="Limpar busca">…</button>
+       <p class="sh-search__status" id="busca-status" role="status" aria-live="polite"></p>
+     </div>
+
+     O único atributo desta anatomia é data-sh-search-clear, lido por
+     js/shalom-ds-form.js. Este exemplo já trouxe um data-sh-search no
+     <input>: era atributo fantasma — nenhum seletor de CSS e nenhuma linha de
+     JS o liam. Removido na revisão final, porque atributo documentado que
+     ninguém lê vira contrato imaginário na próxima página que copiar daqui.
+
+     type="search" já é role searchbox; não repetimos o papel no HTML.
+     O botão limpar só existe quando há o que limpar — some por CSS
+     (:placeholder-shown), sem JS e sem sair do fluxo do Tab quando visível.
+     ====================================================================== */
+
+  .sh-search {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    min-inline-size: 0;
+  }
+
+  .sh-search__input {
+    flex: 1 1 100%;
+    padding-inline-start: calc(var(--sh-space-3) * 2 + var(--sh-icon-size-md));
+    padding-inline-end: calc(var(--sh-space-2) + var(--sh-touch-target));
+  }
+  /* O X nativo do WebKit duplicaria o __clear. */
+  .sh-search__input::-webkit-search-cancel-button,
+  .sh-search__input::-webkit-search-decoration { appearance: none; display: none; }
+
+  .sh-search__icon {
+    position: absolute;
+    inset-inline-start: var(--sh-space-3);
+    inset-block-start: calc(var(--sh-touch-target) / 2);
+    translate: 0 -50%;
+    --sh-icon-size: var(--sh-icon-size-md);
+    color: var(--sh-text-muted);
+    pointer-events: none;
+  }
+
+  .sh-search__clear {
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-start: calc(var(--sh-touch-target) / 2);
+    translate: 0 -50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    border-radius: var(--sh-radius-pill);
+    color: var(--sh-text-muted);
+    visibility: hidden;
+    cursor: pointer;
+  }
+  .sh-search__clear > .sh-icon { --sh-icon-size: var(--sh-icon-size-md); }
+  .sh-search__input:not(:placeholder-shown) ~ .sh-search__clear { visibility: visible; }
+  @media (hover: hover) {
+    .sh-search__clear:hover { background-color: var(--sh-surface-active); color: var(--sh-text-default); }
+  }
+  .sh-search__clear:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  .sh-search__status {
+    flex: 1 1 100%;
+    margin-block-start: var(--sh-space-2);
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-muted);
+  }
+  .sh-search__status:empty { display: none; }
+
+  .sh-search--lg .sh-search__input { --sh-input-size: 3.25rem; }
+  .sh-search--lg .sh-search__icon,
+  .sh-search--lg .sh-search__clear { inset-block-start: 1.625rem; }
+
+  /* ======================================================================
+     sh-file — área de soltar + botão + lista + progresso.
+
+     <div class="sh-file" data-sh-file data-sh-max-size="5242880">
+       <input class="sh-file__input" type="file" id="comp" accept="image/*,.pdf" multiple>
+       <label class="sh-file__drop" for="comp">
+         <svg class="sh-icon sh-file__icon" aria-hidden="true">…</svg>
+         <span class="sh-file__prompt">Arraste os comprovantes ou <b class="sh-file__browse">escolha do dispositivo</b></span>
+         <span class="sh-file__meta">PNG, JPG ou PDF · até 5 MB cada</span>
+       </label>
+       <ul class="sh-file__list"></ul>
+     </div>
+
+     O que é aceito e o tamanho máximo ficam VISÍVEIS antes de escolher —
+     descobrir a regra pela mensagem de erro é o padrão que este componente
+     existe para acabar.
+
+     Sem JS o __drop some e fica o <input type="file"> nativo: escolher
+     arquivo continua possível. Com JS o nativo é recortado (segue focável) e
+     o __drop vira o alvo.
+     ====================================================================== */
+
+  .sh-file {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-3);
+    min-inline-size: 0;
+  }
+  .sh-file:not([data-sh-enhanced]) > .sh-file__drop { display: none; }
+  .sh-file[data-sh-enhanced] > .sh-file__input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .sh-file__drop {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-1);
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--sh-file-drop-size, 8rem);
+    padding: var(--sh-space-5);
+    border: var(--sh-border-width-thin) dashed
+            var(--sh-file-border, var(--sh-border-control));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-file-bg, var(--sh-surface-sunken));
+    color: var(--sh-text-default);
+    text-align: center;
+    cursor: pointer;
+    transition:
+      border-color     var(--sh-duration-fast) var(--sh-ease-standard),
+      background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-file__icon { --sh-icon-size: var(--sh-icon-size-xl); color: var(--sh-text-muted); }
+  .sh-file__prompt {
+    font-size: var(--sh-font-size-md);
+    line-height: var(--sh-leading-snug);
+  }
+  /* Sem tinta de link, de propósito. __drop PINTA a própria superfície
+     (--sh-surface-sunken), mas --sh-text-link é calibrado contra a superfície
+     do ESCOPO ancestral: num painel do acamp's claro (creme) o link é o teal
+     5,94:1 sobre creme, e aqui dentro ele caía para 2,94:1 sobre o laranja
+     rebaixado. Herdar a tinta do próprio __drop (que já é o par verificado
+     contra este fundo) resolve nos seis cenários e em qualquer --sh-file-bg
+     — inclusive no estado desabilitado, onde antes a palavra continuava azul
+     dentro de uma área cinza. A afordância continua inteira: peso semibold
+     mais sublinhado. Não é um <a>: quem abre o seletor é o __drop inteiro. */
+  .sh-file__browse {
+    font-weight: var(--sh-weight-semibold);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
+  .sh-file__meta {
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-muted);
+  }
+
+  @media (hover: hover) {
+    .sh-file__drop:hover { --sh-file-border: var(--sh-border-strong); }
+  }
+  .sh-file__input:focus-visible ~ .sh-file__drop {
+    box-shadow: var(--sh-focus-ring);
+    --sh-file-border: var(--sh-action-primary-border);
+  }
+  .sh-file[data-state="dragover"] .sh-file__drop {
+    --sh-file-border: var(--sh-action-primary-border);
+    --sh-file-bg: var(--sh-surface-selected);
+    border-style: solid;
+  }
+  .sh-file:has(.sh-file__input:disabled) .sh-file__drop {
+    --sh-file-bg: var(--sh-surface-disabled);
+    --sh-file-border: var(--sh-border-disabled);
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+  .sh-file__input[aria-invalid="true"] ~ .sh-file__drop,
+  .sh-field[data-state="error"] .sh-file__drop {
+    --sh-file-border: var(--sh-border-danger);
+    border-style: solid;
+    border-width: var(--sh-border-width-thick);
+  }
+
+  /* --------------------------------------------------------------- lista */
+
+  .sh-file__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-2);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .sh-file__list:empty { display: none; }
+
+  .sh-file__item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2) var(--sh-space-3);
+    align-items: center;
+    padding: var(--sh-space-2) var(--sh-space-3);
+    border: var(--sh-border-width-hair) solid var(--sh-file-item-border, var(--sh-border-subtle));
+    border-radius: var(--sh-radius-control);
+    background-color: var(--sh-surface-default);
+  }
+  .sh-file__item-icon { --sh-icon-size: var(--sh-icon-size-lg); flex: none; color: var(--sh-text-muted); }
+  .sh-file__name {
+    flex: 1 1 8rem;
+    min-inline-size: 0;
+    overflow: hidden;
+    font-size: var(--sh-font-size-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sh-file__size {
+    flex: none;
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--sh-text-muted);
+  }
+  .sh-file__item[data-state="error"] {
+    --sh-file-item-border: var(--sh-border-danger);
+  }
+  .sh-file__error {
+    flex: 1 1 100%;
+    display: flex;
+    gap: var(--sh-space-2);
+    align-items: center;
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-medium);
+    color: var(--sh-text-danger);
+  }
+  .sh-file__error:empty { display: none; }
+
+  .sh-file__progress {
+    flex: 1 1 100%;
+    inline-size: 100%;
+    block-size: var(--sh-space-2);
+    border: var(--sh-border-width-hair) solid var(--sh-border-control);
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-surface-sunken);
+    appearance: none;
+    overflow: hidden;
+  }
+  .sh-file__progress::-webkit-progress-bar { background-color: var(--sh-surface-sunken); }
+  .sh-file__progress::-webkit-progress-value { background-color: var(--sh-action-primary-bg); }
+  .sh-file__progress::-moz-progress-bar { background-color: var(--sh-action-primary-bg); }
+
+  .sh-file__remove {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    margin-block: calc(var(--sh-space-2) * -1);
+    margin-inline-end: calc(var(--sh-space-2) * -1);
+    border-radius: var(--sh-radius-pill);
+    color: var(--sh-text-muted);
+    cursor: pointer;
+  }
+  .sh-file__remove > .sh-icon { --sh-icon-size: var(--sh-icon-size-md); }
+  @media (hover: hover) {
+    .sh-file__remove:hover { background-color: var(--sh-surface-active); color: var(--sh-text-default); }
+  }
+  .sh-file__remove:focus-visible { outline: none; box-shadow: var(--sh-focus-ring); }
+
+  /* ======================================================================
+     sh-form-actions — a barra que fecha o formulário.
+
+     <div class="sh-form-actions sh-form-actions--sticky">
+       <p class="sh-form-actions__note">Você poderá revisar antes de pagar.</p>
+       <div class="sh-form-actions__group">
+         <button class="sh-btn sh-btn--ghost">Voltar</button>
+         <button class="sh-btn sh-btn--primary">Confirmar inscrição</button>
+       </div>
+     </div>
+
+     A primária é a ÚLTIMA do DOM: fica à direita no desktop e no fim da
+     ordem de leitura, que é onde a decisão pertence. Em telas estreitas o
+     grupo empilha em coluna invertida — a primária sobe, todas em largura
+     total. A quebra responde à largura do FORMULÁRIO (@container), não à da
+     janela: a mesma barra dentro de uma coluna estreita se comporta igual.
+     ====================================================================== */
+
+  .sh-form-actions {
+    container-type: inline-size;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3) var(--sh-space-4);
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--sh-form-actions-padding, var(--sh-space-4));
+    min-inline-size: 0;
+  }
+
+  .sh-form-actions__note {
+    flex: 1 1 14rem;
+    min-inline-size: 0;
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-form-actions__group {
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3);
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  @container (width < 30rem) {
+    .sh-form-actions__group {
+      flex-direction: column-reverse;
+      inline-size: 100%;
+    }
+    .sh-form-actions__group > * { inline-size: 100%; }
+  }
+
+  .sh-form-actions--start { justify-content: flex-start; }
+  .sh-form-actions--between .sh-form-actions__group { flex: 1 1 auto; justify-content: space-between; }
+
+  .sh-form-actions--sticky {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: var(--sh-layer-sticky);
+    padding-inline: var(--sh-form-actions-padding, var(--sh-space-4));
+    margin-inline: calc(var(--sh-space-4) * -1);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    background-color: var(--sh-surface-default);
+  }
+  .sh-form-actions--bordered {
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    margin-block-start: var(--sh-space-2);
+  }
+
+  /* ======================================================================
+     Ajustes de composição com o Lote 0
+     ====================================================================== */
+
+  /* Grupos de opção dentro de .sh-field respiram menos que campos
+     independentes: são irmãos de uma pergunta só. */
+  .sh-field > .sh-option-list,
+  .sh-field > .sh-segmented { margin-block-start: var(--sh-space-1); }
+
+  /* .sh-field--inline foi escrito para .sh-input e .sh-input-group; os
+     controles deste lote entram na mesma coluna. */
+  .sh-field--inline > .sh-select,
+  .sh-field--inline > .sh-search,
+  .sh-field--inline > .sh-segmented {
+    flex: 1 1 var(--sh-field-control-min, 12rem);
+  }
+  .sh-field--inline > .sh-quantity { flex: none; }
+}

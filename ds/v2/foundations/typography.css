@@ -1,0 +1,272 @@
+/* ==========================================================================
+   Shalom DS — tipografia
+   Display, texto e interface: Montserrat (variável: wght 100–900, itálico)
+   Dados e código:             JetBrains Mono (variável: wght 100–800)
+   Acento editorial RARO:      Fraunces (wght 100–900, opsz 9–144, SOFT, WONK)
+   Todas OFL, auto-hospedadas em assets/fonts/ — sem CDN, sem Google Fonts em
+   tempo de execução. Os @font-face e os fallbacks métricos vivem em
+   assets/fonts/fonts.css, importado por shalom-ds.css. A página não precisa
+   de nenhum <link> de fonte.
+
+   POR QUE UMA FAMÍLIA SÓ
+   A linha "COMUNIDADE CATÓLICA" do logotipo oficial É Montserrat Medium —
+   sobreposição de contornos, erro máximo de 0,20% nas dez larguras de letra
+   medidas (estudo-tipografia.html, seção 1.3). Usar a fonte do logotipo faz
+   cada rótulo, botão e título descer da própria marca, sem intermediário.
+   E a marca não tem serifa em milímetro nenhum: nem no wordmark, nem no
+   descritor, nem no lettering do jubileu. Por isso Newsreader foi aposentada
+   do display, e não substituída por outra serifada.
+
+   A REGRA DO ACENTO RARO
+   --sh-font-accent (Fraunces, eixo SOFT 60) aparece em quatro lugares no
+   sistema inteiro: .sh-quote, a aspa de abertura de .sh-prose blockquote,
+   .sh-prose__quote (components/surface.css) e o mote do rodapé editorial
+   (components/navigation.css). Se um dia aparecer num quinto lugar sem
+   decisão registrada, está errado — o acento não é uma segunda voz do
+   sistema, é uma inflexão da mesma voz.
+   ========================================================================== */
+
+@layer sh.base {
+
+  html {
+    font-family: var(--sh-font-text);
+    font-optical-sizing: auto;
+  }
+
+  /* Numerais alinhados em qualquer lugar que compare valores. */
+  table, .sh-tabular, [data-sh-numeric] {
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+  }
+
+  /* ---------------------------------------------------- estilos de texto */
+  /* Aplicar como classe. Nunca redeclarar font-size solto em componente. */
+
+  .sh-display-xl,
+  .sh-display-lg,
+  .sh-display-md,
+  .sh-display-sm {
+    font-family: var(--sh-font-display);
+    font-weight: var(--sh-font-display-weight);
+    font-stretch: var(--sh-font-display-stretch);
+    font-variation-settings: var(--sh-font-display-axes);
+    line-height: var(--sh-leading-none);
+    letter-spacing: var(--sh-tracking-tighter);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+  .sh-display-xl { font-size: var(--sh-font-size-display-xl); }
+  .sh-display-lg { font-size: var(--sh-font-size-display-lg); }
+  .sh-display-md { font-size: var(--sh-font-size-display-md); line-height: var(--sh-leading-tight); }
+  .sh-display-sm { font-size: var(--sh-font-size-display-sm); line-height: var(--sh-leading-tight); }
+
+  .sh-heading-1,
+  .sh-heading-2,
+  .sh-heading-3,
+  .sh-heading-4 {
+    font-family: var(--sh-font-display);
+    font-weight: var(--sh-weight-semibold);
+    font-stretch: var(--sh-font-display-stretch);
+    font-variation-settings: var(--sh-font-display-axes);
+    line-height: var(--sh-leading-tight);
+    letter-spacing: var(--sh-tracking-tight);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+  .sh-heading-1 { font-size: var(--sh-font-size-display-sm); }
+  .sh-heading-2 { font-size: var(--sh-font-size-h2); }
+  .sh-heading-3 { font-size: var(--sh-font-size-h3); line-height: var(--sh-leading-snug); }
+  .sh-heading-4 { font-size: var(--sh-font-size-h4); line-height: var(--sh-leading-snug); letter-spacing: var(--sh-tracking-normal); }
+
+  /* Títulos de produto: sem serifa, escala fixa, densidade de painel. */
+  .sh-title-lg,
+  .sh-title,
+  .sh-title-sm {
+    font-family: var(--sh-font-text);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    letter-spacing: var(--sh-tracking-tight);
+    color: var(--sh-text-strong);
+  }
+  .sh-title-lg { font-size: var(--sh-font-size-xl); }
+  .sh-title    { font-size: var(--sh-font-size-lg); }
+  .sh-title-sm { font-size: var(--sh-font-size-md); }
+
+  .sh-body-lg,
+  .sh-body,
+  .sh-body-sm {
+    font-family: var(--sh-font-text);
+    font-weight: var(--sh-weight-regular);
+    line-height: var(--sh-leading-relaxed);
+    color: var(--sh-text-default);
+  }
+  .sh-body-lg { font-size: var(--sh-font-size-lg); }
+  .sh-body    { font-size: var(--sh-font-size-md); }
+  .sh-body-sm { font-size: var(--sh-font-size-sm); line-height: var(--sh-leading-normal); }
+
+  .sh-label {
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+  }
+
+  /* Medium e não regular: a haste da Montserrat 400 mede 0,105 da altura de
+     caixa, contra 0,120 da Figtree 400 — 12% mais fina. A 12px, e em cor
+     apagada, isso é a diferença entre ler e adivinhar. A 500 a haste vai a
+     0,142 e o texto volta ao peso visual que a legenda tinha antes. */
+  .sh-caption {
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-medium);
+    line-height: var(--sh-leading-normal);
+    letter-spacing: var(--sh-tracking-micro);
+    color: var(--sh-text-muted);
+  }
+
+  /* Sobrancelha de seção: caixa alta, nunca acima de 4 palavras. */
+  .sh-eyebrow {
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    line-height: var(--sh-leading-snug);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+    color: var(--sh-text-accent);
+  }
+
+  /* Frase de carisma: mote, citação, chamada pastoral. É UM DOS QUATRO
+     lugares do sistema que podem usar --sh-font-accent. Ver o cabeçalho. */
+  .sh-quote {
+    font-family: var(--sh-font-accent);
+    font-size: var(--sh-font-size-h3);
+    font-weight: var(--sh-weight-regular);
+    font-style: italic;
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+
+  /* Eixos da fonte de acento, num lugar só.
+     A Fraunces tem SOFT (0–100) e WONK (0–1) além de opsz. SOFT 60 arredonda
+     as terminações e é o que faz ela ecoar o canto de raio grande do wordmark
+     — sem isso, ela é só mais uma serifada e a escolha perde o motivo.
+     A lista de seletores mora aqui, e não em cada componente, porque o eixo é
+     propriedade da FONTE, não do componente: se um dia o acento mudar de
+     família, muda-se --sh-font-accent-axes e nada mais. Quando o tema remapeia
+     o acento para uma fonte sem esses eixos (Caveat no jubileu, Permanent
+     Marker no acamp's), a declaração é simplesmente ignorada pelo navegador. */
+  .sh-quote,
+  .sh-prose blockquote::before,
+  .sh-prose__quote,
+  .sh-prose__quote::before,
+  .sh-footer__statement {
+    font-variation-settings: var(--sh-font-accent-axes);
+  }
+
+  .sh-mono,
+  .sh-mono-sm {
+    font-family: var(--sh-font-mono);
+    font-weight: var(--sh-weight-regular);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-default);
+  }
+  .sh-mono    { font-size: var(--sh-font-size-sm); }
+  .sh-mono-sm { font-size: var(--sh-font-size-xs); }
+
+  /* ------------------------------------------------------------- prosa */
+  /* Para conteúdo vindo de editor (Quill, Markdown, CMS). */
+
+  .sh-prose {
+    max-width: var(--sh-measure);
+    font-size: var(--sh-font-size-md);
+    line-height: var(--sh-leading-relaxed);
+    color: var(--sh-text-default);
+  }
+  .sh-prose > * + * { margin-block-start: var(--sh-space-4); }
+  .sh-prose h2 {
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h2);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-tight);
+    letter-spacing: var(--sh-tracking-tight);
+    color: var(--sh-text-strong);
+    margin-block-start: var(--sh-space-10);
+  }
+  .sh-prose h3 {
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h3);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+    margin-block-start: var(--sh-space-8);
+  }
+  .sh-prose h4 {
+    font-size: var(--sh-font-size-h4);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-strong);
+    margin-block-start: var(--sh-space-6);
+  }
+  .sh-prose a { color: var(--sh-text-link); text-decoration: underline; }
+  .sh-prose a:hover { color: var(--sh-text-link-hover); }
+  .sh-prose strong { font-weight: var(--sh-weight-semibold); color: var(--sh-text-strong); }
+  .sh-prose ul, .sh-prose ol { padding-inline-start: var(--sh-space-6); }
+  .sh-prose li + li { margin-block-start: var(--sh-space-2); }
+  .sh-prose ul { list-style: disc; }
+  .sh-prose ol { list-style: decimal; }
+  .sh-prose li::marker { color: var(--sh-text-accent); }
+  /* DEC-024: sem traço vertical, aqui também. Mesmo desenho de
+     .sh-prose__quote (components/surface.css): recuo + aspa de display na
+     calha + itálico. O contrato de conteúdo e o contrato de classe têm de
+     ler igual — é o mesmo sh-prose, só muda quem escreve a marcação. */
+  .sh-prose blockquote {
+    position: relative;
+    padding-inline-start: var(--sh-space-8);
+    color: var(--sh-text-muted);
+    font-style: italic;
+  }
+  .sh-prose blockquote::before {
+    content: '\201C';
+    position: absolute;
+    inset-block-start: -0.12em;
+    inset-inline-start: 0;
+    font-family: var(--sh-font-accent);
+    font-size: var(--sh-font-size-display-md);
+    font-style: normal;
+    line-height: 1;
+    color: var(--sh-text-accent);
+  }
+  .sh-prose img, .sh-prose figure { border-radius: var(--sh-radius-media); }
+  .sh-prose table { width: 100%; font-size: var(--sh-font-size-sm); }
+  .sh-prose th, .sh-prose td {
+    padding: var(--sh-space-2) var(--sh-space-3);
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  /* -------------------------------------------- modificadores de cor */
+  .sh-text-strong  { color: var(--sh-text-strong); }
+  .sh-text-muted   { color: var(--sh-text-muted); }
+  .sh-text-accent  { color: var(--sh-text-accent); }
+  .sh-text-brand   { color: var(--sh-text-brand); }
+  .sh-text-success { color: var(--sh-text-success); }
+  .sh-text-warning { color: var(--sh-text-warning); }
+  .sh-text-danger  { color: var(--sh-text-danger); }
+  .sh-text-info    { color: var(--sh-text-info); }
+
+  .sh-text-balance { text-wrap: balance; }
+  .sh-text-pretty  { text-wrap: pretty; }
+  .sh-measure      { max-width: var(--sh-measure); }
+  .sh-measure-narrow { max-width: var(--sh-measure-narrow); }
+
+  /* Corta em N linhas sem esconder a ação principal do cartão. */
+  .sh-clamp-2, .sh-clamp-3, .sh-clamp-4 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .sh-clamp-2 { -webkit-line-clamp: 2; line-clamp: 2; }
+  .sh-clamp-3 { -webkit-line-clamp: 3; line-clamp: 3; }
+  .sh-clamp-4 { -webkit-line-clamp: 4; line-clamp: 4; }
+}
