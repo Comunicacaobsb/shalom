@@ -1,0 +1,597 @@
+/* ARQUIVO GERADO por scripts/gerar-tokens.mjs a partir de tokens/tokens.json — NÃO EDITE À MÃO; edite o JSON e regenere */
+
+/* ===========================================================================
+   Shalom DS — tema de evento: Acamp's
+   Baseado na identidade real do Acamp's 2026.2 (CSS inline de /acamps/):
+   laranja #D6832E, teal #6DAB9D, creme #FFF8F0, Archivo Black,
+   Permanent Marker, botão pílula com sombra sólida deslocada.
+
+   Este é o teste mais duro do mecanismo de tema, porque inverte três
+   premissas do sistema base:
+     1. a página inteira é uma cor saturada, não um neutro;
+     2. o botão primário é claro sobre fundo escuro-quente, não o contrário;
+     3. a elevação é uma sombra sólida sem blur, não uma sombra ambiente.
+   Tudo isso cabe na camada semântica. Nenhum componente precisa saber.
+
+   Correções de acessibilidade em relação à página publicada:
+     - A página atual usa branco (#FFFFFF) sobre #D6832E: 2.94:1. Reprova em
+       AA para texto (4.5) e reprova até para texto grande (3.0). O tema move
+       o texto para #1b1005 (6.36:1) e mantém o creme só como preenchimento
+       de superfície e de botão.
+     - .btn-primario creme sobre a página laranja marca 2.79:1 de silhueta e
+       não cumpre 1.4.11. O tema dá ao botão um limite escuro reaproveitando
+       a própria linguagem da sombra sólida: #123a30 (4.27:1), um teal quase
+       preto no lugar de --teal-escuro #4A6E63 (2.74:1).
+     - .btn-teal sobre laranja marca 1.11:1 de silhueta. Mesmo limite resolve.
+     - Archivo Black é estática. O tema usa Archivo variável nos eixos
+       wght 900 / wdth 112%, que reproduz o mesmo peso e mantém um eixo para
+       telas estreitas. Permanent Marker fica como fonte de acento, limitada
+       a no máximo quatro palavras.
+
+   Uso:  <html data-sh-theme="acamps">
+   =========================================================================== */
+
+@layer sh.theme {
+  [data-sh-theme="acamps"] {
+    /* ------------------------------------------------- primitivos do tema */
+    --sh-ac-orange:        #d6832e;
+    --sh-ac-orange-light:  #e7a45d;
+    --sh-ac-orange-pale:   #f7e7d5;
+    --sh-ac-orange-deep:   #a95f00;
+    --sh-ac-teal:          #6dab9d;
+    --sh-ac-teal-light:    #8dc1b5;
+    --sh-ac-teal-pale:     #dcece8;
+    --sh-ac-teal-deep:     #296b5e;
+    --sh-ac-teal-night:    #31574e;
+    --sh-ac-teal-ink:      #123a30;
+    --sh-ac-teal-black:    #0f2620;
+    --sh-ac-cream:         #fff8f0;
+    --sh-ac-ink:           #1b1005;
+    --sh-ac-ink-soft:      #3a1c0a;
+
+    /* ------------------------------------------------- tipografia do tema */
+    /* O acamp's continua com voz própria no display: Archivo Black esticada é
+       cartaz de acampamento, não site institucional. O que mudou na troca
+       tipográfica (DEC-029) foi o FIM da cadeia — quem não tiver Archivo cai
+       na Montserrat do sistema, não numa Arial Black qualquer. O texto e a
+       interface do tema são a Montserrat da base: fonte de texto é decisão do
+       sistema, não do tema. */
+    --sh-font-display:          'Archivo', 'Montserrat', 'Montserrat Fallback', 'Arial Black', sans-serif;
+    --sh-font-display-weight:   900;
+    --sh-font-display-stretch:  112%;
+
+    /* O tema troca o acento: aqui a inflexão editorial é manuscrita, não
+       serifada. Permanent Marker ignora --sh-font-accent-axes (é estática e
+       não tem os eixos da Fraunces) — o navegador simplesmente descarta a
+       declaração, e nada precisa ser desfeito. */
+    --sh-font-accent: 'Permanent Marker', 'Fraunces', cursive;
+
+    /* ------------------------------------------------------ forma e ritmo */
+    --sh-radius-control:  var(--sh-radius-full);
+    --sh-radius-surface:  var(--sh-radius-lg);
+    --sh-radius-media:    var(--sh-radius-lg);
+    --sh-radius-field:    var(--sh-radius-full);
+
+    /* Elevação sólida: o token guarda a sombra inteira, não só a cor. */
+    --sh-shadow-rgb:     27 16 5;
+    --sh-shadow-raised:  0 4px 0 var(--sh-ac-teal-ink);
+    --sh-shadow-sm:      0 2px 0 var(--sh-ac-teal-ink);
+    --sh-shadow-md:      0 4px 0 var(--sh-ac-teal-ink);
+    --sh-shadow-lg:      0 6px 0 var(--sh-ac-teal-ink);
+    --sh-shadow-xl:      0 8px 0 var(--sh-ac-teal-ink),
+                         0 20px 44px rgb(var(--sh-shadow-rgb) / 0.28);
+
+    /* -------------------------------------------------- semântica (claro) */
+    --sh-surface-page:           var(--sh-ac-orange);
+    --sh-surface-sunken:         var(--sh-ac-orange-light);
+    --sh-surface-default:        var(--sh-ac-cream);
+    --sh-surface-raised:         var(--sh-white);
+    --sh-surface-subtle:         var(--sh-ac-orange-pale);
+    --sh-surface-inverse:        var(--sh-ac-teal-night);
+    --sh-surface-brand:          var(--sh-ac-cream);
+    --sh-surface-brand-subtle:   var(--sh-ac-orange-pale);
+    --sh-surface-accent:         var(--sh-ac-teal);
+    --sh-surface-accent-subtle:  var(--sh-ac-teal-pale);
+    --sh-surface-accent-border:  var(--sh-ac-teal-ink);
+    --sh-surface-selected:       var(--sh-ac-teal-pale);
+    --sh-surface-hover:          rgb(255 248 240 / 0.16);
+    --sh-surface-active:         rgb(255 248 240 / 0.26);
+    --sh-surface-scrim:          rgb(27 16 5 / 0.62);
+
+    /* Vidro = véu + 4 pontos de alfa, na tinta do tema. A tinta por cima é
+       --sh-glass-ink → --sh-text-on-scrim, que o acamp's já remapeia para o
+       creme mais abaixo; nada mais precisa ser declarado. */
+    --sh-glass-veil:         rgb(27 16 5 / 0.66);
+    --sh-glass-veil-hover:   rgb(27 16 5 / 0.74);
+    --sh-glass-veil-active:  rgb(27 16 5 / 0.82);
+    --sh-glass-solid:        rgb(27 16 5 / 1);
+
+    --sh-text-strong:       var(--sh-ac-ink);  /* 6.36 sobre laranja */
+    --sh-text-default:      var(--sh-ac-ink);
+    --sh-text-muted:        var(--sh-ac-ink-soft);  /* 5.29 sobre laranja */
+    --sh-text-placeholder:  var(--sh-ac-ink-soft);
+    --sh-text-inverse:      var(--sh-ac-cream);  /* 7.66 sobre teal-night */
+    --sh-text-on-brand:     var(--sh-ac-ink);  /* 17.75 sobre creme */
+    --sh-text-on-accent:    var(--sh-ac-teal-black);  /* 6.04 sobre teal */
+
+    /* A marca do Acamp's é uma superfície CLARA nos dois esquemas (creme aqui,
+       orange-light no escuro). O conjunto on-brand é escuro nos dois. */
+    --sh-text-on-brand-muted:       var(--sh-ac-ink-soft);  /* 14.76 sobre creme */
+    --sh-text-on-brand-link:        var(--sh-ac-teal-deep);  /* 5.94 sobre creme */
+    --sh-text-on-brand-link-hover:  var(--sh-ac-teal-ink);  /* 11.91 sobre creme */
+
+    /* Sem par no bloco escuro, de propósito: o véu não inverte. 5.00 no claro
+       e 8.89 no escuro, no pior caso de foto branca sob o véu. */
+    --sh-text-on-scrim: var(--sh-ac-cream);
+
+    /* A ação sobre véu segue a mesma regra (sem par no bloco escuro). O
+       preenchimento já vem do creme sozinho, porque --sh-action-primary-bg-on-scrim
+       aponta para --sh-text-on-scrim; aqui só a tinta escura e os estados
+       precisam do tom do tema — navy sobre creme seria um azul que o acamp's
+       não usa. */
+    --sh-action-primary-fg-on-scrim:   var(--sh-ac-ink);  /* 17.75 sobre o creme */
+    --sh-action-primary-bg-hover-on-scrim: var(--sh-white);
+    --sh-action-primary-bg-active-on-scrim: var(--sh-ac-orange-pale);
+
+    --sh-text-brand:       var(--sh-ac-ink);
+    --sh-text-accent:      #0f2f27;  /* 4.91 sobre laranja */
+    --sh-text-link:        var(--sh-ac-ink);
+    --sh-text-link-hover:  var(--sh-ac-teal-black);
+    --sh-text-success:     #134d33;
+    --sh-text-warning:     #4a3400;
+    --sh-text-danger:      #7d1610;
+    --sh-text-info:        #0d4a52;
+
+    --sh-border-subtle:           rgb(27 16 5 / 0.18);
+    --sh-border-default:          rgb(27 16 5 / 0.32);
+    --sh-border-control:          var(--sh-ac-ink-soft);  /* 5.29 sobre laranja */
+    --sh-border-strong:           var(--sh-ac-ink);
+    --sh-border-brand:            var(--sh-ac-teal-ink);
+    --sh-border-accent:           var(--sh-ac-teal-ink);
+    --sh-border-inverse:          var(--sh-ac-teal);
+    --sh-border-on-brand:         rgb(27 16 5 / 0.32);
+    --sh-border-on-brand-strong:  var(--sh-ac-ink-soft);  /* 14.76 sobre creme */
+
+    /* O primário é o creme, como na página real. */
+    --sh-action-primary-bg:         var(--sh-ac-cream);
+    --sh-action-primary-bg-hover:   var(--sh-white);
+    --sh-action-primary-bg-active:  var(--sh-ac-orange-pale);
+    --sh-action-primary-fg:         var(--sh-ac-ink);
+    --sh-action-primary-border:     var(--sh-ac-teal-ink);  /* 4.27 sobre laranja */
+
+    --sh-action-secondary-bg:         transparent;
+    --sh-action-secondary-bg-hover:   rgb(255 248 240 / 0.16);
+    --sh-action-secondary-bg-active:  rgb(255 248 240 / 0.26);
+    --sh-action-secondary-fg:         var(--sh-ac-ink);
+    --sh-action-secondary-border:     var(--sh-ac-ink);
+
+    --sh-action-ghost-fg:         var(--sh-ac-ink);
+    --sh-action-ghost-bg-hover:   rgb(255 248 240 / 0.16);
+    --sh-action-ghost-bg-active:  rgb(255 248 240 / 0.26);
+
+    --sh-action-accent-bg:         var(--sh-ac-teal);
+    --sh-action-accent-bg-hover:   var(--sh-ac-teal-light);
+    --sh-action-accent-bg-active:  var(--sh-ac-teal-deep);
+    --sh-action-accent-fg:         var(--sh-ac-teal-black);
+    --sh-action-accent-border:     var(--sh-ac-teal-ink);
+
+    --sh-action-danger-bg:         #7d1610;
+    --sh-action-danger-bg-hover:   #661009;
+    --sh-action-danger-bg-active:  #500b06;
+    --sh-action-danger-fg:         var(--sh-white);
+    --sh-action-danger-border:     var(--sh-ac-ink);
+
+    --sh-action-disabled-bg:      rgb(27 16 5 / 0.14);
+    --sh-action-disabled-fg:      var(--sh-ac-ink-soft);
+    --sh-action-disabled-border:  rgb(27 16 5 / 0.24);
+
+    --sh-feedback-success-surface:  #e7f4ec;
+    --sh-feedback-success-border:   #134d33;
+    --sh-feedback-success-text:     #134d33;
+    --sh-feedback-success-solid:    #134d33;
+
+    --sh-feedback-warning-surface:  #faf0d8;
+    --sh-feedback-warning-border:   #4a3400;
+    --sh-feedback-warning-text:     #4a3400;
+    --sh-feedback-warning-solid:    #4a3400;
+
+    --sh-feedback-danger-surface:  #fbe9e7;
+    --sh-feedback-danger-border:   #7d1610;
+    --sh-feedback-danger-text:     #7d1610;
+    --sh-feedback-danger-solid:    #7d1610;
+
+    --sh-feedback-info-surface:  #e2f2f5;
+    --sh-feedback-info-border:   #0d4a52;
+    --sh-feedback-info-text:     #0d4a52;
+    --sh-feedback-info-solid:    #0d4a52;
+
+    --sh-focus-halo:      var(--sh-ac-cream);
+    --sh-focus-color:     var(--sh-ac-ink);  /* 6.36 sobre laranja */
+    --sh-focus-on-brand:  var(--sh-ac-ink);  /* 17.75 sobre creme */
+
+    /* O brilho do esqueleto é a luz do tema: creme, não a pomba âmbar. */
+    --sh-surface-sheen: linear-gradient(100deg, transparent 0%, var(--sh-ac-cream) 50%, transparent 100%);
+
+    /* A pomba em creme era o pior contraste dos seis cenários: sobre a página
+       laranja media 2,79:1, mas dentro de QUALQUER cartão — e no acamp's o
+       cartão é creme — media 1,00:1. Não era discreta: era invisível, e o
+       cartão é onde a pomba mais aparece (selo de rodapé, estado vazio,
+       divisor). A tinta escura do tema resolve os dois de uma vez: teal-ink
+       marca 4,27:1 sobre o laranja e 11,91:1 sobre o creme. Não é cor
+       inventada — é a mesma tinta que este arquivo JÁ dava à pomba no escopo
+       inverso, com o mesmo 11,91 anotado. O acamp's passa a ter uma pomba só,
+       escura, em todo o esquema claro. No escuro ela volta ao creme: ver os
+       dois blocos escuros. DEC-029. */
+    --sh-dove-ink: var(--sh-ac-teal-ink);
+
+    /* orange-deep e não orange-light. --sh-surface-sunken TAMBÉM é
+       orange-light: sobre o rebaixado a marca d'água era exatamente a cor do
+       fundo, 1,000:1 — medido em prova-superficies.html e em
+       docs-site/componentes/dove.html. Uma marca d'água discreta é uma coisa;
+       uma que não existe é outra. orange-deep, na mesma opacidade, dá 1,112
+       sobre a página laranja, 1,182 sobre o rebaixado, 1,338 sobre o creme e
+       1,307 sobre o pale — os quatro na faixa dos outros temas. */
+    --sh-dove-watermark:  var(--sh-ac-orange-deep);
+    --sh-dove-opacity:    0.22;
+  }
+
+  /* Exceção do claro: sobre o inverso (teal-night) a pomba escura mede 1,56 e
+     some. Ali ela volta ao creme, que mede 7,66. Regra sem guarda de esquema
+     de propósito — os dois blocos escuros de [data-sh-surface="inverse"] mais
+     abaixo são mais específicos e declarados depois, então continuam mandando
+     no escuro (onde o inverso é o creme e a pomba é teal-ink). */
+  [data-sh-theme="acamps"] [data-sh-surface="inverse"] {
+    --sh-dove-ink: var(--sh-ac-cream);
+  }
+
+  /* No creme, o link volta a ser teal e o foco troca de halo.
+
+     ATENÇÃO — CONTRATO COM OS BLOCOS ESCUROS. Esta regra não tem guarda de
+     esquema (é a convenção do arquivo: o claro é a base, o escuro sobrescreve).
+     Ela continua casando no escuro, quando o painel é #2c1a0d e estas tintas
+     são claras. As DUAS regras escuras equivalentes — a de
+     @media (prefers-color-scheme: dark) e a de [data-theme="dark"], ambas mais
+     específicas e declaradas depois — têm de redeclarar TODAS as propriedades
+     desta lista. Propriedade nova aqui = propriedade nova nas duas de lá, ou
+     volta o 1.07:1 de tinta clara sobre painel escuro. */
+  [data-sh-theme="acamps"] [data-sh-surface="panel"],
+  [data-sh-theme="acamps"] [data-sh-surface="sunken"] {
+    --sh-text-link:        var(--sh-ac-teal-deep);  /* 5.94 sobre creme */
+    --sh-text-link-hover:  var(--sh-ac-teal-ink);
+    --sh-text-accent:      var(--sh-ac-teal-deep);
+    --sh-text-muted:       var(--sh-ac-ink-soft);  /* 14.76 sobre creme */
+    --sh-border-control:   var(--sh-ac-ink-soft);
+    --sh-focus-halo:       var(--sh-ac-cream);
+  }
+
+  /* --------------------------------------- 1. automático (o sistema pede) */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) [data-sh-theme="acamps"],
+    :root:not([data-theme="light"])[data-sh-theme="acamps"] {
+      --sh-surface-page:           #1d1108;
+      --sh-surface-sunken:         #120a04;
+      --sh-surface-default:        #2c1a0d;
+      --sh-surface-raised:         #3b2513;
+      --sh-surface-subtle:         #2c1a0d;
+      --sh-surface-inverse:        var(--sh-ac-cream);
+      --sh-surface-brand:          var(--sh-ac-orange-light);
+      --sh-surface-brand-subtle:   #3b2513;
+      --sh-surface-accent:         var(--sh-ac-teal);
+      --sh-surface-accent-subtle:  #173029;
+      --sh-surface-accent-border:  var(--sh-ac-teal-light);
+      --sh-surface-selected:       #173029;
+      --sh-surface-hover:          rgb(255 248 240 / 0.07);
+      --sh-surface-active:         rgb(255 248 240 / 0.14);
+      --sh-surface-scrim:          rgb(9 5 2 / 0.74);
+
+      /* Vidro. Precisa estar aqui: --sh-shadow-rgb do acamp's continua sendo
+         27 16 5 no escuro, mas o véu escurece para 9 5 2 — sem esta linha o
+         vidro ficaria com a tinta navy que tokens/dark.css declara em :root,
+         e vidro e véu deixariam de ser a mesma coisa. */
+      --sh-glass-veil:         rgb(9 5 2 / 0.78);
+      --sh-glass-veil-hover:   rgb(9 5 2 / 0.85);
+      --sh-glass-veil-active:  rgb(9 5 2 / 0.92);
+      --sh-glass-solid:        rgb(9 5 2 / 1);
+
+      --sh-text-strong:       var(--sh-ac-cream);
+      --sh-text-default:      #f0e2d3;
+      --sh-text-muted:        #c0a893;
+      --sh-text-placeholder:  #c0a893;
+      --sh-text-inverse:      var(--sh-ac-ink);
+      --sh-text-brand:        var(--sh-ac-orange-light);
+      --sh-text-accent:       var(--sh-ac-teal-light);
+      --sh-text-link:         var(--sh-ac-orange-light);
+      --sh-text-link-hover:   #f3c68a;
+      --sh-text-success:      var(--sh-success-300);
+      --sh-text-warning:      var(--sh-warning-300);
+      --sh-text-danger:       var(--sh-danger-300);
+      --sh-text-info:         var(--sh-info-300);
+
+      /* A marca aqui é orange-light: o link teal-deep do bloco claro marca
+         2.94 sobre ela. Só o link precisa descer um passo. */
+      --sh-text-on-brand-link:        var(--sh-ac-teal-ink);
+      --sh-text-on-brand-link-hover:  var(--sh-ac-teal-black);
+
+      --sh-border-subtle:   #3b2513;
+      --sh-border-default:  #4d3319;
+      --sh-border-control:  #8a6a4e;
+      --sh-border-strong:   #a5836a;
+      --sh-border-inverse:  var(--sh-ac-ink);
+      --sh-border-brand:    var(--sh-ac-orange-light);
+      --sh-border-accent:   var(--sh-ac-teal-light);
+
+      --sh-action-primary-bg:        var(--sh-ac-cream);
+      --sh-action-primary-bg-hover:  var(--sh-white);
+      --sh-action-primary-fg:        var(--sh-ac-ink);
+      --sh-action-primary-border:    var(--sh-ac-cream);
+
+      --sh-action-secondary-fg:      var(--sh-ac-cream);
+      --sh-action-secondary-border:  var(--sh-ac-orange-light);
+      --sh-action-ghost-fg:          var(--sh-ac-orange-light);
+      --sh-action-accent-border:     var(--sh-ac-teal-light);
+
+      --sh-action-danger-bg:         var(--sh-danger-300);
+      --sh-action-danger-bg-hover:   var(--sh-danger-200);
+      --sh-action-danger-bg-active:  var(--sh-danger-100);
+      --sh-action-danger-fg:         var(--sh-danger-950);
+      --sh-action-danger-border:     var(--sh-danger-300);
+
+      /* O claro pinta o inerte com tinta sobre laranja; aqui inverte. */
+      --sh-action-disabled-bg:      rgb(255 248 240 / 0.08);
+      --sh-action-disabled-fg:      #9c8471;
+      --sh-action-disabled-border:  rgb(255 248 240 / 0.16);
+
+      --sh-feedback-success-surface:  var(--sh-success-900);
+      --sh-feedback-success-border:   var(--sh-success-400);
+      --sh-feedback-success-text:     var(--sh-success-300);
+      --sh-feedback-success-solid:    var(--sh-success-300);
+
+      --sh-feedback-warning-surface:  var(--sh-warning-900);
+      --sh-feedback-warning-border:   var(--sh-warning-400);
+      --sh-feedback-warning-text:     var(--sh-warning-300);
+      --sh-feedback-warning-solid:    var(--sh-warning-300);
+
+      --sh-feedback-danger-surface:  var(--sh-danger-900);
+      --sh-feedback-danger-border:   var(--sh-danger-400);
+      --sh-feedback-danger-text:     var(--sh-danger-300);
+      --sh-feedback-danger-solid:    var(--sh-danger-300);
+
+      --sh-feedback-info-surface:  var(--sh-info-900);
+      --sh-feedback-info-border:   var(--sh-info-400);
+      --sh-feedback-info-text:     var(--sh-info-300);
+      --sh-feedback-info-solid:    var(--sh-info-300);
+
+      --sh-focus-halo:   #1d1108;
+      --sh-focus-color:  var(--sh-ac-orange-light);
+
+      --sh-shadow-raised:  0 4px 0 #0b1e19;
+      --sh-shadow-md:      0 4px 0 #0b1e19;
+
+      /* O claro passou a pintar a pomba de teal-ink; aqui ela volta ao creme,
+         que é o que funciona sobre marrom escuro: 17,55 sobre a página
+         (#1d1108) e 15,81 sobre o painel (#2c1a0d). Sem esta linha, a pomba
+         escura do claro vazaria para o escuro e mediria 1,4. */
+      --sh-dove-ink:        var(--sh-ac-cream);
+      --sh-dove-watermark:  #4d3319;
+      --sh-dove-opacity:    0.24;
+    }
+
+    /* No escuro os painéis são quentes e escuros: o link volta ao laranja.
+
+       A forma COMPOSTA é obrigatória. O uso documentado põe os dois atributos no
+       mesmo <html>; só com o descendente, este bloco nunca casava e o painel
+       escuro herdava o bloco claro logo acima — tinta #3a1c0a sobre #2c1a0d
+       (1.07:1) e halo de foco creme sobre painel escuro. Era a origem de ~40 das
+       reprovações do acamp's escuro. `sunken` entra junto porque o bloco claro
+       cobre os dois. */
+    :root:not([data-theme="light"]) [data-sh-theme="acamps"] [data-sh-surface="panel"],
+    :root:not([data-theme="light"]) [data-sh-theme="acamps"] [data-sh-surface="sunken"],
+    :root:not([data-theme="light"])[data-sh-theme="acamps"] [data-sh-surface="panel"],
+    :root:not([data-theme="light"])[data-sh-theme="acamps"] [data-sh-surface="sunken"] {
+      --sh-text-link:        var(--sh-ac-orange-light);
+      --sh-text-link-hover:  #f3c68a;
+      --sh-text-accent:      var(--sh-ac-teal-light);
+      --sh-text-muted:       #c0a893;
+      --sh-border-control:   #8a6a4e;
+      --sh-focus-halo:       #2c1a0d;
+    }
+
+    /* No escuro o inverso é o creme: as ações voltam à tinta teal do tema,
+       em vez do navy que dark.css aplica como padrão seguro. */
+    :root:not([data-theme="light"]) [data-sh-theme="acamps"] [data-sh-surface="inverse"],
+    :root:not([data-theme="light"])[data-sh-theme="acamps"] [data-sh-surface="inverse"] {
+      --sh-text-strong:      var(--sh-ac-ink);
+      --sh-text-default:     var(--sh-ac-ink);
+      --sh-text-muted:       var(--sh-ac-ink-soft);
+      --sh-text-link:        var(--sh-ac-teal-deep);
+      --sh-text-link-hover:  var(--sh-ac-teal-ink);
+      --sh-text-accent:      var(--sh-ac-teal-deep);
+      --sh-border-control:   var(--sh-ac-ink-soft);
+
+      --sh-action-primary-bg:         var(--sh-ac-teal-ink);  /* 11.91 de silhueta sobre o creme */
+      --sh-action-primary-bg-hover:   var(--sh-ac-teal-black);
+      --sh-action-primary-bg-active:  var(--sh-ac-teal-black);
+      --sh-action-primary-fg:         var(--sh-ac-cream);  /* 11.91 sobre o preenchimento */
+      --sh-action-primary-border:     var(--sh-ac-teal-ink);
+
+      --sh-action-secondary-fg:      var(--sh-ac-teal-ink);
+      --sh-action-secondary-border:  var(--sh-ac-teal-ink);
+      --sh-action-ghost-fg:          var(--sh-ac-teal-ink);
+
+      --sh-focus-halo:   var(--sh-ac-cream);
+      --sh-focus-color:  var(--sh-ac-ink);
+      --sh-dove-ink:     var(--sh-ac-teal-ink);  /* 11.91 sobre o creme */
+    }
+  }
+
+  /* ---------------------------------------- 2. escolhido (a pessoa pediu) */
+  [data-theme="dark"] [data-sh-theme="acamps"],
+  [data-theme="dark"][data-sh-theme="acamps"] {
+    --sh-surface-page:           #1d1108;
+    --sh-surface-sunken:         #120a04;
+    --sh-surface-default:        #2c1a0d;
+    --sh-surface-raised:         #3b2513;
+    --sh-surface-subtle:         #2c1a0d;
+    --sh-surface-inverse:        var(--sh-ac-cream);
+    --sh-surface-brand:          var(--sh-ac-orange-light);
+    --sh-surface-brand-subtle:   #3b2513;
+    --sh-surface-accent:         var(--sh-ac-teal);
+    --sh-surface-accent-subtle:  #173029;
+    --sh-surface-accent-border:  var(--sh-ac-teal-light);
+    --sh-surface-selected:       #173029;
+    --sh-surface-hover:          rgb(255 248 240 / 0.07);
+    --sh-surface-active:         rgb(255 248 240 / 0.14);
+    --sh-surface-scrim:          rgb(9 5 2 / 0.74);
+
+    /* Vidro. Precisa estar aqui: --sh-shadow-rgb do acamp's continua sendo
+       27 16 5 no escuro, mas o véu escurece para 9 5 2 — sem esta linha o
+       vidro ficaria com a tinta navy que tokens/dark.css declara em :root,
+       e vidro e véu deixariam de ser a mesma coisa. */
+    --sh-glass-veil:         rgb(9 5 2 / 0.78);
+    --sh-glass-veil-hover:   rgb(9 5 2 / 0.85);
+    --sh-glass-veil-active:  rgb(9 5 2 / 0.92);
+    --sh-glass-solid:        rgb(9 5 2 / 1);
+
+    --sh-text-strong:       var(--sh-ac-cream);
+    --sh-text-default:      #f0e2d3;
+    --sh-text-muted:        #c0a893;
+    --sh-text-placeholder:  #c0a893;
+    --sh-text-inverse:      var(--sh-ac-ink);
+    --sh-text-brand:        var(--sh-ac-orange-light);
+    --sh-text-accent:       var(--sh-ac-teal-light);
+    --sh-text-link:         var(--sh-ac-orange-light);
+    --sh-text-link-hover:   #f3c68a;
+    --sh-text-success:      var(--sh-success-300);
+    --sh-text-warning:      var(--sh-warning-300);
+    --sh-text-danger:       var(--sh-danger-300);
+    --sh-text-info:         var(--sh-info-300);
+
+    /* A marca aqui é orange-light: o link teal-deep do bloco claro marca
+       2.94 sobre ela. Só o link precisa descer um passo. */
+    --sh-text-on-brand-link:        var(--sh-ac-teal-ink);
+    --sh-text-on-brand-link-hover:  var(--sh-ac-teal-black);
+
+    --sh-border-subtle:   #3b2513;
+    --sh-border-default:  #4d3319;
+    --sh-border-control:  #8a6a4e;
+    --sh-border-strong:   #a5836a;
+    --sh-border-inverse:  var(--sh-ac-ink);
+    --sh-border-brand:    var(--sh-ac-orange-light);
+    --sh-border-accent:   var(--sh-ac-teal-light);
+
+    --sh-action-primary-bg:        var(--sh-ac-cream);
+    --sh-action-primary-bg-hover:  var(--sh-white);
+    --sh-action-primary-fg:        var(--sh-ac-ink);
+    --sh-action-primary-border:    var(--sh-ac-cream);
+
+    --sh-action-secondary-fg:      var(--sh-ac-cream);
+    --sh-action-secondary-border:  var(--sh-ac-orange-light);
+    --sh-action-ghost-fg:          var(--sh-ac-orange-light);
+    --sh-action-accent-border:     var(--sh-ac-teal-light);
+
+    --sh-action-danger-bg:         var(--sh-danger-300);
+    --sh-action-danger-bg-hover:   var(--sh-danger-200);
+    --sh-action-danger-bg-active:  var(--sh-danger-100);
+    --sh-action-danger-fg:         var(--sh-danger-950);
+    --sh-action-danger-border:     var(--sh-danger-300);
+
+    /* O claro pinta o inerte com tinta sobre laranja; aqui inverte. */
+    --sh-action-disabled-bg:      rgb(255 248 240 / 0.08);
+    --sh-action-disabled-fg:      #9c8471;
+    --sh-action-disabled-border:  rgb(255 248 240 / 0.16);
+
+    --sh-feedback-success-surface:  var(--sh-success-900);
+    --sh-feedback-success-border:   var(--sh-success-400);
+    --sh-feedback-success-text:     var(--sh-success-300);
+    --sh-feedback-success-solid:    var(--sh-success-300);
+
+    --sh-feedback-warning-surface:  var(--sh-warning-900);
+    --sh-feedback-warning-border:   var(--sh-warning-400);
+    --sh-feedback-warning-text:     var(--sh-warning-300);
+    --sh-feedback-warning-solid:    var(--sh-warning-300);
+
+    --sh-feedback-danger-surface:  var(--sh-danger-900);
+    --sh-feedback-danger-border:   var(--sh-danger-400);
+    --sh-feedback-danger-text:     var(--sh-danger-300);
+    --sh-feedback-danger-solid:    var(--sh-danger-300);
+
+    --sh-feedback-info-surface:  var(--sh-info-900);
+    --sh-feedback-info-border:   var(--sh-info-400);
+    --sh-feedback-info-text:     var(--sh-info-300);
+    --sh-feedback-info-solid:    var(--sh-info-300);
+
+    --sh-focus-halo:   #1d1108;
+    --sh-focus-color:  var(--sh-ac-orange-light);
+
+    --sh-shadow-raised:  0 4px 0 #0b1e19;
+    --sh-shadow-md:      0 4px 0 #0b1e19;
+
+    /* O claro passou a pintar a pomba de teal-ink; aqui ela volta ao creme,
+       que é o que funciona sobre marrom escuro: 17,55 sobre a página
+       (#1d1108) e 15,81 sobre o painel (#2c1a0d). Sem esta linha, a pomba
+       escura do claro vazaria para o escuro e mediria 1,4. */
+    --sh-dove-ink:        var(--sh-ac-cream);
+    --sh-dove-watermark:  #4d3319;
+    --sh-dove-opacity:    0.24;
+  }
+
+  /* No escuro os painéis são quentes e escuros: o link volta ao laranja.
+
+     A forma COMPOSTA é obrigatória. O uso documentado põe os dois atributos no
+     mesmo <html>; só com o descendente, este bloco nunca casava e o painel
+     escuro herdava o bloco claro logo acima — tinta #3a1c0a sobre #2c1a0d
+     (1.07:1) e halo de foco creme sobre painel escuro. Era a origem de ~40 das
+     reprovações do acamp's escuro. `sunken` entra junto porque o bloco claro
+     cobre os dois. */
+  [data-theme="dark"] [data-sh-theme="acamps"] [data-sh-surface="panel"],
+  [data-theme="dark"] [data-sh-theme="acamps"] [data-sh-surface="sunken"],
+  [data-theme="dark"][data-sh-theme="acamps"] [data-sh-surface="panel"],
+  [data-theme="dark"][data-sh-theme="acamps"] [data-sh-surface="sunken"] {
+    --sh-text-link:        var(--sh-ac-orange-light);
+    --sh-text-link-hover:  #f3c68a;
+    --sh-text-accent:      var(--sh-ac-teal-light);
+    --sh-text-muted:       #c0a893;
+    --sh-border-control:   #8a6a4e;
+    --sh-focus-halo:       #2c1a0d;
+  }
+
+  /* No escuro o inverso é o creme: as ações voltam à tinta teal do tema,
+     em vez do navy que dark.css aplica como padrão seguro. */
+  [data-theme="dark"] [data-sh-theme="acamps"] [data-sh-surface="inverse"],
+  [data-theme="dark"][data-sh-theme="acamps"] [data-sh-surface="inverse"] {
+    --sh-text-strong:      var(--sh-ac-ink);
+    --sh-text-default:     var(--sh-ac-ink);
+    --sh-text-muted:       var(--sh-ac-ink-soft);
+    --sh-text-link:        var(--sh-ac-teal-deep);
+    --sh-text-link-hover:  var(--sh-ac-teal-ink);
+    --sh-text-accent:      var(--sh-ac-teal-deep);
+    --sh-border-control:   var(--sh-ac-ink-soft);
+
+    --sh-action-primary-bg:         var(--sh-ac-teal-ink);  /* 11.91 de silhueta sobre o creme */
+    --sh-action-primary-bg-hover:   var(--sh-ac-teal-black);
+    --sh-action-primary-bg-active:  var(--sh-ac-teal-black);
+    --sh-action-primary-fg:         var(--sh-ac-cream);  /* 11.91 sobre o preenchimento */
+    --sh-action-primary-border:     var(--sh-ac-teal-ink);
+
+    --sh-action-secondary-fg:      var(--sh-ac-teal-ink);
+    --sh-action-secondary-border:  var(--sh-ac-teal-ink);
+    --sh-action-ghost-fg:          var(--sh-ac-teal-ink);
+
+    --sh-focus-halo:   var(--sh-ac-cream);
+    --sh-focus-color:  var(--sh-ac-ink);
+    --sh-dove-ink:     var(--sh-ac-teal-ink);  /* 11.91 sobre o creme */
+  }
+}
+
+/* ===========================================================================
+   Fontes do tema — JÁ AUTO-HOSPEDADAS.
+
+   Archivo (wdth 62–125, wght 100–900) e Permanent Marker vivem em
+   assets/fonts/, declaradas em assets/fonts/fonts.css junto com as do sistema.
+   Nada a fazer na página: shalom-ds.css importa o arquivo, e os woff2 só
+   descem quando o tema está de fato ativo e o token é usado.
+   Nenhum <link> para fonts.googleapis.com — nem aqui, nem em lugar nenhum.
+
+   Permanent Marker é estática e não tem itálico: usar só em --sh-font-accent,
+   no máximo quatro palavras, nunca em texto corrido nem em rótulo de controle.
+   =========================================================================== */

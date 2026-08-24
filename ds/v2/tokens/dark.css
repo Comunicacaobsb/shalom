@@ -1,0 +1,545 @@
+/* ARQUIVO GERADO por scripts/gerar-tokens.mjs a partir de tokens/tokens.json — NÃO EDITE À MÃO; edite o JSON e regenere */
+
+/* ===========================================================================
+   Shalom DS — esquema escuro do tema base
+   Remapeia SOMENTE a camada semântica. Nenhum primitivo muda.
+
+   Dois blocos idênticos, de propósito:
+     1. @media (prefers-color-scheme: dark) — quando o sistema pede e a
+        página não forçou claro.
+     2. [data-theme="dark"] — quando a pessoa escolheu, em qualquer subárvore.
+   CSS não permite reaproveitar um bloco de declarações; um gerador a partir de
+   tokens.json elimina esta duplicação quando houver build.
+
+   Regra da troca de elevação: no escuro a profundidade vem de superfície mais
+   clara + borda, não de sombra. As sombras continuam declaradas apenas para
+   sobreposições reais (menu, modal, toast).
+   =========================================================================== */
+
+@layer sh.tokens {
+  /* --------------------------------------- 1. automático (o sistema pede) */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+
+      /* ------------------------------------------------------ superfícies */
+      --sh-surface-page:           var(--sh-navy-950);
+      --sh-surface-sunken:         var(--sh-navy-1000);
+      --sh-surface-default:        var(--sh-navy-900);
+      --sh-surface-raised:         var(--sh-navy-800);
+      --sh-surface-subtle:         var(--sh-navy-900);
+      --sh-surface-inverse:        var(--sh-neutral-100);
+      --sh-surface-brand:          var(--sh-navy-400);
+      --sh-surface-brand-subtle:   var(--sh-navy-900);
+      --sh-surface-accent:         var(--sh-ember-400);
+      --sh-surface-accent-subtle:  var(--sh-ember-950);
+      --sh-surface-accent-border:  var(--sh-ember-300);
+      --sh-surface-disabled:       var(--sh-neutral-800);
+      --sh-surface-hover:          rgb(255 255 255 / 0.06);
+      --sh-surface-active:         rgb(255 255 255 / 0.12);
+      --sh-surface-selected:       var(--sh-navy-800);
+      --sh-surface-scrim:          rgb(2 9 24 / 0.72);
+
+      /* ------------------------------------------------------------ texto */
+      --sh-text-strong:       var(--sh-neutral-50);
+      --sh-text-default:      var(--sh-neutral-200);
+      --sh-text-muted:        var(--sh-neutral-400);
+      --sh-text-placeholder:  var(--sh-neutral-400);
+      --sh-text-disabled:     var(--sh-neutral-500);
+      --sh-text-inverse:      var(--sh-navy-900);
+      --sh-text-on-brand:     var(--sh-navy-1000);  /* 8.16 sobre brand */
+      --sh-text-on-accent:    var(--sh-ember-950);
+
+      /* No escuro --sh-surface-brand vira navy-400, uma superfície CLARA:
+         o conjunto on-brand inverte junto. */
+      --sh-text-on-brand-muted:       var(--sh-navy-800);  /* 5.51 sobre brand */
+      --sh-text-on-brand-link:        var(--sh-ember-950);  /* 6.45 sobre brand */
+      --sh-text-on-brand-link-hover:  var(--sh-navy-1000);  /* 8.16 sobre brand */
+      --sh-text-brand:                var(--sh-navy-300);
+      --sh-text-accent:               var(--sh-ember-300);
+      --sh-text-link:                 var(--sh-navy-300);
+      --sh-text-link-hover:           var(--sh-navy-200);
+      --sh-text-link-visited:         var(--sh-navy-200);
+      --sh-text-success:              var(--sh-success-300);
+      --sh-text-warning:              var(--sh-warning-300);
+      --sh-text-danger:               var(--sh-danger-300);
+      --sh-text-info:                 var(--sh-info-300);
+
+      /* ----------------------------------------------------------- bordas */
+      --sh-border-subtle:           var(--sh-navy-800);
+      --sh-border-default:          var(--sh-navy-700);
+      --sh-border-control:          var(--sh-neutral-600);
+      --sh-border-strong:           var(--sh-neutral-500);
+      --sh-border-brand:            var(--sh-navy-400);
+      --sh-border-accent:           var(--sh-ember-300);
+      --sh-border-inverse:          var(--sh-neutral-300);
+      --sh-border-on-brand:         var(--sh-navy-600);
+      --sh-border-on-brand-strong:  var(--sh-navy-800);  /* 5.51 sobre brand */
+      --sh-border-disabled:         var(--sh-neutral-700);
+      --sh-border-success:          var(--sh-success-400);
+      --sh-border-warning:          var(--sh-warning-400);
+      --sh-border-danger:           var(--sh-danger-400);
+      --sh-border-info:             var(--sh-info-400);
+
+      /* ------------------------------------------------------------ ações */
+      --sh-action-primary-bg:         var(--sh-navy-400);
+      --sh-action-primary-bg-hover:   var(--sh-navy-300);
+      --sh-action-primary-bg-active:  var(--sh-navy-200);
+      --sh-action-primary-fg:         var(--sh-navy-1000);
+      --sh-action-primary-border:     var(--sh-navy-400);
+
+      --sh-action-secondary-bg:         transparent;
+      --sh-action-secondary-bg-hover:   rgb(255 255 255 / 0.08);
+      --sh-action-secondary-bg-active:  rgb(255 255 255 / 0.16);
+      --sh-action-secondary-fg:         var(--sh-navy-200);
+      --sh-action-secondary-border:     var(--sh-navy-400);
+
+      --sh-action-ghost-bg-hover:   rgb(255 255 255 / 0.08);
+      --sh-action-ghost-bg-active:  rgb(255 255 255 / 0.16);
+      --sh-action-ghost-fg:         var(--sh-navy-300);
+
+      --sh-action-accent-bg:         var(--sh-ember-400);
+      --sh-action-accent-bg-hover:   var(--sh-ember-300);
+      --sh-action-accent-bg-active:  var(--sh-ember-200);
+      --sh-action-accent-fg:         var(--sh-ember-950);
+      --sh-action-accent-border:     var(--sh-ember-300);
+
+      --sh-action-danger-bg:         var(--sh-danger-300);
+      --sh-action-danger-bg-hover:   var(--sh-danger-200);
+      --sh-action-danger-bg-active:  var(--sh-danger-100);
+      --sh-action-danger-fg:         var(--sh-danger-950);
+      --sh-action-danger-border:     var(--sh-danger-300);
+
+      --sh-action-disabled-bg:      var(--sh-neutral-800);
+      --sh-action-disabled-fg:      var(--sh-neutral-400);
+      --sh-action-disabled-border:  var(--sh-neutral-700);
+
+      /* ------------------------------------------------------------ vidro */
+      /* Vidro. O véu de foto acompanha --sh-surface-scrim: mesma tinta
+         rgb(2 9 24), quatro pontos de alfa acima do scrim (0.72 → 0.76).
+         --sh-glass-ink NÃO entra aqui, de propósito: ele aponta para
+         --sh-text-on-scrim, que não é remapeado por esquema (DEC-020). */
+      --sh-glass-veil:         rgb(2 9 24 / 0.76);
+      --sh-glass-veil-hover:   rgb(2 9 24 / 0.83);
+      --sh-glass-veil-active:  rgb(2 9 24 / 0.90);
+      --sh-glass-solid:        rgb(2 9 24 / 1);
+
+      /* O vidro de superfície INVERTE, porque a superfície dele é a página:
+         no escuro passa conteúdo claro sob uma barra escura. --sh-surface-default
+         já é navy-900 aqui, então o color-mix do :root resolve sozinho; a linha
+         existe para subir o alfa — sobre conteúdo 100% branco, 0.86 deixava o
+         --sh-text-default em 4,1:1. A 0.92 sobe para 8,3:1. */
+      --sh-glass-surface: color-mix(in srgb, var(--sh-surface-default) 92%, transparent);
+
+      /* -------------------------------------------------- vidro SOBRE VÉU */
+      /* Vidro. O véu de foto acompanha --sh-surface-scrim: mesma tinta
+         rgb(2 9 24), quatro pontos de alfa acima do scrim (0.72 → 0.76).
+         --sh-glass-ink NÃO entra aqui, de propósito: ele aponta para
+         --sh-text-on-scrim, que não é remapeado por esquema (DEC-020). */
+      --sh-glass-veil:         rgb(2 9 24 / 0.76);
+      --sh-glass-veil-hover:   rgb(2 9 24 / 0.83);
+      --sh-glass-veil-active:  rgb(2 9 24 / 0.90);
+      --sh-glass-solid:        rgb(2 9 24 / 1);
+
+      /* O vidro de superfície INVERTE, porque a superfície dele é a página:
+         no escuro passa conteúdo claro sob uma barra escura. --sh-surface-default
+         já é navy-900 aqui, então o color-mix do :root resolve sozinho; a linha
+         existe para subir o alfa — sobre conteúdo 100% branco, 0.86 deixava o
+         --sh-text-default em 4,1:1. A 0.92 sobe para 8,3:1. */
+      --sh-glass-surface: color-mix(in srgb, var(--sh-surface-default) 92%, transparent);
+
+      /* --------------------------------------------------------- feedback */
+      --sh-feedback-success-surface:   var(--sh-success-900);
+      --sh-feedback-success-border:    var(--sh-success-400);
+      --sh-feedback-success-text:      var(--sh-success-300);
+      --sh-feedback-success-solid:     var(--sh-success-300);
+      --sh-feedback-success-on-solid:  var(--sh-success-950);
+
+      --sh-feedback-warning-surface:   var(--sh-warning-900);
+      --sh-feedback-warning-border:    var(--sh-warning-400);
+      --sh-feedback-warning-text:      var(--sh-warning-300);
+      --sh-feedback-warning-solid:     var(--sh-warning-300);
+      --sh-feedback-warning-on-solid:  var(--sh-warning-950);
+
+      --sh-feedback-danger-surface:   var(--sh-danger-900);
+      --sh-feedback-danger-border:    var(--sh-danger-400);
+      --sh-feedback-danger-text:      var(--sh-danger-300);
+      --sh-feedback-danger-solid:     var(--sh-danger-300);
+      --sh-feedback-danger-on-solid:  var(--sh-danger-950);
+
+      --sh-feedback-info-surface:   var(--sh-info-900);
+      --sh-feedback-info-border:    var(--sh-info-400);
+      --sh-feedback-info-text:      var(--sh-info-300);
+      --sh-feedback-info-solid:     var(--sh-info-300);
+      --sh-feedback-info-on-solid:  var(--sh-info-950);
+
+      /* ------------------------------------------------------------- foco */
+      --sh-focus-halo:      var(--sh-surface-page);
+      --sh-focus-color:     var(--sh-navy-300);
+      --sh-focus-on-brand:  var(--sh-navy-1000);  /* 8.16 sobre brand */
+
+      /* --------------------------------------------------------- elevação */
+      --sh-shadow-rgb:     2 9 24;
+      --sh-shadow-sm:      0 1px 2px rgb(var(--sh-shadow-rgb) / 0.40);
+      --sh-shadow-md:      0 2px 4px rgb(var(--sh-shadow-rgb) / 0.36),
+                           0 8px 20px rgb(var(--sh-shadow-rgb) / 0.44);
+      --sh-shadow-lg:      0 4px 8px rgb(var(--sh-shadow-rgb) / 0.40),
+                           0 16px 40px rgb(var(--sh-shadow-rgb) / 0.52);
+      --sh-shadow-xl:      0 8px 16px rgb(var(--sh-shadow-rgb) / 0.44),
+                           0 28px 72px rgb(var(--sh-shadow-rgb) / 0.60);
+      --sh-shadow-raised:  none;
+
+      /* ------------------------------------------------------------ pomba */
+      /* navy-700 e não navy-800, mesma lógica do claro: navy-800 a 0.14 sobre
+         navy-950 compõe #071730 e marca 1.036 — abaixo do 1.087 do claro e do
+         1.05 dos temas, ou seja, a marca d'água mais fraca dos seis cenários.
+         navy-700 na mesma opacidade dá 1.077 e entra na faixa da família. */
+      --sh-dove-watermark:  var(--sh-navy-700);
+      --sh-dove-opacity:    0.14;
+    }
+
+    /* Escopos de superfície no escuro: inverse deixa de ser navy e vira claro.
+
+       As AÇÕES têm de virar junto. semantic.css desenha o escopo inverse para um
+       fundo escuro — secundário com texto branco e limite navy-300, ghost em
+       navy-100. Sobre a superfície clara do escuro isso dava 1.13:1 (branco sobre
+       neutral-100) e 1.58:1 de silhueta. Aqui elas voltam ao desenho claro.
+       Os três temas se beneficiam: a regra casa o ELEMENTO com data-sh-surface,
+       e declaração no elemento sempre vence herança, qualquer que seja a camada. */
+    :root:not([data-theme="light"]) [data-sh-surface="inverse"],
+    :root:not([data-theme="light"])[data-sh-surface="inverse"] {
+      --sh-text-strong:      var(--sh-navy-900);
+      --sh-text-default:     var(--sh-navy-800);
+      --sh-text-muted:       var(--sh-neutral-600);
+      --sh-text-link:        var(--sh-navy-700);
+      --sh-text-link-hover:  var(--sh-navy-800);
+      --sh-text-brand:       var(--sh-navy-700);  /* 7.61 — o herdado era navy-200, 1.22 */
+      --sh-text-accent:      var(--sh-ember-700);  /* 4.93 — o herdado era ember-300, 1.41 */
+      --sh-text-success:     var(--sh-success-700);
+      --sh-text-warning:     var(--sh-warning-700);
+      --sh-text-danger:      var(--sh-danger-700);
+      --sh-text-info:        var(--sh-info-700);
+
+      --sh-border-subtle:   var(--sh-neutral-300);
+      --sh-border-default:  var(--sh-neutral-400);
+      --sh-border-control:  var(--sh-neutral-500);
+      --sh-border-strong:   var(--sh-neutral-600);
+      --sh-border-brand:    var(--sh-navy-700);
+      --sh-border-accent:   var(--sh-ember-700);
+
+      /* Completa o conjunto de limites informativos: no escuro a superfície
+         inversa é CLARA (neutral-100), então a tinta correta é a faixa 600, a
+         mesma do canvas claro. Herdados do escuro (faixa 400) marcavam de 2,12 a
+         2,36 sobre ela — abaixo dos 3:1 de 1.4.11.
+         Medido contra --sh-surface-inverse = neutral-100 #eef1f5. */
+      --sh-border-success:           var(--sh-success-600);  /* 4.61 — era success-400, 2.12 */
+      --sh-border-warning:           var(--sh-warning-600);  /* 4.91 — era warning-400, 2.24 */
+      --sh-border-danger:            var(--sh-danger-600);  /* 5.30 — era danger-400, 2.36 */
+      --sh-border-info:              var(--sh-info-600);  /* 4.74 — era info-400, 2.14 */
+      --sh-feedback-success-border:  var(--sh-success-600);  /* 4.61 */
+      --sh-feedback-warning-border:  var(--sh-warning-600);  /* 4.91 */
+      --sh-feedback-danger-border:   var(--sh-danger-600);  /* 5.30 */
+      --sh-feedback-info-border:     var(--sh-info-600);  /* 4.74 */
+
+      --sh-focus-halo:   var(--sh-surface-inverse);
+      --sh-focus-color:  var(--sh-navy-700);
+
+      --sh-action-primary-bg:         var(--sh-navy-700);  /* 7.61 de silhueta */
+      --sh-action-primary-bg-hover:   var(--sh-navy-800);
+      --sh-action-primary-bg-active:  var(--sh-navy-900);
+      --sh-action-primary-fg:         var(--sh-white);
+      --sh-action-primary-border:     var(--sh-navy-700);
+
+      --sh-action-secondary-bg:         transparent;
+      --sh-action-secondary-bg-hover:   rgb(var(--sh-shadow-rgb) / 0.08);
+      --sh-action-secondary-bg-active:  rgb(var(--sh-shadow-rgb) / 0.16);
+      --sh-action-secondary-fg:         var(--sh-navy-700);  /* 7.61 sobre inverse */
+      --sh-action-secondary-border:     var(--sh-navy-700);  /* 7.61 de silhueta */
+
+      --sh-action-ghost-bg:         transparent;
+      --sh-action-ghost-bg-hover:   rgb(var(--sh-shadow-rgb) / 0.08);
+      --sh-action-ghost-bg-active:  rgb(var(--sh-shadow-rgb) / 0.16);
+      --sh-action-ghost-fg:         var(--sh-navy-700);  /* 7.61 sobre inverse */
+      --sh-action-ghost-border:     transparent;
+
+      --sh-action-accent-bg:         var(--sh-ember-500);
+      --sh-action-accent-bg-hover:   var(--sh-ember-600);
+      --sh-action-accent-bg-active:  var(--sh-ember-700);
+      --sh-action-accent-fg:         var(--sh-navy-950);
+      --sh-action-accent-border:     var(--sh-ember-700);
+
+      --sh-action-danger-bg:         var(--sh-danger-700);
+      --sh-action-danger-bg-hover:   var(--sh-danger-800);
+      --sh-action-danger-bg-active:  var(--sh-danger-900);
+      --sh-action-danger-fg:         var(--sh-white);
+      --sh-action-danger-border:     var(--sh-danger-700);
+
+      /* A pomba também é tinta: ember-500 sobre a superfície inversa CLARA
+         do escuro marca 2.59, o mesmo número que o próprio DS documenta
+         como reprovado em canvas claro. */
+      --sh-dove-ink: var(--sh-ember-700);  /* 4.93 sobre inverse */
+    }
+  }
+
+  /* ---------------------------------------- 2. escolhido (a pessoa pediu) */
+  [data-theme="dark"] {
+    color-scheme: dark;
+
+    /* -------------------------------------------------------- superfícies */
+    --sh-surface-page:           var(--sh-navy-950);
+    --sh-surface-sunken:         var(--sh-navy-1000);
+    --sh-surface-default:        var(--sh-navy-900);
+    --sh-surface-raised:         var(--sh-navy-800);
+    --sh-surface-subtle:         var(--sh-navy-900);
+    --sh-surface-inverse:        var(--sh-neutral-100);
+    --sh-surface-brand:          var(--sh-navy-400);
+    --sh-surface-brand-subtle:   var(--sh-navy-900);
+    --sh-surface-accent:         var(--sh-ember-400);
+    --sh-surface-accent-subtle:  var(--sh-ember-950);
+    --sh-surface-accent-border:  var(--sh-ember-300);
+    --sh-surface-disabled:       var(--sh-neutral-800);
+    --sh-surface-hover:          rgb(255 255 255 / 0.06);
+    --sh-surface-active:         rgb(255 255 255 / 0.12);
+    --sh-surface-selected:       var(--sh-navy-800);
+    --sh-surface-scrim:          rgb(2 9 24 / 0.72);
+
+    /* -------------------------------------------------------------- texto */
+    --sh-text-strong:       var(--sh-neutral-50);
+    --sh-text-default:      var(--sh-neutral-200);
+    --sh-text-muted:        var(--sh-neutral-400);
+    --sh-text-placeholder:  var(--sh-neutral-400);
+    --sh-text-disabled:     var(--sh-neutral-500);
+    --sh-text-inverse:      var(--sh-navy-900);
+    --sh-text-on-brand:     var(--sh-navy-1000);  /* 8.16 sobre brand */
+    --sh-text-on-accent:    var(--sh-ember-950);
+
+    /* No escuro --sh-surface-brand vira navy-400, uma superfície CLARA:
+       o conjunto on-brand inverte junto. */
+    --sh-text-on-brand-muted:       var(--sh-navy-800);  /* 5.51 sobre brand */
+    --sh-text-on-brand-link:        var(--sh-ember-950);  /* 6.45 sobre brand */
+    --sh-text-on-brand-link-hover:  var(--sh-navy-1000);  /* 8.16 sobre brand */
+    --sh-text-brand:                var(--sh-navy-300);
+    --sh-text-accent:               var(--sh-ember-300);
+    --sh-text-link:                 var(--sh-navy-300);
+    --sh-text-link-hover:           var(--sh-navy-200);
+    --sh-text-link-visited:         var(--sh-navy-200);
+    --sh-text-success:              var(--sh-success-300);
+    --sh-text-warning:              var(--sh-warning-300);
+    --sh-text-danger:               var(--sh-danger-300);
+    --sh-text-info:                 var(--sh-info-300);
+
+    /* ------------------------------------------------------------- bordas */
+    --sh-border-subtle:           var(--sh-navy-800);
+    --sh-border-default:          var(--sh-navy-700);
+    --sh-border-control:          var(--sh-neutral-600);
+    --sh-border-strong:           var(--sh-neutral-500);
+    --sh-border-brand:            var(--sh-navy-400);
+    --sh-border-accent:           var(--sh-ember-300);
+    --sh-border-inverse:          var(--sh-neutral-300);
+    --sh-border-on-brand:         var(--sh-navy-600);
+    --sh-border-on-brand-strong:  var(--sh-navy-800);  /* 5.51 sobre brand */
+    --sh-border-disabled:         var(--sh-neutral-700);
+    --sh-border-success:          var(--sh-success-400);
+    --sh-border-warning:          var(--sh-warning-400);
+    --sh-border-danger:           var(--sh-danger-400);
+    --sh-border-info:             var(--sh-info-400);
+
+    /* -------------------------------------------------------------- ações */
+    --sh-action-primary-bg:         var(--sh-navy-400);
+    --sh-action-primary-bg-hover:   var(--sh-navy-300);
+    --sh-action-primary-bg-active:  var(--sh-navy-200);
+    --sh-action-primary-fg:         var(--sh-navy-1000);
+    --sh-action-primary-border:     var(--sh-navy-400);
+
+    --sh-action-secondary-bg:         transparent;
+    --sh-action-secondary-bg-hover:   rgb(255 255 255 / 0.08);
+    --sh-action-secondary-bg-active:  rgb(255 255 255 / 0.16);
+    --sh-action-secondary-fg:         var(--sh-navy-200);
+    --sh-action-secondary-border:     var(--sh-navy-400);
+
+    --sh-action-ghost-bg-hover:   rgb(255 255 255 / 0.08);
+    --sh-action-ghost-bg-active:  rgb(255 255 255 / 0.16);
+    --sh-action-ghost-fg:         var(--sh-navy-300);
+
+    --sh-action-accent-bg:         var(--sh-ember-400);
+    --sh-action-accent-bg-hover:   var(--sh-ember-300);
+    --sh-action-accent-bg-active:  var(--sh-ember-200);
+    --sh-action-accent-fg:         var(--sh-ember-950);
+    --sh-action-accent-border:     var(--sh-ember-300);
+
+    --sh-action-danger-bg:         var(--sh-danger-300);
+    --sh-action-danger-bg-hover:   var(--sh-danger-200);
+    --sh-action-danger-bg-active:  var(--sh-danger-100);
+    --sh-action-danger-fg:         var(--sh-danger-950);
+    --sh-action-danger-border:     var(--sh-danger-300);
+
+    --sh-action-disabled-bg:      var(--sh-neutral-800);
+    --sh-action-disabled-fg:      var(--sh-neutral-400);
+    --sh-action-disabled-border:  var(--sh-neutral-700);
+
+    /* -------------------------------------------------------------- vidro */
+    /* Vidro. O véu de foto acompanha --sh-surface-scrim: mesma tinta
+       rgb(2 9 24), quatro pontos de alfa acima do scrim (0.72 → 0.76).
+       --sh-glass-ink NÃO entra aqui, de propósito: ele aponta para
+       --sh-text-on-scrim, que não é remapeado por esquema (DEC-020). */
+    --sh-glass-veil:         rgb(2 9 24 / 0.76);
+    --sh-glass-veil-hover:   rgb(2 9 24 / 0.83);
+    --sh-glass-veil-active:  rgb(2 9 24 / 0.90);
+    --sh-glass-solid:        rgb(2 9 24 / 1);
+
+    /* O vidro de superfície INVERTE, porque a superfície dele é a página:
+       no escuro passa conteúdo claro sob uma barra escura. --sh-surface-default
+       já é navy-900 aqui, então o color-mix do :root resolve sozinho; a linha
+       existe para subir o alfa — sobre conteúdo 100% branco, 0.86 deixava o
+       --sh-text-default em 4,1:1. A 0.92 sobe para 8,3:1. */
+    --sh-glass-surface: color-mix(in srgb, var(--sh-surface-default) 92%, transparent);
+
+    /* ---------------------------------------------------- vidro SOBRE VÉU */
+    /* Vidro. O véu de foto acompanha --sh-surface-scrim: mesma tinta
+       rgb(2 9 24), quatro pontos de alfa acima do scrim (0.72 → 0.76).
+       --sh-glass-ink NÃO entra aqui, de propósito: ele aponta para
+       --sh-text-on-scrim, que não é remapeado por esquema (DEC-020). */
+    --sh-glass-veil:         rgb(2 9 24 / 0.76);
+    --sh-glass-veil-hover:   rgb(2 9 24 / 0.83);
+    --sh-glass-veil-active:  rgb(2 9 24 / 0.90);
+    --sh-glass-solid:        rgb(2 9 24 / 1);
+
+    /* O vidro de superfície INVERTE, porque a superfície dele é a página:
+       no escuro passa conteúdo claro sob uma barra escura. --sh-surface-default
+       já é navy-900 aqui, então o color-mix do :root resolve sozinho; a linha
+       existe para subir o alfa — sobre conteúdo 100% branco, 0.86 deixava o
+       --sh-text-default em 4,1:1. A 0.92 sobe para 8,3:1. */
+    --sh-glass-surface: color-mix(in srgb, var(--sh-surface-default) 92%, transparent);
+
+    /* ----------------------------------------------------------- feedback */
+    --sh-feedback-success-surface:   var(--sh-success-900);
+    --sh-feedback-success-border:    var(--sh-success-400);
+    --sh-feedback-success-text:      var(--sh-success-300);
+    --sh-feedback-success-solid:     var(--sh-success-300);
+    --sh-feedback-success-on-solid:  var(--sh-success-950);
+
+    --sh-feedback-warning-surface:   var(--sh-warning-900);
+    --sh-feedback-warning-border:    var(--sh-warning-400);
+    --sh-feedback-warning-text:      var(--sh-warning-300);
+    --sh-feedback-warning-solid:     var(--sh-warning-300);
+    --sh-feedback-warning-on-solid:  var(--sh-warning-950);
+
+    --sh-feedback-danger-surface:   var(--sh-danger-900);
+    --sh-feedback-danger-border:    var(--sh-danger-400);
+    --sh-feedback-danger-text:      var(--sh-danger-300);
+    --sh-feedback-danger-solid:     var(--sh-danger-300);
+    --sh-feedback-danger-on-solid:  var(--sh-danger-950);
+
+    --sh-feedback-info-surface:   var(--sh-info-900);
+    --sh-feedback-info-border:    var(--sh-info-400);
+    --sh-feedback-info-text:      var(--sh-info-300);
+    --sh-feedback-info-solid:     var(--sh-info-300);
+    --sh-feedback-info-on-solid:  var(--sh-info-950);
+
+    /* --------------------------------------------------------------- foco */
+    --sh-focus-halo:      var(--sh-surface-page);
+    --sh-focus-color:     var(--sh-navy-300);
+    --sh-focus-on-brand:  var(--sh-navy-1000);  /* 8.16 sobre brand */
+
+    /* ----------------------------------------------------------- elevação */
+    --sh-shadow-rgb:     2 9 24;
+    --sh-shadow-sm:      0 1px 2px rgb(var(--sh-shadow-rgb) / 0.40);
+    --sh-shadow-md:      0 2px 4px rgb(var(--sh-shadow-rgb) / 0.36),
+                         0 8px 20px rgb(var(--sh-shadow-rgb) / 0.44);
+    --sh-shadow-lg:      0 4px 8px rgb(var(--sh-shadow-rgb) / 0.40),
+                         0 16px 40px rgb(var(--sh-shadow-rgb) / 0.52);
+    --sh-shadow-xl:      0 8px 16px rgb(var(--sh-shadow-rgb) / 0.44),
+                         0 28px 72px rgb(var(--sh-shadow-rgb) / 0.60);
+    --sh-shadow-raised:  none;
+
+    /* -------------------------------------------------------------- pomba */
+    /* navy-700 e não navy-800, mesma lógica do claro: navy-800 a 0.14 sobre
+       navy-950 compõe #071730 e marca 1.036 — abaixo do 1.087 do claro e do
+       1.05 dos temas, ou seja, a marca d'água mais fraca dos seis cenários.
+       navy-700 na mesma opacidade dá 1.077 e entra na faixa da família. */
+    --sh-dove-watermark:  var(--sh-navy-700);
+    --sh-dove-opacity:    0.14;
+  }
+
+  /* Escopos de superfície no escuro: inverse deixa de ser navy e vira claro.
+
+     As AÇÕES têm de virar junto. semantic.css desenha o escopo inverse para um
+     fundo escuro — secundário com texto branco e limite navy-300, ghost em
+     navy-100. Sobre a superfície clara do escuro isso dava 1.13:1 (branco sobre
+     neutral-100) e 1.58:1 de silhueta. Aqui elas voltam ao desenho claro.
+     Os três temas se beneficiam: a regra casa o ELEMENTO com data-sh-surface,
+     e declaração no elemento sempre vence herança, qualquer que seja a camada. */
+  [data-theme="dark"] [data-sh-surface="inverse"],
+  [data-theme="dark"][data-sh-surface="inverse"] {
+    --sh-text-strong:      var(--sh-navy-900);
+    --sh-text-default:     var(--sh-navy-800);
+    --sh-text-muted:       var(--sh-neutral-600);
+    --sh-text-link:        var(--sh-navy-700);
+    --sh-text-link-hover:  var(--sh-navy-800);
+    --sh-text-brand:       var(--sh-navy-700);  /* 7.61 — o herdado era navy-200, 1.22 */
+    --sh-text-accent:      var(--sh-ember-700);  /* 4.93 — o herdado era ember-300, 1.41 */
+    --sh-text-success:     var(--sh-success-700);
+    --sh-text-warning:     var(--sh-warning-700);
+    --sh-text-danger:      var(--sh-danger-700);
+    --sh-text-info:        var(--sh-info-700);
+
+    --sh-border-subtle:   var(--sh-neutral-300);
+    --sh-border-default:  var(--sh-neutral-400);
+    --sh-border-control:  var(--sh-neutral-500);
+    --sh-border-strong:   var(--sh-neutral-600);
+    --sh-border-brand:    var(--sh-navy-700);
+    --sh-border-accent:   var(--sh-ember-700);
+
+    /* Completa o conjunto de limites informativos: no escuro a superfície
+       inversa é CLARA (neutral-100), então a tinta correta é a faixa 600, a
+       mesma do canvas claro. Herdados do escuro (faixa 400) marcavam de 2,12 a
+       2,36 sobre ela — abaixo dos 3:1 de 1.4.11.
+       Medido contra --sh-surface-inverse = neutral-100 #eef1f5. */
+    --sh-border-success:           var(--sh-success-600);  /* 4.61 — era success-400, 2.12 */
+    --sh-border-warning:           var(--sh-warning-600);  /* 4.91 — era warning-400, 2.24 */
+    --sh-border-danger:            var(--sh-danger-600);  /* 5.30 — era danger-400, 2.36 */
+    --sh-border-info:              var(--sh-info-600);  /* 4.74 — era info-400, 2.14 */
+    --sh-feedback-success-border:  var(--sh-success-600);  /* 4.61 */
+    --sh-feedback-warning-border:  var(--sh-warning-600);  /* 4.91 */
+    --sh-feedback-danger-border:   var(--sh-danger-600);  /* 5.30 */
+    --sh-feedback-info-border:     var(--sh-info-600);  /* 4.74 */
+
+    --sh-focus-halo:   var(--sh-surface-inverse);
+    --sh-focus-color:  var(--sh-navy-700);
+
+    --sh-action-primary-bg:         var(--sh-navy-700);  /* 7.61 de silhueta */
+    --sh-action-primary-bg-hover:   var(--sh-navy-800);
+    --sh-action-primary-bg-active:  var(--sh-navy-900);
+    --sh-action-primary-fg:         var(--sh-white);
+    --sh-action-primary-border:     var(--sh-navy-700);
+
+    --sh-action-secondary-bg:         transparent;
+    --sh-action-secondary-bg-hover:   rgb(var(--sh-shadow-rgb) / 0.08);
+    --sh-action-secondary-bg-active:  rgb(var(--sh-shadow-rgb) / 0.16);
+    --sh-action-secondary-fg:         var(--sh-navy-700);  /* 7.61 sobre inverse */
+    --sh-action-secondary-border:     var(--sh-navy-700);  /* 7.61 de silhueta */
+
+    --sh-action-ghost-bg:         transparent;
+    --sh-action-ghost-bg-hover:   rgb(var(--sh-shadow-rgb) / 0.08);
+    --sh-action-ghost-bg-active:  rgb(var(--sh-shadow-rgb) / 0.16);
+    --sh-action-ghost-fg:         var(--sh-navy-700);  /* 7.61 sobre inverse */
+    --sh-action-ghost-border:     transparent;
+
+    --sh-action-accent-bg:         var(--sh-ember-500);
+    --sh-action-accent-bg-hover:   var(--sh-ember-600);
+    --sh-action-accent-bg-active:  var(--sh-ember-700);
+    --sh-action-accent-fg:         var(--sh-navy-950);
+    --sh-action-accent-border:     var(--sh-ember-700);
+
+    --sh-action-danger-bg:         var(--sh-danger-700);
+    --sh-action-danger-bg-hover:   var(--sh-danger-800);
+    --sh-action-danger-bg-active:  var(--sh-danger-900);
+    --sh-action-danger-fg:         var(--sh-white);
+    --sh-action-danger-border:     var(--sh-danger-700);
+
+    /* A pomba também é tinta: ember-500 sobre a superfície inversa CLARA
+       do escuro marca 2.59, o mesmo número que o próprio DS documenta
+       como reprovado em canvas claro. */
+    --sh-dove-ink: var(--sh-ember-700);  /* 4.93 sobre inverse */
+  }
+}

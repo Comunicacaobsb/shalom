@@ -1,0 +1,135 @@
+/* ==========================================================================
+   Shalom DS — reset
+   Substitui o Reboot do Bootstrap. Só normaliza; não decora.
+   ========================================================================== */
+
+@layer sh.reset {
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  * { margin: 0; }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -moz-tab-size: 2;
+    tab-size: 2;
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--sh-scroll-offset, 5rem);
+  }
+
+  body {
+    min-height: 100svh;
+    background-color: var(--sh-surface-page);
+    color: var(--sh-text-default);
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-regular);
+    line-height: var(--sh-leading-normal);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Só o que é realmente fluido pode encolher a página. */
+  img, picture, video, canvas, svg, iframe {
+    display: block;
+    max-width: 100%;
+  }
+  img, video { height: auto; }
+
+  svg { fill: currentColor; }
+
+  input, button, textarea, select {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+
+  button { background: none; border: none; padding: 0; cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+
+  textarea { resize: vertical; }
+
+  p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
+  h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; text-wrap: balance; }
+  p, li, figcaption { text-wrap: pretty; }
+
+  ul[class], ol[class] { list-style: none; padding: 0; }
+
+  a { color: inherit; text-decoration-thickness: max(0.08em, 1px); text-underline-offset: 0.16em; }
+  a:not([class]) { color: var(--sh-text-link); }
+  a:not([class]):hover { color: var(--sh-text-link-hover); }
+
+  hr {
+    border: 0;
+    border-top: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    margin-block: var(--sh-space-8);
+  }
+
+  table { border-collapse: collapse; border-spacing: 0; }
+  th { text-align: start; font-weight: var(--sh-weight-semibold); }
+
+  code, kbd, samp, pre {
+    font-family: var(--sh-font-mono);
+    font-size: 0.9375em;
+  }
+  pre { overflow-x: auto; }
+
+  abbr[title] { text-decoration: underline dotted; cursor: help; }
+
+  ::selection {
+    background-color: var(--sh-surface-accent);
+    color: var(--sh-text-on-accent);
+  }
+
+  /* Foco em duas camadas: visível sobre qualquer superfície ou tema.
+
+     ARMADILHA — leia antes de confiar neste anel como rede de segurança.
+     Esta regra mora em sh.reset, a PRIMEIRA camada de shalom-ds.css. Camada
+     vence especificidade: qualquer `box-shadow` declarado em sh.components,
+     sh.utilities ou sh.overrides apaga este anel mesmo com especificidade
+     MENOR (`.p-btn--primary { box-shadow: var(--sh-shadow-raised) }` em
+     sh.overrides, 0-2-0, vence `:focus-visible` aqui, 0-1-0 — e o DevTools
+     mostra as duas casando, o que faz parecer bug de especificidade).
+     Por isso todo componente que escreve box-shadow declara TAMBÉM o próprio
+     `:focus-visible` na mesma camada. Quem pintar sombra fora de um
+     componente do sistema tem de fazer o mesmo. */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: inherit;
+  }
+  :focus:not(:focus-visible) { outline: none; }
+
+  [hidden] { display: none !important; }
+
+  [inert], [aria-disabled="true"] { cursor: not-allowed; }
+
+  dialog { border: 0; padding: 0; background: none; color: inherit; max-width: none; max-height: none; }
+  dialog::backdrop { background-color: var(--sh-surface-scrim); }
+
+  ::placeholder { color: var(--sh-text-placeholder); opacity: 1; }
+
+  /* Barras de rolagem seguem o esquema declarado em color-scheme. */
+  @supports (scrollbar-color: auto) {
+    * { scrollbar-color: var(--sh-border-strong) transparent; scrollbar-width: thin; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  @media print {
+    body { background: #fff; color: #000; }
+    a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; }
+    .sh-no-print { display: none !important; }
+  }
+}

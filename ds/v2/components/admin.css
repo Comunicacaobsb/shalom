@@ -1,0 +1,1449 @@
+/* ==========================================================================
+   Shalom DS — Lote G — Painel administrativo
+   sh-app-shell · sh-user-menu · sh-site-picker · sh-auth · sh-datatable ·
+   sh-uploader · sh-editor
+
+   O mais compositivo de todos os lotes: quase tudo aqui orquestra
+   componentes já prontos (sh-nav--sidebar, sh-header--admin, sh-search,
+   sh-select, sh-checkbox, sh-file, sh-table, sh-pagination, sh-menu,
+   sh-avatar, sh-badge). Este arquivo raramente desenha cor ou forma nova —
+   ele posiciona, agrupa e dá moldura.
+
+   Contrato deste arquivo (o mesmo de components/foundation.css)
+   ----------------------------------------------------------
+   1. Só a camada semântica para cor. Nenhum primitivo, nenhum hex.
+   2. Nenhum seletor cita [data-sh-theme]. Os seis cenários saem do mesmo CSS.
+   3. Estado vem do DOM: [data-collapsed], [data-state], [aria-expanded],
+      [aria-current], [aria-sort], [hidden], :has(). Classe is-* não é usada.
+   4. Tokens de camada 3 (--sh-shell-*, --sh-editor-*, --sh-uploader-*) com
+      valor padrão inline. Zero !important.
+   5. Alvo de toque 44×44 (--sh-touch-target) em tudo que se clica.
+
+   ---------------------------------------------------------------------------
+   COMO CADA BLOCO COMPÕE (para não reimplementar por engano)
+   ---------------------------------------------------------------------------
+   sh-app-shell   → sh-nav--sidebar (A), sh-header--admin (A), sh-btn--icon (0)
+   sh-user-menu   → sh-avatar (C), sh-menu (A) — REUSA data-sh-menu-toggle,
+                    não inventa outro mecanismo de abrir/fechar.
+   sh-site-picker → sh-select 2.0 (B), wrapper de hidden + opções declarativas.
+   sh-auth        → sh-field/sh-input/sh-btn (0), sh-alert (0) para os
+                    estados de erro/aviso — nenhum estado novo aqui.
+   sh-datatable   → sh-search (B), sh-select (B), sh-checkbox (B),
+                    sh-table/sh-table-wrap (D, INTOCADO), sh-pagination (A).
+   sh-uploader    → sh-file (B, INTOCADO) para a área de soltar + lista de
+                    pendentes; a galeria de mídia já enviada é anatomia nova.
+   sh-editor      → casca de tokens para as classes que o Quill 2 (tema
+                    "snow") gera em runtime — .ql-toolbar, .ql-container,
+                    .ql-editor, .ql-picker, .ql-stroke, .ql-fill, .ql-active,
+                    .ql-selected, .ql-blank. O JS do Quill NÃO é carregado
+                    por este arquivo nem pelo design system — a página que
+                    usa sh-editor traz o próprio <script> do Quill (CDN ou
+                    empacotado) e inicializa com theme:'snow'. Sem o JS do
+                    Quill, o wrapper mostra a toolbar estática (se o autor a
+                    escreveu no HTML) e um <textarea>/<div> comum — o mesmo
+                    fallback crítico explícito quando shalom-ds-form.js não está disponível.
+
+   Ponto de corte de navegação (sidebar ⇄ topbar): 64rem (1024px), o mesmo
+   "lg" que components/navigation.css já usa para header ⇄ drawer e que
+   layout.css usa para a grade. Consistência com o Lote A, não invenção nova.
+
+   ---------------------------------------------------------------------------
+   sh-app-shell — como o colapso funciona (leia antes de mexer)
+   ---------------------------------------------------------------------------
+   [data-collapsed] no `.sh-app-shell` é o ÚNICO estado do modo desktop
+   (>=64rem): presente = barra vira trilho de ícones; ausente = barra
+   completa. É um atributo booleano simples (sem valor), lido puro do DOM —
+   uma página pode nascer com `<div class="sh-app-shell" data-collapsed>`
+   sem uma linha de JavaScript e o CSS já reflete o trilho. js/shalom-ds-
+   admin.js só acrescenta a CONVENIÊNCIA de alternar por clique e lembrar a
+   escolha (localStorage) — exatamente o exemplo que a especificação cita.
+
+   Abaixo de 64rem a barra lateral NÃO usa [data-collapsed] — vira um painel
+   sobreposto (position:fixed), fechado por padrão, aberto por
+   `.sh-app-shell__sidebar[data-state="open"]`. Esse atributo só é escrito
+   por JS (clique no botão de menu da topbar). SEM JS, o botão de menu não
+   abre a barra no celular — mesmo grau de degradação que sh-drawer já
+   assume em navigation.css ("o gatilho continua sendo um <button> normal").
+   A variante `--mobile` (barra inferior) é o caminho para quem não quer
+   depender de JS no celular: componha um `sh-nav sh-nav--bottom` (Lote A,
+   pronto) num slot `sh-app-shell__mobile-nav` — ver anatomia abaixo.
+
+   Toast region — AVISO DE INTEGRAÇÃO (contrato do Lote D, feedback.css):
+   `.sh-toast-region` é sempre filha direta de <body>, NUNCA filha de
+   `.sh-app-shell`. Este arquivo não a estiliza nem a posiciona — ela é
+   position:fixed e ignora onde mora no DOM. "O app-shell reserva o lugar,
+   não a engole" significa: nenhuma regra aqui aplica overflow:hidden ou
+   cria contexto de empilhamento que capturaria a região se ela por engano
+   fosse aninhada — e a página de prova mantém a região fora do shell,
+   como prova-dados.html já faz.
+
+   Especificação: docs/03-inventario-componentes.md → Lote G
+   JS: js/shalom-ds-admin.js (colapso de sidebar + menu mobile, opcional)
+   ========================================================================== */
+
+@layer sh.components {
+
+  /* ======================================================================
+     sh-app-shell
+     <div class="sh-app-shell" data-collapsed>          (opcional, ver acima)
+       <aside class="sh-app-shell__sidebar" id="app-sidebar">
+         <div class="sh-app-shell__brand">
+           <a class="sh-app-shell__brand-mark" href="/admin" aria-label="Painel Shalom">
+             <svg class="sh-icon" aria-hidden="true">…pomba/marca…</svg>
+           </a>
+           <span class="sh-app-shell__brand-word">Painel Shalom</span>
+           <button class="sh-btn sh-btn--ghost sh-btn--icon sh-btn--sm
+                          sh-app-shell__collapse-btn" type="button"
+                   data-sh-shell-collapse aria-expanded="true"
+                   aria-controls="app-sidebar" aria-label="Recolher menu">
+             <svg class="sh-icon sh-btn__icon" aria-hidden="true">…seta…</svg>
+           </button>
+         </div>
+         <div class="sh-app-shell__body">
+           <nav class="sh-nav sh-nav--sidebar" aria-label="Principal">
+             <ul class="sh-nav__list">
+               <li class="sh-nav__item">
+                 <a class="sh-nav__link" href="#" aria-current="page" title="Inscritos">
+                   <svg class="sh-icon sh-nav__icon" aria-hidden="true">…</svg>
+                   <span class="sh-nav__label">Inscritos</span>
+                 </a>
+               </li>
+             </ul>
+           </nav>
+         </div>
+         <div class="sh-app-shell__foot">
+           <div class="sh-user-menu">…</div>
+         </div>
+       </aside>
+       <button class="sh-app-shell__scrim" type="button" tabindex="-1"
+               aria-hidden="true" data-sh-shell-menu></button>
+
+       <header class="sh-header sh-header--admin sh-app-shell__topbar">
+         <div class="sh-header__inner">
+           <button class="sh-btn sh-btn--ghost sh-btn--icon sh-app-shell__menu-btn"
+                   type="button" data-sh-shell-menu aria-expanded="false"
+                   aria-controls="app-sidebar" aria-label="Abrir menu">
+             <svg class="sh-icon sh-btn__icon" aria-hidden="true">…</svg>
+           </button>
+           <div class="sh-site-picker sh-app-shell__site-picker">…</div>
+           <div class="sh-header__actions">
+             <div class="sh-user-menu">…</div>
+           </div>
+         </div>
+       </header>
+
+       <main class="sh-app-shell__main" id="main">…conteúdo…</main>
+       <aside class="sh-app-shell__aside">…contextual, opcional…</aside>
+     </div>
+
+     Landmarks reais (aside/header/main), skip-link ANTES do shell (o mesmo
+     sh-skip-link de layout.css, sem alteração), ordem de tabulação segue a
+     ordem do DOM acima: menu mobile → marca → colapsar → nav → user-menu do
+     rodapé da barra → topbar → conteúdo. `.sh-app-shell__scrim` é um botão
+     (não <div onclick>) para fechar por teclado/toque sem alvo extra.
+     ====================================================================== */
+
+  .sh-app-shell {
+    display: grid;
+    grid-template-columns: var(--sh-shell-sidebar-w, 16rem) minmax(0, 1fr);
+    grid-template-rows: minmax(var(--sh-header-height, 4.25rem), auto) minmax(0, 1fr);
+    grid-template-areas:
+      "sidebar topbar"
+      "sidebar main";
+    block-size: 100dvh;
+    background-color: var(--sh-surface-page);
+    /* A coluna é estrutural. Animar grid-template-columns provoca reflow e
+       cria uma falsa sensação de arrasto; a barra sobreposta usa translate. */
+    transition: none;
+  }
+
+  /* Terceira coluna só quando o autor inclui __aside — :has() evita duas
+     variantes de classe (com/sem aside) para o mesmo layout. */
+  .sh-app-shell:has(.sh-app-shell__aside) {
+    grid-template-columns:
+      var(--sh-shell-sidebar-w, 16rem) minmax(0, 1fr) var(--sh-shell-aside-w, 20rem);
+    grid-template-areas:
+      "sidebar topbar topbar"
+      "sidebar main aside";
+  }
+
+  .sh-app-shell[data-collapsed] {
+    --sh-shell-sidebar-w: var(--sh-shell-rail-w, 4.5rem);
+  }
+
+  /* --------------------------------------------------------------- barra */
+
+  .sh-app-shell__sidebar {
+    grid-area: sidebar;
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    min-block-size: 0;
+    overflow: hidden;
+    /* ESTRUTURAL, e por isso sobrevive a DEC-024: este filete separa a
+       coluna da barra da coluna do conteúdo. A barra proibida é a que
+       DESTACA um item; esta SEPARA duas regiões. Mesmo caso do
+       __aside abaixo e do sh-divider--vertical. */
+    border-inline-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    background-color: var(--sh-surface-default);
+    transition: translate var(--sh-duration-slow) var(--sh-ease-standard);
+  }
+
+  .sh-app-shell__brand {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--sh-space-2);
+    min-block-size: var(--sh-header-height, 4.25rem);
+    padding-inline: var(--sh-space-4);
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  .sh-app-shell__brand-mark {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    margin-inline-start: calc(var(--sh-space-2) * -1);
+    border-radius: var(--sh-radius-control);
+    color: var(--sh-text-brand);
+    transition: background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  @media (hover: hover) {
+    .sh-app-shell__brand-mark:hover { background-color: var(--sh-surface-hover); }
+  }
+  .sh-app-shell__brand-mark:active { background-color: var(--sh-surface-active); }
+  .sh-app-shell__brand-mark:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  .sh-app-shell__brand-word {
+    min-inline-size: 0;
+    overflow: hidden;
+    color: var(--sh-text-strong);
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-lg);
+    font-weight: var(--sh-weight-semibold);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .sh-app-shell__collapse-btn {
+    margin-inline-start: auto;
+  }
+  /* Só existe no modo barra completa do desktop: no trilho não há espaço, e
+     no celular quem fecha é o menu-btn da topbar, não este botão. */
+  .sh-app-shell__collapse-btn { display: none; }
+
+  .sh-app-shell__body {
+    flex: 1;
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--sh-space-3);
+  }
+
+  .sh-app-shell__foot {
+    flex: none;
+    padding: var(--sh-space-3);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  /* Rótulo do sh-nav--sidebar some visualmente no trilho, mas fica no nome
+     acessível — mesmo recorte de sh-visually-hidden, não display:none.
+     Desvio assumido: um tooltip completo (sh-tooltip) recuperaria o rótulo
+     para quem enxerga; `title` no <a> é o reforço mínimo que este arquivo
+     pede ao autor (ver prova-admin.html). Documentado no relatório do lote. */
+  .sh-app-shell[data-collapsed] .sh-app-shell__body .sh-nav__label,
+  .sh-app-shell[data-collapsed] .sh-app-shell__body .sh-nav__badge {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .sh-app-shell[data-collapsed] .sh-app-shell__body .sh-nav__link {
+    justify-content: center;
+    padding-inline: 0;
+  }
+  .sh-app-shell[data-collapsed] .sh-app-shell__brand-word {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* O bloco de identidade do sh-user-menu também recolhe no trilho, mas a
+     regra mora no próprio componente (secção sh-user-menu), junto das outras
+     duas situações que o apertam — ver "gatilho que encolhe" mais abaixo. */
+
+  /* --------------------------------------------------------------- scrim */
+
+  .sh-app-shell__scrim {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: var(--sh-layer-scrim);
+    border: 0;
+    padding: 0;
+    background-color: var(--sh-surface-scrim);
+    cursor: pointer;
+  }
+
+  /* -------------------------------------------------------------- topbar */
+
+  .sh-app-shell__topbar {
+    grid-area: topbar;
+  }
+
+  .sh-app-shell__menu-btn { display: none; }
+
+  .sh-app-shell__site-picker {
+    min-inline-size: 0;
+  }
+
+  /* ---------------------------------------------------------------- main */
+
+  .sh-app-shell__main {
+    grid-area: main;
+    min-inline-size: 0;
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--sh-shell-main-padding, var(--sh-space-6));
+  }
+
+  .sh-app-shell__aside {
+    grid-area: aside;
+    min-inline-size: 0;
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--sh-shell-main-padding, var(--sh-space-6));
+    border-inline-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    background-color: var(--sh-surface-subtle);
+  }
+
+  /* --------------------------------------------------- barra inferior --mobile */
+  /* Slot pronto para um <nav class="sh-nav sh-nav--bottom"> (Lote A,
+     intocado) — a alternativa sem JS ao painel sobreposto. Some acima do
+     ponto de corte; reserva o respiro que sh-nav--bottom pede embaixo do
+     conteúdo (ele já é position:fixed, então só falta o padding do main). */
+  .sh-app-shell__mobile-nav { display: none; }
+  .sh-app-shell--mobile .sh-app-shell__mobile-nav { display: block; }
+  .sh-app-shell--mobile .sh-app-shell__menu-btn,
+  .sh-app-shell--mobile .sh-app-shell__scrim { display: none; }
+
+  /* ====================================================================
+     Ponto de corte único: 64rem (1024px), como sh-header ⇄ drawer no
+     Lote A. Abaixo dele a barra sai da grade e vira painel sobreposto.
+     ==================================================================== */
+
+  @media (min-width: 64rem) {
+    .sh-app-shell__collapse-btn { display: inline-flex; }
+  }
+
+  @media (max-width: 63.9375rem) {
+    .sh-app-shell {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "topbar"
+        "main";
+    }
+    .sh-app-shell:has(.sh-app-shell__aside) {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "topbar"
+        "main"
+        "aside";
+    }
+    .sh-app-shell:not([data-collapsed]) { --sh-shell-sidebar-w: 16rem; }
+
+    .sh-app-shell__sidebar {
+      position: fixed;
+      z-index: var(--sh-layer-modal);
+      inset-block: 0;
+      inset-inline-start: 0;
+      inline-size: min(85vw, var(--sh-shell-sidebar-w, 16rem));
+      block-size: 100%;
+      translate: -100% 0;
+      box-shadow: var(--sh-shadow-xl);
+    }
+    .sh-app-shell__sidebar[data-state="open"] {
+      translate: 0 0;
+    }
+    .sh-app-shell:has(.sh-app-shell__sidebar[data-state="open"]) .sh-app-shell__scrim {
+      display: block;
+    }
+    /* No celular [data-collapsed] não faz sentido (não há trilho) — o
+       rótulo do link volta a aparecer mesmo que o autor tenha herdado o
+       atributo do modo desktop. */
+    .sh-app-shell[data-collapsed] .sh-app-shell__body .sh-nav__label,
+    .sh-app-shell[data-collapsed] .sh-app-shell__body .sh-nav__badge,
+    .sh-app-shell[data-collapsed] .sh-app-shell__brand-word {
+      position: static;
+      inline-size: auto;
+      block-size: auto;
+      overflow: visible;
+      clip-path: none;
+      white-space: nowrap;
+    }
+    .sh-app-shell[data-collapsed] .sh-app-shell__body .sh-nav__link {
+      justify-content: flex-start;
+      padding-inline: var(--sh-space-4);
+    }
+    .sh-app-shell__menu-btn { display: inline-flex; }
+
+    .sh-app-shell--mobile .sh-app-shell__sidebar { display: none; }
+    .sh-app-shell--mobile .sh-app-shell__main {
+      padding-block-end: calc(var(--sh-shell-main-padding, var(--sh-space-6)) + 4.5rem);
+    }
+  }
+
+  /* ======================================================================
+     sh-user-menu
+     <div class="sh-user-menu">
+       <button class="sh-user-menu__trigger" type="button" aria-haspopup="menu"
+               aria-expanded="false" data-sh-menu-toggle="#user-menu-lista">
+         <span class="sh-avatar sh-avatar--sm" aria-hidden="true">
+           <span class="sh-avatar__initials">MR</span>
+         </span>
+         <span class="sh-user-menu__info">
+           <span class="sh-user-menu__name">Maria Rocha</span>
+           <span class="sh-user-menu__role">Administradora</span>
+         </span>
+         <svg class="sh-icon sh-user-menu__caret" aria-hidden="true">…</svg>
+       </button>
+       <div class="sh-menu sh-menu--end" id="user-menu-lista" role="menu"
+            aria-label="Minha conta" hidden>
+         <p class="sh-user-menu__identity" aria-hidden="true">
+           <span class="sh-user-menu__name">Maria Rocha</span>
+           <span class="sh-user-menu__role">Administradora</span>
+         </p>
+         <a class="sh-menu__item" role="menuitem" href="#">Meu perfil</a>
+         <hr class="sh-menu__separator" role="separator">
+         <button class="sh-menu__item sh-menu__item--danger" role="menuitem" type="button">Sair</button>
+       </div>
+     </div>
+
+     data-sh-menu-toggle é o MESMO mecanismo de qualquer dropdown do sistema
+     (js/shalom-ds-navigation.js) — este bloco não abre/fecha nada sozinho,
+     só estiliza o gatilho. .sh-menu em si é o Lote A intocado.
+
+     __identity NÃO é opcional. É o abrigo do nome nas três situações em que o
+     gatilho não tem largura para escrever quem é a pessoa: aparelho estreito
+     (abaixo de 30rem), modificador --compact e trilho recolhido do desktop.
+     Fora dessas três ela não aparece, porque aí o nome já está no gatilho e
+     repeti-lo seria gastar espaço com o que não informa. É a regra 16 do
+     OFICIAL.md aplicada ao componente: a informação muda de forma, não some.
+
+     Por que aria-hidden numa informação que importa: as mesmas palavras já
+     são o nome acessível do gatilho, porque __info é RECORTADA e nunca
+     display:none — quem usa leitor de tela ouve "Maria Rocha, Administradora,
+     botão" em qualquer largura, e ouviria duas vezes se __identity entrasse
+     na árvore. Some-se a isto que role="menu" só possui menuitem, group e
+     separator: um <p> solto ali é estrutura ARIA inválida.
+
+     Se o autor preferir escrever o gatilho SEM __info (só o avatar, como
+     permite --compact), então o <button> precisa de aria-label com nome e
+     papel — sem isso o gatilho fica sem nome acessível nenhum, já que avatar
+     e seta são aria-hidden.
+     ====================================================================== */
+
+  .sh-user-menu {
+    position: relative;
+    min-inline-size: 0;
+  }
+
+  .sh-user-menu__trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    min-inline-size: 0;
+    min-block-size: var(--sh-touch-target);
+    padding-inline: var(--sh-space-2);
+    border: 0;
+    border-radius: var(--sh-radius-control);
+    background-color: transparent;
+    color: inherit;
+    font-family: var(--sh-font-text);
+    text-align: start;
+    cursor: pointer;
+    transition: background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  @media (hover: hover) {
+    .sh-user-menu__trigger:hover { background-color: var(--sh-surface-hover); }
+  }
+  .sh-user-menu__trigger:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+  .sh-user-menu__trigger:active { background-color: var(--sh-surface-active); }
+  .sh-user-menu__trigger[aria-expanded="true"] { background-color: var(--sh-surface-selected); }
+
+  .sh-user-menu__info {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    line-height: var(--sh-leading-snug);
+  }
+  .sh-user-menu__name {
+    overflow: hidden;
+    color: var(--sh-text-strong);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .sh-user-menu__role {
+    overflow: hidden;
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-xs);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .sh-user-menu__caret {
+    --sh-icon-size: var(--sh-icon-size-sm);
+    flex: none;
+    color: var(--sh-text-muted);
+    transition: rotate var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-user-menu__trigger[aria-expanded="true"] .sh-user-menu__caret { rotate: 180deg; }
+
+  /* A identidade dentro do menu aberto: o abrigo do nome e do papel para
+     quem enxerga, exatamente nas larguras em que o gatilho os recolhe.
+     Nasce escondida — quem a acende são as três regras do bloco seguinte. */
+  .sh-user-menu__identity {
+    display: none;
+    flex-direction: column;
+    padding-inline: var(--sh-space-3);
+    padding-block: var(--sh-space-2);
+    margin-block-end: var(--sh-space-1);
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    line-height: var(--sh-leading-snug);
+  }
+  /* No menu há largura de sobra: nome comprido quebra a linha em vez de
+     virar reticência, ao contrário do que acontece dentro do gatilho. */
+  .sh-user-menu__identity .sh-user-menu__name,
+  .sh-user-menu__identity .sh-user-menu__role {
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* ------------------------------------------------ gatilho que encolhe */
+  /* Três situações apertam o gatilho: o aparelho estreito (abaixo de
+     --sh-bp-sm, 30rem), o modificador --compact e o trilho recolhido do
+     desktop. Nas três o bloco de identidade sai da VISTA, nunca do NOME
+     ACESSÍVEL: o recorte é o mesmo de sh-visually-hidden, repetido aqui
+     porque display:none apagaria o único texto do botão e deixaria o
+     gatilho anônimo (avatar e seta são aria-hidden). Quem enxerga recupera
+     nome e papel abrindo o menu, em __identity.
+
+     As três regras dizem a mesma coisa e por isso não disputam entre si em
+     nenhuma largura — foi para conseguir isso que a regra do trilho saiu da
+     secção sh-app-shell, onde precisava de um desfazer no celular. */
+  @media (max-width: 29.9375rem) {
+    .sh-user-menu__info {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .sh-user-menu__identity { display: flex; }
+  }
+
+  .sh-user-menu--compact .sh-user-menu__info {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .sh-user-menu--compact .sh-user-menu__caret { display: none; }
+  .sh-user-menu--compact .sh-user-menu__identity { display: flex; }
+
+  @media (min-width: 64rem) {
+    .sh-app-shell[data-collapsed] .sh-user-menu__info {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .sh-app-shell[data-collapsed] .sh-user-menu__identity { display: flex; }
+  }
+
+  /* ======================================================================
+     sh-site-picker
+     <div class="sh-site-picker">
+       <svg class="sh-icon sh-site-picker__icon" aria-hidden="true">…</svg>
+       <div class="sh-select sh-select--sm" data-sh-select>
+         <input type="hidden" id="site-picker" name="site" value="santamaria">
+         <div data-sh-option data-sh-value="asasul">Shalom Asa Sul</div>
+         <div data-sh-option data-sh-value="santamaria" aria-selected="true">Shalom Santa Maria</div>
+       </div>
+     </div>
+
+     sh-select 2.0 (Lote B) faz todo o trabalho. Este bloco só posiciona um ícone de
+     contexto opcional e trava uma largura razoável dentro da topbar.
+     ====================================================================== */
+
+  .sh-site-picker {
+    display: flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    min-inline-size: 0;
+    max-inline-size: var(--sh-site-picker-w, 16rem);
+  }
+  .sh-site-picker__icon {
+    flex: none;
+    color: var(--sh-text-muted);
+  }
+  .sh-site-picker > .sh-select {
+    min-inline-size: 0;
+  }
+
+  /* ======================================================================
+     sh-auth
+     <div class="sh-auth">
+       <div class="sh-auth__card">
+         <div class="sh-auth__brand">
+           <svg class="sh-icon sh-icon--xl" aria-hidden="true">…marca…</svg>
+           <p class="sh-heading-3 sh-auth__title">Entrar no painel</p>
+           <p class="sh-body-sm sh-text-muted sh-auth__lede">Comunidade Católica Shalom</p>
+         </div>
+
+         <div class="sh-auth__notice">
+           <div class="sh-alert sh-alert--danger" role="alert">…</div>
+         </div>
+
+         <form class="sh-stack" style="--sh-stack-gap: var(--sh-space-4);">
+           <div class="sh-field sh-field--required">
+             <label class="sh-field__label" for="auth-email">E-mail</label>
+             <input class="sh-input" id="auth-email" type="email" autocomplete="username" required>
+             <p class="sh-field__error" aria-live="polite"></p>
+           </div>
+           <div class="sh-field sh-field--required">
+             <label class="sh-field__label" for="auth-senha">Senha</label>
+             <input class="sh-input" id="auth-senha" type="password"
+                    autocomplete="current-password" required>
+             <p class="sh-field__error" aria-live="polite"></p>
+           </div>
+           <button class="sh-btn sh-btn--primary sh-auth__submit" type="submit">Entrar</button>
+         </form>
+
+         <p class="sh-auth__divider">ou</p>
+
+         <div class="sh-auth__oauth">
+           <button class="sh-btn sh-btn--secondary sh-btn--block" type="button">
+             <svg class="sh-icon sh-btn__icon" aria-hidden="true">…google…</svg>
+             <span class="sh-btn__label">Entrar com Google</span>
+           </button>
+         </div>
+
+         <div class="sh-auth__links">
+           <a href="#">Esqueci minha senha</a>
+           <a href="#">Preciso de acesso</a>
+         </div>
+       </div>
+     </div>
+
+     Estados da spec (erro de credencial, conta sem permissão, e-mail não
+     confirmado, recuperação enviada) são TODOS .sh-alert do Lote 0 dentro de
+     .sh-auth__notice — nenhum vocabulário de erro novo. "Erro não revela se
+     o e-mail existe": a MESMA mensagem genérica serve para usuário
+     inexistente e senha errada — decisão de copy do autor, não de CSS.
+     autocomplete="current-password" já vem no exemplo acima, como a spec
+     exige.
+     ====================================================================== */
+
+  .sh-auth {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 100dvh;
+    padding: var(--sh-space-6);
+    background-color: var(--sh-surface-subtle);
+  }
+
+  .sh-auth__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-5);
+    inline-size: 100%;
+    max-inline-size: var(--sh-auth-width, 26rem);
+    padding: var(--sh-space-8);
+    border: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-default);
+    box-shadow: var(--sh-shadow-lg);
+  }
+
+  .sh-auth__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sh-space-2);
+    text-align: center;
+    color: var(--sh-text-brand);
+  }
+  .sh-auth__title { color: var(--sh-text-strong); }
+  .sh-auth__lede { margin: 0; }
+
+  .sh-auth__notice:empty { display: none; }
+
+  .sh-auth__submit { inline-size: 100%; }
+
+  .sh-auth__divider {
+    display: flex;
+    align-items: center;
+    gap: var(--sh-space-3);
+    margin: 0;
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-semibold);
+    letter-spacing: var(--sh-tracking-wide);
+    text-transform: uppercase;
+  }
+  .sh-auth__divider::before,
+  .sh-auth__divider::after {
+    content: '';
+    flex: 1;
+    block-size: var(--sh-border-width-hair);
+    background-color: var(--sh-border-subtle);
+  }
+
+  .sh-auth__oauth {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-3);
+  }
+
+  .sh-auth__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sh-space-2) var(--sh-space-4);
+    font-size: var(--sh-font-size-sm);
+  }
+  .sh-auth__links a {
+    position: relative;
+    color: var(--sh-text-link);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
+  /* position: relative já estava aqui esperando por isto: o link desenha uma
+     linha de texto (21px) e clica 44px. O intervalo do bloco (8px/16px) mantém
+     os dois links a 61px de centro a centro — as áreas não se encostam. */
+  .sh-auth__links a::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 50%;
+    block-size: var(--sh-touch-target);
+    translate: 0 -50%;
+  }
+  .sh-auth__links a:hover { color: var(--sh-text-link-hover); }
+  .sh-auth__links a:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  /* Rodapé de conformidade opcional (LGPD, versão), fora do cartão. */
+  .sh-auth__foot {
+    position: fixed;
+    inset-block-end: var(--sh-space-4);
+    inset-inline: 0;
+    text-align: center;
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-xs);
+  }
+
+  /* ======================================================================
+     sh-datatable — COMPOSIÇÃO, não reimplementação.
+     sh-datatable › __toolbar (__search, __filters, __density, __bulk) ›
+       sh-table-wrap › sh-table (Lote D, INTOCADO) › __footer (__count,
+       sh-pagination)
+
+     <div class="sh-datatable">
+       <div class="sh-datatable__toolbar">
+         <div class="sh-search sh-datatable__search">…sh-search, Lote B…</div>
+         <div class="sh-datatable__filters">
+           <div class="sh-select sh-select--sm" data-sh-select>…status…</div>
+           <div class="sh-select sh-select--sm" data-sh-select>…lote…</div>
+         </div>
+         <div class="sh-datatable__density" role="group" aria-label="Densidade">…</div>
+       </div>
+
+       <div class="sh-datatable__bulk" hidden>
+         <p class="sh-datatable__bulk-label">3 selecionados</p>
+         <div class="sh-datatable__bulk-actions">
+           <button class="sh-btn sh-btn--secondary sh-btn--sm">Exportar</button>
+           <button class="sh-btn sh-btn--danger sh-btn--sm">Excluir</button>
+         </div>
+       </div>
+
+       <div class="sh-table-wrap">
+         <table class="sh-table sh-table--sticky-head">
+           <caption>…</caption>
+           <thead><tr>
+             <th><label class="sh-checkbox sh-checkbox--sm">
+               <input class="sh-checkbox__input" type="checkbox" aria-label="Selecionar todos">
+               <span class="sh-checkbox__box"></span>
+             </label></th>
+             …
+           </tr></thead>
+           <tbody><tr>
+             <td><label class="sh-checkbox sh-checkbox--sm">
+               <input class="sh-checkbox__input" type="checkbox" aria-label="Selecionar Maria…">
+               <span class="sh-checkbox__box"></span>
+             </label></td>
+             …
+             <td><span class="sh-badge sh-badge--success sh-badge--sm">Confirmado</span></td>
+           </tr></tbody>
+         </table>
+       </div>
+
+       <div class="sh-datatable__footer">
+         <p class="sh-datatable__count">142 inscritos</p>
+         <nav aria-label="Paginação"><ul class="sh-pagination">…Lote A…</ul></nav>
+       </div>
+     </div>
+
+     Seleção em massa usa sh-checkbox (Lote B), não `.sh-table__select` cru
+     — por isso o realce de linha selecionada de data.css (que só casa
+     `tr:has(> .sh-table__select:checked)`, filho DIRETO) não alcança um
+     input encaixado dentro de um <label class="sh-checkbox">. A regra
+     abaixo é a mesma ideia, reescrita para a forma real deste encaixe —
+     não um patch em data.css, que continua intocado.
+
+     Densidade: alterna a classe `sh-table--compact` (Lote D, já pronta) no
+     próprio <table> — a troca de classe é decisão do autor/app (o mesmo
+     espírito de sh-table__sort-btn, cuja lógica de ordenar é sempre da
+     aplicação). Este arquivo só estiliza os dois botões do controle.
+     ====================================================================== */
+
+  /* Densidade sob Montserrat (DEC-029): a célula desce de 14px para 13px. Não
+     é a escala pública encolhendo — é o degrau --sh-font-size-dense, que só
+     existe para admin. A Montserrat tem altura-x 5% maior que a Figtree, então
+     13px daqui tem a mesma altura-x que 13,65px de lá: quem passa o dia em
+     tabela não lê menor, e a coluna devolve 7% da largura que a troca de fonte
+     tinha tomado. Ver o bloco de densidade em components/data.css. */
+  .sh-datatable {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-4);
+    min-inline-size: 0;
+    --sh-table-font-size: var(--sh-font-size-dense);
+  }
+
+  .sh-datatable__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-3);
+    min-inline-size: 0;
+  }
+
+  .sh-datatable__search {
+    flex: 1 1 16rem;
+    min-inline-size: 0;
+  }
+
+  .sh-datatable__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2);
+    min-inline-size: 0;
+  }
+  .sh-datatable__filters > .sh-select {
+    flex: 1 1 9rem;
+    min-inline-size: 8rem;
+  }
+
+  /* ---------------------------------------------------------- densidade */
+
+  .sh-datatable__density {
+    display: inline-flex;
+    flex: none;
+    gap: var(--sh-space-1);
+    padding: var(--sh-space-1);
+    border: var(--sh-border-width-hair) solid var(--sh-border-control);
+    border-radius: var(--sh-radius-control);
+    background-color: var(--sh-surface-sunken);
+  }
+  /* 44×44 de desenho, não 36 com ::after: os três botões são vizinhos com 4px
+     de intervalo, e três áreas de 44px sobre um passo de 40px se sobrepõem —
+     o hit-test devolvia 40px para cada um e nenhum cumpria o alvo. Aumentar o
+     intervalo desmancharia o segmentado (o desenho depende de os botões
+     andarem juntos dentro do trilho), então quem cresce é o botão. */
+  .sh-datatable__density-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    border: var(--sh-border-width-hair) solid transparent;
+    border-radius: calc(var(--sh-radius-control) - var(--sh-space-1));
+    background-color: transparent;
+    color: var(--sh-text-muted);
+    cursor: pointer;
+  }
+  .sh-datatable__density-btn::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: max(100%, var(--sh-touch-target));
+    translate: -50% -50%;
+  }
+  @media (hover: hover) {
+    .sh-datatable__density-btn:hover:not([aria-pressed="true"]) {
+      background-color: var(--sh-surface-hover);
+      color: var(--sh-text-default);
+    }
+  }
+  .sh-datatable__density-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  .sh-datatable__density-btn:active:not([aria-pressed="true"]) {
+    background-color: var(--sh-surface-active);
+  }
+  .sh-datatable__density-btn[aria-pressed="true"] {
+    border-color: var(--sh-action-primary-border);
+    background-color: var(--sh-surface-default);
+    color: var(--sh-text-brand);
+    outline: var(--sh-border-width-hair) solid var(--sh-action-primary-border);
+    outline-offset: calc(var(--sh-border-width-hair) * -2);
+  }
+
+  /* ------------------------------------------------------------- em massa */
+
+  .sh-datatable__bulk {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sh-space-3);
+    padding: var(--sh-space-3) var(--sh-space-4);
+    border: var(--sh-border-width-hair) solid var(--sh-border-brand);
+    border-radius: var(--sh-radius-control);
+    background-color: var(--sh-surface-selected);
+  }
+  .sh-datatable__bulk[hidden] { display: none; }
+
+  .sh-datatable__bulk-label {
+    margin: 0;
+    color: var(--sh-text-strong);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+  }
+
+  .sh-datatable__bulk-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2);
+  }
+
+  /* -------------------------------------------------- seleção de linha */
+  /* Equivalente ao `tr:has(> .sh-table__select:checked)` de data.css, para
+     quando o controle é sh-checkbox (Lote B) em vez do checkbox nativo cru
+     — o input não é mais filho direto do <tr>, então o seletor de lá nunca
+     casaria. Escopado a .sh-datatable para não mudar o comportamento de
+     nenhuma tabela fora daqui. */
+  .sh-datatable .sh-table tbody tr:has(.sh-checkbox__input:checked) {
+    background-color: var(--sh-surface-selected);
+  }
+  .sh-datatable .sh-table th:first-child,
+  .sh-datatable .sh-table td:first-child {
+    inline-size: 1px; /* encolhe a coluna da caixa ao conteúdo */
+    white-space: nowrap;
+  }
+  /* sh-checkbox sem __label visível (o nome acessível vem de aria-label no
+     input, como o próprio Lote D já fazia com o checkbox nativo) tem a
+     segunda coluna do grid (auto minmax(0,1fr)) colapsada a quase zero —
+     o alvo de clique real ficava mais estreito que 44px. min-inline-size
+     aqui garante os 44×44 sem exigir rótulo visível na tabela. */
+  .sh-datatable .sh-checkbox {
+    min-inline-size: var(--sh-touch-target);
+  }
+
+  /* ------------------------------------------------------------- rodapé */
+
+  .sh-datatable__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sh-space-3);
+  }
+
+  .sh-datatable__count {
+    margin: 0;
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-sm);
+  }
+
+  /* ======================================================================
+     sh-uploader
+     sh-uploader › sh-file (Lote B, INTOCADO — soltar/escolher/pendentes) ›
+       __gallery › __item (__thumb, __meta › __name/__size, __actions,
+       __progress, __error)
+
+     <div class="sh-uploader">
+       <div class="sh-file" data-sh-file data-sh-max-size="5242880">
+         <input class="sh-file__input" type="file" id="capa" accept="image/*" multiple>
+         <label class="sh-file__drop" for="capa">
+           <svg class="sh-icon sh-file__icon" aria-hidden="true">…</svg>
+           <span class="sh-file__prompt">Arraste imagens ou <b class="sh-file__browse">escolha do dispositivo</b></span>
+           <span class="sh-file__meta">PNG, JPG ou WEBP · até 5 MB cada</span>
+         </label>
+         <ul class="sh-file__list"></ul>
+       </div>
+
+       <ul class="sh-uploader__gallery">
+         <li class="sh-uploader__item">
+           <div class="sh-uploader__thumb"><img src="…" alt=""></div>
+           <div class="sh-uploader__meta">
+             <p class="sh-uploader__name">capa-acamps.jpg</p>
+             <p class="sh-uploader__size">1,4 MB</p>
+           </div>
+           <div class="sh-uploader__actions">
+             <button class="sh-btn sh-btn--ghost sh-btn--icon sh-btn--sm" aria-label="Remover capa-acamps.jpg">…</button>
+           </div>
+         </li>
+         <li class="sh-uploader__item" data-state="uploading">
+           <div class="sh-uploader__thumb"><span class="sh-spinner sh-spinner--sm" role="status">
+             <span class="sh-visually-hidden">Enviando</span></span></div>
+           <div class="sh-uploader__meta">
+             <p class="sh-uploader__name">cartaz-evento.png</p>
+             <progress class="sh-uploader__progress" value="62" max="100">62%</progress>
+           </div>
+         </li>
+         <li class="sh-uploader__item" data-state="error">
+           <div class="sh-uploader__thumb" aria-hidden="true">…</div>
+           <div class="sh-uploader__meta">
+             <p class="sh-uploader__name">banner.bmp</p>
+             <p class="sh-uploader__error">Formato não aceito. Envie PNG, JPG ou WEBP.</p>
+           </div>
+           <div class="sh-uploader__actions">
+             <button class="sh-btn sh-btn--ghost sh-btn--icon sh-btn--sm" aria-label="Remover banner.bmp">…</button>
+           </div>
+         </li>
+       </ul>
+     </div>
+
+     A galeria é para mídia JÁ enviada (o que sh-file sozinho não cobre —
+     ele só lista o que está prestes a ser enviado nesta sessão). "Limites
+     ditos antes" já é sh-file__meta, sem novidade aqui.
+     ====================================================================== */
+
+  .sh-uploader {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-4);
+    min-inline-size: 0;
+  }
+
+  .sh-uploader__gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(var(--sh-uploader-thumb-min, 9rem), 100%), 1fr));
+    gap: var(--sh-space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sh-uploader__gallery:empty { display: none; }
+
+  .sh-uploader__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-2);
+    padding: var(--sh-space-2);
+    border: var(--sh-border-width-hair) solid var(--sh-uploader-item-border, var(--sh-border-subtle));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-default);
+  }
+
+  .sh-uploader__thumb {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: var(--sh-radius-control);
+    background-color: var(--sh-surface-sunken);
+    color: var(--sh-text-muted);
+  }
+  .sh-uploader__thumb > img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .sh-uploader__meta {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--sh-space-1) / 2);
+    min-inline-size: 0;
+  }
+  .sh-uploader__name {
+    margin: 0;
+    overflow: hidden;
+    color: var(--sh-text-default);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-medium);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .sh-uploader__size {
+    margin: 0;
+    color: var(--sh-text-muted);
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-xs);
+    font-variant-numeric: tabular-nums;
+  }
+  .sh-uploader__error {
+    margin: 0;
+    color: var(--sh-text-danger);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-medium);
+  }
+
+  .sh-uploader__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .sh-uploader__progress {
+    inline-size: 100%;
+    block-size: var(--sh-space-2);
+    border: var(--sh-border-width-hair) solid var(--sh-border-control);
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-surface-sunken);
+    appearance: none;
+    overflow: hidden;
+  }
+  .sh-uploader__progress::-webkit-progress-bar { background-color: var(--sh-surface-sunken); }
+  .sh-uploader__progress::-webkit-progress-value { background-color: var(--sh-action-primary-bg); }
+  .sh-uploader__progress::-moz-progress-bar { background-color: var(--sh-action-primary-bg); }
+
+  .sh-uploader__item[data-state="error"] {
+    --sh-uploader-item-border: var(--sh-border-danger);
+  }
+  .sh-uploader__item[data-state="uploading"] .sh-uploader__thumb {
+    background-color: var(--sh-surface-sunken);
+  }
+
+  /* ======================================================================
+     sh-editor — casca de tokens para o Quill 2 (tema "snow").
+     sh-editor › __toolbar (= .ql-toolbar) › __surface (= .ql-container) ›
+       (.ql-editor, também marcado .sh-prose — ver nota) › __footer
+
+     O JS do Quill NÃO é carregado aqui nem em lugar nenhum do Shalom DS.
+     Este bloco só remapeia as classes que o Quill 2 gera em runtime
+     (.ql-toolbar, .ql-container, .ql-editor, .ql-picker, .ql-stroke,
+     .ql-fill, .ql-active, .ql-selected, .ql-blank) para tokens semânticos.
+     A página que usa sh-editor traz o próprio <script src=".../quill.js">
+     (como admin/index.html já faz hoje) e inicializa:
+
+       new Quill('.sh-editor__surface .ql-editor'…).parentNode, {
+         theme: 'snow',
+         modules: { toolbar: '.sh-editor__toolbar' }
+       });
+
+     Sem esse JS, a marcação abaixo é a TOOLBAR ESTÁTICA — os botões não
+     reagem a clique, mas ficam legíveis e com o mesmo desenho que o Quill
+     real produziria, porque a folha de estilo não depende do JS para
+     existir (mesmo grau de "progressivo" que sh-select tem sem
+     shalom-ds-form.js: o esqueleto aparece, só não fica interativo).
+
+     <div class="sh-editor">
+       <div class="sh-editor__toolbar ql-toolbar ql-snow">
+         <span class="ql-formats">
+           <button class="ql-bold" type="button" aria-label="Negrito" aria-pressed="false">
+             <svg viewBox="0 0 18 18"><path class="ql-stroke" d="…"/></svg>
+           </button>
+           …
+         </span>
+         <span class="ql-formats">
+           <span class="ql-picker ql-header">
+             <span class="ql-picker-label" tabindex="0" role="button"
+                   aria-expanded="false" aria-label="Estilo do parágrafo">
+               Título 2
+               <svg viewBox="0 0 18 18"><polygon class="ql-stroke" points="…"/></svg>
+             </span>
+             <span class="ql-picker-options" role="listbox">
+               <span class="ql-picker-item" role="option" data-value="1">Título 1</span>
+               <span class="ql-picker-item ql-selected" role="option" aria-selected="true" data-value="2">Título 2</span>
+             </span>
+           </span>
+         </span>
+       </div>
+       <div class="sh-editor__surface ql-container ql-snow">
+         <div class="ql-editor sh-prose" contenteditable="true"
+              data-placeholder="Escreva a descrição do evento…"></div>
+       </div>
+       <div class="sh-editor__footer">
+         <p class="sh-editor__count">248 palavras</p>
+         <p class="sh-editor__status" data-state="saved">
+           <svg class="sh-icon sh-icon--sm" aria-hidden="true">…</svg> Salvo às 14h32
+         </p>
+       </div>
+     </div>
+
+     Desvio deliberado: a área editável leva as DUAS classes, `.ql-editor`
+     (gancho do Quill) e `.sh-prose` (Lote de fundação — tipografia de
+     conteúdo). É o que garante "o que se escreve é o que se lê", ao pé da
+     letra: o MESMO seletor que estiliza o conteúdo publicado estiliza o
+     conteúdo em edição. `.sh-prose` trava `max-width` em --sh-measure
+     (68ch); dentro do editor isso encolheria a área de digitação sem
+     necessidade, por isso a régua abaixo devolve a largura total.
+
+     Botões da toolbar: o Quill real marca o botão ativo com a classe
+     `.ql-active` (não escreve `aria-pressed`, lacuna conhecida da
+     biblioteca). Este arquivo estiliza os dois seletores em união — reage
+     ao `.ql-active` que o Quill de fato escreve E ao `aria-pressed` que a
+     spec deste lote pede ("botões da toolbar com rótulo e aria-pressed").
+     O autor que compõe sh-editor deve espelhar um no outro por JS de
+     página (poucas linhas: on 'selection-change', sincronizar), ou usar
+     um wrapper que já faça isso — não é responsabilidade deste CSS.
+     ====================================================================== */
+
+  .sh-editor {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    border: var(--sh-border-width-hair) solid var(--sh-border-control);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-default);
+    overflow: hidden;
+  }
+  .sh-editor:focus-within {
+    border-color: var(--sh-border-brand);
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  /* ------------------------------------------------------------- toolbar */
+
+  .sh-editor .ql-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-1) 0;
+    padding: var(--sh-space-2);
+    border: 0;
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    background-color: var(--sh-surface-sunken);
+  }
+
+  /* O filete entre grupos é ESTRUTURAL — divisor entre itens de uma lista
+     horizontal, o caso que DEC-024 mantém explicitamente. Prova de que
+     separa em vez de destacar: o último grupo não tem filete, porque não há
+     próximo grupo do outro lado. */
+  .sh-editor .ql-formats {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-1);
+    padding-inline: var(--sh-space-2);
+    border-inline-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+  .sh-editor .ql-formats:last-child { border-inline-end: 0; }
+
+  .sh-editor .ql-toolbar button,
+  .sh-editor .ql-picker-label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sh-space-1);
+    min-inline-size: 1.75rem;
+    min-block-size: 1.75rem;
+    padding-inline: var(--sh-space-1);
+    border: var(--sh-border-width-hair) solid transparent;
+    border-radius: var(--sh-radius-control);
+    background-color: transparent;
+    color: var(--sh-text-default);
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-sm);
+    cursor: pointer;
+  }
+  /* Alvo de toque real de 44px sem inflar o desenho compacto da toolbar. */
+  .sh-editor .ql-toolbar button::after,
+  .sh-editor .ql-picker-label::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: max(100%, var(--sh-touch-target));
+    translate: -50% -50%;
+  }
+
+  .sh-editor .ql-stroke {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .sh-editor .ql-thin { stroke-width: 1.1; }
+  .sh-editor .ql-fill,
+  .sh-editor .ql-stroke.ql-fill { fill: currentColor; stroke: none; }
+  .sh-editor .ql-toolbar svg { inline-size: 1rem; block-size: 1rem; flex: none; }
+
+  @media (hover: hover) {
+    .sh-editor .ql-toolbar button:hover:not([disabled]),
+    .sh-editor .ql-picker-label:hover {
+      background-color: var(--sh-surface-hover);
+    }
+  }
+  .sh-editor .ql-toolbar button:focus-visible,
+  .sh-editor .ql-picker-label:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  .sh-editor .ql-toolbar button:active:not([disabled]) {
+    background-color: var(--sh-surface-active);
+  }
+
+  /* Ativo: cor + preenchimento + contorno — nunca só a cor do traço
+     (a mesma regra de contraste que sh-chip/sh-segmented já seguem). */
+  .sh-editor .ql-toolbar button.ql-active,
+  .sh-editor .ql-toolbar button[aria-pressed="true"],
+  .sh-editor .ql-picker.ql-expanded .ql-picker-label {
+    border-color: var(--sh-action-primary-border);
+    background-color: var(--sh-surface-selected);
+    color: var(--sh-text-brand);
+  }
+
+  .sh-editor .ql-toolbar button[disabled] {
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* --------------------------------------------------------------- picker */
+
+  .sh-editor .ql-picker {
+    position: relative;
+    display: inline-flex;
+  }
+  .sh-editor .ql-picker-label {
+    min-inline-size: 6rem;
+    justify-content: space-between;
+    padding-inline: var(--sh-space-2);
+  }
+  .sh-editor .ql-picker-label svg {
+    --sh-icon-size: var(--sh-icon-size-sm);
+    flex: none;
+    color: var(--sh-text-muted);
+  }
+
+  .sh-editor .ql-picker-options {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-start: 0;
+    z-index: var(--sh-layer-dropdown);
+    display: none;
+    flex-direction: column;
+    gap: var(--sh-space-1);
+    min-inline-size: 10rem;
+    margin-block-start: var(--sh-space-1);
+    padding: var(--sh-space-1);
+    border: var(--sh-border-width-hair) solid var(--sh-border-default);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-raised);
+    box-shadow: var(--sh-shadow-lg);
+  }
+  .sh-editor .ql-picker.ql-expanded .ql-picker-options { display: flex; }
+
+  .sh-editor .ql-picker-item {
+    display: block;
+    padding: var(--sh-space-2) var(--sh-space-3);
+    border-radius: var(--sh-radius-control);
+    color: var(--sh-text-default);
+    font-size: var(--sh-font-size-sm);
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .sh-editor .ql-picker-item:hover { background-color: var(--sh-surface-hover); }
+  }
+  .sh-editor .ql-picker-item.ql-selected,
+  .sh-editor .ql-picker-item[aria-selected="true"] {
+    background-color: var(--sh-surface-selected);
+    color: var(--sh-text-brand);
+    font-weight: var(--sh-weight-semibold);
+  }
+
+  /* -------------------------------------------------------------- surface */
+
+  .sh-editor .ql-container {
+    flex: 1;
+    min-block-size: 0;
+    border: 0;
+    background-color: var(--sh-surface-default);
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-md);
+  }
+
+  .sh-editor .ql-editor {
+    min-block-size: var(--sh-editor-min-height, 14rem);
+    max-inline-size: none;      /* sobrepõe o measure de .sh-prose aqui dentro */
+    padding: var(--sh-space-5);
+    color: var(--sh-text-default);
+    outline: none;
+  }
+  .sh-editor .ql-editor.ql-blank::before {
+    content: attr(data-placeholder);
+    display: block;
+    color: var(--sh-text-placeholder);
+    font-style: normal;
+    pointer-events: none;
+  }
+
+  /* ------------------------------------------------------------- footer */
+
+  .sh-editor__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sh-space-2) var(--sh-space-4);
+    padding: var(--sh-space-2) var(--sh-space-4);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    background-color: var(--sh-surface-sunken);
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-xs);
+  }
+  .sh-editor__count { margin: 0; font-variant-numeric: tabular-nums; }
+
+  .sh-editor__status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-1);
+    margin: 0;
+  }
+  .sh-editor__status .sh-icon { --sh-icon-size: var(--sh-icon-size-sm); }
+  .sh-editor__status[data-state="saved"]  { color: var(--sh-text-success); }
+  .sh-editor__status[data-state="saving"] { color: var(--sh-text-muted); }
+  .sh-editor__status[data-state="error"]  { color: var(--sh-text-danger); }
+}

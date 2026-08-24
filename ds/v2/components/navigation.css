@@ -1,0 +1,1593 @@
+/* ==========================================================================
+   Shalom DS — Lote A: navegação
+   sh-header · sh-nav · sh-drawer · sh-tabs · sh-accordion · sh-menu ·
+   sh-breadcrumb · sh-back-link · sh-pagination · sh-footer · sh-fab
+
+   Contrato deste arquivo — igual ao de components/foundation.css
+   ----------------------------------------------------------------
+   1. Só a camada semântica é consumida para COR. Nenhum primitivo de cor,
+      nenhum hex. Espaço, tipo, duração, largura de borda e ícone vêm dos
+      primitivos, como já fazem foundations/typography.css e layout.css.
+   2. Nenhum seletor cita [data-sh-theme]. Os seis cenários saem do mesmo
+      CSS, sem condicional — inclusive nenhum seletor cita [data-theme]: um
+      componente não sabe se está em claro ou escuro, só o token muda.
+   3. Estado vem do DOM: [aria-current], [aria-expanded], [aria-selected],
+      [disabled], [hidden], [open] (em <details>/<dialog>), [data-state].
+      Classe is-* não é usada aqui.
+   4. Cada componente expõe tokens de camada 3 com valor padrão inline
+      apontando para a camada 2. Configurar de fora é setar a custom
+      property; nunca sobrescrever o seletor.
+   5. Zero !important.
+
+   Alvo de toque: 44×44 CSS px (--sh-touch-target) em tudo que se clica.
+
+   Ponto de corte único para colapso de navegação (header ⇄ drawer): 64rem
+   (1024px), o mesmo "lg" que foundations/layout.css já usa para a grade e
+   que docs-site/assets/docs.js já usa para a própria gaveta. Não é grade,
+   então media query aqui — e não @container — é o que corresponde à
+   largura real da viewport, não à de um pai.
+
+   Gap de token registrado (proponha ao agente de tokens, não contornado
+   aqui): não existe um par "texto claro sobre véu escuro" que **não**
+   inverta com o esquema — todo --sh-text-on-* de hoje troca de tom no
+   escuro porque a superfície que ele acompanha também troca. sh-header
+   --transparent fica sobre foto (hero), que não inverte com o esquema do
+   sistema operacional. Ver nota completa junto de .sh-header--transparent.
+
+   Especificação: docs/03-inventario-componentes.md → Lote A
+   Fundação disponível: components/foundation.css
+   JS: js/shalom-ds-navigation.js (drawer, tabs, accordion, menu)
+   ========================================================================== */
+
+@layer sh.components {
+
+  /* ======================================================================
+     sh-header
+     <header class="sh-header" data-scrolled="false">
+       <div class="sh-header__inner">
+         <a class="sh-header__brand" href="/">…</a>
+         <nav class="sh-header__nav" aria-label="Principal">
+           <ul class="sh-nav sh-nav--horizontal">…</ul>
+         </nav>
+         <div class="sh-header__actions">…</div>
+         <button class="sh-header__toggle" aria-haspopup="dialog"
+                 aria-expanded="false" aria-controls="drawer-principal"
+                 aria-label="Abrir menu" data-sh-drawer-open="#drawer-principal">
+           <svg class="sh-icon">…</svg>
+         </button>
+       </div>
+     </header>
+
+     sh-skip-link (foundations/layout.css) vem ANTES dele no DOM.
+     [data-scrolled="true"] e [data-menu="open"] são lidos do DOM, mas quem
+     escreve [data-scrolled] é a página (um IntersectionObserver contra uma
+     sentinela, ou scrollY) — não é um dos quatro comportamentos que
+     js/shalom-ds-navigation.js cobre, porque o limiar de rolagem é decisão
+     de cada página, não do sistema. [data-menu="open"] É escrito pelo
+     módulo de drawer sempre que o gatilho de abertura está dentro de um
+     .sh-header — nenhum HTML extra é necessário para isso.
+     ====================================================================== */
+
+  .sh-header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--sh-layer-header);
+    min-block-size: var(--sh-header-height, 4.25rem);
+    background-color: var(--sh-header-bg, var(--sh-surface-default));
+    border-block-end: var(--sh-border-width-hair) solid
+                       var(--sh-header-border, var(--sh-border-subtle));
+    box-shadow: var(--sh-header-shadow, none);
+    transition:
+      background-color var(--sh-duration-base) var(--sh-ease-standard),
+      border-color      var(--sh-duration-base) var(--sh-ease-standard),
+      box-shadow        var(--sh-duration-base) var(--sh-ease-standard),
+      color             var(--sh-duration-base) var(--sh-ease-standard);
+  }
+
+  .sh-header__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--sh-space-4);
+    max-inline-size: calc(var(--sh-container-wide) + var(--sh-gutter) * 2);
+    min-block-size: inherit;
+    margin-inline: auto;
+    padding-inline: var(--sh-gutter);
+  }
+
+  .sh-header__brand {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    flex: none;
+    color: inherit;
+    text-decoration: none;
+    font-family: var(--sh-font-display);
+    font-weight: var(--sh-weight-semibold);
+    font-size: var(--sh-font-size-lg);
+  }
+  /* A marca desenha na altura do texto (27–28px) e clica 44px, o mesmo par de
+     .sh-btn--sm. O excedente cai sobre o padding do __inner, nunca sobre a
+     navegação ou as ações: o vizinho mais próximo, medido nas quatro
+     variantes de cabeçalho, está a 44px do centro da marca. */
+  .sh-header__brand::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: var(--sh-touch-target);
+    translate: -50% -50%;
+  }
+  /* :not(.sh-icon) importa: um logo real (<img> ou <svg> próprio) precisa da
+     largura livre para manter a proporção, mas um glifo do sprite de ícones
+     usado como marca provisória já resolve o próprio tamanho por
+     --sh-icon-size — sem o :not(), esta regra teria mais especificidade
+     (classe+tipo) que .sh-icon (só classe) e forçaria inline-size:auto nele,
+     caindo no tamanho intrínseco padrão do SVG (300×150). */
+  .sh-header__brand img,
+  .sh-header__brand svg:not(.sh-icon) {
+    block-size: var(--sh-space-8);
+    inline-size: auto;
+  }
+  .sh-header__brand:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  .sh-header__nav {
+    display: none;
+    flex: 1;
+    justify-content: center;
+    min-inline-size: 0;
+  }
+
+  .sh-header__actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--sh-space-3);
+    margin-inline-start: auto;
+  }
+
+  /* Hambúrguer — só existe abaixo do ponto de corte. */
+  .sh-header__toggle {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    border-radius: var(--sh-radius-control);
+    color: inherit;
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .sh-header__toggle:hover { background-color: var(--sh-surface-hover); }
+  }
+  .sh-header__toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  @media (min-width: 64rem) {
+    .sh-header__nav { display: flex; }
+    .sh-header__toggle { display: none; }
+    /* Sem toggle, __actions não precisa mais empurrar sozinho contra ele —
+       mantém o comportamento, só documentando que o layout já resolve. */
+  }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-header--compact {
+    --sh-header-height: 3.5rem;
+  }
+
+  /* Uso completo: .sh-header.sh-header--admin nunca fica centralizado —
+     é a barra de topo de um app shell de largura total (Lote G). */
+  .sh-header--admin .sh-header__inner {
+    max-inline-size: none;
+  }
+
+  /* Reproduz o padrão do asasul/: o herói começa sob o header, que só vira
+     opaco depois de rolar. O véu (gradiente com --sh-shadow-rgb, a mesma
+     tinta de --sh-surface-scrim) é quem garante contraste — o
+     backdrop-filter abaixo é reforço opcional, nunca a única defesa, como
+     manda docs/03-inventario-componentes.md.
+
+     Gap FECHADO: a tinta é --sh-text-on-scrim, o token de texto que não
+     inverte com o esquema — pelo mesmo motivo que o véu não inverte (a foto
+     do herói não escurece quando a pessoa liga o modo escuro). Antes daqui
+     havia --sh-text-inverse, que INVERTE porque foi desenhado para
+     superfícies que também invertem: no escuro pintava tinta escura sobre
+     véu escuro. Medido em prova-navegacao.html, nos três cenários escuros:
+     marca 1,13 · links 1,11 e 1,12 · título do herói 1,08 (acamp's escuro
+     chegava a 1,37/1,38). Com --sh-text-on-scrim o pior par sobe para o
+     patamar do claro. O véu também passou a sair de --sh-surface-scrim, a
+     mesma tinta que sh-hero__scrim usa. */
+  .sh-header--transparent {
+    --sh-header-bg: transparent;
+    --sh-header-border: transparent;
+    --sh-header-shadow: none;
+    position: absolute;
+    inset-inline: 0;
+    /* CORREÇÃO DE CONTRASTE, medida em prova-vidro.html. Os stops antigos
+       (0.55 no topo → 0.22 em 60% → transparente) decaíam rápido demais: o
+       link da navegação mora verticalmente centrado, por volta de 50% da
+       altura da barra, e ali o alfa efetivo já era ~0.28. Sobre foto clara,
+       com o desfoque desligado, --sh-text-on-scrim caía a 3,72:1.
+       A faixa onde o conteúdo mora agora recebe o alfa CHEIO do véu (0.62, o
+       mesmo de --sh-surface-scrim, que garante 4,70:1 sobre foto branca), e o
+       degradê só existe nos últimos 30% para a barra não terminar em corte
+       seco sobre a foto. */
+    background-image: linear-gradient(
+      to bottom,
+      rgb(var(--sh-shadow-rgb) / 0.62) 0%,
+      rgb(var(--sh-shadow-rgb) / 0.62) 70%,
+      transparent 100%
+    );
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    color: var(--sh-text-on-scrim);
+  }
+  .sh-header--transparent .sh-header__toggle,
+  .sh-header--transparent .sh-header__brand { color: var(--sh-text-on-scrim); }
+
+  /* -------------------------------------------------- cabeçalho de vidro
+     .sh-header--glass é um ACRÉSCIMO a --transparent, não um substituto:
+
+       <header class="sh-header sh-header--transparent sh-header--glass">
+
+     Sobre a foto (topo da página) ele é o mesmo véu de --transparent com o
+     desfoque forte do sistema no lugar dos 2px — é o vidro do asasul/ antes
+     de rolar. Depois de rolar, onde --transparent vira chapa opaca, o vidro
+     mantém a barra translúcida: --sh-glass-surface, a SEGUNDA família de
+     vidro (tokens/semantic.css), a única que usa a tinta normal da página,
+     porque o que passa por baixo dela é a própria página e não uma foto.
+
+     O alfa é o que garante a leitura, de novo: 0.86 no claro e 0.92 no
+     escuro. Pior caso é conteúdo 100% preto (claro) ou 100% branco (escuro)
+     rolando sob a barra; medido em prova-vidro.html, cenário a cenário, com
+     o desfoque desligado. */
+  .sh-header--glass.sh-header--transparent:not([data-scrolled="true"]):not([data-menu="open"]) {
+    -webkit-backdrop-filter: var(--sh-glass-filter);
+    backdrop-filter: var(--sh-glass-filter);
+  }
+  .sh-header--glass.sh-header--transparent[data-scrolled="true"],
+  .sh-header--glass.sh-header--transparent[data-menu="open"] {
+    --sh-header-bg: var(--sh-glass-surface);
+    --sh-header-shadow: none;
+    -webkit-backdrop-filter: var(--sh-glass-filter);
+    backdrop-filter: var(--sh-glass-filter);
+  }
+  /* Degradação: sem backdrop-filter (ou com transparência reduzida) a barra
+     volta a ser a chapa opaca de --transparent rolado. Nunca uma faixa
+     semitransparente com o conteúdo da página atravessando o rótulo. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .sh-header--glass.sh-header--transparent[data-scrolled="true"],
+    .sh-header--glass.sh-header--transparent[data-menu="open"] {
+      --sh-header-bg: var(--sh-glass-surface-solid);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .sh-header--glass.sh-header--transparent[data-scrolled="true"],
+    .sh-header--glass.sh-header--transparent[data-menu="open"] {
+      --sh-header-bg: var(--sh-glass-surface-solid);
+    }
+    .sh-header--glass.sh-header--transparent {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  /* Enquanto o cabeçalho está SOBRE a foto, tudo que é ação dentro dele mora
+     no véu: tintas vindas do conjunto -on-scrim (tokens/semantic.css), o
+     mesmo que sh-hero--cover consome. Inclui a pílula do item atual, que sem
+     isto sairia com --sh-action-primary-bg — tinta calculada contra o canvas,
+     não contra o véu (no escuro base, navy-400 sobre o véu).
+
+     O :not() é o mecanismo de volta: custom property não tem como ser
+     "desdeclarada" pela cascata, então o estado rolado não desfaz um remap —
+     ele precisa nunca ter acontecido. Por isso as tintas do véu moram numa
+     regra que deixa de casar assim que [data-scrolled] ou [data-menu] entram,
+     e o normal volta sozinho pelo valor padrão de cada token. */
+  .sh-header--transparent:not([data-scrolled="true"]):not([data-menu="open"]) {
+    --sh-nav-link-fg:               var(--sh-text-on-scrim);
+    --sh-nav-link-fg-hover:         var(--sh-text-on-scrim);
+    --sh-nav-link-bg-current:       var(--sh-action-primary-bg-on-scrim);
+    --sh-nav-link-bg-current-hover: var(--sh-action-primary-bg-hover-on-scrim);
+    --sh-nav-link-bg-current-active:var(--sh-action-primary-bg-active-on-scrim);
+    --sh-nav-link-fg-current:       var(--sh-action-primary-fg-on-scrim);
+    --sh-nav-link-border-current:   var(--sh-action-primary-border-on-scrim);
+
+    --sh-action-primary-bg:        var(--sh-action-primary-bg-on-scrim);
+    --sh-action-primary-bg-hover:  var(--sh-action-primary-bg-hover-on-scrim);
+    --sh-action-primary-bg-active: var(--sh-action-primary-bg-active-on-scrim);
+    --sh-action-primary-fg:        var(--sh-action-primary-fg-on-scrim);
+    --sh-action-primary-border:    var(--sh-action-primary-border-on-scrim);
+
+    /* Enquanto está sobre a foto, o cabeçalho é área VELADA: o vidro que
+       morar dentro dele é filme claro com fio inteiro. Ver a família
+       --sh-glass-*-on-veil em tokens/semantic.css. */
+    --sh-glass-veil:        var(--sh-glass-veil-on-veil);
+    --sh-glass-veil-hover:  var(--sh-glass-veil-hover-on-veil);
+    --sh-glass-veil-active: var(--sh-glass-veil-active-on-veil);
+    --sh-glass-solid:       var(--sh-glass-solid-on-veil);
+    --sh-glass-border:      var(--sh-glass-border-on-veil);
+    --sh-glass-keyline:     var(--sh-glass-keyline-on-veil);
+  }
+
+  .sh-header--transparent[data-scrolled="true"],
+  .sh-header--transparent[data-menu="open"] {
+    position: sticky;
+    --sh-header-bg: var(--sh-surface-default);
+    --sh-header-border: var(--sh-border-subtle);
+    --sh-header-shadow: var(--sh-shadow-sm);
+    background-image: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    color: var(--sh-text-default);
+  }
+  .sh-header--transparent[data-scrolled="true"] .sh-header__toggle,
+  .sh-header--transparent[data-menu="open"] .sh-header__toggle,
+  .sh-header--transparent[data-scrolled="true"] .sh-header__brand,
+  .sh-header--transparent[data-menu="open"] .sh-header__brand {
+    color: var(--sh-text-default);
+  }
+
+  /* ======================================================================
+     sh-nav
+     <nav aria-label="Principal">
+       <ul class="sh-nav sh-nav--horizontal">
+         <li class="sh-nav__item">
+           <a class="sh-nav__link" href="/" aria-current="page">
+             <svg class="sh-icon sh-nav__icon">…</svg>
+             <span class="sh-nav__label">Início</span>
+             <span class="sh-nav__badge sh-badge sh-badge--sm sh-badge--brand">3</span>
+           </a>
+         </li>
+         <li class="sh-nav__item">
+           <button class="sh-nav__link" aria-haspopup="menu" aria-expanded="false"
+                   data-sh-menu-toggle="#nav-sub-sobre">
+             <span class="sh-nav__label">Sobre</span>
+             <svg class="sh-icon" aria-hidden="true">…seta-baixo…</svg>
+           </button>
+           <div class="sh-menu" id="nav-sub-sobre" role="menu" aria-label="Sobre" hidden>…</div>
+         </li>
+       </ul>
+     </nav>
+
+     Submenu = composição com sh-menu (não duplica a lógica de dropdown):
+     o gatilho é um .sh-nav__link comum com aria-haspopup, o próprio
+     shalom-ds-navigation.js abre/fecha/navega por teclado. .sh-nav só
+     estiliza o ícone de seta girando com [aria-expanded="true"].
+
+     __badge não redesenha o selo: combine com .sh-badge (foundation.css) —
+     .sh-nav__badge só resolve o espaçamento dele dentro do link.
+     ====================================================================== */
+
+  .sh-nav__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-nav-gap, var(--sh-space-1));
+    /* Não depender só de `ul[class]` do reset: display:flex no <ul> não
+       blindou os <li> — list-item continua computando marker se a classe
+       cair do markup por qualquer razão. Lista de navegação nunca tem
+       marker, então a garantia mora aqui, no componente. */
+    list-style: none;
+    padding-inline-start: 0;
+  }
+
+  .sh-nav__item { position: relative; }
+
+  .sh-nav__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    min-block-size: var(--sh-touch-target);
+    padding-block: var(--sh-space-2);
+    padding-inline: var(--sh-nav-link-padding-inline, var(--sh-space-3));
+    /* Contorno transparente em TODO link, não só no atual: é o que impede o
+       item ativo de crescer 2px e empurrar os vizinhos quando a pílula entra. */
+    border: var(--sh-border-width-hair) solid transparent;
+    border-radius: var(--sh-nav-link-radius, var(--sh-radius-control));
+    color: var(--sh-nav-link-fg, var(--sh-text-default));
+    font-weight: var(--sh-weight-semibold);
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-snug);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      color             var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color      var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-nav__icon { --sh-icon-size: var(--sh-icon-size-sm); flex: none; }
+  .sh-nav__label { min-inline-size: 0; }
+  .sh-nav__badge { margin-inline-start: var(--sh-space-1); }
+
+  @media (hover: hover) {
+    .sh-nav__link:hover {
+      background-color: var(--sh-surface-hover);
+      color: var(--sh-nav-link-fg-hover, var(--sh-text-brand));
+    }
+  }
+  .sh-nav__link:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  .sh-nav__link:active { background-color: var(--sh-surface-active); }
+
+  /* ======================================================================
+     LOCAL ATUAL — REGRA PERMANENTE DO SISTEMA
+     O item ativo NUNCA usa barra, traço ou borda lateral. Nem no sidebar,
+     nem no vertical, nem no bottom, nem em variante nova. Decisão do dono
+     do projeto, sem exceção; não reintroduzir "só neste caso".
+
+     O sinal é: PÍLULA PREENCHIDA + PESO TIPOGRÁFICO MAIOR (e, quem tiver os
+     dois desenhos, ícone preenchido em vez de contornado — ver abaixo). Cor
+     nunca aparece sozinha: forma (o preenchimento entra) e peso (semibold →
+     bold) são os canais não-cromáticos, e sobrevivem em escala de cinza.
+
+     O par é --sh-action-primary-*, o mesmo de sh-pagination[aria-current] e
+     de sh-btn--primary. Não é --sh-surface-selected: aquele é tinta sutil
+     (1,1:1 contra a página) e a pílula seria um indicador invisível; e não é
+     --sh-surface-brand, que no escopo inverse fica navy-700 sobre navy-800
+     (1,01:1). O conjunto de ação já é remapeado e verificado nos seis
+     cenários, no escopo inverse e no véu — a pílula herda tudo isso de graça.
+     ====================================================================== */
+  .sh-nav__link[aria-current="page"] {
+    background-color: var(--sh-nav-link-bg-current, var(--sh-action-primary-bg));
+    border-color:     var(--sh-nav-link-border-current, var(--sh-action-primary-border));
+    border-radius:    var(--sh-nav-link-radius-current, var(--sh-radius-pill));
+    color:            var(--sh-nav-link-fg-current, var(--sh-action-primary-fg));
+    font-weight:      var(--sh-weight-bold);
+  }
+  /* Sem esta regra o :hover genérico (mesma especificidade, mas antes na
+     ordem) perderia — e o item atual ficaria sem resposta ao mouse. A tinta
+     NÃO muda no hover: trocar para --sh-text-brand sobre a pílula cheia
+     quebraria o contraste do rótulo. */
+  @media (hover: hover) {
+    .sh-nav__link[aria-current="page"]:hover {
+      background-color: var(--sh-nav-link-bg-current-hover, var(--sh-action-primary-bg-hover));
+      color: var(--sh-nav-link-fg-current, var(--sh-action-primary-fg));
+    }
+  }
+  .sh-nav__link[aria-current="page"]:active {
+    background-color: var(--sh-nav-link-bg-current-active, var(--sh-action-primary-bg-active));
+  }
+
+  /* Terceiro canal, opcional e sem JS: quem tiver os dois desenhos do mesmo
+     ícone (contornado e preenchido) entrega os dois no link e o CSS troca.
+     Quem entregar só um usa .sh-nav__icon puro e nada muda. */
+  .sh-nav__icon--solid { display: none; }
+  .sh-nav__link[aria-current="page"] .sh-nav__icon--outline { display: none; }
+  .sh-nav__link[aria-current="page"] .sh-nav__icon--solid { display: inline-flex; }
+
+  /* Gatilho de submenu: seta que gira, nunca ícone sozinho (tem __label). */
+  .sh-nav__link[aria-haspopup] .sh-icon:last-child {
+    --sh-icon-size: var(--sh-icon-size-sm);
+    transition: rotate var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-nav__link[aria-expanded="true"] .sh-icon:last-child { rotate: 180deg; }
+
+  .sh-nav__link[disabled],
+  .sh-nav__link[aria-disabled="true"] {
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-nav--horizontal .sh-nav__list { flex-direction: row; align-items: center; }
+
+  .sh-nav--vertical .sh-nav__list,
+  .sh-nav--sidebar .sh-nav__list {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .sh-nav--vertical .sh-nav__link,
+  .sh-nav--sidebar .sh-nav__link { inline-size: 100%; }
+
+  /* Sidebar: só alvo mais largo. O indicador é o da regra permanente acima —
+     pílula preenchida na largura da faixa. NÃO há border-inline-start aqui,
+     nem transparente: a declaração de reserva de espaço já é o `border`
+     transparente de .sh-nav__link, uniforme nos quatro lados. */
+  .sh-nav--sidebar .sh-nav__link {
+    --sh-nav-link-padding-inline: var(--sh-space-4);
+  }
+
+  /* Pills: a forma de repouso também é pílula, então o item atual só se
+     distingue pelo preenchimento e pelo peso — que é o ponto da variante. */
+  .sh-nav--pills .sh-nav__link { border-radius: var(--sh-radius-pill); }
+
+  /* Barra inferior — celular, para check-in e navegação primária em pé.
+     Ícone deitado sobre rótulo pequeno: nunca ícone sozinho (§ regra). */
+  .sh-nav--bottom {
+    /* A faixa é baixa e o item é uma coluna (ícone sobre rótulo): pílula
+       inteira em stadium ficaria alta demais. Raio de superfície é o
+       compromisso — continua pílula preenchida, não traço. O traço superior
+       que esta variante usava caiu junto com o lateral: a regra é a mesma. */
+    --sh-nav-link-radius-current: var(--sh-radius-surface);
+    --sh-nav-link-radius: 0;
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: var(--sh-layer-sticky);
+    background-color: var(--sh-surface-default);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    box-shadow: var(--sh-shadow-lg);
+    padding-block-end: max(env(safe-area-inset-bottom, 0px), var(--sh-space-1));
+  }
+  .sh-nav--bottom .sh-nav__list { flex-wrap: nowrap; gap: 0; }
+  /* padding: respiro para a pílula do item atual não colar na régua superior
+     da faixa nem na área segura de baixo. */
+  .sh-nav--bottom .sh-nav__item { flex: 1; min-inline-size: 0; padding: var(--sh-space-1); }
+  .sh-nav--bottom .sh-nav__link {
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--sh-space-1);
+    inline-size: 100%;
+    min-block-size: calc(var(--sh-touch-target) + var(--sh-space-2));
+    padding-block: var(--sh-space-2);
+    /* O raio vem de --sh-nav-link-radius (0 aqui) para não competir por
+       especificidade com o raio da pílula do item atual — os dois seletores
+       empatam em (0,2,0) e este viria depois no arquivo. */
+    font-size: var(--sh-font-size-2xs);
+    text-align: center;
+  }
+  .sh-nav--bottom .sh-nav__icon { --sh-icon-size: var(--sh-icon-size-md); }
+  .sh-nav--bottom .sh-nav__badge {
+    position: absolute;
+    inset-block-start: var(--sh-space-1);
+    inset-inline-start: 55%;
+    margin-inline-start: 0;
+  }
+
+  /* ======================================================================
+     sh-drawer
+     <dialog class="sh-drawer" id="drawer-principal" aria-labelledby="drawer-titulo">
+       <div class="sh-drawer__panel">
+         <div class="sh-drawer__head">
+           <h2 class="sh-drawer__title" id="drawer-titulo">Menu</h2>
+           <button class="sh-drawer__close" data-sh-drawer-close aria-label="Fechar menu">
+             <svg class="sh-icon">…</svg>
+           </button>
+         </div>
+         <div class="sh-drawer__body"><nav class="sh-nav sh-nav--vertical">…</nav></div>
+         <div class="sh-drawer__foot">…</div>
+       </div>
+     </dialog>
+
+     É um <dialog> nativo aberto com showModal() (js/shalom-ds-navigation.js).
+     Isso resolve foco preso, Esc (evento "cancel") e inert no resto da
+     página de graça — é exatamente o que docs/03-inventario-componentes.md
+     pede ("sem JS de terceiro: <dialog> nativo cobre o caso"). __scrim da
+     anatomia é o ::backdrop nativo, tingido com --sh-surface-scrim; não é
+     um <div> à parte. foundations/reset.css já zera padding/border/max-*
+     de <dialog> para todo o sistema — aqui só o posicionamento é próprio
+     do drawer, então sh-modal (Lote C) não herda nada por engano.
+     ====================================================================== */
+
+  .sh-drawer {
+    position: fixed;
+    inset: 0;
+    max-inline-size: none;
+    max-block-size: none;
+    inline-size: 100%;
+    block-size: 100%;
+    margin: 0;
+    background: transparent;
+    overflow: visible;
+  }
+  .sh-drawer::backdrop {
+    background-color: var(--sh-drawer-scrim, var(--sh-surface-scrim));
+  }
+
+  .sh-drawer__panel {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--sh-drawer-bg, var(--sh-surface-raised));
+    box-shadow: var(--sh-drawer-shadow, var(--sh-shadow-xl));
+    transition:
+      translate var(--sh-duration-base) var(--sh-ease-standard),
+      opacity var(--sh-duration-base) var(--sh-ease-standard);
+    opacity: 0;
+  }
+
+  /* Borda: --end é o padrão (menu de navegação típico); os outros três
+     variam por classe, como todo modificador do sistema. */
+  .sh-drawer .sh-drawer__panel,
+  .sh-drawer--end .sh-drawer__panel {
+    inset-block: 0;
+    inset-inline-end: 0;
+    inline-size: min(100%, var(--sh-drawer-size, 22rem));
+    block-size: 100%;
+    translate: 100% 0;
+  }
+  .sh-drawer--start .sh-drawer__panel {
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: min(100%, var(--sh-drawer-size, 22rem));
+    block-size: 100%;
+    translate: -100% 0;
+  }
+  .sh-drawer--top .sh-drawer__panel {
+    inset-inline: 0;
+    inset-block-start: 0;
+    block-size: min(100%, var(--sh-drawer-size, 22rem));
+    inline-size: 100%;
+    translate: 0 -100%;
+  }
+  .sh-drawer--bottom .sh-drawer__panel {
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: min(85%, var(--sh-drawer-size, 28rem));
+    inline-size: 100%;
+    border-start-start-radius: var(--sh-radius-surface);
+    border-start-end-radius: var(--sh-radius-surface);
+    padding-block-end: env(safe-area-inset-bottom, 0px);
+    translate: 0 100%;
+  }
+
+  /* Aberto: JS troca data-state um quadro depois de showModal(), para a
+     transição de fato correr a partir da posição fechada. */
+  .sh-drawer[data-state="open"] .sh-drawer__panel {
+    translate: 0 0;
+    opacity: 1;
+  }
+
+  .sh-drawer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sh-space-3);
+    flex: none;
+    padding: var(--sh-space-5);
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+  .sh-drawer__title {
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h4);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-strong);
+  }
+  .sh-drawer__close {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    margin: calc(var(--sh-space-2) * -1);
+    border-radius: var(--sh-radius-control);
+    color: var(--sh-text-default);
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .sh-drawer__close:hover { background-color: var(--sh-surface-hover); }
+  }
+  .sh-drawer__close:focus-visible { outline: none; box-shadow: var(--sh-focus-ring); }
+
+  .sh-drawer__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--sh-space-5);
+  }
+
+  .sh-drawer__foot {
+    flex: none;
+    padding: var(--sh-space-5);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    padding-block-end: max(var(--sh-space-5), env(safe-area-inset-bottom, 0px));
+  }
+
+  /* ======================================================================
+     sh-tabs
+     <div class="sh-tabs">
+       <div class="sh-tabs__list" role="tablist" aria-label="…">
+         <button class="sh-tabs__tab" role="tab" id="tab-1" aria-selected="true"
+                 aria-controls="painel-1" tabindex="0">Programação</button>
+         <button class="sh-tabs__tab" role="tab" id="tab-2" aria-selected="false"
+                 aria-controls="painel-2" tabindex="-1">Inscritos</button>
+       </div>
+       <div class="sh-tabs__panel" role="tabpanel" id="painel-1" aria-labelledby="tab-1" tabindex="0">…</div>
+       <div class="sh-tabs__panel" role="tabpanel" id="painel-2" aria-labelledby="tab-2" tabindex="0" hidden>…</div>
+     </div>
+
+     Teclado (setas, Home/End, tabindex rotativo) é js/shalom-ds-navigation.js.
+     Sem ele, a aba marcada aria-selected="true" no HTML permanece visível e
+     as outras não trocam — degrade previsível, documentado no JS.
+     ====================================================================== */
+
+  .sh-tabs__list {
+    display: flex;
+    gap: var(--sh-tabs-gap, var(--sh-space-1));
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    scrollbar-width: thin;
+    /* Indicador de que há mais abas fora da tela, sem JS e sem sombra
+       flutuante por cima do conteúdo — a régua "some" nas pontas. */
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--sh-space-4),
+                          #000 calc(100% - var(--sh-space-4)), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 var(--sh-space-4),
+                 #000 calc(100% - var(--sh-space-4)), transparent 100%);
+  }
+  .sh-tabs--scrollable .sh-tabs__list { scroll-snap-type: inline proximity; }
+  .sh-tabs__tab { scroll-snap-align: start; }
+
+  .sh-tabs__tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    flex: none;
+    min-block-size: var(--sh-touch-target);
+    padding-inline: var(--sh-space-4);
+    margin-block-end: calc(var(--sh-border-width-hair) * -1);
+    border-block-end: var(--sh-border-width-thick) solid transparent;
+    color: var(--sh-tabs-tab-fg, var(--sh-text-muted));
+    font-weight: var(--sh-weight-semibold);
+    font-size: var(--sh-font-size-sm);
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      color var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color var(--sh-duration-fast) var(--sh-ease-standard),
+      background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  @media (hover: hover) {
+    .sh-tabs__tab:hover:not([aria-selected="true"]):not([disabled]) {
+      color: var(--sh-text-default);
+    }
+  }
+  .sh-tabs__tab:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  .sh-tabs__tab[aria-selected="true"] {
+    color: var(--sh-tabs-tab-fg-selected, var(--sh-text-brand));
+    border-block-end-color: var(--sh-tabs-indicator, var(--sh-border-brand));
+  }
+  .sh-tabs__tab[disabled],
+  .sh-tabs__tab[aria-disabled="true"] {
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+
+  .sh-tabs__panel {
+    padding-block: var(--sh-space-5);
+  }
+  .sh-tabs__panel[hidden] { display: none; }
+  .sh-tabs__panel:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-tabs--pills .sh-tabs__list { border-block-end: 0; gap: var(--sh-space-2); }
+  /* O fio existe transparente em TODA pílula e ganha cor só na selecionada:
+     assim o estado não muda a largura da fila (nada pula ao trocar de aba) e
+     a diferença entre selecionado e não selecionado deixa de ser só cor. */
+  .sh-tabs--pills .sh-tabs__tab {
+    margin-block-end: 0;
+    border: var(--sh-border-width-hair) solid transparent;
+    border-radius: var(--sh-radius-pill);
+  }
+  @media (hover: hover) {
+    .sh-tabs--pills .sh-tabs__tab:hover:not([aria-selected="true"]):not([disabled]) {
+      background-color: var(--sh-surface-hover);
+    }
+  }
+  /* currentColor e não um token de borda próprio: a tinta da aba selecionada
+     (--sh-text-brand) já é o par verificado contra a superfície ao redor
+     (≥4,5:1), então pedir ao limite a MESMA tinta garante os 3:1 da WCAG
+     1.4.11 por construção — o mesmo raciocínio, e a mesma linha, que
+     internal.css usa nas células do mapa de calor. Sozinho, o preenchimento
+     --sh-surface-selected media 1,07–1,23:1 contra o painel: a pílula
+     selecionada praticamente não tinha silhueta. */
+  .sh-tabs--pills .sh-tabs__tab[aria-selected="true"] {
+    background-color: var(--sh-surface-selected);
+    border-color: currentColor;
+  }
+
+  .sh-tabs--enclosed .sh-tabs__list { gap: var(--sh-space-1); }
+  .sh-tabs--enclosed .sh-tabs__tab {
+    border: var(--sh-border-width-hair) solid transparent;
+    border-block-end: var(--sh-border-width-hair) solid transparent;
+    border-start-start-radius: var(--sh-radius-control);
+    border-start-end-radius: var(--sh-radius-control);
+    margin-block-end: calc(var(--sh-border-width-hair) * -1);
+  }
+  /* --sh-border-control e não --sh-border-subtle: a aba fechada selecionada
+     pinta o MESMO branco do painel abaixo (é o efeito de "pasta", e é
+     deliberado), então o preenchimento mede 1,00:1 e a única silhueta é a
+     borda. `subtle` é decorativa (1,13–1,47:1 medido); `control` é o token
+     que semantic.css declara como mínimo de 1.4.11. A borda de baixo continua
+     na cor do painel — é ela que emenda a aba ao conteúdo. */
+  .sh-tabs--enclosed .sh-tabs__tab[aria-selected="true"] {
+    background-color: var(--sh-surface-default);
+    border-color: var(--sh-border-control);
+    border-block-end-color: var(--sh-surface-default);
+  }
+
+  /* ======================================================================
+     sh-accordion
+     <div class="sh-accordion sh-accordion--boxed">
+       <details class="sh-accordion__item">
+         <summary class="sh-accordion__trigger">
+           <span>Preciso levar barraca?</span>
+           <svg class="sh-icon" aria-hidden="true">…seta-baixo…</svg>
+         </summary>
+         <div class="sh-accordion__panel"><p class="sh-body-sm">…</p></div>
+       </details>
+     </div>
+
+     Nativo: <details>/<summary> não precisam de JS para abrir, fechar,
+     comunicar aria-expanded ou funcionar com Ctrl+F. js/shalom-ds-navigation.js
+     só espelha "beforetoggle"/"toggle" em eventos sh:* para quem quiser
+     interceptar (analytics, carregar conteúdo tardio) — nunca é requisito
+     para o componente abrir.
+     --exclusive: mesmo name="" nos <details> do grupo (atributo HTML, sem
+     classe própria) — o navegador fecha os irmãos sozinho.
+     ====================================================================== */
+
+  .sh-accordion { display: flex; flex-direction: column; }
+
+  .sh-accordion__item {
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+  .sh-accordion__item:last-child { border-block-end: 0; }
+
+  .sh-accordion__trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sh-space-3);
+    min-block-size: var(--sh-touch-target);
+    padding-block: var(--sh-space-4);
+    color: var(--sh-text-strong);
+    font-weight: var(--sh-weight-semibold);
+    cursor: pointer;
+    list-style: none;             /* remove o triângulo padrão do <summary> */
+  }
+  .sh-accordion__trigger::-webkit-details-marker { display: none; }
+  .sh-accordion__trigger .sh-icon {
+    flex: none;
+    color: var(--sh-text-muted);
+    transition: rotate var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-accordion__item[open] > .sh-accordion__trigger .sh-icon { rotate: 180deg; }
+
+  @media (hover: hover) {
+    .sh-accordion__trigger:hover { color: var(--sh-text-brand); }
+  }
+  .sh-accordion__trigger:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  .sh-accordion__panel {
+    padding-block-end: var(--sh-space-5);
+    color: var(--sh-text-default);
+  }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-accordion--boxed {
+    gap: var(--sh-space-3);
+  }
+  .sh-accordion--boxed .sh-accordion__item {
+    border: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    border-radius: var(--sh-radius-surface);
+    padding-inline: var(--sh-space-5);
+  }
+  .sh-accordion--boxed .sh-accordion__item[open] {
+    border-color: var(--sh-border-default);
+  }
+
+  .sh-accordion--flush .sh-accordion__item { border-block-end: 0; }
+  .sh-accordion--flush {
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+  .sh-accordion--flush .sh-accordion__trigger,
+  .sh-accordion--flush .sh-accordion__panel {
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  /* ======================================================================
+     sh-menu (dropdown)
+     <div style="position:relative;">          ← qualquer ancestral posicionado
+       <button class="sh-btn sh-btn--secondary" aria-haspopup="menu"
+               aria-expanded="false" data-sh-menu-toggle="#menu-conta">
+         <span class="sh-btn__label">Minha conta</span>
+       </button>
+       <div class="sh-menu" id="menu-conta" role="menu" aria-label="Minha conta" hidden>
+         <div class="sh-menu__group" role="group" aria-labelledby="menu-conta-g1">
+           <p class="sh-menu__group-label" id="menu-conta-g1">Conta</p>
+           <a class="sh-menu__item" role="menuitem" href="#">Perfil</a>
+         </div>
+         <hr class="sh-menu__separator" role="separator">
+         <button class="sh-menu__item sh-menu__item--danger" role="menuitem">Sair</button>
+       </div>
+     </div>
+
+     Aberto/fechado é o atributo [hidden] — nada de data-state redundante.
+     Setas, Esc, clique-fora e devolução de foco: js/shalom-ds-navigation.js.
+     Posicionamento: position:absolute é a base (funciona em qualquer
+     navegador, exige um ancestral position!=static); anchor positioning
+     entra como reforço quando o motor suporta, sem Popper.
+     ====================================================================== */
+
+  .sh-menu {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-start: 0;
+    z-index: var(--sh-layer-dropdown);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-1);
+    min-inline-size: var(--sh-menu-min-width, 12rem);
+    max-inline-size: min(90vw, 20rem);
+    margin-block-start: var(--sh-space-2);
+    padding: var(--sh-space-2);
+    border: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    border-radius: var(--sh-menu-radius, var(--sh-radius-surface));
+    background-color: var(--sh-menu-bg, var(--sh-surface-raised));
+    box-shadow: var(--sh-menu-shadow, var(--sh-shadow-lg));
+    opacity: 0;
+    translate: 0 calc(var(--sh-space-2) * -1);
+    transition:
+      opacity var(--sh-duration-base) var(--sh-ease-standard),
+      translate var(--sh-duration-base) var(--sh-ease-standard);
+  }
+  .sh-menu[hidden] { display: none; }
+  .sh-menu[data-state="open"] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* Reforço progressivo: quando o motor suporta CSS Anchor Positioning, o
+     menu ancora no próprio gatilho em vez de depender de um pai
+     position:relative. --sh-menu-anchor é o mesmo nome em todo gatilho de
+     menu de propósito: como cada .sh-menu segue seu próprio gatilho no DOM,
+     a resolução padrão do spec ("último anchor com este nome antes do
+     elemento ancorado") aponta sempre para o par correto. */
+  [data-sh-menu-toggle] { anchor-name: --sh-menu-anchor; }
+  @supports (position-anchor: --sh-menu-anchor) {
+    .sh-menu {
+      position: fixed;
+      position-anchor: --sh-menu-anchor;
+      inset-block-start: anchor(bottom);
+      inset-inline-start: anchor(start);
+      inset-inline-end: auto;
+    }
+    .sh-menu--end {
+      inset-inline-start: auto;
+      inset-inline-end: anchor(end);
+    }
+  }
+
+  .sh-menu__group { display: flex; flex-direction: column; gap: var(--sh-space-1); }
+  .sh-menu__group-label {
+    padding-inline: var(--sh-space-3);
+    padding-block: var(--sh-space-1);
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+  }
+
+  .sh-menu__separator {
+    border: 0;
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    margin-block: var(--sh-space-1);
+  }
+
+  .sh-menu__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--sh-space-3);
+    min-block-size: var(--sh-touch-target);
+    padding-inline: var(--sh-space-3);
+    border-radius: var(--sh-radius-control);
+    color: var(--sh-text-default);
+    font-size: var(--sh-font-size-sm);
+    text-align: start;
+    text-decoration: none;
+    inline-size: 100%;
+    cursor: pointer;
+    transition: background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-menu__icon { --sh-icon-size: var(--sh-icon-size-sm); flex: none; color: var(--sh-text-muted); }
+
+  @media (hover: hover) {
+    .sh-menu__item:hover:not([aria-disabled="true"]) { background-color: var(--sh-surface-hover); }
+  }
+  .sh-menu__item:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  .sh-menu__item[aria-disabled="true"] {
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+  .sh-menu__item--danger { color: var(--sh-text-danger); }
+  @media (hover: hover) {
+    .sh-menu__item--danger:hover:not([aria-disabled="true"]) {
+      background-color: var(--sh-feedback-danger-surface);
+    }
+  }
+  .sh-menu__item--danger .sh-menu__icon { color: var(--sh-text-danger); }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-menu--end { inset-inline-start: auto; inset-inline-end: 0; }
+  .sh-menu--wide { min-inline-size: var(--sh-menu-min-width, 18rem); }
+  /* Com ícones misturados a itens sem ícone, reserva a mesma coluna para
+     todos — evita rótulos "dançando" horizontalmente entre linhas. */
+  .sh-menu--with-icons .sh-menu__item { padding-inline-start: var(--sh-space-3); }
+  .sh-menu--with-icons .sh-menu__item:not(:has(.sh-menu__icon)) {
+    padding-inline-start: calc(var(--sh-space-3) + var(--sh-icon-size-sm) + var(--sh-space-3));
+  }
+
+  /* ======================================================================
+     sh-breadcrumb
+     <nav aria-label="Trilha">
+       <ol class="sh-breadcrumb">
+         <li class="sh-breadcrumb__item"><a class="sh-breadcrumb__link" href="/">Início</a></li>
+         <li class="sh-breadcrumb__sep" aria-hidden="true">/</li>
+         <li class="sh-breadcrumb__item" aria-current="page">Acamp's 2026.2</li>
+       </ol>
+     </nav>
+     ====================================================================== */
+
+  .sh-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-2);
+    font-size: var(--sh-font-size-sm);
+    /* Mesma garantia de .sh-nav__list: trilha é navegação, nunca marker,
+       sem depender só de `ol[class]` do reset. */
+    list-style: none;
+    padding-inline-start: 0;
+  }
+  .sh-breadcrumb__item {
+    display: inline-flex;
+    align-items: center;
+    color: var(--sh-text-muted);
+  }
+  .sh-breadcrumb__item[aria-current="page"] {
+    color: var(--sh-text-strong);
+    font-weight: var(--sh-weight-semibold);
+  }
+  .sh-breadcrumb__sep { color: var(--sh-text-muted); }
+  .sh-breadcrumb__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--sh-space-8);
+    color: var(--sh-text-muted);
+    text-decoration: none;
+  }
+  /* 32px de desenho (a trilha é uma linha discreta, não uma barra de botões),
+     44px de área real. Os separadores não são alvo e os links vizinhos estão
+     a 67px de centro a centro — dois alvos de 44px não se encostam. */
+  .sh-breadcrumb__link::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: var(--sh-touch-target);
+    translate: -50% -50%;
+  }
+  @media (hover: hover) {
+    .sh-breadcrumb__link:hover { color: var(--sh-text-brand); text-decoration: underline; }
+  }
+  .sh-breadcrumb__link:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  /* ======================================================================
+     sh-back-link
+     <a class="sh-back-link" href="/eventos">
+       <svg class="sh-icon sh-back-link__icon" aria-hidden="true">…seta-esquerda…</svg>
+       <span class="sh-back-link__label">Voltar para Eventos</span>
+     </a>
+     ====================================================================== */
+
+  .sh-back-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    min-block-size: var(--sh-touch-target);
+    color: var(--sh-text-muted);
+    font-weight: var(--sh-weight-semibold);
+    font-size: var(--sh-font-size-sm);
+    text-decoration: none;
+  }
+  .sh-back-link__icon {
+    --sh-icon-size: var(--sh-icon-size-sm);
+    transition: translate var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  @media (hover: hover) {
+    .sh-back-link:hover { color: var(--sh-text-brand); }
+    .sh-back-link:hover .sh-back-link__icon { translate: -3px 0; }
+  }
+  .sh-back-link:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  /* ======================================================================
+     sh-pagination
+     <nav aria-label="Paginação">
+       <ul class="sh-pagination">
+         <li><a class="sh-pagination__link sh-pagination__link--prev" href="?p=1" aria-label="Página anterior"><svg class="sh-icon">…</svg></a></li>
+         <li><a class="sh-pagination__link" href="?p=1">1</a></li>
+         <li><span class="sh-pagination__ellipsis" aria-hidden="true">…</span></li>
+         <li><a class="sh-pagination__link" href="?p=3" aria-current="page">3</a></li>
+         <li><a class="sh-pagination__link" href="?p=4">4</a></li>
+         <li><a class="sh-pagination__link sh-pagination__link--next" href="?p=4" aria-label="Próxima página"><svg class="sh-icon">…</svg></a></li>
+       </ul>
+     </nav>
+     ====================================================================== */
+
+  .sh-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-1);
+    /* Mesma garantia de .sh-nav__list: paginação é navegação, nunca marker,
+       sem depender só de `ul[class]` do reset. */
+    list-style: none;
+    padding-inline-start: 0;
+  }
+
+  .sh-pagination__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--sh-touch-target);
+    min-block-size: var(--sh-touch-target);
+    padding-inline: var(--sh-space-2);
+    border: var(--sh-border-width-hair) solid transparent;
+    border-radius: var(--sh-radius-control);
+    color: var(--sh-text-default);
+    font-weight: var(--sh-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--sh-duration-fast) var(--sh-ease-standard),
+                color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  @media (hover: hover) {
+    .sh-pagination__link:hover:not([aria-disabled="true"]) { background-color: var(--sh-surface-hover); }
+  }
+  .sh-pagination__link:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  /* O contorno é obrigatório na página atual, pela mesma razão de
+     .sh-btn--accent: --sh-action-primary-bg não contrasta com toda superfície.
+     No acamp's claro ele É o creme, e o painel também — 1,00:1: a marcação de
+     "você está aqui" simplesmente sumia. --sh-action-primary-border é o par
+     que o próprio conjunto de ação já traz verificado (4,27:1 ali). O fio
+     transparente acima reserva o espaço, então nada muda de largura ao paginar. */
+  .sh-pagination__link[aria-current="page"] {
+    background-color: var(--sh-action-primary-bg);
+    border-color: var(--sh-action-primary-border);
+    color: var(--sh-action-primary-fg);
+  }
+  .sh-pagination__link[aria-disabled="true"] {
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+  .sh-pagination__ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--sh-touch-target);
+    min-block-size: var(--sh-touch-target);
+    color: var(--sh-text-muted);
+  }
+
+  /* ======================================================================
+     sh-footer
+
+     Três propostas, uma classe cada. A marca aparece UMA VEZ em todas —
+     a duplicação "bloco de marca em cima + selo repetido embaixo" foi o
+     defeito central do desenho anterior.
+
+     1) editorial — o mote é o protagonista
+     <footer class="sh-footer sh-footer--editorial" data-sh-surface="inverse">
+       <div class="sh-footer__inner">
+         <a class="sh-logo sh-footer__logo" href="/" aria-label="…">…logo oficial…</a>
+         <p class="sh-footer__eyebrow">Mote do ano</p>
+         <p class="sh-footer__statement">Fecundos pelo Coração do Kyrios</p>
+         <p class="sh-footer__line">
+           <span>Missão Brasília</span>
+           <a class="sh-footer__link" href="mailto:…">contato@comshalom.org</a>
+           <a class="sh-footer__link" href="tel:…">(61) 9 0000-0000</a>
+         </p>
+       </div>
+       <div class="sh-footer__legal"><p>© 2026 …</p><p>…</p></div>
+     </footer>
+
+     2) compacto — uma linha só
+     <footer class="sh-footer sh-footer--compact" data-sh-surface="inverse">
+       <div class="sh-footer__bar">
+         <a class="sh-logo sh-footer__logo" href="/" aria-label="…">…</a>
+         <nav class="sh-footer__links" aria-label="Rodapé">
+           <a class="sh-footer__link" href="…">Eventos</a> …
+         </nav>
+         <p class="sh-footer__copy">© 2026 …</p>
+       </div>
+     </footer>
+
+     3) mapa do site — colunas de links reais
+     <footer class="sh-footer sh-footer--sitemap" data-sh-surface="inverse">
+       <div class="sh-footer__columns">
+         <div class="sh-footer__col sh-footer__col--brand">
+           <a class="sh-logo sh-footer__logo" href="/" aria-label="…">…</a>
+           <p class="sh-footer__note">…</p>
+         </div>
+         <nav class="sh-footer__col" aria-labelledby="rod-com">
+           <p class="sh-footer__col-title" id="rod-com">Comunidade</p>
+           <a class="sh-footer__link" href="…">…</a> …
+         </nav>
+       </div>
+       <div class="sh-footer__legal"><p>© 2026 …</p><p>…</p></div>
+     </footer>
+
+     data-sh-surface="inverse" já reescreve texto, borda, link e foco dos
+     filhos (tokens/semantic.css) — sh-footer só desenha a estrutura, nunca
+     a cor. O contraste do rodapé é onde mais se erra; aqui ele já vem
+     calculado do escopo de superfície.
+     ====================================================================== */
+
+  .sh-footer {
+    padding-block: var(--sh-footer-padding, var(--sh-space-12));
+  }
+
+  /* Calha comum. Todo bloco de primeiro nível do rodapé nasce na mesma
+     medida — é o que faz a logo do topo, as colunas e a linha legal
+     alinharem pela mesma borda óptica em qualquer variante. */
+  .sh-footer__inner,
+  .sh-footer__columns,
+  .sh-footer__bar,
+  .sh-footer__legal {
+    max-inline-size: calc(var(--sh-container-wide) + var(--sh-gutter) * 2);
+    margin-inline: auto;
+    padding-inline: var(--sh-gutter);
+  }
+
+  /* A marca no rodapé é sempre o componente sh-logo (surface.css) — este
+     arquivo não redesenha nada, só diz de que tamanho e com que tinta. A
+     tinta é --sh-text-strong porque é o token que o escopo de superfície e
+     os temas remapeiam juntos; --sh-text-brand daria azul institucional
+     dentro do verde do acamp's. */
+  .sh-footer__logo {
+    --sh-logo-ink: var(--sh-text-strong);
+    --sh-logo-size: var(--sh-footer-logo-size, 2rem);
+  }
+
+  .sh-footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sh-space-4);
+    padding-block-start: var(--sh-space-6);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    font-size: var(--sh-font-size-xs);
+    color: var(--sh-text-muted);
+  }
+
+  /* Peças compartilhadas pelas três variantes abaixo ---------------------- */
+
+  /* Rótulo curto que ANCORA o mote. Sem ele o mote em acento/itálico fica
+     boiando — foi a crítica direta do dono ao desenho anterior. */
+  .sh-footer__eyebrow {
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-2xs);
+    font-weight: var(--sh-weight-bold);
+    font-style: normal;
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+    color: var(--sh-text-accent);
+  }
+
+  /* O mote como declaração: tamanho de display, não de parágrafo. */
+  .sh-footer__statement {
+    max-inline-size: var(--sh-container-text);
+    font-family: var(--sh-font-accent);
+    font-size: var(--sh-footer-statement-size, var(--sh-font-size-display-sm));
+    line-height: var(--sh-leading-tight);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+
+  /* Linha corrida de dados, com separadores por gap (não por caractere
+     solto, que leitor de tela soletra). */
+  .sh-footer__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-1) var(--sh-space-5);
+    min-inline-size: 0;
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-muted);
+  }
+
+  /* Alvo de 44px vive no link, não no bloco: é o que deixa o rodapé de uma
+     linha ficar de fato baixo sem estreitar a área de toque. */
+  .sh-footer__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--sh-touch-target);
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
+  /* A altura já era 44px; a LARGURA não era — um link curto ("Fale", "Doe")
+     media 34px. O ::after só cresce quando o texto é mais estreito que 44px
+     (max(100%, …)), então nada muda nos links longos. */
+  .sh-footer__link::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: 100%;
+    translate: -50% -50%;
+  }
+  @media (hover: hover) {
+    .sh-footer__link:hover { color: var(--sh-text-strong); }
+  }
+  .sh-footer__link:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  .sh-footer__copy {
+    font-size: var(--sh-font-size-xs);
+    color: var(--sh-text-muted);
+    min-inline-size: 0;
+  }
+
+  /* ======================================================================
+     AS TRÊS VARIANTES DE RODAPÉ — DEC-025
+
+     O dono manteve as três e fixou qual vale em cada contexto. Não é
+     escolha de gosto por página: é o contexto que determina a variante.
+
+       --sitemap    PÁGINA PÚBLICA. Site institucional, CEVs, hubs.
+                    Colunas de links reais; a marca é a primeira coluna.
+       --compact    SISTEMA INTERNO. Painel administrativo, telas de
+                    trabalho. Uma linha só; não disputa atenção.
+       --editorial  PÁGINA DE EVENTO e institucional de encerramento
+                    (jubileu). O mote é o protagonista.
+
+     Regra que vale para as três: A MARCA APARECE UMA VEZ SÓ. Não há bloco
+     de marca em cima e selo repetido embaixo; a faixa legal carrega só o
+     aviso de direito autoral. Foi o defeito central do par --full/--slim,
+     removido do sistema nesta rodada junto com as peças que só ele usava
+     (__grid, __brand, __contact, __motto, __seal).
+
+     As três não são ajustes de um mesmo desenho: mudam de hierarquia, de
+     altura e de propósito.
+     ====================================================================== */
+
+  /* ------------------------------- editorial · página de evento -------- */
+  /* Hierarquia: marca (média) → mote (display, protagonista) → contato
+     (miúdo). Tudo ancorado na MESMA borda esquerda, em coluna: é o que
+     tira o mote de "solto à direita" e o transforma na fala do rodapé.
+     Altura vem do tamanho do mote, não de respiro vazio.
+     Contexto (DEC-025): página de evento e institucional de encerramento. */
+  .sh-footer--editorial {
+    --sh-footer-padding: var(--sh-space-10);
+    --sh-footer-logo-size: 2.5rem;
+  }
+  .sh-footer--editorial .sh-footer__inner {
+    display: grid;
+    justify-items: start;
+    gap: var(--sh-space-5);
+    padding-block-end: var(--sh-space-8);
+  }
+  .sh-footer--editorial .sh-footer__eyebrow { margin-block-start: var(--sh-space-3); }
+  .sh-footer--editorial .sh-footer__statement {
+    margin-block-start: calc(var(--sh-space-2) * -1);
+  }
+  .sh-footer--editorial .sh-footer__line { margin-block-start: var(--sh-space-2); }
+
+  /* ------------------------------- compacto · sistema interno ---------- */
+  /* Uma linha: marca miúda, links essenciais, direito autoral. Sem bloco
+     alto, sem faixa legal separada — o aviso entra na própria linha.
+     Contexto (DEC-025): painel administrativo e telas internas. */
+  .sh-footer--compact {
+    --sh-footer-padding: var(--sh-space-3);
+    /* 1.75rem e não 1.5rem: abaixo disso a linha "COMUNIDADE CATÓLICA" do
+       lockup oficial fecha em menos de 4px e vira sujeira. */
+    --sh-footer-logo-size: 1.75rem;
+  }
+  .sh-footer--compact .sh-footer__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-2) var(--sh-space-6);
+    min-inline-size: 0;
+  }
+  /* flex-grow no BLOCO DE LINKS, e não margin-inline-start:auto no aviso: os
+     dois empurram o aviso para a ponta quando tudo cabe numa linha, mas o
+     `auto` continua empurrando depois que o aviso quebra para a linha de
+     baixo — e ali ele fica sozinho, encostado à direita, desalinhado de todo
+     o resto. Com o grow no vizinho, a linha que sobra começa na margem. */
+  .sh-footer--compact .sh-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex: 1 1 auto;
+    gap: 0 var(--sh-space-5);
+    min-inline-size: 0;
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-muted);
+  }
+
+  /* ------------------------------- mapa do site · página pública ------- */
+  /* Colunas de links de verdade. A marca vira a primeira coluna, discreta:
+     logo pequena e uma linha de identificação, sem virar bloco.
+     Contexto (DEC-025): site institucional, CEVs e hubs. */
+  .sh-footer--sitemap {
+    --sh-footer-padding: var(--sh-space-10);
+    --sh-footer-logo-size: 1.75rem;
+  }
+  .sh-footer--sitemap .sh-footer__columns {
+    display: grid;
+    gap: var(--sh-space-8) var(--sh-space-6);
+    grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+    padding-block-end: var(--sh-space-8);
+  }
+  .sh-footer__col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sh-space-1);
+    min-inline-size: 0;
+  }
+  .sh-footer__col-title {
+    margin-block-end: var(--sh-space-1);
+    font-size: var(--sh-font-size-2xs);
+    font-weight: var(--sh-weight-bold);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+    color: var(--sh-text-muted);
+  }
+  /* A coluna da marca respira um pouco mais que as de links. */
+  .sh-footer__col--brand { gap: var(--sh-space-3); }
+  .sh-footer__col--brand .sh-footer__note {
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-muted);
+    text-wrap: pretty;
+  }
+
+  /* ======================================================================
+     sh-fab
+     <a class="sh-fab sh-fab--whatsapp" href="https://wa.me/…" target="_blank" rel="noopener">
+       <svg class="sh-icon sh-fab__icon" aria-hidden="true">…</svg>
+       <span class="sh-visually-hidden">Falar no WhatsApp (abre em nova aba)</span>
+     </a>
+
+     Máximo DOIS por página (docs/03-inventario-componentes.md). __icon +
+     sh-visually-hidden (foundations/layout.css) — rótulo acessível é
+     obrigatório, o FAB nunca leva texto visível.
+     ====================================================================== */
+
+  .sh-fab {
+    position: fixed;
+    inset-block-end: max(
+      var(--sh-fab-offset, var(--sh-space-6)),
+      calc(env(safe-area-inset-bottom, 0px) + var(--sh-space-4))
+    );
+    inset-inline-end: var(--sh-fab-offset, var(--sh-space-6));
+    z-index: var(--sh-layer-sticky);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-fab-size, 3.5rem);
+    block-size: var(--sh-fab-size, 3.5rem);
+    border: var(--sh-border-width-hair) solid var(--sh-fab-border, var(--sh-action-accent-border));
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-fab-bg, var(--sh-action-accent-bg));
+    color: var(--sh-fab-fg, var(--sh-action-accent-fg));
+    box-shadow: var(--sh-fab-shadow, var(--sh-shadow-lg));
+    cursor: pointer;
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      box-shadow        var(--sh-duration-base) var(--sh-ease-standard),
+      opacity           var(--sh-duration-base) var(--sh-ease-standard),
+      scale              var(--sh-duration-base) var(--sh-ease-standard),
+      translate          var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-fab__icon { --sh-icon-size: var(--sh-icon-size-lg); }
+
+  @media (hover: hover) {
+    .sh-fab:hover { background-color: var(--sh-fab-bg-hover, var(--sh-action-accent-bg-hover)); }
+  }
+  .sh-fab:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring), var(--sh-fab-shadow, var(--sh-shadow-lg));
+  }
+  .sh-fab:active { translate: 0 1px; }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-fab--start { inset-inline-end: auto; inset-inline-start: var(--sh-fab-offset, var(--sh-space-6)); }
+
+  /* Sem token de marca para terceiros na camada semântica: a família
+     feedback-success é a leitura verde mais próxima que o sistema tem sem
+     recorrer a hex fora da paleta. Documentado no relatório do lote. */
+  .sh-fab--whatsapp {
+    --sh-fab-bg: var(--sh-feedback-success-solid);
+    --sh-fab-bg-hover: var(--sh-feedback-success-solid);
+    --sh-fab-fg: var(--sh-feedback-success-on-solid);
+    --sh-fab-border: var(--sh-feedback-success-solid);
+  }
+
+  /* "Início" — volta ao topo. Tom secundário (não compete com o CTA
+     principal) e empilha ACIMA de um FAB vizinho no mesmo canto sozinho,
+     sem coordenação por JS. */
+  /* --sh-border-strong, não --sh-border-default: `default` está anotado em
+     semantic.css como borda DECORATIVA, e aqui a borda é a única silhueta que
+     este FAB tem — o preenchimento (--sh-surface-raised) fica a 1,06–2,94:1 da
+     página nos seis cenários, e o botão flutua sobre conteúdo qualquer. Com
+     `strong` o limite mede 4,97–6,36:1, acima dos 3:1 da WCAG 1.4.11. O FAB de
+     ação (o padrão, --accent) não precisa: o preenchimento dele já resolve. */
+  .sh-fab--top {
+    --sh-fab-bg: var(--sh-surface-raised);
+    --sh-fab-bg-hover: var(--sh-surface-hover);
+    --sh-fab-fg: var(--sh-text-default);
+    --sh-fab-border: var(--sh-border-strong);
+    --sh-fab-shadow: var(--sh-shadow-md);
+    inset-block-end: calc(
+      max(var(--sh-fab-offset, var(--sh-space-6)), calc(env(safe-area-inset-bottom, 0px) + var(--sh-space-4)))
+      + var(--sh-fab-size, 3.5rem) + var(--sh-space-3)
+    );
+  }
+
+  /* Visibilidade condicional (ex.: "início" só depois de rolar). Sem o
+     atributo, o FAB fica sempre visível — é o caso comum do WhatsApp. */
+  .sh-fab[data-visible="false"] {
+    opacity: 0;
+    scale: 0.85;
+    translate: 0 8px;
+    pointer-events: none;
+    box-shadow: none;
+  }
+}
