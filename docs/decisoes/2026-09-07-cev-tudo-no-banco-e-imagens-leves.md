@@ -61,8 +61,23 @@ Site: item 7 da seção 3 + comparação computada (Asa Sul × irmãs) + Asa Sul
 2. Descoberta: a migration do Portal `20260818093000_paginas_externas_grants.sql` limita `settings_public_read` a `('schedules','cafe_info')`, então as páginas (anônimas) não liam `home`. Correção pelo caminho previsto naquela migration: nova migration **no repo do Portal** `supabase/migrations/20260907170000_settings_home_public_read.sql` (validada no homolog com rollback) e a mesma política aplicada em produção pelo SQL Editor. Depois: 3 linhas `home` visíveis ao anon. A migration é idempotente (`drop policy if exists`), então o próximo `db push`/`migration up` do Portal não conflita.
 3. Ordem do carrossel de Taguatinga corrigida em produção (`grupo-aberto` 0, `grupo-de-casais` 1), a pedido.
 
-**Branch de publicação `feat/cev-editavel`** (worktree `~/Documents/GitHub/Shalom-cev`): commit `0376367` (rodadas 1–2) + commit `a0c9fae` (rodada 3, 50 arquivos, inclui as remoções de `data.js` ×3 e das duas JPGs pesadas). Teste final a partir da branch contra o banco real: capa do banco aplicada, horários e eventos corretos nas três páginas, zero erros, nenhum `data.js` carregado; suíte do painel (mock) passando. **Push não feito** — ação do João.
+**Publicação:** branch `feat/cev-editavel` (worktree `~/Documents/GitHub/Shalom-cev`), commits `0376367` (rodadas 1–2) e `80ec785` (rodada 3, inclui as remoções de `data.js` ×3 e das duas JPGs pesadas), **mesclada em `origin/main` pelo João**. GitHub Pages publicou.
 
-**Observação esperada até o deploy:** `home.imagem` de Taguatinga aponta para `https://brasilia.comshalom.org/images/shalom-taguatinga.webp`, que só existe em produção depois do push; até lá, o teste local mostra o gradiente (D14). Depois do push, a foto aparece.
+**Verificação em produção (2026-09-07, depois do deploy):**
 
-**Pendências:** push da branch (deploy); conceder páginas aos editores em "Usuários e acessos"; validar QR Pix; foto de Santa Maria (pelo painel); WhatsApps; endereço "QC 1, Casa 7"; rótulo "10%"; a sessão do Portal deve incorporar a migration `20260907170000` no fluxo normal dela (homolog já tem a política antiga; `migration up` aplica). A aba "Untitled query" do SQL Editor ficou aberta no Chrome com edições não salvas (pode ser fechada).
+| Verificação | Resultado |
+|---|---|
+| `brasilia.comshalom.org/{asasul,taguatinga,santamaria}/` | 200; zero erro de console, de página ou de recurso próprio |
+| Capa vinda do banco | Asa Sul e Taguatinga com foto carregada (`naturalWidth > 0`); Santa Maria com o gradiente (ainda sem foto); títulos e frases do banco |
+| Horários | seis cartões preenchidos nas três; "A confirmar" só em Missas de Santa Maria |
+| Eventos | 8 / 4 / 2; o primeiro de Taguatinga é "Grupo de Oração Aberto" (o único com arte) |
+| Páginas `e/<slug>/` | sete conferidas: 200 e `og:image` correta (arte do evento ou imagem padrão do centro) |
+| Notícias | três cartões do feed compartilhado nas três páginas |
+| `js/data.js` | 404 e nenhum `<script>` o carrega |
+| Imagens servidas | nenhuma acima de 300 KB |
+| Painel `/admin/` | 200, tela de login sem aviso de configuração, sem erros |
+| RLS | `insert`, `update` e `delete` anônimos recusados (42501); dados intactos |
+| Demais páginas (`/`, `/25anos/`, `/providencia/**`, `/sh82cafe/`, `/acamps/`, `/adoracao/`) | 200 — o deploy não afetou o trabalho de terceiros |
+| Embeds no navegador real | mapa mostra a ficha do centro (QNA 26, 5,0 estrelas) e o Instagram carrega o perfil; em navegador headless ficam em branco por bloqueio de cookies, igual à Asa Sul antes desta reforma |
+
+**Pendências:** conceder páginas aos editores em "Usuários e acessos"; validar QR Pix; foto de Santa Maria (pelo painel); WhatsApps; endereço "QC 1, Casa 7"; rótulo "10%"; a sessão do Portal deve incorporar a migration `20260907170000` no fluxo normal dela (a política já está aplicada em produção e a migration é idempotente). A aba "Untitled query" do SQL Editor ficou aberta no Chrome com edições não salvas (pode ser fechada).
