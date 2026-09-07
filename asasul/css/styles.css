@@ -1,5 +1,5 @@
 /* =====================================================================
-   Shalom Asa Sul — Layout (self-contained, Montserrat)
+   Shalom Asa Sul — Layout (self-contained, Montserrat) — base compartilhada com Taguatinga e Santa Maria
    Tema claro / hero imersivo / acento azul-Shalom. Mobile-first.
    ===================================================================== */
 
@@ -77,6 +77,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .site-header:not(.scrolled) .nav-links a:hover { background: rgba(255,255,255,.18); }
 .nav-cta { background: var(--blue); color: #fff !important; box-shadow: var(--shadow-sm); text-shadow: none !important; }
 .nav-cta:hover { background: var(--blue-deep); }
+.site-header .nav-links a.nav-cta:hover, .site-header.scrolled .nav-links a.nav-cta:hover { background: var(--blue-deep); color: #fff; }
 
 .nav-toggle { display: inline-flex; flex-direction: column; gap: 5px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.3); border-radius: var(--r-pill); padding: .6rem .65rem; backdrop-filter: blur(8px); color: #fff; }
 .site-header.scrolled .nav-toggle { background: var(--paper-2); border-color: var(--line); color: var(--ink); }
@@ -263,7 +264,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .tithe__qr span { display: block; margin-top: .7rem; font-size: .82rem; color: rgba(255,255,255,.72); letter-spacing: .04em; }
 @media (min-width: 820px) { .tithe__qr { display: block; } }
 
-/* Campo de PIX vindo do CSV (cev-data.js) — caso seja exibido */
+/* Campo de PIX em bloco de código — não usado nesta página, mantido por compatibilidade */
 .codeblock { display: flex; align-items: center; gap: .5rem; background: rgba(0,0,0,.22); border: 1px solid rgba(255,255,255,.14); border-radius: var(--r); padding: .7rem .9rem; }
 .codeblock code { flex: 1; overflow-wrap: anywhere; color: #fff; font-size: .9rem; }
 .copy-btn { background: var(--gold); border: none; border-radius: 8px; width: 34px; height: 34px; display: grid; place-items: center; cursor: pointer; }
@@ -290,3 +291,20 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 .toast-mini { position: fixed; left: 50%; bottom: 1.5rem; transform: translate(-50%, 20px); z-index: 80; background: var(--ink); color: #fff; padding: .7rem 1.1rem; border-radius: var(--r-pill); font-size: .9rem; font-weight: 600; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: opacity .25s var(--ease), transform .25s var(--ease); }
 .toast-mini.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Ajustes locais (Taguatinga / Santa Maria) ---------- */
+/* Pôster de reserva do carrossel usa h3 (ordem de títulos h2 > h3), com o mesmo visual do h4 da Asa Sul */
+.event-card__media .poster-fallback h3 { font-size: clamp(1.3rem,5vw,1.8rem); text-shadow: 0 2px 20px rgba(0,0,0,.3); }
+/* Dois blocos de chave Pix (10% e 5%) no painel de comunhão de bens */
+.pix-key + .pix-key { margin-top: .8rem; }
+/* Hero sem foto do centro (Santa Maria, até haver imagem): fundo institucional na mesma linguagem da seção de comunhão */
+.hero__bg--nophoto { background:
+  radial-gradient(70% 60% at 85% 10%, rgba(201,162,74,.18), transparent 60%),
+  radial-gradient(70% 70% at 10% 90%, rgba(37,96,168,.55), transparent 60%),
+  linear-gradient(160deg, #12345F 0%, #0a1f3d 100%); }
+/* Capa editável: troca suave da imagem vinda do painel */
+.hero__bg img { transition: opacity .35s var(--ease); }
+.hero__bg img.is-swapping { opacity: .001; }
+/* Link discreto para a área de edição no rodapé */
+.site-footer .footer-admin { color: rgba(255,255,255,.5); font-size: .78rem; }
+.site-footer .footer-admin:hover { color: #fff; }

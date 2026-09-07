@@ -43,7 +43,7 @@
     document.title = ev.titulo + " — Shalom Asa Sul";
     setOG(ev);
 
-    var fallback = '<div class="poster-fallback"><div><h4>' + esc(ev.titulo) + '</h4></div></div>';
+    var fallback = '<div class="poster-fallback"><div><strong>' + esc(ev.titulo) + '</strong></div></div>';
     var poster = ev.imagem
       ? '<img src="' + esc(ev.imagem) + '" alt="' + esc(ev.titulo) + '" onerror="var p=this.parentElement;this.style.display=\'none\';p.insertAdjacentHTML(\'beforeend\', this.dataset.fb)" data-fb="' + esc(fallback).replace(/"/g, "&quot;") + '">'
       : fallback;

@@ -32,7 +32,7 @@
   var routeModule = "";
   var SITE_CATALOG = [
     {id:"root", name:"Raiz / 25 anos", path:"../25anos/", status:"published", type:"readonly", modules:[]},
-    {id:"asasul", name:"Shalom Asa Sul", path:"../asasul/", status:"published", type:"editable", modules:["events","schedules"], children:[
+    {id:"asasul", name:"Shalom Asa Sul", path:"../asasul/", status:"published", type:"editable", modules:["home","schedules","events"], children:[
       {name:"Vida Plena",path:"../asasul/e/vida-plena/"},
       {name:"Kyrios",path:"../asasul/e/kyrios/"},
       {name:"Amare",path:"../asasul/e/amare/"},
@@ -42,8 +42,16 @@
       {name:"Curada: História de Vida",path:"../asasul/e/curada-historia-de-vida/"},
       {name:"És Precioso",path:"../asasul/e/es-precioso/"}
     ]},
-    {id:"taguatinga", name:"Shalom Taguatinga", path:"../taguatinga/", status:"published", type:"readonly", modules:[]},
-    {id:"santamaria", name:"Shalom Santa Maria", path:"../santamaria/", status:"published", type:"readonly", modules:[]},
+    {id:"taguatinga", name:"Shalom Taguatinga", path:"../taguatinga/", status:"published", type:"editable", modules:["home","schedules","events"], children:[
+      {name:"Grupo de Oração Aberto",path:"../taguatinga/e/grupo-aberto/"},
+      {name:"Grupo de Oração de Casais",path:"../taguatinga/e/grupo-de-casais/"},
+      {name:"Grupo de Oração Jovem",path:"../taguatinga/e/grupo-jovem/"},
+      {name:"Missa Jovem",path:"../taguatinga/e/missa-jovem/"}
+    ]},
+    {id:"santamaria", name:"Shalom Santa Maria", path:"../santamaria/", status:"published", type:"editable", modules:["home","schedules","events"], children:[
+      {name:"Grupo de Oração de Adultos",path:"../santamaria/e/grupo-de-adultos/"},
+      {name:"Grupo de Oração de Jovens",path:"../santamaria/e/grupo-de-jovens/"}
+    ]},
     {id:"sh82cafe", name:"SH-82 Café", path:"../sh82cafe/", status:"published", type:"editable", modules:["menu"]},
     {id:"providencia", name:"Providência", path:"../providencia/", status:"published", type:"readonly", modules:[], children:[{name:"Habilidades",path:"../providencia/habilidades/"},{name:"Necessidades",path:"../providencia/necessidades/"}]},
     {id:"adoracao", name:"Adoração", path:"../adoracao/", status:"published", type:"app", modules:[]},
@@ -51,7 +59,42 @@
     {id:"eventos", name:"Eventos", path:"../eventos/", status:"development", type:"app", modules:[]},
     {id:"inscricoes", name:"Inscrições", path:"../inscricoes/", status:"development", type:"app", modules:[]},
   ];
-  var MODULE_LABELS = { events:"Eventos e encontros", schedules:"Horários e serviços", menu:"Cardápio" };
+  var MODULE_LABELS = { home:"Capa (topo da página)", schedules:"Horários e serviços", events:"Eventos e encontros", menu:"Cardápio" };
+
+  // Endereço do site publicado. Serve para transformar um caminho local do
+  // js/data.js de uma página ("images/eventos/x.webp") no endereço completo
+  // que o banco precisa guardar.
+  var PUBLIC_ORIGIN = "https://brasilia.comshalom.org/";
+
+  // Para cada módulo: o que ele muda, onde isso aparece na página e a âncora
+  // que leva direto ao trecho. A miniatura é desenhada em pageThumb().
+  var MODULE_META = {
+    home: {
+      descricao: "A imagem de fundo, o título e a frase de apoio que abrem a página.",
+      onde: "no topo da página, na primeira tela que a pessoa vê",
+      ancora: "",
+      thumbAlt: "Miniatura da página com o topo destacado"
+    },
+    schedules: {
+      descricao: "Os seis cartões de horários: funcionamento, missas, grupos de oração, adoração, serviços e aconselhamento.",
+      onde: "logo abaixo do topo, na seção “Horários e serviços”",
+      ancora: "#horarios",
+      thumbAlt: "Miniatura da página com a faixa de horários destacada"
+    },
+    events: {
+      descricao: "Os cartões do carrossel “Eventos e encontros” e a página de detalhe de cada um.",
+      onde: "na seção “Eventos e encontros”, mais abaixo na página",
+      ancora: "#eventos",
+      thumbAlt: "Miniatura da página com a faixa de eventos destacada"
+    },
+    menu: {
+      descricao: "As categorias, os produtos e as informações do café.",
+      onde: "na página do café",
+      ancora: "",
+      thumbAlt: "Miniatura da página de cardápio"
+    }
+  };
+  var PANEL_BY_MODULE = { home:"#tab-capa", schedules:"#tab-horarios", events:"#tab-eventos", menu:"#tab-cardapio" };
 
   /* ---------- helpers ---------- */
   function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"})[c];}); }
@@ -101,6 +144,96 @@
       img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error("img")); };
       img.src = url;
     });
+  }
+
+  /* ---------- "onde isto aparece na página" ---------- */
+  // Miniatura esquemática de uma página (90x120), com o trecho do módulo em azul.
+  function pageThumb(module, decorative){
+    var quiet = "#DCE6F2", live = "var(--blue)";
+    var out = '<rect x=".9" y=".9" width="88.2" height="118.2" rx="7" fill="#FFF" stroke="#C9D5E4" stroke-width="1.6"/>';
+    function block(x,y,w,h,fill,rx){ out += '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(rx==null?2:rx)+'" fill="'+fill+'"/>'; }
+    block(10,8,42,5,quiet,2.5);                                     // barra do topo
+    if (module === "menu"){
+      block(10,17,70,18,quiet,3);
+      block(10,41,26,4,live);
+      block(10,49,70,9,live);
+      block(10,61,70,9,live);
+      block(10,74,26,4,live);
+      block(10,82,70,9,live);
+      block(10,94,70,9,live);
+    } else {
+      block(10,17,70,33, module === "home" ? live : quiet, 3);      // capa
+      var s = module === "schedules" ? live : quiet;
+      block(10,55,33.5,14,s); block(46.5,55,33.5,14,s);
+      block(10,72,33.5,14,s); block(46.5,72,33.5,14,s);
+      var e = module === "events" ? live : quiet;
+      block(10,92,23,20,e,3); block(33.5,92,23,20,e,3); block(57,92,23,20,e,3);
+    }
+    var meta = MODULE_META[module] || {};
+    var a11y = decorative ? 'aria-hidden="true"' : 'role="img" aria-label="'+esc(meta.thumbAlt || "Miniatura da página")+'"';
+    return '<svg class="page-thumb" viewBox="0 0 90 120" focusable="false" '+a11y+'>'+out+'</svg>';
+  }
+  // Endereço público do trecho que o módulo edita (para o botão "Ver no site").
+  function moduleHref(item, module){
+    var meta = MODULE_META[module] || {};
+    return publicHref(item) + (meta.ancora || "");
+  }
+  // Faixa "Você está editando …" no topo de um editor.
+  function renderEditingContext(hostSel, module){
+    var host = $(hostSel); if (!host) return;
+    var item = catalogFor(site);
+    if (!item){ host.innerHTML = ""; return; }
+    var meta = MODULE_META[module] || {};
+    host.innerHTML =
+      pageThumb(module) +
+      '<div class="editing-context__body">' +
+        '<p class="editing-context__what">Você está editando <strong>' + esc(MODULE_LABELS[module] || "") + '</strong> da página <strong>' + esc(item.name) + '</strong>.</p>' +
+        (meta.onde ? '<p class="editing-context__where">Onde aparece: ' + esc(meta.onde) + '.</p>' : '') +
+      '</div>' +
+      '<a class="btn btn--sm" href="' + esc(moduleHref(item, module)) + '" target="_blank" rel="noopener">Ver no site<span class="sr-only"> (abre em outra aba)</span></a>';
+  }
+
+  /* ---------- dados locais da página (js/data.js de cada site) ---------- */
+  var localDataCache = {};
+  // Lê o js/data.js publicado da página e devolve capa, horários e eventos locais.
+  // Falha (arquivo ausente, erro de sintaxe) devolve tudo vazio, sem quebrar o painel.
+  function loadSiteLocalData(siteId){
+    var empty = { home:null, schedules:null, events:[] };
+    if (!siteId || !/^[a-z0-9-]+$/.test(siteId)) return Promise.resolve(empty);
+    if (localDataCache[siteId]) return localDataCache[siteId];
+    var p = fetch("../" + siteId + "/js/data.js", { cache:"no-store" })
+      .then(function(res){ if (!res.ok) throw new Error("http " + res.status); return res.text(); })
+      .then(function(src){
+        var sandbox = {};
+        try { new Function("window", src)(sandbox); }
+        catch (e){ return empty; }
+        return {
+          home: sandbox.SHALOM_HOME || null,
+          schedules: sandbox.SHALOM_SCHEDULES || null,
+          events: Array.isArray(sandbox.SHALOM_EVENTOS) ? sandbox.SHALOM_EVENTOS : []
+        };
+      })
+      .catch(function(){ return empty; });
+    localDataCache[siteId] = p;
+    return p;
+  }
+  // Caminho local do site -> endereço completo do site publicado.
+  function toPublicUrl(path, siteId){
+    var v = String(path == null ? "" : path).trim();
+    if (!v) return "";
+    if (/^data:image\//i.test(v)) return v;
+    try { var u = new URL(v, PUBLIC_ORIGIN + siteId + "/"); return /^https?:$/.test(u.protocol) ? u.href : ""; } catch (e){ return ""; }
+  }
+  // Texto do data.js -> HTML: parágrafos em <p>, quebras simples em <br>, links clicáveis.
+  function descriptionToHtml(text){
+    var t = String(text == null ? "" : text).replace(/\r\n/g, "\n").trim();
+    if (!t) return "";
+    return t.split(/\n{2,}/).map(function(par){
+      var safe = esc(par).replace(/https?:\/\/[^\s<]*[^\s<.,;:!?)\]"']/g, function(u){
+        return '<a href="' + u + '" target="_blank" rel="noopener">' + u + '</a>';
+      });
+      return "<p>" + safe.replace(/\n/g, "<br>") + "</p>";
+    }).join("");
   }
 
   /* ---------- views ---------- */
@@ -254,14 +387,17 @@
     $("#workspaceTitle").textContent=item.name; $("#workspaceDescription").textContent="Escolha somente um módulo suportado por esta página.";
     $("#workspacePublicLink").href=publicHref(item);
     var switcher=$("#workspaceSwitcher"), modules=$("#workspaceModules");
-    switcher.innerHTML=item.modules.map(function(m){return '<a id="workspace-'+m+'-link" class="workspace-module-link '+(routeModule===m?'is-selected':'')+'" href="#page/'+esc(item.id)+'/'+esc(m)+'">'+esc(MODULE_LABELS[m])+'</a>';}).join("");
-    modules.innerHTML=item.modules.map(function(m){return '<div class="workspace-module '+(routeModule===m?'is-current':'')+'" data-workspace-module="'+esc(m)+'"><div><h2>'+esc(MODULE_LABELS[m])+'</h2><p>Edite os dados publicados nesta página.</p></div><a class="btn btn--primary" href="#page/'+esc(item.id)+'/'+esc(m)+'">Abrir editor</a></div>';}).join("");
+    switcher.innerHTML=item.modules.map(function(m){var meta=MODULE_META[m]||{};return '<a id="workspace-'+m+'-link" class="workspace-module-link '+(routeModule===m?'is-selected':'')+'" href="#page/'+esc(item.id)+'/'+esc(m)+'" title="'+esc(meta.descricao||"")+'">'+pageThumb(m,true)+esc(MODULE_LABELS[m])+'</a>';}).join("");
+    modules.innerHTML=item.modules.map(function(m){var meta=MODULE_META[m]||{};return '<div class="workspace-module '+(routeModule===m?'is-current':'')+'" data-workspace-module="'+esc(m)+'"><div class="workspace-module__head"><div class="workspace-module__thumb">'+pageThumb(m)+'</div><div class="workspace-module__body"><h2>'+esc(MODULE_LABELS[m])+'</h2><p>'+esc(meta.descricao||"Edite os dados publicados nesta página.")+'</p></div></div><a class="btn btn--primary" href="#page/'+esc(item.id)+'/'+esc(m)+'">Abrir editor</a></div>';}).join("");
     $("#legacyWorkspaceLabel").textContent=item.name;
     $$(".legacy-panel").forEach(function(p){p.classList.remove("is-editor-visible");p.classList.add("hidden");});
     if(routeModule){
-      var target=routeModule === "events" ? $("#tab-eventos") : routeModule === "schedules" ? $("#tab-horarios") : $("#tab-cardapio");
+      var target=$(PANEL_BY_MODULE[routeModule]||"");
       if(target){ target.classList.remove("hidden"); target.classList.add("is-editor-visible"); target.setAttribute("aria-hidden","false"); }
-      if(routeModule === "events") loadEvents(); if(routeModule === "schedules") loadSchedules(); if(routeModule === "menu") loadMenu();
+      if(routeModule === "home"){ renderEditingContext("#capaContext","home"); loadCapa(); }
+      if(routeModule === "schedules"){ renderEditingContext("#horariosContext","schedules"); loadSchedules(); }
+      if(routeModule === "events"){ renderEditingContext("#eventosContext","events"); loadEvents(); }
+      if(routeModule === "menu") loadMenu();
       modules.innerHTML='<div class="active-editor-note"><a href="#page/'+esc(item.id)+'">Voltar para '+esc(item.name)+'</a><p>Editor de '+esc(MODULE_LABELS[routeModule])+'.</p></div>';
     }
   }
@@ -299,7 +435,7 @@
   /* ---------- seletor de página (site) ---------- */
   var siteSelect = $("#siteSelect"), siteOptions = $("#siteOptions"), siteRows = [];
   var activeTab = "eventos";
-  function updateChips(){ $("#siteChip").textContent = siteName; $("#siteChip2").textContent = siteName; var c3=$("#siteChip3"); if(c3) c3.textContent = siteName; }
+  function updateChips(){ ["#siteChip","#siteChip2","#siteChip3","#siteChip4"].forEach(function(sel){ var el=$(sel); if(el) el.textContent = siteName; }); }
   function loadSites(){
     if (!sb) return Promise.resolve([]);
     return sb.from("sites").select("id,name").order("name").then(function(res){
@@ -338,7 +474,7 @@
   siteOptions.addEventListener("keydown", function(e){ var opts=$$('[data-site]',siteOptions), i=opts.indexOf(document.activeElement); if(e.key==="Escape"){e.preventDefault();toggleChoice(siteSelect,siteOptions,false);siteSelect.focus();} if(e.key==="Home"){e.preventDefault();opts[0].focus();} if(e.key==="End"){e.preventDefault();opts[opts.length-1].focus();} if(e.key==="ArrowDown"){e.preventDefault();(opts[i+1]||opts[0]).focus();} if(e.key==="ArrowUp"){e.preventDefault();(opts[i-1]||opts[opts.length-1]).focus();} if(e.key==="Enter"&&document.activeElement.dataset.site) chooseSite(document.activeElement.dataset.site); });
 
   /* ---------- tabs ---------- */
-  var PANELS = ["eventos","horarios","cardapio","usuarios"];
+  var PANELS = ["capa","eventos","horarios","cardapio","usuarios"];
   $$(".tab").forEach(function(t){
     t.addEventListener("click", function(){
       if (t.classList.contains("hidden")) return;
@@ -354,6 +490,145 @@
   });
 
   /* =====================================================================
+     CAPA (topo da página) — settings.home, com prévia ao vivo
+     ===================================================================== */
+  var capaTitulo=$("#capa-titulo"), capaSub=$("#capa-subtitulo");
+  var capaImgUrl=$("#capa-image-url"), capaImgAlt=$("#capa-image-alt");
+  var capaPreview=$("#capaPreview");
+  var CAPA_HINT = "JPG ou PNG na horizontal, de preferência com 1600 px de largura ou mais. A imagem é ajustada automaticamente.";
+
+  // Nome curto do centro, para o texto alternativo da imagem.
+  function capaAltPadrao(){ return "Centro de Evangelização " + String(siteName||"").replace(/^Shalom\s+/i,""); }
+  function setCapaNotice(text){
+    var el=$("#capaNotice"); if(!el) return;
+    el.textContent = text || "";
+    el.classList.toggle("hidden", !text);
+  }
+  function drawCapaPreview(){
+    if (!capaPreview) return;
+    var titulo=(capaTitulo.value||"").replace(/[ \t]+\n/g,"\n").trim();
+    var sub=(capaSub.value||"").trim();
+    var img=(capaImgUrl.value||"").trim();
+    $("#capaPreviewTitle").textContent = titulo || "Título da capa";
+    $("#capaPreviewSub").textContent = sub;
+    var el=capaPreview.querySelector(".capa-preview__img");
+    if (img){
+      if (!el){ el=document.createElement("img"); el.className="capa-preview__img"; el.alt=""; capaPreview.insertBefore(el, capaPreview.firstChild); }
+      if (el.getAttribute("src") !== img) el.setAttribute("src", img);
+      capaPreview.classList.remove("capa-preview--nophoto");
+    } else {
+      if (el) el.remove();
+      capaPreview.classList.add("capa-preview--nophoto");
+    }
+    $("#capa-image-clear").disabled = !img;
+  }
+  function setCapaFields(v){
+    v = v || {};
+    capaTitulo.value = v.titulo || "";
+    capaSub.value = v.subtitulo || "";
+    capaImgUrl.value = v.imagem || "";
+    capaImgAlt.value = v.imagem_alt || "";
+    drawCapaPreview();
+  }
+  if (capaTitulo){
+    capaTitulo.addEventListener("input", drawCapaPreview);
+    capaSub.addEventListener("input", drawCapaPreview);
+  }
+
+  function loadCapa(){
+    if (!sb) return;
+    var target=site;
+    setCapaNotice("");
+    setCapaFields({});
+    setMsg($("#capaMsg"), "Carregando a capa desta página…", true);
+    $("#capa-upload-status").textContent = CAPA_HINT;
+    sb.from("settings").select("value").eq("site",site).eq("key","home").limit(1).then(function(res){
+      if (target !== site) return;
+      setMsg($("#capaMsg"), "");
+      if (res.error){ setMsg($("#capaMsg"), "Não foi possível carregar a capa: "+res.error.message); return; }
+      var row = res.data && res.data[0] && res.data[0].value;
+      if (row && (row.titulo || row.subtitulo || row.imagem)){ setCapaFields(row); return; }
+      return loadSiteLocalData(target).then(function(local){
+        if (target !== site) return;
+        var home = local.home;
+        if (home){
+          setCapaFields({
+            titulo: home.titulo || "",
+            subtitulo: home.subtitulo || "",
+            imagem: toPublicUrl(home.imagem || "", target),
+            imagem_alt: home.imagem_alt || capaAltPadrao()
+          });
+          setCapaNotice("Estes dados vieram do arquivo do site e ainda não foram salvos aqui. Revise e clique em Salvar capa para passar a controlá-los pelo painel.");
+        } else {
+          setCapaFields({});
+          setCapaNotice("Esta página ainda não tem capa salva no painel. Escreva o título e a frase de apoio e clique em Salvar capa.");
+        }
+      });
+    }).catch(function(){
+      if (target !== site) return;
+      setMsg($("#capaMsg"), "Não foi possível carregar a capa. Verifique a conexão e tente de novo.");
+    });
+  }
+
+  if ($("#capa-upload-btn")) $("#capa-upload-btn").addEventListener("click", function(){ $("#capa-image-file").click(); });
+  if ($("#capa-image-clear")) $("#capa-image-clear").addEventListener("click", function(){
+    capaImgUrl.value=""; drawCapaPreview();
+    $("#capa-upload-status").textContent = "Imagem removida. Clique em Salvar capa para aplicar no site.";
+    capaTitulo.focus();
+  });
+  if ($("#capa-image-file")) $("#capa-image-file").addEventListener("change", function(){
+    var file=this.files && this.files[0]; this.value="";
+    if (!file || !sb) return;
+    var status=$("#capa-upload-status"), target=site;
+    status.textContent="Preparando a imagem…";
+    resizeImage(file, 1920, 0.85).then(function(blob){
+      status.textContent="Enviando a imagem…";
+      var path=target+"/capa-"+Date.now()+".jpg";
+      return sb.storage.from("eventos").upload(path, blob, { upsert:true, cacheControl:"3600", contentType:"image/jpeg" }).then(function(res){
+        if (res.error){
+          if (isRlsError(res.error)){ status.textContent="Sem permissão para enviar imagem nesta página."; toast("Sem permissão para editar esta página."); }
+          else status.textContent="Não foi possível enviar a imagem: "+res.error.message;
+          return;
+        }
+        if (target !== site) return;
+        var pub=sb.storage.from("eventos").getPublicUrl(path);
+        capaImgUrl.value = (pub && pub.data && pub.data.publicUrl) || "";
+        if (!capaImgAlt.value) capaImgAlt.value = capaAltPadrao();
+        drawCapaPreview();
+        status.textContent="Imagem enviada. Clique em Salvar capa para aplicar no site.";
+      });
+    }).catch(function(){ status.textContent="Não foi possível preparar a imagem. Tente outro arquivo."; });
+  });
+
+  if ($("#saveCapaBtn")) $("#saveCapaBtn").addEventListener("click", function(){
+    if (!sb) return;
+    var btn=this, msg=$("#capaMsg");
+    var titulo=(capaTitulo.value||"").split("\n").map(function(l){return l.trim();}).filter(Boolean).join("\n");
+    if (!titulo){ setMsg(msg,"Escreva o título da capa antes de salvar."); capaTitulo.focus(); return; }
+    var imagem=(capaImgUrl.value||"").trim();
+    var value={
+      titulo: titulo,
+      subtitulo: (capaSub.value||"").trim(),
+      imagem: imagem,
+      imagem_alt: imagem ? ((capaImgAlt.value||"").trim() || capaAltPadrao()) : ""
+    };
+    capaTitulo.value = titulo; drawCapaPreview();
+    btn.disabled=true; setMsg(msg,"Salvando…",true);
+    sb.from("settings").upsert({ site:site, key:"home", value:value, updated_at:new Date().toISOString() }, { onConflict:"site,key" })
+      .then(function(res){
+        btn.disabled=false;
+        if (res.error){
+          if (isRlsError(res.error)){ setMsg(msg,"Sem permissão para editar esta página."); toast("Sem permissão para editar esta página."); }
+          else setMsg(msg,"Erro ao salvar: "+res.error.message);
+          return;
+        }
+        setCapaNotice("");
+        setMsg(msg,"Capa salva! A página já mostra estes textos.",true); toast("Capa salva");
+      })
+      .catch(function(){ btn.disabled=false; setMsg(msg,"Não foi possível salvar agora. Tente de novo."); });
+  });
+
+  /* =====================================================================
      HORÁRIOS & SERVIÇOS
      ===================================================================== */
   var schedGrid=$("#schedGrid");
@@ -363,16 +638,44 @@
         '<textarea id="sch-'+c.key+'" rows="4" placeholder="Um item por linha"></textarea></div>';
     }).join("");
   }
+  function fillSched(val){
+    val = val || {};
+    CATS.forEach(function(c){
+      var ta=$("#sch-"+c.key); if(!ta) return;
+      var arr=val[c.key]||[];
+      ta.value = Array.isArray(arr) ? arr.join("\n") : "";
+    });
+  }
+  function setSchedNotice(text){
+    var el=$("#schedNotice"); if(!el) return;
+    el.textContent = text || "";
+    el.classList.toggle("hidden", !text);
+  }
 
   function loadSchedules(){
     if (!sb) return;
+    var target=site;
+    setSchedNotice("");
+    setMsg($("#schedMsg"), "Carregando os horários desta página…", true);
     sb.from("settings").select("value").eq("site",site).eq("key","schedules").limit(1).then(function(res){
-      var val = (res.data && res.data[0] && res.data[0].value) || {};
-      CATS.forEach(function(c){
-        var ta=$("#sch-"+c.key); if(!ta) return;
-        var arr=val[c.key]||[];
-        ta.value = Array.isArray(arr) ? arr.join("\n") : "";
+      if (target !== site) return;
+      setMsg($("#schedMsg"), "");
+      if (res.error){ setMsg($("#schedMsg"), "Não foi possível carregar os horários: "+res.error.message); return; }
+      var val = res.data && res.data[0] && res.data[0].value;
+      if (val && Object.keys(val).length){ fillSched(val); return; }
+      return loadSiteLocalData(target).then(function(local){
+        if (target !== site) return;
+        if (local.schedules){
+          fillSched(local.schedules);
+          setSchedNotice("Estes horários vieram do arquivo do site e ainda não foram salvos aqui. Revise e clique em Salvar horários para passar a controlá-los pelo painel.");
+        } else {
+          fillSched({});
+          setSchedNotice("Esta página ainda não tem horários salvos no painel. Preencha as seis categorias e clique em Salvar horários.");
+        }
       });
+    }).catch(function(){
+      if (target !== site) return;
+      setMsg($("#schedMsg"), "Não foi possível carregar os horários. Verifique a conexão e tente de novo.");
     });
   }
 
@@ -389,7 +692,7 @@
       .then(function(res){
         btn.disabled=false;
         if (res.error) { setMsg(msg,"Erro ao salvar: "+res.error.message); }
-        else { setMsg(msg,"Horários salvos!",true); toast("Horários salvos"); }
+        else { setSchedNotice(""); setMsg(msg,"Horários salvos!",true); toast("Horários salvos"); }
       })
       .catch(function(){ btn.disabled=false; setMsg(msg,"Erro ao salvar."); });
   });
@@ -397,21 +700,132 @@
   /* =====================================================================
      EVENTOS
      ===================================================================== */
-  var listEl=$("#eventList");
-  var currentEvents=[];
+  var listEl=$("#eventList"), importEl=$("#eventImport");
+  var currentEvents=[], localEvents=[];
 
   function loadEvents(){
     if (!sb) return;
+    var target=site;
     listEl.innerHTML='<p class="center" style="color:var(--ink-faint)">Carregando…</p>';
-    sb.from("events").select("*").eq("site",site).order("position",{ascending:true}).then(function(res){
+    if (importEl) importEl.innerHTML="";
+    Promise.all([
+      sb.from("events").select("*").eq("site",site).order("position",{ascending:true}),
+      loadSiteLocalData(site)
+    ]).then(function(r){
+      if (target !== site) return;
+      var res=r[0];
       if (res.error){ listEl.innerHTML='<p class="notice notice--err">Erro ao carregar: '+esc(res.error.message)+'</p>'; return; }
       currentEvents = res.data||[];
+      localEvents = (r[1].events||[]).filter(function(ev){ return ev && ev.featuredLocal === true && ev.id; });
       renderList();
-    }).catch(function(){ listEl.innerHTML='<p class="notice notice--err">Não foi possível carregar os eventos. Verifique a conexão e tente novamente.</p>'; });
+      renderImport();
+    }).catch(function(){
+      if (target !== site) return;
+      listEl.innerHTML='<p class="notice notice--err">Não foi possível carregar os eventos. Verifique a conexão e tente novamente.</p>';
+    });
+  }
+
+  /* ---------- eventos que ainda só existem no arquivo do site ---------- */
+  function pendingLocalEvents(){
+    var have={}; currentEvents.forEach(function(e){ if(e && e.slug) have[e.slug]=true; });
+    return localEvents.filter(function(ev){ return !have[ev.id]; });
+  }
+  function nextPosition(){
+    return currentEvents.reduce(function(m,e){ var p=Number(e.position); return isFinite(p) && p>m ? p : m; }, -1) + 1;
+  }
+  function localEventToRow(ev, position, siteId){
+    return {
+      site: siteId,
+      slug: ev.id,
+      title: ev.titulo || "",
+      badge: ev.badge || "",
+      date_text: ev.data || "",
+      location: ev.local || "",
+      image_url: toPublicUrl(ev.imagem || "", siteId),
+      summary: ev.resumo || "",
+      description: descriptionToHtml(ev.descricao),
+      link_text: (ev.link && ev.link.texto) || "",
+      link_url: (ev.link && ev.link.url) || "",
+      published: true,
+      position: position,
+      updated_at: new Date().toISOString()
+    };
+  }
+  function renderImport(){
+    if (!importEl) return;
+    var pend=pendingLocalEvents();
+    if (!pend.length){ importEl.innerHTML=""; return; }
+    importEl.innerHTML =
+      '<section class="import-block" aria-labelledby="importTitle">' +
+        '<div class="import-block__head">' +
+          '<div><h3 id="importTitle">No site, mas ainda não no painel</h3>' +
+          '<p>Estes eventos estão gravados no arquivo do site. Ao trazer, passam a ser editados só por aqui.</p></div>' +
+          '<button class="btn btn--primary" id="importAllBtn" type="button">Trazer todos ('+pend.length+')</button>' +
+        '</div>' +
+        '<div class="import-list">' + pend.map(function(ev){
+          var url=toPublicUrl(ev.imagem||"", site);
+          var thumb = url ? '<img class="import-row__thumb" src="'+esc(url)+'" alt="">'
+                          : '<div class="import-row__thumb">'+esc(ev.badge||"Evento")+'</div>';
+          return '<div class="import-row">'+thumb+
+            '<div class="import-row__main"><h4>'+esc(ev.titulo||ev.id)+'</h4>'+
+              '<div class="import-row__meta">'+esc(ev.data||"")+(ev.data&&ev.local?" · ":"")+esc(ev.local||"")+'</div></div>'+
+            '<button class="btn btn--sm" type="button" data-import="'+esc(ev.id)+'">Trazer para o painel<span class="sr-only">: '+esc(ev.titulo||ev.id)+'</span></button>'+
+          '</div>';
+        }).join("") + '</div>' +
+        '<p class="notice notice--err hidden import-msg" id="importMsg" role="alert"></p>' +
+      '</section>';
+    $("#importAllBtn").addEventListener("click", function(){ importLocalEvents(pendingLocalEvents(), this); });
+    $$("[data-import]", importEl).forEach(function(b){
+      b.addEventListener("click", function(){
+        var ev=pendingLocalEvents().filter(function(x){ return x.id===b.dataset.import; })[0];
+        if (ev) importLocalEvents([ev], b);
+      });
+    });
+  }
+  function importError(text){
+    var el=$("#importMsg"); if(!el) return;
+    el.textContent=text||""; el.classList.toggle("hidden", !text);
+  }
+  // Insere os eventos locais escolhidos no banco, um a um, na ordem do arquivo.
+  function importLocalEvents(list, btn){
+    if (!sb || !list.length) return;
+    var target=site, pos=nextPosition(), done=0;
+    importError("");
+    $$("#eventImport button").forEach(function(b){ b.disabled=true; });
+    if (btn) btn.textContent = "Trazendo…";
+    function step(i){
+      if (i >= list.length){
+        toast(done===1 ? "Evento trazido para o painel" : done+" eventos trazidos para o painel");
+        loadEvents();
+        return;
+      }
+      sb.from("events").insert(localEventToRow(list[i], pos+i, target)).then(function(res){
+        if (res.error){
+          var msg = isRlsError(res.error) ? "Sem permissão para editar esta página."
+                  : res.error.code === "23505" ? 'Já existe um evento com o endereço "'+list[i].id+'" nesta página.'
+                  : "Não foi possível trazer “"+(list[i].titulo||list[i].id)+"”: "+res.error.message;
+          $$("#eventImport button").forEach(function(b){ b.disabled=false; });
+          importError(msg);
+          if (done) loadEvents();
+          return;
+        }
+        done++; step(i+1);
+      }).catch(function(){
+        $$("#eventImport button").forEach(function(b){ b.disabled=false; });
+        importError("Não foi possível trazer os eventos agora. Verifique a conexão e tente de novo.");
+        if (done) loadEvents();
+      });
+    }
+    step(0);
   }
 
   function renderList(){
-    if (!currentEvents.length){ listEl.innerHTML='<p class="center" style="color:var(--ink-faint)">Nenhum evento nesta página ainda. Clique em "Novo evento".</p>'; return; }
+    if (!currentEvents.length){
+      listEl.innerHTML = pendingLocalEvents().length
+        ? '<p class="center" style="color:var(--ink-faint)">Nenhum evento salvo no painel ainda. Logo abaixo estão os que já aparecem no site — traga-os para editá-los por aqui.</p>'
+        : '<p class="center" style="color:var(--ink-faint)">Nenhum evento nesta página ainda. Clique em "Novo evento".</p>';
+      return;
+    }
     listEl.innerHTML = currentEvents.map(function(ev,i){
       var thumb = ev.image_url ? '<img class="ev-row__thumb" src="'+esc(ev.image_url)+'" alt="">'
         : '<div class="ev-row__thumb">'+esc((ev.badge||"Evento"))+'</div>';

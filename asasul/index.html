@@ -96,6 +96,24 @@
     <div class="hero__cue" aria-hidden="true">Role<span></span></div>
   </section>
 
+  <script>
+  /* Capa editável no painel: aplica de imediato a última capa salva (cache local); js/main.js reconcilia depois com o banco. */
+  (function () {
+    try {
+      var c = JSON.parse(localStorage.getItem("shalom:home:asasul") || "null"); if (!c) return;
+      var h = document.querySelector(".hero h1"), s = document.querySelector(".hero__sub"), bg = document.querySelector(".hero__bg");
+      var esc = function (t) { return String(t).replace(/[&<>"]/g, function (ch) { return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" })[ch]; }); };
+      if (c.titulo && h) h.innerHTML = esc(c.titulo).replace(/\n/g, "<br>");
+      if (c.subtitulo && s) s.textContent = c.subtitulo;
+      if (bg) {
+        var img = bg.querySelector("img");
+        if (c.imagem) { if (!img) { img = document.createElement("img"); img.setAttribute("fetchpriority", "high"); bg.appendChild(img); } img.alt = c.imagem_alt || ""; img.onerror = function () { img.remove(); bg.classList.add("hero__bg--nophoto"); }; if (img.src !== c.imagem) img.src = c.imagem; bg.classList.remove("hero__bg--nophoto"); }
+        else if (img) { img.remove(); bg.classList.add("hero__bg--nophoto"); }
+      }
+    } catch (e) {}
+  })();
+  </script>
+
   <!-- ============ HORÁRIOS ============ -->
   <section class="section" id="horarios">
     <div class="wrap">
@@ -324,6 +342,7 @@
     <div class="wrap footer-bottom">
       <span>© <span id="year"></span> Centro de Evangelização Shalom Asa Sul.</span>
       <span>Comunidade Católica Shalom</span>
+      <a class="footer-admin" href="../admin/" rel="nofollow">Área de edição</a>
     </div>
   </footer>
 

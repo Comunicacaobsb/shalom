@@ -15,6 +15,14 @@
    A ordem aqui é a ordem no carrossel.
    ===================================================================== */
 
+/* Capa (padrão local; usado quando não há settings.home no painel) */
+window.SHALOM_HOME = {
+  titulo:     "Um lugar para\nencontrar Deus\nna Asa Sul",
+  subtitulo:  "Missas, adoração, grupos de oração e formação. Toda a vida do Centro de Evangelização, num só lugar.",
+  imagem:     "../images/shalom-asa-sul.webp",
+  imagem_alt: "Centro de Evangelização Shalom Asa Sul"
+};
+
 /* Horários/serviços de reserva — usados enquanto o Supabase não estiver
    configurado. Depois de configurado, o painel /admin é a fonte oficial. */
 window.SHALOM_SCHEDULES = {

@@ -122,8 +122,58 @@
         <div class="breadcrumbs"><a href="#pages">Páginas editáveis</a><span aria-hidden="true">/</span><span id="legacyWorkspaceLabel">Página</span></div>
       </div>
 
+      <!-- ---- CAPA (topo da página) ---- -->
+      <section id="tab-capa" class="panel-card hidden legacy-panel" role="tabpanel" aria-labelledby="workspace-home-link">
+        <div class="editing-context" id="capaContext"></div>
+        <div class="section-title">
+          <h2>Capa da página <span class="site-chip" id="siteChip4"></span></h2>
+        </div>
+        <div class="notice notice--info hidden" id="capaNotice"></div>
+        <div class="capa-grid">
+          <div class="capa-side">
+            <h3 class="capa-side__title">Prévia da capa</h3>
+            <div class="capa-preview capa-preview--nophoto" id="capaPreview" aria-hidden="true">
+              <div class="capa-preview__scrim"></div>
+              <div class="capa-preview__text">
+                <p class="capa-preview__h1" id="capaPreviewTitle"></p>
+                <p class="capa-preview__sub" id="capaPreviewSub"></p>
+              </div>
+            </div>
+            <p class="hint">Prévia aproximada — o site usa a fonte Montserrat e ocupa a tela inteira.</p>
+          </div>
+          <div class="capa-fields">
+            <div class="field">
+              <label for="capa-titulo">Título</label>
+              <textarea id="capa-titulo" rows="3" placeholder="Um lugar para&#10;encontrar Deus&#10;em Taguatinga" aria-describedby="capa-titulo-hint"></textarea>
+              <p class="hint" id="capa-titulo-hint">Cada linha do campo vira uma linha do título na página.</p>
+            </div>
+            <div class="field">
+              <label for="capa-subtitulo">Frase de apoio</label>
+              <input type="text" id="capa-subtitulo" placeholder="Uma frase curta, logo abaixo do título." aria-describedby="capa-subtitulo-hint" />
+              <p class="hint" id="capa-subtitulo-hint">Aparece menor, embaixo do título.</p>
+            </div>
+            <div class="field">
+              <span class="field__label" id="capa-imagem-label">Imagem de fundo</span>
+              <div class="uploader uploader--stack" role="group" aria-labelledby="capa-imagem-label">
+                <input type="file" id="capa-image-file" accept="image/*" style="display:none" />
+                <button type="button" class="btn btn--sm" id="capa-upload-btn">Enviar imagem</button>
+                <button type="button" class="btn btn--sm btn--danger" id="capa-image-clear">Remover imagem</button>
+              </div>
+              <p class="hint" id="capa-upload-status" role="status" aria-live="polite">JPG ou PNG na horizontal, de preferência com 1600 px de largura ou mais. A imagem é ajustada automaticamente.</p>
+              <input type="hidden" id="capa-image-url" />
+              <input type="hidden" id="capa-image-alt" />
+            </div>
+          </div>
+        </div>
+        <div class="capa-foot">
+          <span id="capaMsg" class="msg"></span>
+          <button class="btn btn--primary" id="saveCapaBtn">Salvar capa</button>
+        </div>
+      </section>
+
       <!-- ---- EVENTOS ---- -->
       <section id="tab-eventos" class="panel-card legacy-panel" role="tabpanel" aria-labelledby="workspace-events-link">
+        <div class="editing-context" id="eventosContext"></div>
         <div class="section-title">
           <h2>Eventos &amp; encontros <span class="site-chip" id="siteChip"></span></h2>
           <button class="btn btn--primary" id="newEventBtn">
@@ -132,15 +182,18 @@
           </button>
         </div>
         <div class="ev-list" id="eventList"><p class="center" style="color:var(--ink-faint)">Carregando…</p></div>
+        <div id="eventImport"></div>
       </section>
 
       <!-- ---- HORÁRIOS ---- -->
       <section id="tab-horarios" class="panel-card hidden legacy-panel" role="tabpanel" aria-labelledby="workspace-schedules-link">
+        <div class="editing-context" id="horariosContext"></div>
         <div class="section-title">
           <h2>Horários &amp; serviços <span class="site-chip" id="siteChip2"></span></h2>
           <button class="btn btn--primary" id="saveSchedBtn">Salvar horários</button>
         </div>
         <p style="color:var(--ink-soft);font-size:.9rem;margin-top:-.6rem">Uma linha = um item. Deixe em branco para "A confirmar".</p>
+        <div class="notice notice--info hidden" id="schedNotice"></div>
         <div class="sched-grid" id="schedGrid"></div>
         <div class="center" style="margin-top:1.2rem"><span id="schedMsg" class="msg"></span></div>
       </section>

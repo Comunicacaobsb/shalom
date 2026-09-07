@@ -11,6 +11,8 @@
      .loadEvents()     -> Promise<Array>  (formato dos cards, só do site)
      .loadEvent(slug)  -> Promise<Object|null>
      .loadSchedules()  -> Promise<Object|null>
+     .loadSetting(key) -> Promise<any|null>  (settings.value, por chave)
+     .loadHome()       -> Promise<Object|null>  (settings key "home": capa)
    Sem Supabase (ou em falha), cai para os dados locais da página
    (window.SHALOM_EVENTOS / window.SHALOM_SCHEDULES do data.js).
    ===================================================================== */
@@ -90,12 +92,23 @@ window.SHALOM = (function () {
       .catch(function () { return null; });
   }
 
+  function loadSetting(key) {
+    var c = client();
+    if (!c) return Promise.resolve(null);
+    return c.from("settings").select("value").eq("site", SITE).eq("key", key).limit(1)
+      .then(function (res) { if (res.error || !res.data || !res.data.length) return null; return res.data[0].value || null; })
+      .catch(function () { return null; });
+  }
+  function loadHome() { return loadSetting("home"); }
+
   return {
     ready: configured,
     site: SITE,
     client: client,
     loadEvents: loadEvents,
     loadEvent: loadEvent,
-    loadSchedules: loadSchedules
+    loadSchedules: loadSchedules,
+    loadSetting: loadSetting,
+    loadHome: loadHome
   };
 })();

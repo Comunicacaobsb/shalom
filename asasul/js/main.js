@@ -2,7 +2,7 @@
    Shalom Asa Sul — interações da página
    ===================================================================== */
 
-/* copyText global — usado também pelo cev-data.js (campo PIX do CSV) */
+/* copyText global — usado pelos botões de copiar chave Pix */
 function copyText(text) {
   function done() { showToast("Copiado!"); }
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -66,6 +66,40 @@ function showToast(msg) {
     reveals.forEach(function (el) { io.observe(el); });
   }
 
+  /* ===================== CAPA (settings.home no painel, com padrão local) ===================== */
+  var HOME_KEY = "shalom:home:" + ((window.SHALOM && SHALOM.site) || window.SHALOM_SITE || "asasul");
+  function escHtml(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" })[c]; }); }
+  function resolveUrl(v) { try { return v ? new URL(v, location.href).href : ""; } catch (e) { return ""; } }
+  function applyHome(row) {
+    var base = window.SHALOM_HOME || {};
+    var home = {
+      titulo:     (row && row.titulo)     || base.titulo     || "",
+      subtitulo:  (row && row.subtitulo)  || base.subtitulo  || "",
+      // string vazia gravada pelo painel = "sem foto" (gradiente); campo ausente = padrão local
+      imagem:     resolveUrl(row && typeof row.imagem === "string" ? row.imagem : (base.imagem || "")),
+      imagem_alt: (row && row.imagem_alt) || base.imagem_alt || ""
+    };
+    var h1 = $(".hero h1"), sub = $(".hero__sub"), bg = $(".hero__bg");
+    if (h1 && home.titulo) h1.innerHTML = escHtml(home.titulo).replace(/\n/g, "<br>");
+    if (sub && home.subtitulo) sub.textContent = home.subtitulo;
+    if (bg) {
+      var img = bg.querySelector("img");
+      if (home.imagem) {
+        if (!img) { img = document.createElement("img"); img.setAttribute("fetchpriority", "high"); bg.appendChild(img); }
+        img.alt = home.imagem_alt;
+        img.onerror = function () { img.classList.remove("is-swapping"); img.remove(); bg.classList.add("hero__bg--nophoto"); };
+        if (img.src !== home.imagem) { img.classList.add("is-swapping"); img.onload = function () { img.classList.remove("is-swapping"); }; img.src = home.imagem; }
+        bg.classList.remove("hero__bg--nophoto");
+      } else {
+        if (img) img.remove();
+        bg.classList.add("hero__bg--nophoto");
+      }
+    }
+    try { if (row) localStorage.setItem(HOME_KEY, JSON.stringify(home)); else localStorage.removeItem(HOME_KEY); } catch (e) {}
+  }
+  if (window.SHALOM && SHALOM.loadHome) { SHALOM.loadHome().then(applyHome).catch(function () { applyHome(null); }); }
+  else { applyHome(null); }
+
   /* ===================== HORÁRIOS & SERVIÇOS (Supabase) ===================== */
   var SCHED = { funcionamento:"field-funcionamento", missa:"field-missa", adoracao:"field-adoracao", aconselhamento:"field-aconselhamento", grupos:"field-grupos", servicos:"field-servicos" };
   function renderSchedules(data) {
@@ -92,19 +126,29 @@ function showToast(msg) {
   */
   function initCarousel(eventos) {
     var track = $("#carTrack");
-    if (!track || !eventos.length) return;
+    if (!track) return;
+    if (!eventos.length) {
+      var sec = document.getElementById("eventos"); if (sec) sec.hidden = true;
+      $$('a[href="#eventos"]').forEach(function (a) { a.hidden = true; });
+      return;
+    }
     var dotsWrap = $("#carDots"), bar = $("#carBar");
     var prevBtn = $("#carPrev"), nextBtn = $("#carNext");
     var controls = document.querySelector(".carousel__top");
     var progress = document.querySelector(".carousel__progress");
     var AUTO_MS = 6000;
     var N = eventos.length;
-    var loop = N > 1;
+    /* Ajuste local: quantos slides cabem na tela (espelha os breakpoints de .slide no CSS) */
+    function visibleNow() { return window.matchMedia("(min-width: 980px)").matches ? 3 : window.matchMedia("(min-width: 640px)").matches ? 2 : 1; }
+    /* Loop infinito (com clones) só quando há mais eventos do que cabem na tela;
+       com poucos eventos a fita fica estática, sem repetir card. */
+    var loop = N > visibleNow();
+    function maxP() { return loop ? Infinity : Math.max(0, N - visibleNow()); }
     function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" })[c]; }); }
 
     function buildSlide(ev, eager) {
       var href = "evento.html?id=" + encodeURIComponent(ev.id);
-      var fallback = '<div class="poster-fallback"><div><h4>' + esc(ev.titulo) + '</h4><small>' + esc(ev.badge || "Shalom Asa Sul") + '</small></div></div>';
+      var fallback = '<div class="poster-fallback"><div><h3>' + esc(ev.titulo) + '</h3><small>' + esc(ev.badge || "Shalom Asa Sul") + '</small></div></div>';
       var img = ev.imagem
         ? '<img src="' + esc(ev.imagem) + '" alt="' + esc(ev.titulo) + '" loading="' + (eager ? "eager" : "lazy") + '" onerror="var p=this.parentElement;this.style.display=\'none\';p.insertAdjacentHTML(\'beforeend\', this.dataset.fb)" data-fb="' + esc(fallback).replace(/"/g, "&quot;") + '">'
         : fallback;
@@ -155,8 +199,8 @@ function showToast(msg) {
     }
     track.addEventListener("transitionend", function (e) { if (e.propertyName === "transform") wrap(); });
 
-    function next() { p += 1; apply(true); }
-    function prev() { p -= 1; apply(true); }
+    function next() { if (!loop && p >= maxP()) return; p += 1; apply(true); }
+    function prev() { if (!loop && p <= 0) return; p -= 1; apply(true); }
     function goReal(i) { p = (loop ? N : 0) + i; apply(true); }
 
     // dots (um por evento real)
@@ -176,9 +220,12 @@ function showToast(msg) {
       dots.forEach(function (d, i) { d.setAttribute("aria-current", String(i === cur)); });
     }
 
-    var showControls = loop;
-    if (controls) controls.style.display = showControls ? "" : "none";
-    if (progress) progress.style.display = showControls ? "" : "none";
+    function updateControls() {
+      var showControls = loop || N > visibleNow();
+      if (controls) controls.style.display = showControls ? "" : "none";
+      if (progress) progress.style.display = loop ? "" : "none";
+    }
+    updateControls();
 
     if (nextBtn) nextBtn.addEventListener("click", function () { next(); restart(); });
     if (prevBtn) prevBtn.addEventListener("click", function () { prev(); restart(); });
@@ -229,7 +276,7 @@ function showToast(msg) {
     });
 
     var rt = null;
-    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { apply(false); }, 150); });
+    window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { if (!loop) p = Math.min(p, maxP()); updateControls(); apply(false); }, 150); });
 
     apply(false);
     start();
@@ -244,8 +291,7 @@ function showToast(msg) {
   /* ===================== NOTÍCIAS (feed local da página Brasília) ===================== */
   var list = $("#comshalom-list");
   if (list) {
-    // O feed é gerado a partir dos três primeiros cards da página oficial
-    // https://comshalom.org/brasilia/ e servido same-origin.
+    // Feed compartilhado da missão (gerado em asasul/data pelo workflow asasul-news.yml)
     var API = "data/noticias.json?cb=" + new Date().toISOString().slice(0, 13).replace(/[-T:]/g, "");
     var PLACEHOLDER = "../images/shalom-brasilia.jpg"; // imagem de reserva on-brand
     var HOST_RE = /(^|\.)comshalom\.org$/i;

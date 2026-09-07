@@ -253,3 +253,83 @@ body{background:var(--luminous)}
   .icon-btn{width:44px;height:44px}
   .auth-switch__button,.segmented__button,.workspace-module-link{min-height:44px}
 }
+
+/* =====================================================================
+   Onde isto aparece na página — contexto de edição, miniaturas e capa
+   ===================================================================== */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+.field__label{display:block;font-size:.82rem;font-weight:700;margin:0 0 .35rem;color:var(--ink)}
+
+/* ---- Miniatura esquemática da página (mostra em que trecho o módulo mexe) ---- */
+.page-thumb{display:block;flex:none;width:48px;height:64px;border-radius:5px}
+.workspace-module__thumb .page-thumb{width:60px;height:80px}
+.workspace-module-link .page-thumb{width:18px;height:24px;border-radius:3px}
+
+/* ---- Faixa "Você está editando" no topo de cada editor ---- */
+.editing-context{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding:.85rem 1rem;margin:0 0 1.5rem;background:var(--luminous);border:1px solid var(--line);border-radius:var(--r)}
+.editing-context:empty{display:none}
+.editing-context__body{flex:1;min-width:190px}
+.editing-context__what{margin:0;font-size:.95rem;color:var(--ink-soft)}
+.editing-context__what strong{color:var(--ink);font-weight:800}
+.editing-context__where{margin:.3rem 0 0;font-size:.82rem;color:var(--ink-soft)}
+.editing-context .btn{flex:none}
+
+/* ---- Cards de módulo com miniatura + descrição ---- */
+.workspace-module__head{display:flex;align-items:center;gap:1rem;min-width:0;flex:1}
+.workspace-module__body{min-width:0}
+.workspace-module-link{gap:.5rem}
+
+/* ---- Editor de capa ---- */
+.capa-grid{display:grid;gap:1.5rem}
+@media(min-width:900px){
+  .capa-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
+  .capa-fields{order:1}
+  .capa-side{order:2;position:sticky;top:1rem}
+}
+.capa-fields .field:last-child{margin-bottom:0}
+.capa-side__title{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin:0 0 .6rem}
+.capa-side .hint{font-size:.76rem;color:var(--ink-faint);margin:.5rem 0 0;font-weight:500}
+.capa-preview{position:relative;aspect-ratio:16/9;display:flex;align-items:flex-end;overflow:hidden;border-radius:var(--r);border:1px solid var(--line);background:#12345F}
+.capa-preview--nophoto{background:
+  radial-gradient(70% 60% at 85% 10%, rgba(201,162,74,.18), transparent 60%),
+  radial-gradient(70% 70% at 10% 90%, rgba(37,96,168,.55), transparent 60%),
+  linear-gradient(160deg,#12345F 0%,#0a1f3d 100%)}
+.capa-preview__img{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.capa-preview__scrim{position:absolute;inset:0;z-index:1;background:
+  linear-gradient(180deg, rgba(9,20,40,.55) 0%, rgba(9,20,40,.12) 26%, rgba(9,20,40,.55) 66%, rgba(7,16,33,.9) 100%),
+  linear-gradient(90deg, rgba(7,16,33,.6) 0%, rgba(7,16,33,.05) 62%)}
+.capa-preview__text{position:relative;z-index:2;width:100%;padding:1rem 1.1rem 1.1rem;color:#fff}
+.capa-preview__h1{margin:0;font-weight:800;line-height:.98;letter-spacing:-.03em;white-space:pre-line;font-size:clamp(1.25rem,4.6vw,2rem);text-shadow:0 2px 30px rgba(6,16,32,.5)}
+.capa-preview__sub{margin:.55rem 0 0;max-width:34ch;color:rgba(255,255,255,.94);font-size:clamp(.78rem,1.9vw,.95rem);line-height:1.35;text-shadow:0 1px 18px rgba(6,16,32,.55)}
+@supports (container-type: inline-size){
+  .capa-preview{container-type:inline-size}
+  .capa-preview__h1{font-size:clamp(1.15rem,7.4cqw,2.1rem)}
+  .capa-preview__sub{font-size:clamp(.74rem,3cqw,.95rem)}
+}
+.uploader--stack{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.capa-foot{display:flex;align-items:center;justify-content:flex-end;gap:1rem;flex-wrap:wrap;margin-top:1.6rem;padding-top:1.3rem;border-top:1px solid var(--line)}
+
+/* ---- "No site, mas ainda não no painel" (trazer eventos locais) ---- */
+.import-block{margin-top:1.8rem;padding-top:1.6rem;border-top:1px solid var(--line)}
+.import-block__head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+.import-block__head h3{font-size:1.05rem;font-weight:800;letter-spacing:-.01em;margin:0}
+.import-block__head p{margin:.4rem 0 0;max-width:58ch;color:var(--ink-soft);font-size:.86rem}
+.import-list{display:grid;gap:.6rem}
+.import-row{display:flex;align-items:center;gap:1rem;background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r);padding:.7rem .8rem}
+.import-row__thumb{width:54px;height:68px;border-radius:8px;object-fit:cover;background:linear-gradient(150deg,var(--blue-deep),#12345F);flex:none;display:grid;place-items:center;color:#fff;font-size:.6rem;line-height:1.25;text-align:center;padding:.25rem;overflow:hidden}
+.import-row__main{flex:1;min-width:0}
+.import-row__main h4{margin:0;font-size:1rem;font-weight:700;letter-spacing:-.01em;overflow-wrap:anywhere}
+.import-row__meta{font-size:.8rem;color:var(--ink-faint);margin-top:.15rem}
+.import-row .btn{flex:none}
+.import-msg{margin:.9rem 0 0}
+
+@media(max-width:640px){
+  .editing-context{align-items:flex-start}
+  .editing-context .btn{width:100%;justify-content:center}
+  .import-block__head .btn{width:100%;justify-content:center}
+  .import-row{display:grid;grid-template-columns:54px minmax(0,1fr);align-items:center}
+  .import-row .btn{grid-column:1/-1;width:100%;justify-content:center}
+  .capa-foot{justify-content:stretch}
+  .capa-foot .btn{width:100%;justify-content:center}
+  .uploader--stack .btn{flex:1;justify-content:center}
+}
