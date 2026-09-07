@@ -1,0 +1,320 @@
+{
+  "generated_at": "2026-09-07T15:30:23.085Z",
+  "sites": {
+    "asasul": {
+      "home": {
+        "titulo": "Um lugar para\nencontrar Deus\nna Asa Sul",
+        "subtitulo": "Missas, adoração, grupos de oração e formação. Toda a vida do Centro de Evangelização, num só lugar.",
+        "imagem": "https://brasilia.comshalom.org/images/shalom-asa-sul.webp",
+        "imagem_alt": "Centro de Evangelização Shalom Asa Sul"
+      },
+      "schedules": {
+        "funcionamento": [
+          "Segunda a sábado: 14h às 22h"
+        ],
+        "missa": [
+          "Segunda e sexta: 18h",
+          "Sábado e domingo: 17h",
+          "2ª terça: Missa pelas Famílias",
+          "4ª quinta: Missa da Misericórdia"
+        ],
+        "grupos": [
+          "Casais: terça às 20h",
+          "Amare (aberto): quinta às 19h30",
+          "Kyrios (16 a 23 anos): sábado às 15h"
+        ],
+        "adoracao": [
+          "Capela Kyrios — Santíssimo exposto 24 horas"
+        ],
+        "servicos": [
+          "Quarta: 19h30 às 21h",
+          "Sexta: 17h",
+          "Sábado: 16h",
+          "Domingo: após a missa das 17h"
+        ],
+        "aconselhamento": [
+          "Quinta: 14h30 às 21h",
+          "Ou agende pelo link: https://forms.gle/fnbLoKrEtNMw5D5y8"
+        ]
+      },
+      "events": [
+        {
+          "site": "asasul",
+          "slug": "vida-plena",
+          "title": "Encontro Vida Plena",
+          "badge": "Seminário",
+          "date_text": "29 e 30 de agosto",
+          "location": "San Marco Brasília Hotel",
+          "image_url": "https://brasilia.comshalom.org/asasul/images/eventos/vida-plena.jpeg",
+          "summary": "Liderança, crescimento, resultados… Onde encontrar propósito e plenitude em meio a tantos desafios?",
+          "description": "<p>💼✨ Liderança, crescimento, resultados… Onde encontrar propósito e plenitude em meio a tantos desafios?</p><p>🌿 O Encontro Vida Plena é uma experiência com o Amor de Deus, promovido pelo Projeto Mundo Novo da Comunidade Católica Shalom, para profissionais e líderes que desejam integrar fé, vida e missão.</p><p>💫 Dois dias para aprofundar a experiência com Deus, redescobrir a vocação e encontrar um sentido mais profundo para a vida, a família e o trabalho.</p><p>🎤 Carmadélio Sousa (Fortaleza/CE) – Missionário e especialista em relações interpessoais.</p><p>🗓️ 29 e 30 de agosto<br>📍 San Marco Brasília Hotel<br>📲 Informações: (61) 99687-7406<br>👉 Inscrições: <a href=\"https://forms.gle/y8RxBSaj2KEAuqFNA\" target=\"_blank\" rel=\"noopener\">https://forms.gle/y8RxBSaj2KEAuqFNA</a></p><p>📖 &quot;Conhecereis também o amor de Cristo, que ultrapassa todo conhecimento, para que sejais repletos de toda a plenitude de Deus.&quot; (Ef 3,19)</p>",
+          "link_text": "Inscrições",
+          "link_url": "https://forms.gle/y8RxBSaj2KEAuqFNA",
+          "published": true,
+          "position": 0
+        },
+        {
+          "site": "asasul",
+          "slug": "kyrios",
+          "title": "Grupo de Oração Kyrios",
+          "badge": "Grupo de oração",
+          "date_text": "Todo sábado às 15h",
+          "location": "Shalom Asa Sul (507 Sul)",
+          "image_url": "https://brasilia.comshalom.org/asasul/images/eventos/kyrios.jpeg",
+          "summary": "Um grupo de oração para jovens de 16 a 23 anos que querem viver a fé com intensidade.",
+          "description": "<p>Kyrios é o grupo de oração da juventude no Shalom Asa Sul. Um espaço para louvar, rezar e caminhar em comunidade.</p><p>Para quem é: jovens de 16 a 23 anos.<br>Quando: todo sábado, às 15h.<br>Onde: Shalom Asa Sul — 507 Sul.</p><p>Uma iniciativa do Projeto Juventude para Jesus • Comunidade Católica Shalom. Venha e traga um amigo.</p>",
+          "link_text": null,
+          "link_url": null,
+          "published": true,
+          "position": 1
+        },
+        {
+          "site": "asasul",
+          "slug": "amare",
+          "title": "Grupo de Oração Aberto — Amare",
+          "badge": "Grupo de oração",
+          "date_text": "Toda quinta-feira às 19h30",
+          "location": "Shalom Asa Sul, 507 Sul",
+          "image_url": "https://brasilia.comshalom.org/asasul/images/eventos/amare.jpeg",
+          "summary": "Um grupo de oração aberto a todos. Venha amar e ser amado na presença de Deus.",
+          "description": "<p>Amare é o grupo de oração aberto do Shalom Asa Sul — todos são bem-vindos, sem exceção.</p><p>Quando: toda quinta-feira, às 19h30.<br>Onde: Shalom Asa Sul, 507 Sul.<br>Contato: (61) 98210-8676.</p><p>Entre no grupo do WhatsApp para receber os avisos e caminhar conosco.</p>",
+          "link_text": "Entrar no grupo do WhatsApp",
+          "link_url": "https://wa.me/5561982108676",
+          "published": true,
+          "position": 2
+        },
+        {
+          "site": "asasul",
+          "slug": "missa-misericordia",
+          "title": "Missa da Misericórdia",
+          "badge": "Missa especial",
+          "date_text": "Quinta-feira, 30/07",
+          "location": "Shalom Asa Sul",
+          "image_url": "https://brasilia.comshalom.org/asasul/images/eventos/missa-misericordia.jpeg",
+          "summary": "Uma tarde inteira de oração, aconselhamento, confissão e Santa Missa no Shalom Asa Sul.",
+          "description": "<p>A Missa da Misericórdia é um dia dedicado a reencontrar o amor misericordioso de Deus.</p><p>Programação — quinta-feira, 30/07:<br>• 14h30 — Oração e aconselhamento<br>• 18h00 — Confissão<br>• 19h30 — Santa Missa</p><p>Onde: Shalom Asa Sul. Traga suas intenções e viva esse encontro com a Misericórdia.</p>",
+          "link_text": null,
+          "link_url": null,
+          "published": true,
+          "position": 3
+        },
+        {
+          "site": "asasul",
+          "slug": "beraka-casais",
+          "title": "Beraká — Retiro para casais",
+          "badge": "Retiro para casais",
+          "date_text": "26 e 27 de setembro de 2026",
+          "location": "SGAS 606, Bloco D, Lote 42 — Brasília/DF",
+          "image_url": "https://brasilia.comshalom.org/asasul/images/eventos/beraka-casais.webp",
+          "summary": "Um retiro para casais fortalecerem a vida a dois sobre a rocha que é Jesus.",
+          "description": "<p>BERAKÁ — Retiro para casais</p><p>Jesus é a rocha onde edifico a minha casa. (Mateus 7,24)</p><p>Quando: 26 e 27 de setembro de 2026.<br>Onde: SGAS 606, Bloco D, Lote 42 — Brasília/DF.<br>Público: casais.</p><p>Enquanto os casais vivem o retiro, o Beraká Kids oferece uma programação própria e simultânea para crianças de 5 a 10 anos.</p><p>Informações:<br>William: (21) 98875-0530<br>Viviane: (61) 99399-0480<br>Instagram: @shalombrasilia<br>Instagram: <a href=\"https://www.instagram.com/shalombrasilia/\" target=\"_blank\" rel=\"noopener\">https://www.instagram.com/shalombrasilia/</a></p><p>Realização: Projeto Família Shalom, Comunidade Católica Shalom e Shalom Brasília — 25 anos.</p><p>Inscrições e informações: <a href=\"https://comshalom.org/beraka/\" target=\"_blank\" rel=\"noopener\">https://comshalom.org/beraka/</a></p>",
+          "link_text": "Saiba mais e inscreva-se",
+          "link_url": "https://comshalom.org/beraka/",
+          "published": true,
+          "position": 4
+        },
+        {
+          "site": "asasul",
+          "slug": "beraka-kids",
+          "title": "Beraká Kids",
+          "badge": "Crianças de 5 a 10 anos",
+          "date_text": "26 e 27 de setembro de 2026",
+          "location": "SGAS 606, Bloco D, Lote 42 — Brasília/DF",
+          "image_url": "https://brasilia.comshalom.org/asasul/images/eventos/beraka-kids.webp",
+          "summary": "Uma programação própria para crianças de 5 a 10 anos durante o retiro Beraká.",
+          "description": "<p>BERAKÁ KIDS — para crianças de 5 a 10 anos</p><p>Jesus é a rocha onde edifico a minha casa. (Mateus 7,24)</p><p>Quando: 26 e 27 de setembro de 2026.<br>Onde: SGAS 606, Bloco D, Lote 42 — Brasília/DF.<br>Público: crianças de 5 a 10 anos.</p><p>O Beraká Kids acontece simultaneamente ao Beraká para casais, com programação própria, preparada para as crianças enquanto seus pais vivem o retiro.</p><p>Informações:<br>William: (21) 98875-0530<br>Viviane: (61) 99399-0480<br>Instagram: @shalombrasilia<br>Instagram: <a href=\"https://www.instagram.com/shalombrasilia/\" target=\"_blank\" rel=\"noopener\">https://www.instagram.com/shalombrasilia/</a></p><p>Realização: Projeto Família Shalom, Comunidade Católica Shalom e Shalom Brasília — 25 anos.</p><p>Inscrições e informações: <a href=\"https://comshalom.org/beraka/\" target=\"_blank\" rel=\"noopener\">https://comshalom.org/beraka/</a></p>",
+          "link_text": "Saiba mais e inscreva-se",
+          "link_url": "https://comshalom.org/beraka/",
+          "published": true,
+          "position": 5
+        },
+        {
+          "site": "asasul",
+          "slug": "curada-historia-de-vida",
+          "title": "Retiro Curada — História de Vida",
+          "badge": "Retiro",
+          "date_text": "04 a 07 de setembro",
+          "location": "Retiro Santo Antônio",
+          "image_url": "https://brasilia.comshalom.org/asasul/images/eventos/curada-historia-de-vida.webp",
+          "summary": "Um retiro para encontrar cura e um novo olhar para a própria história de vida.",
+          "description": "<p>RETIRO CURADA — história de vida</p><p>Quando: 04 a 07 de setembro.<br>Onde: Retiro Santo Antônio.<br>Valor: R$ 550,00.</p><p>Mais informações:<br>Islane: (61) 98274-8634</p><p>Realização: Shalom Brasília — 25 anos e Comunidade Católica Shalom.</p><p>WhatsApp: <a href=\"https://wa.me/556182748634\" target=\"_blank\" rel=\"noopener\">https://wa.me/556182748634</a></p>",
+          "link_text": "Mais informações",
+          "link_url": "https://wa.me/556182748634",
+          "published": true,
+          "position": 6
+        },
+        {
+          "site": "asasul",
+          "slug": "es-precioso",
+          "title": "Curso És Precioso",
+          "badge": "Curso",
+          "date_text": "15 a 17 de setembro, às 19h30",
+          "location": "Shalom Asa Sul — Auditório Kyrios",
+          "image_url": "https://brasilia.comshalom.org/asasul/images/eventos/es-precioso.webp",
+          "summary": "Curso És Precioso no Shalom Asa Sul, com opção de inscrição com livro.",
+          "description": "<p>CURSO ÉS PRECIOSO</p><p>Data: 15 a 17 de setembro.<br>Horário: às 19h30.<br>Local: Shalom Asa Sul — Auditório Kyrios.</p><p>Inscrição: R$ 30,00.<br>Inscrição + livro: R$ 65,00.</p><p>Mais informações: (61) 98274-8634<br>Realização: Shalom Asa Sul e Comunidade Católica Shalom.<br>WhatsApp: <a href=\"https://wa.me/556182748634\" target=\"_blank\" rel=\"noopener\">https://wa.me/556182748634</a></p>",
+          "link_text": "Mais informações",
+          "link_url": "https://wa.me/556182748634",
+          "published": true,
+          "position": 7
+        }
+      ]
+    },
+    "taguatinga": {
+      "home": {
+        "titulo": "Um lugar para\nencontrar Deus\nem Taguatinga",
+        "subtitulo": "Missas, adoração, grupos de oração e formação. Toda a vida do Centro de Evangelização, num só lugar.",
+        "imagem": "https://brasilia.comshalom.org/images/shalom-taguatinga.webp",
+        "imagem_alt": "Centro de Evangelização Shalom Taguatinga"
+      },
+      "schedules": {
+        "funcionamento": [
+          "Segunda a sábado: 14h às 22h"
+        ],
+        "missa": [
+          "Segunda: 18h30",
+          "Domingo: 10h",
+          "Missa Jovem: 2º sábado do mês, às 17h"
+        ],
+        "grupos": [
+          "Grupo de casais: sábado às 17h",
+          "Grupo aberto: quinta às 19h30",
+          "Grupo jovem: sábado às 14h30"
+        ],
+        "adoracao": [
+          "Segunda a sexta: 14h30 às 21h"
+        ],
+        "servicos": [
+          "Bazar: segunda a sábado, 14h às 21h",
+          "Livraria: segunda a sábado, 14h às 21h",
+          "Lanchonete: segunda a sábado, 14h às 21h"
+        ],
+        "aconselhamento": [
+          "Segunda a sexta: 14h30 às 21h"
+        ]
+      },
+      "events": [
+        {
+          "site": "taguatinga",
+          "slug": "grupo-aberto",
+          "title": "Grupo de Oração Aberto",
+          "badge": "Grupo de oração",
+          "date_text": "Toda quinta-feira às 19h30",
+          "location": "Shalom Taguatinga — QNA 26, Taguatinga",
+          "image_url": "https://brasilia.comshalom.org/taguatinga/images/eventos/grupo-aberto.webp",
+          "summary": "Um grupo de oração aberto a todos. Venha rezar, louvar e caminhar em comunidade.",
+          "description": "<p>O Grupo de Oração Aberto do Shalom Taguatinga acolhe todas as pessoas que desejam rezar e louvar em comunidade. Não é preciso ser membro: basta chegar.</p><p>Quando: toda quinta-feira, às 19h30.<br>Onde: Shalom Taguatinga — QNA 26, Setor A Norte, Taguatinga/DF.</p><p>Venha e traga um amigo.</p>",
+          "link_text": null,
+          "link_url": null,
+          "published": true,
+          "position": 0
+        },
+        {
+          "site": "taguatinga",
+          "slug": "grupo-de-casais",
+          "title": "Grupo de Oração de Casais",
+          "badge": "Grupo de oração",
+          "date_text": "Todo sábado às 17h",
+          "location": "Shalom Taguatinga — QNA 26, Taguatinga",
+          "image_url": null,
+          "summary": "Um espaço para os casais rezarem juntos e fortalecerem a vida a dois em Deus.",
+          "description": "<p>O Grupo de Oração de Casais do Shalom Taguatinga reúne casais para rezar, partilhar e crescer juntos na fé.</p><p>Quando: todo sábado, às 17h.<br>Onde: Shalom Taguatinga — QNA 26, Setor A Norte, Taguatinga/DF.</p>",
+          "link_text": null,
+          "link_url": null,
+          "published": true,
+          "position": 1
+        },
+        {
+          "site": "taguatinga",
+          "slug": "grupo-jovem",
+          "title": "Grupo de Oração Jovem",
+          "badge": "Grupo de oração",
+          "date_text": "Todo sábado às 14h30",
+          "location": "Shalom Taguatinga — QNA 26, Taguatinga",
+          "image_url": null,
+          "summary": "Um grupo de oração para jovens que querem viver a fé com alegria e intensidade.",
+          "description": "<p>O Grupo de Oração Jovem do Shalom Taguatinga é um espaço para a juventude louvar, rezar e caminhar em comunidade.</p><p>Quando: todo sábado, às 14h30.<br>Onde: Shalom Taguatinga — QNA 26, Setor A Norte, Taguatinga/DF.</p><p>Venha e traga um amigo.</p>",
+          "link_text": null,
+          "link_url": null,
+          "published": true,
+          "position": 2
+        },
+        {
+          "site": "taguatinga",
+          "slug": "missa-jovem",
+          "title": "Missa Jovem",
+          "badge": "Missa especial",
+          "date_text": "2º sábado do mês, às 17h",
+          "location": "Shalom Taguatinga — QNA 26, Taguatinga",
+          "image_url": null,
+          "summary": "Uma Santa Missa celebrada com a juventude, todo segundo sábado do mês.",
+          "description": "<p>A Missa Jovem é a Santa Missa celebrada com a juventude do Shalom Taguatinga.</p><p>Quando: todo segundo sábado do mês, às 17h.<br>Onde: Shalom Taguatinga — QNA 26, Setor A Norte, Taguatinga/DF.</p><p>Todos são bem-vindos.</p>",
+          "link_text": null,
+          "link_url": null,
+          "published": true,
+          "position": 3
+        }
+      ]
+    },
+    "santamaria": {
+      "home": {
+        "titulo": "Um lugar para\nencontrar Deus\nem Santa Maria",
+        "subtitulo": "Missas, adoração, grupos de oração e formação. Toda a vida do Centro de Evangelização, num só lugar.",
+        "imagem": "",
+        "imagem_alt": "Centro de Evangelização Shalom Santa Maria"
+      },
+      "schedules": {
+        "funcionamento": [
+          "Segunda a sábado: 14h às 22h"
+        ],
+        "missa": [],
+        "grupos": [
+          "Grupo de adultos: terça às 19h30",
+          "Grupo de adultos: quinta às 19h30",
+          "Grupo de jovens: sábado às 17h"
+        ],
+        "adoracao": [
+          "Quinta: 14h às 18h"
+        ],
+        "servicos": [
+          "Livraria: segunda a sábado, 14h às 21h"
+        ],
+        "aconselhamento": [
+          "Segunda a sexta: 14h às 18h"
+        ]
+      },
+      "events": [
+        {
+          "site": "santamaria",
+          "slug": "grupo-de-adultos",
+          "title": "Grupo de Oração de Adultos",
+          "badge": "Grupo de oração",
+          "date_text": "Terças e quintas às 19h30",
+          "location": "Shalom Santa Maria — QC 1, Santa Maria",
+          "image_url": null,
+          "summary": "Um grupo de oração para adultos rezarem, louvarem e caminharem juntos em comunidade.",
+          "description": "<p>O Grupo de Oração de Adultos do Shalom Santa Maria reúne a comunidade para rezar, louvar e partilhar a fé.</p><p>Quando: terças e quintas-feiras, às 19h30.<br>Onde: Shalom Santa Maria — QC 1, Casa 7, Santa Maria/DF.</p><p>Venha e traga um amigo.</p>",
+          "link_text": null,
+          "link_url": null,
+          "published": true,
+          "position": 0
+        },
+        {
+          "site": "santamaria",
+          "slug": "grupo-de-jovens",
+          "title": "Grupo de Oração de Jovens",
+          "badge": "Grupo de oração",
+          "date_text": "Todo sábado às 17h",
+          "location": "Shalom Santa Maria — QC 1, Santa Maria",
+          "image_url": null,
+          "summary": "Um grupo de oração para jovens que querem viver a fé com alegria e intensidade.",
+          "description": "<p>O Grupo de Oração de Jovens do Shalom Santa Maria é um espaço para a juventude louvar, rezar e caminhar em comunidade.</p><p>Quando: todo sábado, às 17h.<br>Onde: Shalom Santa Maria — QC 1, Casa 7, Santa Maria/DF.</p><p>Venha e traga um amigo.</p>",
+          "link_text": null,
+          "link_url": null,
+          "published": true,
+          "position": 1
+        }
+      ]
+    }
+  }
+}

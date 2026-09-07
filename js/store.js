@@ -10,11 +10,16 @@
      .client()         -> cliente Supabase (ou null)
      .loadEvents()     -> Promise<Array>  (formato dos cards, só do site)
      .loadEvent(slug)  -> Promise<Object|null>
-     .loadSchedules()  -> Promise<Object|null>
-     .loadSetting(key) -> Promise<any|null>  (settings.value, por chave)
-     .loadHome()       -> Promise<Object|null>  (settings key "home": capa)
-   Sem Supabase (ou em falha), cai para os dados locais da página
-   (window.SHALOM_EVENTOS / window.SHALOM_SCHEDULES do data.js).
+     .loadSchedules()  -> Promise<Object|undefined|null>
+     .loadSetting(key) -> Promise<any|undefined|null>  (settings.value, por chave)
+     .loadHome()       -> Promise<Object|undefined|null>  (settings key "home": capa)
+   O banco é a única fonte de dados — não há mais fallback local em data.js.
+   loadSchedules/loadSetting/loadHome devolvem undefined quando não dá para
+   carregar (sem cliente configurado ou erro na consulta) e null quando a
+   consulta funcionou mas não existe linha para esse site/chave; cada página
+   trata os dois casos de forma diferente (erro honesto x "a confirmar").
+   loadEvents()/loadEvent() (normalmente sobrescritos por <site>/js/events.js)
+   devolvem [] / null nesses mesmos casos.
    ===================================================================== */
 window.SHALOM = (function () {
   "use strict";
@@ -52,7 +57,7 @@ window.SHALOM = (function () {
     };
   }
 
-  function fallbackEvents() { return (window.SHALOM_EVENTOS || []).slice(); }
+  function fallbackEvents() { return []; }
 
   function loadEvents() {
     var c = client();
@@ -71,8 +76,7 @@ window.SHALOM = (function () {
 
   function loadEvent(slug) {
     var c = client();
-    var local = function () { return fallbackEvents().filter(function (e) { return e.id === slug; })[0] || null; };
-    if (!c) return Promise.resolve(local());
+    if (!c) return Promise.resolve(null);
     return c.from("events").select("*").eq("site", SITE).eq("slug", slug).limit(1)
       .then(function (res) {
         if (res.error || !res.data || !res.data.length) return null;
@@ -83,21 +87,26 @@ window.SHALOM = (function () {
 
   function loadSchedules() {
     var c = client();
-    if (!c) return Promise.resolve(null);
+    if (!c) return Promise.resolve(undefined);
     return c.from("settings").select("value").eq("site", SITE).eq("key", "schedules").limit(1)
       .then(function (res) {
-        if (res.error || !res.data || !res.data.length) return null;
+        if (res.error) return undefined;
+        if (!res.data || !res.data.length) return null;
         return res.data[0].value || null;
       })
-      .catch(function () { return null; });
+      .catch(function () { return undefined; });
   }
 
   function loadSetting(key) {
     var c = client();
-    if (!c) return Promise.resolve(null);
+    if (!c) return Promise.resolve(undefined);
     return c.from("settings").select("value").eq("site", SITE).eq("key", key).limit(1)
-      .then(function (res) { if (res.error || !res.data || !res.data.length) return null; return res.data[0].value || null; })
-      .catch(function () { return null; });
+      .then(function (res) {
+        if (res.error) return undefined;
+        if (!res.data || !res.data.length) return null;
+        return res.data[0].value || null;
+      })
+      .catch(function () { return undefined; });
   }
   function loadHome() { return loadSetting("home"); }
 

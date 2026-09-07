@@ -1,25 +1,16 @@
 /*
- * Fonte de eventos de Taguatinga.
+ * Fonte de eventos de Taguatinga (Supabase, tabela `events`).
  *
- * O painel e a página pública usam a mesma tabela `events`. Este adaptador
- * mantém o fallback local somente quando o Supabase está indisponível. Os
- * quatro eventos locais marcados com `featuredLocal` são uma exceção
- * deliberada: entram antes dos remotos, exceto quando já existe uma linha
- * remota com o mesmo slug (inclusive despublicada), que então governa o slug.
+ * O painel e a página pública usam a mesma tabela. Sem fallback local: sem
+ * cliente configurado ou em erro, loadEvents devolve [] (a página esconde a
+ * seção de eventos) e loadEvent devolve null (a página mostra "não encontrado").
  */
 (function () {
   "use strict";
   var api = window.SHALOM;
   if (!api) return;
 
-  var fallbackEvents = function () { return (window.SHALOM_EVENTOS || []).slice(); };
   var site = api.site || window.SHALOM_SITE || "taguatinga";
-
-  function localEvent(slug, featuredOnly) {
-    return fallbackEvents().filter(function (e) {
-      return e.id === slug && (!featuredOnly || e.featuredLocal === true);
-    })[0] || null;
-  }
 
   function active(row, now) {
     if (row && row.published === false) return false;
@@ -66,37 +57,22 @@
 
   api.loadEvents = function () {
     var q = rowsQuery();
-    if (!q) return Promise.resolve(fallbackEvents().filter(function (e) { return active(e, Date.now()); }));
+    if (!q) return Promise.resolve([]);
     return q.then(function (res) {
-      if (res.error) return fallbackEvents().filter(function (e) { return active(e, Date.now()); });
+      if (res.error) return [];
       var now = Date.now();
-      var rows = res.data || [];
-      var remoteSlugs = {};
-      rows.forEach(function (row) { if (row && row.slug) remoteSlugs[row.slug] = true; });
-      var local = fallbackEvents().filter(function (event) {
-        return event.featuredLocal === true && !remoteSlugs[event.id] && active(event, now);
-      });
-      var remote = rows.filter(function (row) { return active(row, now); }).map(map);
-      return local.concat(remote);
-    }).catch(function () {
-      return fallbackEvents().filter(function (e) { return active(e, Date.now()); });
-    });
+      return (res.data || []).filter(function (row) { return active(row, now); }).map(map);
+    }).catch(function () { return []; });
   };
 
   api.loadEvent = function (slug) {
+    if (!slug) return Promise.resolve(null);
     var q = rowsQuery(slug);
-    var localFallback = function () {
-      return fallbackEvents().filter(function (e) { return e.id === slug && active(e, Date.now()); })[0] || null;
-    };
-    var localFeatured = function () {
-      var event = localEvent(slug, true);
-      return event && active(event, Date.now()) ? event : null;
-    };
-    if (!q) return Promise.resolve(localFallback());
+    if (!q) return Promise.resolve(null);
     return q.then(function (res) {
-      if (res.error) return localFallback();
+      if (res.error) return null;
       var row = (res.data || [])[0];
-      return row ? (active(row, Date.now()) ? map(row) : null) : localFeatured();
-    }).catch(localFallback);
+      return row && active(row, Date.now()) ? map(row) : null;
+    }).catch(function () { return null; });
   };
 })();

@@ -8,6 +8,12 @@
 
    Nada aqui toca o Supabase real: as tabelas vivem em memória e ficam
    visíveis em window.__mockDB para o teste inspecionar o que seria gravado.
+
+   Estado inicial = produção DEPOIS do seed: as linhas que já existiam (os 4
+   eventos da Asa Sul e os horários da Asa Sul) mais tudo que o
+   docs/seeds/2026-09-07-seed-cev.json acrescenta, com a mesma semântica de
+   "on conflict do nothing" do SQL. O JSON chega em window.__MOCK_SEED,
+   injetado pelo run.mjs antes de qualquer script da página.
    ===================================================================== */
 (function (global) {
   "use strict";
@@ -18,8 +24,17 @@
     display_name: "Editor de Teste"
   };
 
-  // ---- tabelas iniciais (espelham o estado real antes desta rodada) ----
+  var SEEDED_AT = "2026-09-07T15:30:23.085Z";
+
+  // ---- tabelas iniciais (produção depois do seed da terceira rodada) ----
   function seed() {
+    var db = baseRows();
+    applySeedJson(db, global.__MOCK_SEED);
+    return db;
+  }
+  // Linhas que já existiam no banco antes do seed desta sessão (4 eventos da Asa Sul de 2026-08-16;
+  // produção também já tinha as 6 de Taguatinga/Santa Maria trazidas pelo painel em 2026-09-07 — o seed as cobre com on conflict do nothing).
+  function baseRows() {
     return {
       sites: [
         { id: "asasul", name: "Shalom Asa Sul" },
@@ -44,8 +59,8 @@
           }
         }
       ],
-      // Os 4 eventos da Asa Sul que já vivem no banco (os outros 4 do data.js
-      // são featuredLocal e continuam só no arquivo do site).
+      // Os 4 eventos da Asa Sul que já viviam no banco antes do seed (o seed
+      // acrescenta os outros 4 sem tocar nestes).
       events: [
         ev(0, "vida-plena", "Encontro Vida Plena", "Seminário", "29 e 30 de agosto", "San Marco Brasília Hotel", "vida-plena.jpeg"),
         ev(1, "kyrios", "Grupo de Oração Kyrios", "Grupo de oração", "Todo sábado às 15h", "Shalom Asa Sul, 507 Sul", "kyrios.jpeg"),
@@ -56,6 +71,32 @@
       menu_products: [],
       storage: []
     };
+  }
+  // Aplica o seed com a mesma regra do SQL: settings on conflict (site,key)
+  // do nothing; events on conflict (site,slug) do nothing.
+  var seedSeq = 0;
+  function applySeedJson(db, json) {
+    if (!json || !json.sites) return;
+    Object.keys(json.sites).forEach(function (siteId) {
+      var block = json.sites[siteId] || {};
+      ["home", "schedules"].forEach(function (key) {
+        if (!block[key]) return;
+        var has = db.settings.some(function (r) { return r.site === siteId && r.key === key; });
+        if (has) return;
+        db.settings.push({ site: siteId, key: key, value: clone(block[key]), updated_at: SEEDED_AT });
+      });
+      (block.events || []).forEach(function (row) {
+        var site = row.site || siteId;
+        var has = db.events.some(function (r) { return r.site === site && r.slug === row.slug; });
+        if (has) return;
+        seedSeq++;
+        db.events.push(Object.assign(
+          { id: "cccccccc-0000-4000-8000-" + String(1e11 + seedSeq).slice(1), publish_at: null, unpublish_at: null, updated_at: SEEDED_AT },
+          clone(row),
+          { site: site }
+        ));
+      });
+    });
   }
   function ev(i, slug, title, badge, date_text, location, img) {
     return {
@@ -70,10 +111,10 @@
     };
   }
 
+  function clone(v) { return v == null ? v : JSON.parse(JSON.stringify(v)); }
   var db = seed();
   var seq = 0;
   function uid() { seq++; return "bbbbbbbb-0000-4000-8000-" + String(1e11 + seq).slice(1); }
-  function clone(v) { return v == null ? v : JSON.parse(JSON.stringify(v)); }
   function ok(data) { return { data: clone(data), error: null, status: 200, count: null }; }
   function fail(message, code) { return { data: null, error: { message: message, code: code || "MOCK", details: null, hint: null }, status: 400 }; }
 
@@ -161,7 +202,11 @@
   function Bucket(name) { this.name = name; }
   Bucket.prototype.upload = function (path, body, opts) {
     var size = (body && (body.size || body.length)) || 0;
-    db.storage.push({ bucket: this.name, path: path, size: size, options: opts || null, at: new Date().toISOString() });
+    db.storage.push({
+      bucket: this.name, path: path, size: size,
+      type: (body && body.type) || "",
+      options: opts || null, at: new Date().toISOString()
+    });
     return Promise.resolve({ data: { path: path }, error: null });
   };
   Bucket.prototype.getPublicUrl = function (path) {
@@ -201,6 +246,6 @@
 
   global.supabase = { createClient: createClient };
   global.__mockDB = db;
-  global.__mockReset = function () { db = seed(); global.__mockDB = db; };
+  global.__mockReset = function () { seedSeq = 0; db = seed(); global.__mockDB = db; };
   global.__mockMaster = MASTER;
 })(window);

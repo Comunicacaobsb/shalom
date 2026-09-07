@@ -18,14 +18,13 @@ Grupos de Oração, Adoração, Serviços, Oração e Aconselhamento), `#eventos
 - `css/styles.css` — cópia verbatim de `asasul/css/styles.css` (mesmos tokens, mesmo
   layout) + bloco final "Ajustes locais" (dois blocos de chave Pix + gradiente do hero
   sem foto).
-- `js/data.js` — horários (`SHALOM_SCHEDULES`) e eventos locais (`SHALOM_EVENTOS`) de
-  Santa Maria. Fonte de dados enquanto o Supabase não estiver configurado para este site.
-- `js/events.js` — adaptador que decide entre eventos locais (`featuredLocal`) e a
-  tabela `events` do Supabase (site `santamaria`).
+- `js/events.js` — adaptador de eventos — só a tabela `events` do Supabase (site
+  `santamaria`), sem fallback local.
 - `js/evento.js` — monta a página de detalhe do evento a partir do slug.
 - `js/main.js` — interações da página (menu, copiar Pix, horários, carrossel, notícias).
-- `scripts/build-event-pages.mjs` — gera `e/<slug>/index.html` a partir de `js/data.js`
-  e `evento.html`, com a `og:image` de cada evento "assada" no HTML.
+- `scripts/build-event-pages.mjs` — gera `e/<slug>/index.html` a partir do banco (ou de
+  um JSON equivalente ao seed, com `--from-json`) e de `evento.html`, com a `og:image`
+  de cada evento "assada" no HTML.
 - `e/grupo-de-adultos/`, `e/grupo-de-jovens/` — páginas estáticas geradas (ver abaixo).
 - `images/pix-qr.png` — QR Pix já verificado (decodifica para
   `economatosantamaria@comshalom.org`). Não regerar.
@@ -35,27 +34,35 @@ Compartilhados com o resto do site (não ficam dentro de `santamaria/`):
 (compartilhar evento), `../favicon/`, `../images/logo-shlaom.svg`,
 `../images/shalom-brasilia.jpg`.
 
-## Como editar horários e eventos
+## Onde estão os dados
 
-Edite `js/data.js`:
+Capa, horários e eventos não têm mais nenhuma cópia editável no código: a única fonte é o
+banco (Supabase, `site = "santamaria"`) e quem edita é o painel `/admin/`.
 
-- `SHALOM_SCHEDULES` — um array de strings por categoria
-  (`funcionamento`, `missa`, `grupos`, `adoracao`, `servicos`, `aconselhamento`).
-  Array vazio (`[]`) renderiza "A confirmar" — é o caso atual de `missa`, fiel ao
-  horário oficial do centro.
-- `SHALOM_EVENTOS` — um objeto por evento (ver comentário no topo do arquivo para cada
-  campo). Os dois eventos atuais são `grupos de oração` marcados com
-  `featuredLocal: true` e `imagem: ""` (sem arte disponível — aparece o pôster de
-  reserva com o título do evento).
+- **Capa** — `settings` (`key = "home"`): título, frase de apoio e imagem de fundo do hero.
+- **Horários** — `settings` (`key = "schedules"`): um array de textos por categoria
+  (`funcionamento`, `missa`, `grupos`, `adoracao`, `servicos`, `aconselhamento`). Categoria sem
+  linha ou com lista vazia mostra "A confirmar" (é o caso de `missa`, fiel ao horário oficial do
+  centro); se a consulta falhar, os cartões mostram "Não foi possível carregar agora".
+- **Eventos** — tabela `events` (`site = "santamaria"`), a mesma usada pelo carrossel e por
+  `e/<slug>/`. Sem eventos publicados (ou em erro), a seção "Eventos & encontros" fica
+  escondida — não existe mais pôster de reserva local.
+- **Imagens** — enviadas pelo painel, com compressão automática até 300 KB por arquivo.
 
-Depois de editar eventos, regere as páginas estáticas (veja "Como regerar `e/`" abaixo).
+`e/<slug>/index.html` continua gerado por `node scripts/build-event-pages.mjs` (veja "Como
+regerar `e/`" abaixo), mas a fonte agora é o banco (ou um JSON equivalente ao seed, com
+`--from-json`) — nunca um arquivo dentro desta pasta.
+
+**Ordem de publicação:** o seed (`docs/seeds/2026-09-07-seed-cev.sql` ou `.json`) precisa ser
+aplicado em produção **antes** do push desta branch. Se a branch subir sem o seed, esta página
+mostra "A confirmar" nos horários e fica sem a seção de eventos até alguém salvar pelo painel.
 
 ## Capa editável
 
 O topo da página (imagem de fundo, título e frase de apoio do hero) vem de `settings` no
-Supabase (`site = "santamaria"`, `key = "home"`). Sem essa linha, a página usa o padrão local
-`window.SHALOM_HOME`, no topo de `js/data.js` — hoje com `imagem: ""`, ou seja, o gradiente
-descrito em "Hero sem foto" abaixo. A última capa aplicada fica em cache
+Supabase (`site = "santamaria"`, `key = "home"`). Sem essa linha (erro de consulta), a página
+mantém o que já está no HTML/no cache, sem mexer — hoje isso é o gradiente descrito em "Hero sem
+foto" abaixo, já que não há `<img>` no hero estático. A última capa aplicada fica em cache
 (`localStorage["shalom:home:santamaria"]`): um script inline logo após a `section.hero` aplica
 esse cache de imediato (sem esperar rede), e `js/main.js` busca o Supabase em seguida e
 reconcilia — com troca suave da imagem (`.hero__bg img.is-swapping`) quando ela muda. Assim, uma
@@ -69,7 +76,7 @@ Santa Maria já é uma página editável no painel (módulos Horários e Eventos
 (`admin/admin.js`, `SITE_CATALOG`) marca `santamaria` como `type: "editable"`, com
 `modules: ["events", "schedules"]` e `children` apontando para `e/grupo-de-adultos/` e
 `e/grupo-de-jovens/`. Ao salvar Horários pela primeira vez pelo painel, preencha **todas**
-as categorias (o Supabase passa a ser a fonte, substituindo `SHALOM_SCHEDULES`).
+as categorias — o painel substitui o bloco inteiro, não mescla com o que já está salvo.
 
 ## Feed de notícias (compartilhado)
 
@@ -84,12 +91,16 @@ bloquear a chamada, a seção mostra um card de fallback com link para o portal.
 ```
 cd santamaria
 node scripts/build-event-pages.mjs
+# ou, offline, a partir de um JSON no formato do seed:
+node scripts/build-event-pages.mjs --from-json ../docs/seeds/2026-09-07-seed-cev.json
 ```
 
-Rode sempre que `js/data.js` mudar. O script lê `SHALOM_EVENTOS`, usa `evento.html`
-como molde e escreve `e/<slug>/index.html` com meta tags Open Graph/Twitter e
-`window.__EVENT_ID__` fixados por evento (para a prévia do link no WhatsApp mostrar a
-arte certa mesmo sem JavaScript rodar a busca por slug).
+Rode sempre que os eventos publicados mudarem. Sem `--from-json`, o script busca os eventos
+direto no Supabase (REST, com a chave anônima de `../js/config.js`); usa `evento.html` como
+molde e escreve `e/<slug>/index.html` com meta tags Open Graph/Twitter e
+`window.__EVENT_ID__` fixados por evento (para a prévia do link no WhatsApp mostrar a arte
+certa mesmo sem JavaScript rodar a busca por slug), apagando as pastas de `e/` cujo slug não
+existe mais na fonte.
 
 ## Hero sem foto
 
@@ -103,7 +114,8 @@ Quando houver uma foto do centro: salve-a como `../images/shalom-santa-maria.web
 troque a `div` do hero em `index.html` por
 `<div class="hero__bg"><img src="../images/shalom-santa-maria.webp" alt="Centro de Evangelização Shalom Santa Maria" fetchpriority="high" /></div>`
 (instrução também deixada em comentário HTML antes da `section.hero`) e atualize a
-`og:image` no `<head>` para o mesmo arquivo.
+`og:image` no `<head>` para o mesmo arquivo. Ou envie a foto pelo painel (módulo Capa) —
+nesse caso não precisa editar o HTML: a imagem passa a vir do banco.
 
 ## Pendências (spec, seção 9 — não bloqueiam esta implementação)
 

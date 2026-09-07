@@ -28,44 +28,46 @@ taguatinga/
 ├── evento.html                   Molde da página de detalhe de um evento
 ├── css/styles.css                Cópia verbatim de asasul/css/styles.css + bloco
 │                                  "Ajustes locais" no fim (chave Pix dupla, hero sem foto)
-├── js/data.js                    SHALOM_SCHEDULES (horários) e SHALOM_EVENTOS (carrossel)
-├── js/events.js                  Adaptador de eventos (Supabase com fallback local)
+├── js/events.js                  Adaptador de eventos — só Supabase, sem fallback local
 ├── js/evento.js                  Lógica da página de detalhe do evento
 ├── js/main.js                    Interações da página (menu, carrossel, Pix, notícias)
-├── scripts/build-event-pages.mjs Gera taguatinga/e/<slug>/index.html a partir de js/data.js
+├── scripts/build-event-pages.mjs Gera e/<slug>/index.html a partir do banco (ou de um
+│                                  JSON --from-json)
 ├── e/<slug>/index.html           Páginas de evento geradas (não editar à mão)
 ├── images/pix-qr.png             QR Pix (10%, economatotaguatinga@comshalom.org)
-├── images/eventos/grupo-aberto.webp  Arte do evento "Grupo de Oração Aberto"
-├── images/hero.jpg               Fachada original — fonte de referência, não usada no site
-└── images/grupos-oracao.jpg      Ícone original — fonte de referência, não usada no site
+└── images/eventos/grupo-aberto.webp  Arte do evento "Grupo de Oração Aberto"
 ```
 
-O hero e o `og:image` usam `../images/shalom-taguatinga.webp` (raiz do repositório, 1600×900,
-gerada a partir de `images/hero.jpg`). `images/hero.jpg` e `images/grupos-oracao.jpg` ficam no
-lugar como fonte das artes, mas nenhuma página referencia esses dois arquivos diretamente.
+O hero e o `og:image` usam `../images/shalom-taguatinga.webp` (raiz do repositório, 1600×900).
 
-## Como editar os dados
+## Onde estão os dados
 
-**Horários e eventos fixos** — `js/data.js`:
-- `window.SHALOM_SCHEDULES` tem uma lista de textos por categoria (`funcionamento`, `missa`,
-  `grupos`, `adoracao`, `servicos`, `aconselhamento`). Cada linha vira um `<li>`.
-- `window.SHALOM_EVENTOS` é a lista de eventos do carrossel, na ordem em que devem aparecer.
-  Os quatro eventos atuais (grupos de oração e Missa Jovem) têm `featuredLocal: true` — eles só
-  somem do carrossel quando existir, no Supabase, um evento remoto com o mesmo `id` (slug).
-- Depois de editar `js/data.js`, rode `node scripts/build-event-pages.mjs` (a partir desta
-  pasta) para regerar as páginas de `e/`.
+Capa, horários e eventos não têm mais nenhuma cópia editável no código: a única fonte é o
+banco (Supabase, `site = "taguatinga"`) e quem edita é o painel `/admin/`.
 
-**Fonte oficial depois de publicado** — o painel `/admin/` (Supabase) passa a valer sobre
-`js/data.js` assim que alguém salvar Horários ou Eventos pelo painel. No primeiro salvamento de
-Horários, preencha todas as categorias de uma vez (o painel substitui o bloco inteiro, não
-mescla com o fallback local). Enquanto o Supabase não tiver linhas para `site = "taguatinga"`,
-`js/store.js`/`js/events.js` caem de volta para os dados deste arquivo.
+- **Capa** — `settings` (`key = "home"`): título, frase de apoio e imagem de fundo do hero.
+- **Horários** — `settings` (`key = "schedules"`): um array de textos por categoria
+  (`funcionamento`, `missa`, `grupos`, `adoracao`, `servicos`, `aconselhamento`). Categoria sem
+  linha ou com lista vazia mostra "A confirmar"; se a consulta falhar (sem conexão, erro do
+  Supabase), os cartões mostram "Não foi possível carregar agora" — a página nunca inventa dado.
+- **Eventos** — tabela `events` (`site = "taguatinga"`), a mesma usada pelo carrossel e por
+  `e/<slug>/`. Sem eventos publicados (ou em erro), a seção "Eventos & encontros" fica
+  escondida — não existe mais pôster de reserva local.
+- **Imagens** — enviadas pelo painel, com compressão automática até 300 KB por arquivo.
+
+`e/<slug>/index.html` continua sendo gerado por `node scripts/build-event-pages.mjs` (seção
+abaixo), mas a fonte agora é o banco (ou um JSON equivalente ao seed, com `--from-json`) —
+nunca um arquivo dentro desta pasta.
+
+**Ordem de publicação:** o seed (`docs/seeds/2026-09-07-seed-cev.sql` ou `.json`) precisa ser
+aplicado em produção **antes** do push desta branch. Se a branch subir sem o seed, esta página
+mostra "A confirmar" nos horários e fica sem a seção de eventos até alguém salvar pelo painel.
 
 ## Capa editável
 
 O topo da página (imagem de fundo, título e frase de apoio do hero) vem de `settings` no
-Supabase (`site = "taguatinga"`, `key = "home"`). Sem essa linha, a página usa o padrão local
-`window.SHALOM_HOME`, no topo de `js/data.js`. A última capa aplicada fica em cache
+Supabase (`site = "taguatinga"`, `key = "home"`). Sem essa linha (erro de consulta), a página
+mantém o que já está no HTML/no cache, sem mexer. A última capa aplicada fica em cache
 (`localStorage["shalom:home:taguatinga"]`): um script inline logo após a `section.hero` aplica
 esse cache de imediato (sem esperar rede), e `js/main.js` busca o Supabase em seguida e
 reconcilia — com troca suave da imagem (`.hero__bg img.is-swapping`) quando ela muda. A
@@ -75,7 +77,7 @@ trocar a imagem de preview do link exige editar o HTML e publicar.
 ## Painel `/admin/`
 
 Taguatinga é uma página editável no painel (módulos Horários e Eventos), com os quatro eventos
-locais listados como filhos apontando para `e/grupo-aberto/`, `e/grupo-de-casais/`,
+listados como filhos apontando para `e/grupo-aberto/`, `e/grupo-de-casais/`,
 `e/grupo-jovem/` e `e/missa-jovem/`. O catálogo do painel (`admin/admin.js`) é mantido fora
 desta pasta — qualquer mudança nele é responsabilidade de quem edita `admin/`.
 
@@ -92,12 +94,16 @@ ou formato inválido), a seção cai para um cartão de fallback com link para o
 ```bash
 cd taguatinga
 node scripts/build-event-pages.mjs
+# ou, offline, a partir de um JSON no formato do seed:
+node scripts/build-event-pages.mjs --from-json ../docs/seeds/2026-09-07-seed-cev.json
 ```
 
-Gera (ou regrava) `e/<slug>/index.html` para cada entrada de `window.SHALOM_EVENTOS` em
-`js/data.js`, com a `og:image`/`twitter:image` do próprio evento "assada" no HTML — necessário
-para o WhatsApp e o Facebook mostrarem a arte certa na prévia do link compartilhado. Rode o
-script sempre que um evento local for criado, renomeado ou tiver a imagem trocada.
+Sem `--from-json`, o script busca os eventos publicados direto no Supabase (REST, com a chave
+anônima de `../js/config.js`). Gera (ou regrava) `e/<slug>/index.html` para cada evento, com a
+`og:image`/`twitter:image` "assada" no HTML — necessário para o WhatsApp e o Facebook mostrarem
+a arte certa na prévia do link compartilhado — e apaga as pastas de `e/` cujo slug não existe
+mais na fonte. Rode o script sempre que um evento for criado, renomeado, tiver a imagem trocada
+ou for despublicado.
 
 ## Pendências (não bloqueiam o funcionamento da página)
 

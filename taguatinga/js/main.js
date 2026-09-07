@@ -70,12 +70,24 @@ function showToast(msg) {
   var HOME_KEY = "shalom:home:" + ((window.SHALOM && SHALOM.site) || window.SHALOM_SITE || "taguatinga");
   function escHtml(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" })[c]; }); }
   function resolveUrl(v) { try { return v ? new URL(v, location.href).href : ""; } catch (e) { return ""; } }
+  function readHomeFromDom() {
+    var h1 = $(".hero h1"), sub = $(".hero__sub"), bg = $(".hero__bg");
+    var img = bg && bg.querySelector("img");
+    return {
+      titulo:     h1 ? h1.innerHTML.replace(/<br\s*\/?>/gi, "\n") : "",
+      subtitulo:  sub ? sub.textContent : "",
+      imagem:     img ? img.src : "",
+      imagem_alt: img ? img.alt : ""
+    };
+  }
   function applyHome(row) {
-    var base = window.SHALOM_HOME || {};
+    if (row === undefined) return; // erro ao carregar: mantém o HTML/cache atual, sem mexer no DOM nem no cache
+    // base = o que já está no DOM agora (HTML estático ou o cache aplicado pelo script inline — os dois são válidos)
+    var base = readHomeFromDom();
     var home = {
       titulo:     (row && row.titulo)     || base.titulo     || "",
       subtitulo:  (row && row.subtitulo)  || base.subtitulo  || "",
-      // string vazia gravada pelo painel = "sem foto" (gradiente); campo ausente = padrão local
+      // string vazia gravada pelo painel = "sem foto" (gradiente); campo ausente = o que já está no DOM
       imagem:     resolveUrl(row && typeof row.imagem === "string" ? row.imagem : (base.imagem || "")),
       imagem_alt: (row && row.imagem_alt) || base.imagem_alt || ""
     };
@@ -97,14 +109,14 @@ function showToast(msg) {
     }
     try { if (row) localStorage.setItem(HOME_KEY, JSON.stringify(home)); else localStorage.removeItem(HOME_KEY); } catch (e) {}
   }
-  if (window.SHALOM && SHALOM.loadHome) { SHALOM.loadHome().then(applyHome).catch(function () { applyHome(null); }); }
-  else { applyHome(null); }
+  if (window.SHALOM && SHALOM.loadHome) { SHALOM.loadHome().then(applyHome).catch(function () {}); }
 
   /* ===================== HORÁRIOS & SERVIÇOS (Supabase) ===================== */
   var SCHED = { funcionamento:"field-funcionamento", missa:"field-missa", adoracao:"field-adoracao", aconselhamento:"field-aconselhamento", grupos:"field-grupos", servicos:"field-servicos" };
   function renderSchedules(data) {
     Object.keys(SCHED).forEach(function (k) {
       var el = document.getElementById(SCHED[k]); if (!el) return;
+      if (data === undefined) { el.innerHTML = '<li class="text-muted">Não foi possível carregar agora</li>'; return; }
       var arr = (data && data[k]) || [];
       if (!arr.length) { el.innerHTML = '<li class="text-muted">A confirmar</li>'; return; }
       el.innerHTML = arr.map(function (line) {
@@ -115,9 +127,9 @@ function showToast(msg) {
     });
   }
   if (window.SHALOM && SHALOM.loadSchedules) {
-    SHALOM.loadSchedules().then(function (data) { renderSchedules(data || window.SHALOM_SCHEDULES || null); });
+    SHALOM.loadSchedules().then(renderSchedules).catch(function () { renderSchedules(undefined); });
   } else {
-    renderSchedules(window.SHALOM_SCHEDULES || null);
+    renderSchedules(undefined);
   }
 
   /* ===================== CARROSSEL DE EVENTOS =====================
@@ -285,7 +297,7 @@ function showToast(msg) {
   if (window.SHALOM && SHALOM.loadEvents) {
     SHALOM.loadEvents().then(initCarousel);
   } else {
-    initCarousel(window.SHALOM_EVENTOS || []);
+    initCarousel([]);
   }
 
   /* ===================== NOTÍCIAS (feed local da página Brasília) ===================== */

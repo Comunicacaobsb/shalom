@@ -5,8 +5,11 @@ edita o conteúdo de qualquer página (Asa Sul, Taguatinga, Santa Maria, …), c
 **escopo por página** (cada página só vê o seu conteúdo). Usa Supabase (login +
 banco + imagens, plano gratuito). O site continua no GitHub Pages.
 
-Enquanto o Supabase não estiver configurado, cada página funciona com os dados de
-exemplo do seu `js/data.js` — nada quebra.
+**O banco é a única fonte** de capa, horários e eventos das páginas de Centro de
+Evangelização (2026-09-07). Não existe mais conteúdo editável dentro do código:
+sem as linhas no banco, a página mostra "A confirmar" nos horários e esconde a
+seção de eventos. O ponto de partida é o seed `docs/seeds/2026-09-07-seed-cev.sql`
+(veja a seção 2.2).
 
 ## Estrutura
 ```
@@ -21,7 +24,7 @@ exemplo do seu `js/data.js` — nada quebra.
 │   ├── admin.js / admin.css
 │   ├── supabase-setup.sql
 │   └── ADMIN-SETUP.md (este arquivo)
-├── asasul/  (index.html, evento.html, js/main.js, js/data.js, js/evento.js, e/…)
+├── asasul/  (index.html, evento.html, js/main.js, js/events.js, js/evento.js, e/…)
 ├── taguatinga/  santamaria/  …  (mesmo padrão)
 └── scripts/qa/admin-mock/  → teste automático do painel com um Supabase falso
 ```
@@ -48,91 +51,101 @@ editor, a faixa do topo repete em que página e em que módulo você está.
   primeira tela. O título tem **uma linha do campo = uma linha do título** na
   página. A **prévia ao vivo**, ao lado, mostra como vai ficar (aproximada: o site
   usa Montserrat e ocupa a tela inteira); sem imagem, ela mostra o fundo azul
-  institucional, exatamente como a página faz. A imagem é redimensionada no
-  navegador para no máximo 1920 px e enviada para o bucket `eventos`, na pasta da
-  própria página (`<site>/capa-<data>.jpg`). Nada aparece no site antes de clicar
-  em **Salvar capa**.
+  institucional, exatamente como a página faz. A imagem é reduzida a no máximo
+  1920 px e comprimida no navegador até caber em **300 KB** (veja "Imagens"),
+  depois enviada para o bucket `eventos`, na pasta da própria página
+  (`<site>/capa-<data>.webp`). Nada aparece no site antes de clicar em
+  **Salvar capa**.
 - **Eventos:** criar/editar/excluir, upload de imagem, texto curto (card),
   descrição completa (títulos/listas/negrito), link de inscrição, publicar/rascunho,
   ordem no carrossel. Também é possível definir **Publicar em** e **Retirar em**;
   o banco filtra automaticamente o evento pelo horário de Brasília/UTC, sem deploy.
   Vale só para a página selecionada. Eventos existentes da Asa Sul aparecem na lista
   e podem ser editados ou excluídos.
-- **Horários & Serviços:** um campo por categoria, uma linha = um item. **No primeiro
-  salvamento de Horários de uma página**, preencha todas as seis categorias
-  (Funcionamento, Missas, Adoração, Aconselhamento, Grupos de Oração, Serviços) — a
-  partir desse salvamento o Supabase passa a ser a fonte para aquela página, e o
-  `js/data.js` local vira apenas o fallback (usado somente enquanto não existir
-  linha salva em `settings`/`schedules` para o site).
+- **Horários & Serviços:** um campo por categoria, uma linha = um item. Preencha
+  todas as seis categorias (Funcionamento, Missas, Adoração, Aconselhamento,
+  Grupos de Oração, Serviços): o que ficar em branco aparece como "A confirmar"
+  na página. Não há mais cópia dos horários no código — sem linha em
+  `settings`/`schedules`, a página mostra "A confirmar" nas seis categorias.
 
 As mudanças aparecem na respectiva página em tempo real.
 
-## 2.1 Trazer os dados do site para o painel
+## 2.1 Imagens (limite de 300 KB)
 
-Antes do primeiro salvamento, uma página ainda não tem linha no banco: quem manda
-é o arquivo `js/data.js` da própria página. Para não obrigar ninguém a redigitar
-tudo, o painel lê esse arquivo e oferece o conteúdo pronto:
+Toda imagem enviada pelo painel — capa, arte de evento e foto de produto do
+cardápio — é **ajustada e comprimida no seu próprio navegador** antes de subir.
+Nada precisa ser preparado antes: mande a foto do jeito que ela está.
 
-- **Capa e Horários** já abrem **pré-preenchidos** com o que está no site hoje, com
-  o aviso "Estes dados vieram do arquivo do site e ainda não foram salvos aqui".
-  Revise e clique em Salvar. A partir daí o painel passa a mandar naquele trecho.
-- **Eventos** mostra, abaixo da lista, a seção **"No site, mas ainda não no
-  painel"** com os eventos fixos do arquivo (grupos de oração, Missa Jovem e afins)
-  que ainda não existem no banco. **Trazer para o painel** copia um; **Trazer
-  todos** copia a lista inteira, na mesma ordem, logo depois dos eventos que já
-  estavam lá. A descrição em texto vira HTML (parágrafos, quebras de linha e links
-  clicáveis) e o caminho da arte vira o endereço completo do site publicado. Feito
-  isso, o evento passa a ser editado só pelo painel — o arquivo continua no
-  repositório, mas o banco tem prioridade sobre ele quando o endereço (slug) é o
-  mesmo.
+O que acontece com o arquivo:
 
-A seção só aparece enquanto houver algo pendente. Se um evento já foi trazido, ele
-some da lista de pendentes e passa a aparecer na lista normal, acima.
+1. o lado maior é reduzido para o tamanho do lugar onde a imagem aparece —
+   **1920 px** na capa, **1200 px** em evento e cardápio;
+2. a imagem é gravada em **WebP** com qualidade 0,82; se passar de 300 KB, a
+   qualidade cai para 0,72 → 0,62 → 0,52;
+3. se ainda passar, a imagem encolhe mais 20% e o processo recomeça, até o piso
+   de 800 px (em navegador antigo, sem WebP, a mesma escada é feita em JPEG).
+
+O painel **nunca envia um arquivo acima de 300 KB**. Quando termina, a mensagem
+abaixo do botão mostra o tamanho final ("Imagem enviada (184 KB)"). Se nem no
+menor tamanho a imagem couber no limite — normalmente foto com ruído ou textura
+muito fina —, o envio é recusado com "Não foi possível deixar a imagem abaixo de
+300 KB. Use uma imagem menor ou com menos detalhes.". Arquivo que não é imagem
+também é recusado, sem subir nada.
+
+> **Por que 300 KB:** as páginas abrem no celular, muitas vezes em rede fraca. É
+> o teto que todas as imagens do site já respeitam hoje.
 
 > **Prévia no WhatsApp:** a `og:image` de cada página continua vindo do HTML e
 > **não muda** ao trocar a imagem da capa pelo painel — programas como WhatsApp e
 > Facebook não executam JavaScript. Trocar a imagem da prévia exige alterar o
 > `index.html` e publicar.
 
-## 2.2 Checklist depois de publicar (uma vez por página)
+## 2.2 Publicação e primeiro acesso (uma vez)
 
-Entre em `/admin/` com a conta de administrador master e, para **cada** página
-(Shalom Asa Sul, Shalom Taguatinga, Shalom Santa Maria):
+O conteúdo das três páginas de Centro de Evangelização nasce no banco, por um
+**seed** aplicado uma única vez. Nesta ordem:
 
-1. **Capa** → confira título, frase e imagem → **Salvar capa**.
-2. **Horários e serviços** → confira as seis categorias → **Salvar horários**.
-3. **Eventos e encontros** → **Trazer todos** na seção "No site, mas ainda não no
-   painel" → confira a lista que ficou.
-4. Depois das três páginas, vá em **Usuários e acessos** e marque quais páginas
-   cada editor pode cuidar. Criar conta não concede edição (veja a seção 5).
+1. **Aplicar o seed** — *ação do João*: no SQL Editor do projeto Supabase (conta
+   comshalom), rodar `docs/seeds/2026-09-07-seed-cev.sql`. Ele é idempotente
+   (`on conflict do nothing`): grava capa, horários e eventos das três páginas e
+   **não mexe** no que já existe. Rodar duas vezes não duplica nada.
+2. **Publicar** o site (push na `main`).
+3. **Conferir as três páginas** (Asa Sul, Taguatinga, Santa Maria): capa,
+   horários e o carrossel de eventos. Se o seed ainda não tiver rodado, os
+   horários aparecem como "A confirmar" e a seção de eventos some — é o sinal de
+   que falta o passo 1.
+4. **Conceder acessos** em **Usuários e acessos** (visível só para o master):
+   marque quais páginas cada editor pode cuidar. Criar conta não concede edição
+   (veja a seção 5).
+
+A partir daí toda a edição é pelo painel, sem publicar de novo.
 
 ## 3. Ligar uma página nova (ex.: Taguatinga)
 
 > **Taguatinga e Santa Maria já estão ligadas** (2026-09-07), pelo processo abaixo,
 > no mesmo padrão da Asa Sul: páginas autocontidas (`index.html`, `evento.html`,
-> `js/data.js`, `e/<slug>/`, sem `header.js`/Bootstrap/`cev-data.js`), com
+> `e/<slug>/`, sem `header.js`/Bootstrap/`cev-data.js`), com
 > `window.SHALOM_SITE` = `"taguatinga"` / `"santamaria"` e o catálogo do painel
 > (`admin/admin.js` → `SITE_CATALOG`) com `type:"editable"`,
 > `modules:["home","schedules","events"]` (a mesma ordem em que aparecem na página)
 > e `children` apontando para as páginas de evento geradas (`e/<slug>/`) de cada centro.
-> Sobre a regra do primeiro salvamento de Horários, veja a seção 2; sobre trazer os
-> dados do arquivo para o banco, a seção 2.1.
+> Sobre como o conteúdo chega ao banco, veja a seção 2.2.
 >
 > **Capa editável:** a capa vive em `settings` com `key = "home"` e valor
 > `{ titulo, subtitulo, imagem, imagem_alt }`, no mesmo escopo por página das outras
-> chaves. Sem linha no banco, cada página usa o `window.SHALOM_HOME` do seu
-> `js/data.js` — campo a campo, sem quebrar nada.
+> chaves. Sem linha no banco, a página mantém o hero que está no HTML (mesmo texto
+> e mesma imagem do seed) — nada quebra, mas nada é editável até o seed rodar.
+> `imagem: ""` salvo pelo painel significa **sem foto** (fundo azul institucional).
 >
 > **Feed de notícias compartilhado:** Taguatinga e Santa Maria não têm feed próprio;
 > ambas leem `../asasul/data/noticias.json` (o mesmo feed da Asa Sul, atualizado a
 > cada hora pelo workflow `.github/workflows/asasul-news.yml`). As notícias são da
 > missão, não do centro — não crie um `data/noticias.json` local para essas páginas.
 >
-> **Eventos locais `featuredLocal`:** os grupos de oração e a Missa Jovem de cada
-> centro nascem como eventos `featuredLocal: true` dentro do `js/data.js` da própria
-> página (pôster de reserva quando não há arte). Eles aparecem no carrossel normalmente
-> até existir, no painel/Supabase, um evento com o **mesmo slug** — a partir daí o
-> evento remoto sobrepõe o local.
+> **Eventos:** vêm todos do banco (`events`, filtrados por `published` e pelas datas
+> de publicar/retirar). Não existe mais lista de eventos no código: sem linhas no
+> banco a seção "Eventos e encontros" simplesmente não aparece. Quando não há arte,
+> a página monta um pôster de reserva com o título.
 
 1. No painel, o site já pode existir (registre em `sites` via o SQL, ou adicione
    uma linha: `insert into sites (id,name) values ('taguatinga','Shalom Taguatinga');`).
@@ -141,9 +154,8 @@ Entre em `/admin/` com a conta de administrador master e, para **cada** página
    <script>window.SHALOM_SITE = "taguatinga";</script>
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
    <script src="../js/config.js"></script>
-   <script src="js/data.js"></script>      <!-- fallback local (opcional) -->
    <script src="../js/store.js"></script>
-   <script src="js/events.js"></script>      <!-- eventos: Supabase com fallback local (featuredLocal) -->
+   <script src="js/events.js"></script>      <!-- eventos: só Supabase -->
    <script src="../js/share.js"></script>
    <script src="js/main.js"></script>
    ```
@@ -153,10 +165,13 @@ Entre em `/admin/` com a conta de administrador master e, para **cada** página
 
 ## 4. Compartilhar + prévia (og:image do evento)
 Cada página tem `scripts/build-event-pages.mjs`, que gera `<pagina>/e/<slug>/index.html`
-com a `og:image` do evento no HTML (o WhatsApp/Facebook não executam JS). Rode, dentro
-da pasta da página, sempre que mudar os eventos do `data.js`:
+com a `og:image` do evento no HTML (o WhatsApp/Facebook não executam JS). Ele lê os
+eventos publicados **do banco**. Rode, dentro da pasta da página, sempre que criar,
+renomear ou excluir um evento:
 ```
 node scripts/build-event-pages.mjs
+# ou, sem rede, a partir do JSON do seed:
+node scripts/build-event-pages.mjs --from-json ../docs/seeds/2026-09-07-seed-cev.json
 ```
 > Para eventos gerenciados pelo Supabase, a prévia com a arte exige regerar essas
 > páginas (ou usar um Cloudflare Worker que injeta a og:image na hora). Posso montar
@@ -187,7 +202,8 @@ acesso guardados no banco (migração `supabase/migrations/20260718100000_cardap
 
 ### Passo a passo da configuração (uma vez, no Supabase)
 1. **anon key** — preencha a chave em `js/config.js` (Project Settings → API → "anon public").
-   Sem ela, as páginas seguem no fallback de `data.js` e o login não funciona.
+   Sem ela, as páginas não conseguem ler o banco (horários viram "A confirmar", a seção
+   de eventos some) e o login não funciona.
 2. **E-mail** — em Authentication → Providers, mantenha Email habilitado. Para produção,
    exija confirmação de e-mail e configure SMTP transacional; o SMTP padrão do Supabase serve
    apenas para testes e tem limites baixos.

@@ -61,11 +61,6 @@
   ];
   var MODULE_LABELS = { home:"Capa (topo da página)", schedules:"Horários e serviços", events:"Eventos e encontros", menu:"Cardápio" };
 
-  // Endereço do site publicado. Serve para transformar um caminho local do
-  // js/data.js de uma página ("images/eventos/x.webp") no endereço completo
-  // que o banco precisa guardar.
-  var PUBLIC_ORIGIN = "https://brasilia.comshalom.org/";
-
   // Para cada módulo: o que ele muda, onde isso aparece na página e a âncora
   // que leva direto ao trecho. A miniatura é desenhada em pageThumb().
   var MODULE_META = {
@@ -103,7 +98,8 @@
       .replace(/[^a-z0-9\s-]/g,"").trim().replace(/\s+/g,"-").replace(/-+/g,"-").slice(0,60);
   }
   function toast(m){ var t=$("#toast"); if(!t)return; t.textContent=m; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(function(){t.classList.remove("show");},2200); }
-  function setMsg(el,text,ok){ el.textContent=text||""; el.className="msg "+(ok?"msg--ok":"msg--err"); }
+  // ok: true = sucesso, false = erro, "info" = recado neutro (estado vazio).
+  function setMsg(el,text,ok){ el.textContent=text||""; el.className="msg "+(ok==="info"?"msg--info":ok?"msg--ok":"msg--err"); }
 
   var BRL = new Intl.NumberFormat("pt-BR", { style:"currency", currency:"BRL" });
   function fmtBRL(n){ return BRL.format(Number(n)||0); }
@@ -129,20 +125,75 @@
     if (isRlsError(err)) { toast("Sem permissão para editar esta página."); return; }
     toast(fallback || (err && err.message) || "Ocorreu um erro. Tente de novo.");
   }
-  // Redimensiona uma imagem no cliente (máx maxDim px) e devolve um Blob JPEG.
-  function resizeImage(file, maxDim, quality){
+
+  /* ---------- imagens: sempre leves (no máximo 300 KB) ---------- */
+  // Toda imagem enviada pelo painel passa por aqui antes de subir. A escada é:
+  // reduzir para o tamanho máximo do lugar onde ela aparece, gravar em WebP com
+  // qualidade 0,82 e, se ainda passar de 300 KB, baixar a qualidade; esgotadas as
+  // qualidades, encolher 20% e recomeçar, até o piso de 800 px. Navegador sem
+  // WebP (o toBlob devolve outro tipo) faz a mesma escada em JPEG.
+  var IMAGE_LIMIT_BYTES = 300 * 1024;
+  var IMAGE_MIN_DIM = 800;
+  var IMAGE_QUALITIES = [0.82, 0.72, 0.62, 0.52];
+  function imageTooBig(limit){ return "Não foi possível deixar a imagem abaixo de " + Math.round((limit || IMAGE_LIMIT_BYTES) / 1024) + " KB. Use uma imagem menor ou com menos detalhes."; }
+  var IMAGE_NOT_IMAGE = "Este arquivo não é uma imagem. Envie um JPG, PNG ou WebP.";
+  var IMAGE_UNREADABLE = "Não foi possível ler esta imagem. Tente outro arquivo.";
+  var IMAGE_HINT = "JPG, PNG ou WebP. A imagem é ajustada e comprimida automaticamente (até 300 KB).";
+  function kbLabel(bytes){ return Math.max(1, Math.round(Number(bytes||0)/1024)) + " KB"; }
+  function canvasToBlob(cv, type, quality){
     return new Promise(function(resolve, reject){
-      var img = new Image(), url = URL.createObjectURL(file);
-      img.onload = function(){
-        var w=img.width, h=img.height, scale=Math.min(1, maxDim/Math.max(w,h));
-        var cw=Math.max(1,Math.round(w*scale)), ch=Math.max(1,Math.round(h*scale));
-        var cv=document.createElement("canvas"); cv.width=cw; cv.height=ch;
-        cv.getContext("2d").drawImage(img,0,0,cw,ch);
-        URL.revokeObjectURL(url);
-        cv.toBlob(function(b){ b ? resolve(b) : reject(new Error("toBlob")); }, "image/jpeg", quality||0.85);
-      };
-      img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error("img")); };
+      cv.toBlob(function(b){ b ? resolve(b) : reject(new Error(IMAGE_UNREADABLE)); }, type, quality);
+    });
+  }
+  function readImageFile(file){
+    return new Promise(function(resolve, reject){
+      var img=new Image(), url=URL.createObjectURL(file);
+      img.onload = function(){ URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error(IMAGE_UNREADABLE)); };
       img.src = url;
+    });
+  }
+  // compressImage(file, {maxDim, limitBytes}) -> {blob, ext, contentType, width, height, bytes}
+  // Rejeita (com mensagem pronta para o usuário) o que não for imagem e o que não
+  // couber no limite. Nunca devolve um blob maior que limitBytes.
+  function compressImage(file, opts){
+    opts = opts || {};
+    var maxDim = opts.maxDim || 1600;
+    var limit  = opts.limitBytes || IMAGE_LIMIT_BYTES;
+    if (!file || String(file.type||"").indexOf("image/") !== 0) return Promise.reject(new Error(IMAGE_NOT_IMAGE));
+    return readImageFile(file).then(function(img){
+      var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+      if (!w || !h) throw new Error(IMAGE_UNREADABLE);
+      var type = "image/webp";
+      var dim = Math.min(maxDim, Math.max(w, h));   // nunca amplia o original
+      function attempt(){
+        var scale = dim / Math.max(w, h);
+        var cw = Math.max(1, Math.round(w*scale)), ch = Math.max(1, Math.round(h*scale));
+        var cv = document.createElement("canvas"); cv.width=cw; cv.height=ch;
+        cv.getContext("2d").drawImage(img, 0, 0, cw, ch);
+        function quality(i){
+          if (i >= IMAGE_QUALITIES.length) return Promise.resolve(null);
+          return canvasToBlob(cv, type, IMAGE_QUALITIES[i]).then(function(blob){
+            if (type === "image/webp" && blob.type !== "image/webp"){ type = "image/jpeg"; return quality(i); }
+            if (blob.size <= limit) return { blob:blob, width:cw, height:ch };
+            return quality(i+1);
+          });
+        }
+        return quality(0).then(function(hit){
+          if (hit) return hit;
+          if (dim <= IMAGE_MIN_DIM) throw new Error(imageTooBig(limit));
+          dim = Math.max(IMAGE_MIN_DIM, Math.round(dim*0.8));
+          return attempt();
+        });
+      }
+      return attempt().then(function(hit){
+        return {
+          blob: hit.blob,
+          ext: type === "image/webp" ? "webp" : "jpg",
+          contentType: type,
+          width: hit.width, height: hit.height, bytes: hit.blob.size
+        };
+      });
     });
   }
 
@@ -191,49 +242,6 @@
         (meta.onde ? '<p class="editing-context__where">Onde aparece: ' + esc(meta.onde) + '.</p>' : '') +
       '</div>' +
       '<a class="btn btn--sm" href="' + esc(moduleHref(item, module)) + '" target="_blank" rel="noopener">Ver no site<span class="sr-only"> (abre em outra aba)</span></a>';
-  }
-
-  /* ---------- dados locais da página (js/data.js de cada site) ---------- */
-  var localDataCache = {};
-  // Lê o js/data.js publicado da página e devolve capa, horários e eventos locais.
-  // Falha (arquivo ausente, erro de sintaxe) devolve tudo vazio, sem quebrar o painel.
-  function loadSiteLocalData(siteId){
-    var empty = { home:null, schedules:null, events:[] };
-    if (!siteId || !/^[a-z0-9-]+$/.test(siteId)) return Promise.resolve(empty);
-    if (localDataCache[siteId]) return localDataCache[siteId];
-    var p = fetch("../" + siteId + "/js/data.js", { cache:"no-store" })
-      .then(function(res){ if (!res.ok) throw new Error("http " + res.status); return res.text(); })
-      .then(function(src){
-        var sandbox = {};
-        try { new Function("window", src)(sandbox); }
-        catch (e){ return empty; }
-        return {
-          home: sandbox.SHALOM_HOME || null,
-          schedules: sandbox.SHALOM_SCHEDULES || null,
-          events: Array.isArray(sandbox.SHALOM_EVENTOS) ? sandbox.SHALOM_EVENTOS : []
-        };
-      })
-      .catch(function(){ return empty; });
-    localDataCache[siteId] = p;
-    return p;
-  }
-  // Caminho local do site -> endereço completo do site publicado.
-  function toPublicUrl(path, siteId){
-    var v = String(path == null ? "" : path).trim();
-    if (!v) return "";
-    if (/^data:image\//i.test(v)) return v;
-    try { var u = new URL(v, PUBLIC_ORIGIN + siteId + "/"); return /^https?:$/.test(u.protocol) ? u.href : ""; } catch (e){ return ""; }
-  }
-  // Texto do data.js -> HTML: parágrafos em <p>, quebras simples em <br>, links clicáveis.
-  function descriptionToHtml(text){
-    var t = String(text == null ? "" : text).replace(/\r\n/g, "\n").trim();
-    if (!t) return "";
-    return t.split(/\n{2,}/).map(function(par){
-      var safe = esc(par).replace(/https?:\/\/[^\s<]*[^\s<.,;:!?)\]"']/g, function(u){
-        return '<a href="' + u + '" target="_blank" rel="noopener">' + u + '</a>';
-      });
-      return "<p>" + safe.replace(/\n/g, "<br>") + "</p>";
-    }).join("");
   }
 
   /* ---------- views ---------- */
@@ -495,15 +503,10 @@
   var capaTitulo=$("#capa-titulo"), capaSub=$("#capa-subtitulo");
   var capaImgUrl=$("#capa-image-url"), capaImgAlt=$("#capa-image-alt");
   var capaPreview=$("#capaPreview");
-  var CAPA_HINT = "JPG ou PNG na horizontal, de preferência com 1600 px de largura ou mais. A imagem é ajustada automaticamente.";
+  var CAPA_HINT = "Foto na horizontal, de preferência com 1600 px de largura ou mais. " + IMAGE_HINT;
 
   // Nome curto do centro, para o texto alternativo da imagem.
   function capaAltPadrao(){ return "Centro de Evangelização " + String(siteName||"").replace(/^Shalom\s+/i,""); }
-  function setCapaNotice(text){
-    var el=$("#capaNotice"); if(!el) return;
-    el.textContent = text || "";
-    el.classList.toggle("hidden", !text);
-  }
   function drawCapaPreview(){
     if (!capaPreview) return;
     var titulo=(capaTitulo.value||"").replace(/[ \t]+\n/g,"\n").trim();
@@ -538,9 +541,8 @@
   function loadCapa(){
     if (!sb) return;
     var target=site;
-    setCapaNotice("");
     setCapaFields({});
-    setMsg($("#capaMsg"), "Carregando a capa desta página…", true);
+    setMsg($("#capaMsg"), "Carregando a capa desta página…", "info");
     $("#capa-upload-status").textContent = CAPA_HINT;
     sb.from("settings").select("value").eq("site",site).eq("key","home").limit(1).then(function(res){
       if (target !== site) return;
@@ -548,22 +550,8 @@
       if (res.error){ setMsg($("#capaMsg"), "Não foi possível carregar a capa: "+res.error.message); return; }
       var row = res.data && res.data[0] && res.data[0].value;
       if (row && (row.titulo || row.subtitulo || row.imagem)){ setCapaFields(row); return; }
-      return loadSiteLocalData(target).then(function(local){
-        if (target !== site) return;
-        var home = local.home;
-        if (home){
-          setCapaFields({
-            titulo: home.titulo || "",
-            subtitulo: home.subtitulo || "",
-            imagem: toPublicUrl(home.imagem || "", target),
-            imagem_alt: home.imagem_alt || capaAltPadrao()
-          });
-          setCapaNotice("Estes dados vieram do arquivo do site e ainda não foram salvos aqui. Revise e clique em Salvar capa para passar a controlá-los pelo painel.");
-        } else {
-          setCapaFields({});
-          setCapaNotice("Esta página ainda não tem capa salva no painel. Escreva o título e a frase de apoio e clique em Salvar capa.");
-        }
-      });
+      setCapaFields({});
+      setMsg($("#capaMsg"), "Nenhuma capa salva ainda. Escreva o título e a frase de apoio e clique em Salvar capa.", "info");
     }).catch(function(){
       if (target !== site) return;
       setMsg($("#capaMsg"), "Não foi possível carregar a capa. Verifique a conexão e tente de novo.");
@@ -581,10 +569,10 @@
     if (!file || !sb) return;
     var status=$("#capa-upload-status"), target=site;
     status.textContent="Preparando a imagem…";
-    resizeImage(file, 1920, 0.85).then(function(blob){
-      status.textContent="Enviando a imagem…";
-      var path=target+"/capa-"+Date.now()+".jpg";
-      return sb.storage.from("eventos").upload(path, blob, { upsert:true, cacheControl:"3600", contentType:"image/jpeg" }).then(function(res){
+    compressImage(file, { maxDim:1920, limitBytes:IMAGE_LIMIT_BYTES }).then(function(out){
+      status.textContent="Enviando a imagem ("+kbLabel(out.bytes)+")…";
+      var path=target+"/capa-"+Date.now()+"."+out.ext;
+      return sb.storage.from("eventos").upload(path, out.blob, { upsert:true, cacheControl:"3600", contentType:out.contentType }).then(function(res){
         if (res.error){
           if (isRlsError(res.error)){ status.textContent="Sem permissão para enviar imagem nesta página."; toast("Sem permissão para editar esta página."); }
           else status.textContent="Não foi possível enviar a imagem: "+res.error.message;
@@ -595,9 +583,9 @@
         capaImgUrl.value = (pub && pub.data && pub.data.publicUrl) || "";
         if (!capaImgAlt.value) capaImgAlt.value = capaAltPadrao();
         drawCapaPreview();
-        status.textContent="Imagem enviada. Clique em Salvar capa para aplicar no site.";
+        status.textContent="Imagem enviada ("+kbLabel(out.bytes)+"). Clique em Salvar capa para aplicar no site.";
       });
-    }).catch(function(){ status.textContent="Não foi possível preparar a imagem. Tente outro arquivo."; });
+    }).catch(function(err){ status.textContent=(err && err.message) || "Não foi possível preparar a imagem. Tente outro arquivo."; });
   });
 
   if ($("#saveCapaBtn")) $("#saveCapaBtn").addEventListener("click", function(){
@@ -622,7 +610,6 @@
           else setMsg(msg,"Erro ao salvar: "+res.error.message);
           return;
         }
-        setCapaNotice("");
         setMsg(msg,"Capa salva! A página já mostra estes textos.",true); toast("Capa salva");
       })
       .catch(function(){ btn.disabled=false; setMsg(msg,"Não foi possível salvar agora. Tente de novo."); });
@@ -646,33 +633,18 @@
       ta.value = Array.isArray(arr) ? arr.join("\n") : "";
     });
   }
-  function setSchedNotice(text){
-    var el=$("#schedNotice"); if(!el) return;
-    el.textContent = text || "";
-    el.classList.toggle("hidden", !text);
-  }
-
   function loadSchedules(){
     if (!sb) return;
     var target=site;
-    setSchedNotice("");
-    setMsg($("#schedMsg"), "Carregando os horários desta página…", true);
+    setMsg($("#schedMsg"), "Carregando os horários desta página…", "info");
     sb.from("settings").select("value").eq("site",site).eq("key","schedules").limit(1).then(function(res){
       if (target !== site) return;
       setMsg($("#schedMsg"), "");
       if (res.error){ setMsg($("#schedMsg"), "Não foi possível carregar os horários: "+res.error.message); return; }
       var val = res.data && res.data[0] && res.data[0].value;
       if (val && Object.keys(val).length){ fillSched(val); return; }
-      return loadSiteLocalData(target).then(function(local){
-        if (target !== site) return;
-        if (local.schedules){
-          fillSched(local.schedules);
-          setSchedNotice("Estes horários vieram do arquivo do site e ainda não foram salvos aqui. Revise e clique em Salvar horários para passar a controlá-los pelo painel.");
-        } else {
-          fillSched({});
-          setSchedNotice("Esta página ainda não tem horários salvos no painel. Preencha as seis categorias e clique em Salvar horários.");
-        }
-      });
+      fillSched({});
+      setMsg($("#schedMsg"), "Nenhum horário salvo ainda. Preencha e clique em Salvar horários.", "info");
     }).catch(function(){
       if (target !== site) return;
       setMsg($("#schedMsg"), "Não foi possível carregar os horários. Verifique a conexão e tente de novo.");
@@ -692,7 +664,7 @@
       .then(function(res){
         btn.disabled=false;
         if (res.error) { setMsg(msg,"Erro ao salvar: "+res.error.message); }
-        else { setSchedNotice(""); setMsg(msg,"Horários salvos!",true); toast("Horários salvos"); }
+        else { setMsg(msg,"Horários salvos!",true); toast("Horários salvos"); }
       })
       .catch(function(){ btn.disabled=false; setMsg(msg,"Erro ao salvar."); });
   });
@@ -700,130 +672,27 @@
   /* =====================================================================
      EVENTOS
      ===================================================================== */
-  var listEl=$("#eventList"), importEl=$("#eventImport");
-  var currentEvents=[], localEvents=[];
+  var listEl=$("#eventList");
+  var currentEvents=[];
 
   function loadEvents(){
     if (!sb) return;
     var target=site;
     listEl.innerHTML='<p class="center" style="color:var(--ink-faint)">Carregando…</p>';
-    if (importEl) importEl.innerHTML="";
-    Promise.all([
-      sb.from("events").select("*").eq("site",site).order("position",{ascending:true}),
-      loadSiteLocalData(site)
-    ]).then(function(r){
+    sb.from("events").select("*").eq("site",site).order("position",{ascending:true}).then(function(res){
       if (target !== site) return;
-      var res=r[0];
       if (res.error){ listEl.innerHTML='<p class="notice notice--err">Erro ao carregar: '+esc(res.error.message)+'</p>'; return; }
       currentEvents = res.data||[];
-      localEvents = (r[1].events||[]).filter(function(ev){ return ev && ev.featuredLocal === true && ev.id; });
       renderList();
-      renderImport();
     }).catch(function(){
       if (target !== site) return;
       listEl.innerHTML='<p class="notice notice--err">Não foi possível carregar os eventos. Verifique a conexão e tente novamente.</p>';
     });
   }
 
-  /* ---------- eventos que ainda só existem no arquivo do site ---------- */
-  function pendingLocalEvents(){
-    var have={}; currentEvents.forEach(function(e){ if(e && e.slug) have[e.slug]=true; });
-    return localEvents.filter(function(ev){ return !have[ev.id]; });
-  }
-  function nextPosition(){
-    return currentEvents.reduce(function(m,e){ var p=Number(e.position); return isFinite(p) && p>m ? p : m; }, -1) + 1;
-  }
-  function localEventToRow(ev, position, siteId){
-    return {
-      site: siteId,
-      slug: ev.id,
-      title: ev.titulo || "",
-      badge: ev.badge || "",
-      date_text: ev.data || "",
-      location: ev.local || "",
-      image_url: toPublicUrl(ev.imagem || "", siteId),
-      summary: ev.resumo || "",
-      description: descriptionToHtml(ev.descricao),
-      link_text: (ev.link && ev.link.texto) || "",
-      link_url: (ev.link && ev.link.url) || "",
-      published: true,
-      position: position,
-      updated_at: new Date().toISOString()
-    };
-  }
-  function renderImport(){
-    if (!importEl) return;
-    var pend=pendingLocalEvents();
-    if (!pend.length){ importEl.innerHTML=""; return; }
-    importEl.innerHTML =
-      '<section class="import-block" aria-labelledby="importTitle">' +
-        '<div class="import-block__head">' +
-          '<div><h3 id="importTitle">No site, mas ainda não no painel</h3>' +
-          '<p>Estes eventos estão gravados no arquivo do site. Ao trazer, passam a ser editados só por aqui.</p></div>' +
-          '<button class="btn btn--primary" id="importAllBtn" type="button">Trazer todos ('+pend.length+')</button>' +
-        '</div>' +
-        '<div class="import-list">' + pend.map(function(ev){
-          var url=toPublicUrl(ev.imagem||"", site);
-          var thumb = url ? '<img class="import-row__thumb" src="'+esc(url)+'" alt="">'
-                          : '<div class="import-row__thumb">'+esc(ev.badge||"Evento")+'</div>';
-          return '<div class="import-row">'+thumb+
-            '<div class="import-row__main"><h4>'+esc(ev.titulo||ev.id)+'</h4>'+
-              '<div class="import-row__meta">'+esc(ev.data||"")+(ev.data&&ev.local?" · ":"")+esc(ev.local||"")+'</div></div>'+
-            '<button class="btn btn--sm" type="button" data-import="'+esc(ev.id)+'">Trazer para o painel<span class="sr-only">: '+esc(ev.titulo||ev.id)+'</span></button>'+
-          '</div>';
-        }).join("") + '</div>' +
-        '<p class="notice notice--err hidden import-msg" id="importMsg" role="alert"></p>' +
-      '</section>';
-    $("#importAllBtn").addEventListener("click", function(){ importLocalEvents(pendingLocalEvents(), this); });
-    $$("[data-import]", importEl).forEach(function(b){
-      b.addEventListener("click", function(){
-        var ev=pendingLocalEvents().filter(function(x){ return x.id===b.dataset.import; })[0];
-        if (ev) importLocalEvents([ev], b);
-      });
-    });
-  }
-  function importError(text){
-    var el=$("#importMsg"); if(!el) return;
-    el.textContent=text||""; el.classList.toggle("hidden", !text);
-  }
-  // Insere os eventos locais escolhidos no banco, um a um, na ordem do arquivo.
-  function importLocalEvents(list, btn){
-    if (!sb || !list.length) return;
-    var target=site, pos=nextPosition(), done=0;
-    importError("");
-    $$("#eventImport button").forEach(function(b){ b.disabled=true; });
-    if (btn) btn.textContent = "Trazendo…";
-    function step(i){
-      if (i >= list.length){
-        toast(done===1 ? "Evento trazido para o painel" : done+" eventos trazidos para o painel");
-        loadEvents();
-        return;
-      }
-      sb.from("events").insert(localEventToRow(list[i], pos+i, target)).then(function(res){
-        if (res.error){
-          var msg = isRlsError(res.error) ? "Sem permissão para editar esta página."
-                  : res.error.code === "23505" ? 'Já existe um evento com o endereço "'+list[i].id+'" nesta página.'
-                  : "Não foi possível trazer “"+(list[i].titulo||list[i].id)+"”: "+res.error.message;
-          $$("#eventImport button").forEach(function(b){ b.disabled=false; });
-          importError(msg);
-          if (done) loadEvents();
-          return;
-        }
-        done++; step(i+1);
-      }).catch(function(){
-        $$("#eventImport button").forEach(function(b){ b.disabled=false; });
-        importError("Não foi possível trazer os eventos agora. Verifique a conexão e tente de novo.");
-        if (done) loadEvents();
-      });
-    }
-    step(0);
-  }
-
   function renderList(){
     if (!currentEvents.length){
-      listEl.innerHTML = pendingLocalEvents().length
-        ? '<p class="center" style="color:var(--ink-faint)">Nenhum evento salvo no painel ainda. Logo abaixo estão os que já aparecem no site — traga-os para editá-los por aqui.</p>'
-        : '<p class="center" style="color:var(--ink-faint)">Nenhum evento nesta página ainda. Clique em "Novo evento".</p>';
+      listEl.innerHTML = '<p class="center" style="color:var(--ink-faint)">Nenhum evento nesta página ainda. Clique em "Novo evento".</p>';
       return;
     }
     listEl.innerHTML = currentEvents.map(function(ev,i){
@@ -872,6 +741,7 @@
 
   /* ---------- modal / editor rico ---------- */
   var modal=$("#eventModal"), quill=null;
+  var EV_HINT = "Recomendado retrato (4:5). " + IMAGE_HINT;
   function ensureQuill(){
     if (quill || !window.Quill) return;
     quill = new Quill("#ev-editor", {
@@ -916,6 +786,7 @@
     $("#ev-unpublish-at").value = ev && ev.unpublish_at ? toLocalInput(ev.unpublish_at) : "";
     setPublishedChoice($("#ev-published").value);
     setPreview(ev ? ev.image_url : "");
+    $("#ev-upload-status").textContent = EV_HINT;
     if (quill) quill.root.innerHTML = ev ? (ev.description||"") : "";
     focusModal(modal);
   }
@@ -940,21 +811,25 @@
   $("#ev-upload-btn").addEventListener("click", function(){ $("#ev-image-file").click(); });
   $("#ev-image-clear").addEventListener("click", function(){ setPreview(""); });
   $("#ev-image-file").addEventListener("change", function(){
-    var file=this.files && this.files[0]; if (!file || !sb) return;
-    var status=$("#ev-upload-status");
-    status.textContent="Enviando imagem…";
-    var ext=(file.name.split(".").pop()||"jpg").toLowerCase();
+    var file=this.files && this.files[0]; this.value="";
+    if (!file || !sb) return;
+    var status=$("#ev-upload-status"), target=site;
+    status.textContent="Preparando a imagem…";
     var base=slugify($("#ev-slug").value||$("#ev-title").value||"evento")||"evento";
-    var path=site+"/"+base+"-"+Date.now()+"."+ext;
-    sb.storage.from("eventos").upload(path, file, { upsert:true, cacheControl:"3600" })
-      .then(function(res){
-        if (res.error) { status.textContent="Erro no upload: "+res.error.message; return; }
+    compressImage(file, { maxDim:1200, limitBytes:IMAGE_LIMIT_BYTES }).then(function(out){
+      status.textContent="Enviando a imagem ("+kbLabel(out.bytes)+")…";
+      var path=target+"/"+base+"-"+Date.now()+"."+out.ext;
+      return sb.storage.from("eventos").upload(path, out.blob, { upsert:true, cacheControl:"3600", contentType:out.contentType }).then(function(res){
+        if (res.error){
+          if (isRlsError(res.error)){ status.textContent="Sem permissão para enviar imagem nesta página."; toast("Sem permissão para editar esta página."); }
+          else status.textContent="Não foi possível enviar a imagem: "+res.error.message;
+          return;
+        }
         var pub=sb.storage.from("eventos").getPublicUrl(path);
-        setPreview(pub.data.publicUrl);
-        status.textContent="Imagem enviada.";
-      })
-      .catch(function(){ status.textContent="Erro no upload."; });
-    this.value="";
+        setPreview((pub && pub.data && pub.data.publicUrl) || "");
+        status.textContent="Imagem enviada ("+kbLabel(out.bytes)+").";
+      });
+    }).catch(function(err){ status.textContent=(err && err.message) || "Não foi possível preparar a imagem. Tente outro arquivo."; });
   });
 
   $("#modalSave").addEventListener("click", function(){
@@ -1267,7 +1142,7 @@
     $("#pm-position").value = p ? (p.position||0) : menuProds.length;
     fillCategorySelect(p ? (p.category_id||"") : "");
     setPmPreview(p ? p.image_url : "");
-    $("#pm-upload-status").textContent = "JPG ou PNG. Redimensionada para no máx. 1200px.";
+    $("#pm-upload-status").textContent = IMAGE_HINT;
     $$("#weekdayChips .wd-chip").forEach(function(c){ c.classList.remove("on"); });
     $("#pm-start").value=""; $("#pm-end").value="";
     var preset="sempre";
@@ -1298,18 +1173,18 @@
   $("#pm-image-file").addEventListener("change", function(){
     var file=this.files && this.files[0]; this.value="";
     if (!file || !sb) return;
-    var status=$("#pm-upload-status");
-    status.textContent="Processando imagem…";
-    resizeImage(file, 1200, 0.85).then(function(blob){
-      status.textContent="Enviando imagem…";
-      var path=site+"/"+uuid()+".jpg";
-      return sb.storage.from("cardapio").upload(path, blob, { upsert:true, cacheControl:"3600", contentType:"image/jpeg" }).then(function(res){
-        if (res.error){ if(isRlsError(res.error)){ status.textContent="Sem permissão para enviar imagem."; toast("Sem permissão para editar esta página."); } else status.textContent="Erro no upload: "+res.error.message; return; }
+    var status=$("#pm-upload-status"), target=site;
+    status.textContent="Preparando a imagem…";
+    compressImage(file, { maxDim:1200, limitBytes:IMAGE_LIMIT_BYTES }).then(function(out){
+      status.textContent="Enviando a imagem ("+kbLabel(out.bytes)+")…";
+      var path=target+"/"+uuid()+"."+out.ext;
+      return sb.storage.from("cardapio").upload(path, out.blob, { upsert:true, cacheControl:"3600", contentType:out.contentType }).then(function(res){
+        if (res.error){ if(isRlsError(res.error)){ status.textContent="Sem permissão para enviar imagem."; toast("Sem permissão para editar esta página."); } else status.textContent="Não foi possível enviar a imagem: "+res.error.message; return; }
         var pub=sb.storage.from("cardapio").getPublicUrl(path);
-        setPmPreview(pub.data.publicUrl);
-        status.textContent="Imagem enviada.";
+        setPmPreview((pub && pub.data && pub.data.publicUrl) || "");
+        status.textContent="Imagem enviada ("+kbLabel(out.bytes)+").";
       });
-    }).catch(function(){ status.textContent="Não foi possível processar a imagem."; });
+    }).catch(function(err){ status.textContent=(err && err.message) || "Não foi possível preparar a imagem. Tente outro arquivo."; });
   });
 
   $("#pmSave").addEventListener("click", function(){

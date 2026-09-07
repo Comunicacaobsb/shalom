@@ -1,6 +1,6 @@
 /* =====================================================================
-   Página de detalhe do evento — carrega por slug do Supabase
-   (com fallback para js/data.js) e monta o conteúdo.
+   Página de detalhe do evento — carrega por slug do Supabase (única fonte;
+   sem fallback local) e monta o conteúdo.
    ===================================================================== */
 (function () {
   "use strict";
@@ -51,7 +51,7 @@
     var iconCal = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>';
     var iconPin = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>';
 
-    // descrição: HTML (editor rico do painel) ou texto simples (data.js)
+    // descrição: HTML (editor rico do painel) ou texto simples (sem HTML)
     var descHTML;
     if (ev.descricaoHtml) {
       descHTML = ev.descricao || "";
@@ -96,7 +96,6 @@
   if (window.SHALOM && SHALOM.loadEvent) {
     SHALOM.loadEvent(id).then(render).catch(missing);
   } else {
-    var f = (window.SHALOM_EVENTOS || []).filter(function (e) { return e.id === id; })[0];
-    render(f || null);
+    missing();
   }
 })();
