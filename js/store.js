@@ -41,6 +41,39 @@ window.SHALOM = (function () {
     return _client;
   }
 
+  /* Link de ação do evento (inscrição ou link externo), tolerante ao schema:
+     funciona com as colunas de hoje (link_url/link_text) e com colunas que o
+     Portal possa gravar no futuro (signup_url, signup_event_slug,
+     inscricao_slug). Só aceita http(s), mailto e tel. Links da plataforma de
+     inscrições são normalizados para <APP>/eventos/<slug>. */
+  var APP_INSCRICOES = "https://inscricoes.comshalom.workers.dev";
+  function safeUrl(v) {
+    var s = String(v == null ? "" : v).trim();
+    if (!s) return "";
+    try {
+      var u = new URL(s);
+      if (/^(https?:|mailto:|tel:)$/.test(u.protocol)) return u.href;
+    } catch (e) { /* URL inválida: ignora */ }
+    return "";
+  }
+  function eventLink(row) {
+    if (!row) return null;
+    var url = safeUrl(row.link_url) || safeUrl(row.signup_url);
+    var slug = String(row.signup_event_slug || row.inscricao_slug || "").trim();
+    if (!url && slug) url = APP_INSCRICOES + "/eventos/" + encodeURIComponent(slug);
+    if (!url) return null;
+    var plataforma = url.indexOf(APP_INSCRICOES + "/") === 0;
+    if (plataforma) url = url.replace(APP_INSCRICOES + "/e/", APP_INSCRICOES + "/eventos/");
+    var texto = String(row.link_text || "").trim();
+    var inscricao = plataforma || !!slug || /inscri/i.test(texto) || /inscri/i.test(url);
+    return { texto: texto || (inscricao ? "Fazer inscrição" : "Saiba mais"), url: url, inscricao: inscricao };
+  }
+  /* Visibilidade, se um dia existir em public.events: só "publico" aparece. */
+  function eventPublic(row) {
+    var v = row && row.visibility;
+    return !v || v === "publico" || v === "public";
+  }
+
   function mapEvent(row) {
     return {
       id: row.slug,
@@ -52,7 +85,7 @@ window.SHALOM = (function () {
       resumo: row.summary || "",
       descricao: row.description || "",
       descricaoHtml: true,
-      link: row.link_url ? { texto: row.link_text || "Saiba mais", url: row.link_url } : null,
+      link: eventLink(row),
       acao: "Saiba mais"
     };
   }
@@ -69,7 +102,7 @@ window.SHALOM = (function () {
       .order("position", { ascending: true })
       .then(function (res) {
         if (res.error) throw res.error;
-        return res.data.map(mapEvent);
+        return res.data.filter(eventPublic).map(mapEvent);
       })
       .catch(function () { return []; });
   }
@@ -79,7 +112,7 @@ window.SHALOM = (function () {
     if (!c) return Promise.resolve(null);
     return c.from("events").select("*").eq("site", SITE).eq("slug", slug).limit(1)
       .then(function (res) {
-        if (res.error || !res.data || !res.data.length) return null;
+        if (res.error || !res.data || !res.data.length || !eventPublic(res.data[0])) return null;
         return mapEvent(res.data[0]);
       })
       .catch(function () { return null; });
@@ -118,6 +151,9 @@ window.SHALOM = (function () {
     loadEvent: loadEvent,
     loadSchedules: loadSchedules,
     loadSetting: loadSetting,
-    loadHome: loadHome
+    loadHome: loadHome,
+    eventLink: eventLink,
+    eventPublic: eventPublic,
+    appInscricoes: APP_INSCRICOES
   };
 })();

@@ -14,6 +14,7 @@
 
   function active(row, now) {
     if (row && row.published === false) return false;
+    if (api.eventPublic && !api.eventPublic(row)) return false;
     var from = row && (row.publish_at || row.published_at || row.starts_at ||
       row.start_at || row.visible_from || row.available_from || row.schedule_start ||
       row.publish_on);
@@ -37,7 +38,8 @@
       resumo: row.summary || "",
       descricao: row.description || "",
       descricaoHtml: true,
-      link: row.link_url ? { texto: row.link_text || "Saiba mais", url: row.link_url } : null,
+      link: api.eventLink ? api.eventLink(row)
+        : (row.link_url ? { texto: row.link_text || "Saiba mais", url: row.link_url } : null),
       acao: "Saiba mais"
     };
   }

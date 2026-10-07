@@ -160,6 +160,7 @@ function showToast(msg) {
 
     function buildSlide(ev, eager) {
       var href = "evento.html?id=" + encodeURIComponent(ev.id);
+      var signup = ev.link && ev.link.inscricao && ev.link.url ? ev.link : null;
       var fallback = '<div class="poster-fallback"><div><h3>' + esc(ev.titulo) + '</h3><small>' + esc(ev.badge || "Shalom Asa Sul") + '</small></div></div>';
       var img = ev.imagem
         ? '<img src="' + esc(ev.imagem) + '" alt="' + esc(ev.titulo) + '" loading="' + (eager ? "eager" : "lazy") + '" onerror="var p=this.parentElement;this.style.display=\'none\';p.insertAdjacentHTML(\'beforeend\', this.dataset.fb)" data-fb="' + esc(fallback).replace(/"/g, "&quot;") + '">'
@@ -168,8 +169,12 @@ function showToast(msg) {
       '<div class="slide" role="group" aria-roledescription="slide" aria-label="' + esc(ev.titulo) + '">' +
         '<article class="event-card">' +
           '<a class="event-card__media" href="' + href + '" aria-label="' + esc(ev.titulo) + '">' + img + '</a>' +
-          '<div class="event-card__row">' +
-            '<a class="btn btn--primary event-card__cta" href="' + href + '">' + esc(ev.acao || "Saiba mais") + '</a>' +
+          (signup
+            ? '<div class="event-card__row event-card__row--signup">' +
+                '<a class="btn btn--primary event-card__cta" href="' + esc(signup.url) + '" target="_blank" rel="noopener" aria-label="' + esc(signup.texto + ": " + ev.titulo + " (abre em nova aba)") + '">' + esc(signup.texto) + '</a>' +
+                '<a class="btn btn--ghost event-card__more" href="' + href + '">' + esc(ev.acao || "Saiba mais") + '</a>'
+            : '<div class="event-card__row">' +
+                '<a class="btn btn--primary event-card__cta" href="' + href + '">' + esc(ev.acao || "Saiba mais") + '</a>') +
             '<button class="btn btn--ghost btn--icon" type="button" data-share="' + esc(ev.id) + '" data-share-title="' + esc(ev.titulo) + '" aria-label="Compartilhar ' + esc(ev.titulo) + '">' +
               '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>' +
             '</button>' +

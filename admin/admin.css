@@ -316,3 +316,10 @@ body{background:var(--luminous)}
   .capa-foot .btn{width:100%;justify-content:center}
   .uploader--stack .btn{flex:1;justify-content:center}
 }
+/* Aviso discreto: o mesmo painel também existe no Portal (/admin/site). */
+.portal-hint{display:flex;align-items:flex-start;gap:.5rem;margin:1rem 0 0;padding:.6rem .8rem;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--blue-soft);color:var(--ink-soft);font-size:.84rem;line-height:1.45}
+.portal-hint svg{flex:none;width:16px;height:16px;margin-top:.1rem;fill:none;stroke:var(--blue-deep);stroke-width:2;stroke-linecap:round}
+.portal-hint a{font-weight:700;color:var(--blue-deep);text-decoration:underline;text-underline-offset:2px}
+.portal-hint a:hover{color:var(--blue)}
+.portal-hint a:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:2px}
+.admin-view .portal-hint{margin:0 0 1.2rem;max-width:62ch}

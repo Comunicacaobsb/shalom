@@ -5,7 +5,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <script src="js/header.js"></script>
+  <script>
+    /* Página de evento ainda não gerada (/<centro>/e/<slug>/): em vez do 404,
+       monta aqui mesmo a página de detalhe do centro (evento.html), com os
+       dados lidos do Supabase, sem mudar o endereço compartilhado.
+       As páginas já geradas por build-event-pages.mjs continuam sendo
+       servidas direto (com a og:image delas) e nunca passam por aqui. */
+    (function () {
+      var m = location.pathname.match(/^\/(asasul|taguatinga|santamaria)\/e\/([a-z0-9][a-z0-9-]{0,80})\/?(?:index\.html)?$/);
+      window.__SHALOM_EVENTO_404__ = !!m;
+      if (!m) return;
+      var centro = m[1], slug = m[2];
+      var reserva = "/" + centro + "/evento.html?id=" + encodeURIComponent(slug);
+      document.documentElement.style.visibility = "hidden";
+      fetch("/" + centro + "/evento.html", { credentials: "same-origin" })
+        .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); })
+        .then(function (html) {
+          var head = '<base href="/' + centro + '/">' +
+            '<meta name="robots" content="noindex">' +
+            '<script>window.__EVENT_ID__=' + JSON.stringify(slug) + ';<\/script>';
+          html = html.replace(/<head[^>]*>/i, function (t) { return t + head; });
+          document.open();
+          document.write(html);
+          document.close();
+        })
+        .catch(function () { location.replace(reserva); });
+    })();
+    if (!window.__SHALOM_EVENTO_404__) document.write('<script src="/js/header.js"><\/script>');
+  </script>
 
   <meta property="og:site_name" content="Shalom Brasilia">
   <meta property="og:title" content="Shalom Brasilia" />
@@ -50,7 +77,7 @@
     </a>
   </div>
 
-  <script src="js/footer.js"></script>
+  <script>if (!window.__SHALOM_EVENTO_404__) document.write('<script src="/js/footer.js"><\/script>');</script>
 </body>
 
 </html>

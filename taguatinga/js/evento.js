@@ -62,7 +62,7 @@
       }).join("");
     }
 
-    var extLink = ev.link ? '<a class="btn btn--primary" href="' + esc(ev.link.url) + '" target="_blank" rel="noopener">' + esc(ev.link.texto) + '</a>' : "";
+    var extLink = ev.link && ev.link.url ? '<a class="btn btn--primary" href="' + esc(ev.link.url) + '" target="_blank" rel="noopener" aria-label="' + esc(ev.link.texto + " (abre em nova aba)") + '">' + esc(ev.link.texto) + '</a>' : "";
 
     root.innerHTML =
       '<div class="ev-grid">' +
