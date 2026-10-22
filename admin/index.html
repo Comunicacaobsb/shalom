@@ -100,6 +100,7 @@
       <section class="admin-view hidden" id="route-pages" data-view="pages">
         <div class="view-heading"><div><h1>Páginas editáveis</h1><p class="lead">Abra uma página para ver somente os módulos que ela suporta.</p></div><div class="page-filter" role="group" aria-label="Filtrar páginas"><button class="segmented__button is-selected" data-page-filter="all">Todas</button><button class="segmented__button" data-page-filter="editable">Com edição</button></div></div>
         <div class="editable-pages" id="editablePages"></div>
+        <p class="portal-hint"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>O cardápio da Lanchonete agora é editado no Portal, no módulo Lanchonete.</span></p>
       </section>
       <section class="admin-view hidden" id="route-page" data-view="page">
         <div class="view-heading page-workspace-heading"><div><h1 id="workspaceTitle">Página</h1><p class="lead" id="workspaceDescription"></p></div><a class="btn btn--sm" id="workspacePublicLink" target="_blank" rel="noopener">Ver página pública</a></div>
@@ -195,50 +196,6 @@
         <p style="color:var(--ink-soft);font-size:.9rem;margin-top:-.6rem">Uma linha = um item. Deixe em branco para "A confirmar".</p>
         <div class="sched-grid" id="schedGrid"></div>
         <div class="center" style="margin-top:1.2rem"><span id="schedMsg" class="msg"></span></div>
-      </section>
-
-      <!-- ---- CARDÁPIO ---- -->
-      <section id="tab-cardapio" class="panel-card hidden legacy-panel" role="tabpanel" aria-labelledby="workspace-menu-link">
-        <div class="section-title">
-          <h2>Cardápio <span class="site-chip" id="siteChip3"></span></h2>
-          <button class="btn btn--primary" id="newProductBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            Novo produto
-          </button>
-        </div>
-
-        <details class="cafe-info" id="cafeInfoBox">
-          <summary>Informações do café</summary>
-          <div class="cafe-info__grid">
-            <div class="field"><label for="ci-nome">Nome</label><input type="text" id="ci-nome" placeholder="SH-82 Café" /></div>
-            <div class="field"><label for="ci-subtitulo">Subtítulo</label><input type="text" id="ci-subtitulo" placeholder="Ex.: Cafeteria da comunidade" /></div>
-            <div class="field"><label for="ci-endereco">Endereço</label><input type="text" id="ci-endereco" placeholder="Ex.: SHCES 82, Brasília" /></div>
-            <div class="field"><label for="ci-instagram">Instagram</label><input type="text" id="ci-instagram" placeholder="@sh82cafe" /></div>
-            <div class="field"><label for="ci-whatsapp">WhatsApp</label><input type="text" id="ci-whatsapp" placeholder="(61) 90000-0000" /></div>
-            <div class="field"><label for="ci-aviso">Aviso</label><input type="text" id="ci-aviso" placeholder="Ex.: Aberto de ter a dom" /></div>
-          </div>
-          <div class="cafe-info__foot">
-            <span id="cafeInfoMsg" class="msg"></span>
-            <button class="btn btn--primary" id="saveCafeInfoBtn">Salvar informações</button>
-          </div>
-        </details>
-
-        <div class="menu-block">
-          <h3 class="menu-block__title">Categorias</h3>
-          <div class="cat-add">
-            <input type="text" id="newCatName" placeholder="Nova categoria" />
-            <button class="btn btn--sm btn--primary" id="addCatBtn">Adicionar</button>
-          </div>
-          <div id="catList" class="cat-list"></div>
-        </div>
-
-        <div class="menu-block">
-          <div class="menu-block__head">
-            <h3 class="menu-block__title">Produtos</h3>
-            <input type="search" id="prodSearch" class="prod-search" placeholder="Buscar produto…" />
-          </div>
-          <div id="prodList" class="prod-list"></div>
-        </div>
       </section>
 
     </main>
@@ -363,110 +320,6 @@
         <div style="display:flex;gap:.6rem;margin-left:auto">
           <button class="btn" id="modalCancel">Cancelar</button>
           <button class="btn btn--primary" id="modalSave">Salvar evento</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===================== MODAL DE PRODUTO ===================== -->
-  <div class="modal hidden" id="productModal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
-    <div class="modal__card">
-      <div class="modal__head">
-        <h2 id="pmTitle">Novo produto</h2>
-        <button class="icon-btn" id="pmClose" aria-label="Fechar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
-        </button>
-      </div>
-      <div class="modal__body">
-        <input type="hidden" id="pm-id" />
-        <div class="field">
-          <label for="pm-name">Nome</label>
-          <input type="text" id="pm-name" placeholder="Ex.: Cappuccino" />
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label for="pm-slug">Endereço (slug)</label>
-            <input type="text" id="pm-slug" placeholder="ex.: cappuccino" />
-            <p class="hint">Identificador único. Gerado do nome.</p>
-          </div>
-          <div class="field">
-            <label for="pm-price">Preço (R$)</label>
-            <input type="text" id="pm-price" inputmode="decimal" placeholder="0,00" />
-          </div>
-        </div>
-        <div class="field">
-          <label for="pm-description">Descrição</label>
-          <textarea id="pm-description" placeholder="Descrição curta do produto."></textarea>
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label for="pm-category">Categoria</label>
-            <input type="hidden" id="pm-category" value="" />
-            <div class="choice-menu choice-menu--full" id="categoryMenu">
-              <button class="choice-menu__trigger" id="pm-category-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="pm-category-options">Sem categoria</button>
-              <div class="choice-menu__options" id="pm-category-options" role="listbox" tabindex="-1" hidden></div>
-            </div>
-          </div>
-          <div class="field">
-            <label for="pm-badge">Selo (badge)</label>
-            <input type="text" id="pm-badge" placeholder="Ex.: Novo, Do dia (opcional)" />
-          </div>
-        </div>
-
-        <div class="field">
-          <label>Imagem</label>
-          <div class="uploader">
-            <div class="uploader__preview uploader__preview--sq" id="pm-preview">sem imagem</div>
-            <div>
-              <input type="file" id="pm-image-file" accept="image/*" style="display:none" />
-              <button type="button" class="btn btn--sm" id="pm-upload-btn">Enviar imagem</button>
-              <button type="button" class="btn btn--sm btn--danger" id="pm-image-clear" style="margin-top:.4rem">Remover</button>
-              <p class="hint" id="pm-upload-status" role="status" aria-live="polite">JPG, PNG ou WebP. A imagem é ajustada e comprimida automaticamente (até 300 KB).</p>
-              <input type="hidden" id="pm-image-url" />
-            </div>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>Disponibilidade</label>
-          <div class="avail-presets" id="availPresets">
-            <label class="radio-pill"><input type="radio" name="pm-avail" value="sempre" checked /> Sempre</label>
-            <label class="radio-pill"><input type="radio" name="pm-avail" value="semana" /> Dias da semana</label>
-            <label class="radio-pill"><input type="radio" name="pm-avail" value="periodo" /> Período</label>
-            <label class="radio-pill"><input type="radio" name="pm-avail" value="hoje" /> Só hoje</label>
-          </div>
-          <div id="avail-semana" class="avail-body hidden">
-            <div class="weekday-chips" id="weekdayChips"></div>
-          </div>
-          <div id="avail-periodo" class="avail-body hidden">
-            <div class="row2">
-              <div class="field"><label for="pm-start">De</label><input type="date" id="pm-start" /></div>
-              <div class="field"><label for="pm-end">Até</label><input type="date" id="pm-end" /></div>
-            </div>
-          </div>
-          <p class="avail-preview" id="availPreview"></p>
-        </div>
-
-        <div class="row2">
-          <div class="field">
-            <label for="pm-active">Situação</label>
-            <input type="hidden" id="pm-active" value="true" />
-            <div class="segmented" role="group" aria-label="Situação do produto">
-              <button type="button" class="segmented__button" data-active="true">Ativo</button>
-              <button type="button" class="segmented__button" data-active="false">Inativo</button>
-            </div>
-          </div>
-          <div class="field">
-            <label for="pm-position">Ordem</label>
-            <input type="number" id="pm-position" value="0" />
-          </div>
-        </div>
-      </div>
-      <div class="modal__foot">
-        <span id="pmMsg" class="msg"></span>
-        <div style="display:flex;gap:.6rem;margin-left:auto">
-          <button class="btn" id="pmCancel">Cancelar</button>
-          <button class="btn btn--primary" id="pmSave">Salvar produto</button>
         </div>
       </div>
     </div>

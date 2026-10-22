@@ -11,6 +11,12 @@ sem as linhas no banco, a página mostra "A confirmar" nos horários e esconde a
 seção de eventos. O ponto de partida é o seed `docs/seeds/2026-09-07-seed-cev.sql`
 (veja a seção 2.2).
 
+**Cardápio da Lanchonete (2026-10-22):** saiu deste painel. A página pública é
+`/asasul/sh82/` (o antigo `/sh82cafe/` só redireciona) e o cardápio, os horários
+e os pedidos da Lanchonete Shalom | SH82 são editados no Portal, no módulo
+Lanchonete (esquema `lanchonete` no Supabase). As tabelas `menu_categories`,
+`menu_products` e o bucket `cardapio` citados abaixo ficaram sem tela de edição.
+
 ## Estrutura
 ```
 /
