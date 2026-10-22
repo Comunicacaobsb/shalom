@@ -52,14 +52,15 @@
       {name:"Grupo de Oração de Adultos",path:"../santamaria/e/grupo-de-adultos/"},
       {name:"Grupo de Oração de Jovens",path:"../santamaria/e/grupo-de-jovens/"}
     ]},
-    {id:"sh82cafe", name:"SH-82 Café", path:"../sh82cafe/", status:"published", type:"editable", modules:["menu"]},
+    // O cardápio da Lanchonete saiu deste painel (22/10/2026): agora é editado no Portal, módulo Lanchonete.
+    {id:"sh82cafe", name:"Lanchonete Shalom | SH82", path:"../asasul/sh82/", status:"published", type:"readonly", modules:[], nota:"O cardápio da Lanchonete agora é editado no Portal, no módulo Lanchonete."},
     {id:"providencia", name:"Providência", path:"../providencia/", status:"published", type:"readonly", modules:[], children:[{name:"Habilidades",path:"../providencia/habilidades/"},{name:"Necessidades",path:"../providencia/necessidades/"}]},
     {id:"adoracao", name:"Adoração", path:"../adoracao/", status:"published", type:"app", modules:[]},
     {id:"acamps", name:"Acamps", path:"../acamps/", status:"published", type:"readonly", modules:[]},
     {id:"eventos", name:"Eventos", path:"../eventos/", status:"development", type:"app", modules:[]},
     {id:"inscricoes", name:"Inscrições", path:"../inscricoes/", status:"development", type:"app", modules:[]},
   ];
-  var MODULE_LABELS = { home:"Capa (topo da página)", schedules:"Horários e serviços", events:"Eventos e encontros", menu:"Cardápio" };
+  var MODULE_LABELS = { home:"Capa (topo da página)", schedules:"Horários e serviços", events:"Eventos e encontros" };
 
   // Para cada módulo: o que ele muda, onde isso aparece na página e a âncora
   // que leva direto ao trecho. A miniatura é desenhada em pageThumb().
@@ -81,15 +82,9 @@
       onde: "na seção “Eventos e encontros”, mais abaixo na página",
       ancora: "#eventos",
       thumbAlt: "Miniatura da página com a faixa de eventos destacada"
-    },
-    menu: {
-      descricao: "As categorias, os produtos e as informações do café.",
-      onde: "na página do café",
-      ancora: "",
-      thumbAlt: "Miniatura da página de cardápio"
     }
   };
-  var PANEL_BY_MODULE = { home:"#tab-capa", schedules:"#tab-horarios", events:"#tab-eventos", menu:"#tab-cardapio" };
+  var PANEL_BY_MODULE = { home:"#tab-capa", schedules:"#tab-horarios", events:"#tab-eventos" };
 
   /* ---------- helpers ---------- */
   function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"})[c];}); }
@@ -204,22 +199,12 @@
     var out = '<rect x=".9" y=".9" width="88.2" height="118.2" rx="7" fill="#FFF" stroke="#C9D5E4" stroke-width="1.6"/>';
     function block(x,y,w,h,fill,rx){ out += '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(rx==null?2:rx)+'" fill="'+fill+'"/>'; }
     block(10,8,42,5,quiet,2.5);                                     // barra do topo
-    if (module === "menu"){
-      block(10,17,70,18,quiet,3);
-      block(10,41,26,4,live);
-      block(10,49,70,9,live);
-      block(10,61,70,9,live);
-      block(10,74,26,4,live);
-      block(10,82,70,9,live);
-      block(10,94,70,9,live);
-    } else {
-      block(10,17,70,33, module === "home" ? live : quiet, 3);      // capa
-      var s = module === "schedules" ? live : quiet;
-      block(10,55,33.5,14,s); block(46.5,55,33.5,14,s);
-      block(10,72,33.5,14,s); block(46.5,72,33.5,14,s);
-      var e = module === "events" ? live : quiet;
-      block(10,92,23,20,e,3); block(33.5,92,23,20,e,3); block(57,92,23,20,e,3);
-    }
+    block(10,17,70,33, module === "home" ? live : quiet, 3);      // capa
+    var s = module === "schedules" ? live : quiet;
+    block(10,55,33.5,14,s); block(46.5,55,33.5,14,s);
+    block(10,72,33.5,14,s); block(46.5,72,33.5,14,s);
+    var e = module === "events" ? live : quiet;
+    block(10,92,23,20,e,3); block(33.5,92,23,20,e,3); block(57,92,23,20,e,3);
     var meta = MODULE_META[module] || {};
     var a11y = decorative ? 'aria-hidden="true"' : 'role="img" aria-label="'+esc(meta.thumbAlt || "Miniatura da página")+'"';
     return '<svg class="page-thumb" viewBox="0 0 90 120" focusable="false" '+a11y+'>'+out+'</svg>';
@@ -382,7 +367,7 @@
     if(!map || !pages) return;
     map.innerHTML=SITE_CATALOG.filter(function(i){return !i.parent;}).map(function(item){
       var children=(item.children||[]).map(function(c){return '<li><a href="'+esc(c.path)+'" target="_blank" rel="noopener">'+esc(c.name)+'</a></li>';}).join("");
-      return '<article class="site-map-row"><div class="site-map-main"><div><h2>'+esc(item.name)+'</h2><p>'+esc(statusLabel(item.status))+' · '+esc(typeLabel(item.type))+'</p></div></div><div class="site-map-actions"><span class="module-summary">'+(item.modules.length ? item.modules.map(function(m){return esc(MODULE_LABELS[m]);}).join(" · ") : "Sem módulo conectado")+'</span><a class="btn btn--sm" href="'+esc(publicHref(item))+'" target="_blank" rel="noopener">Ver página</a>'+(canEditCatalogItem(item)?'<a class="btn btn--sm btn--primary" href="#page/'+esc(item.id)+'">Abrir edição</a>':'')+'</div>'+(children?'<ul class="site-map-children">'+children+'</ul>':'')+'</article>';
+      return '<article class="site-map-row"><div class="site-map-main"><div><h2>'+esc(item.name)+'</h2><p>'+esc(statusLabel(item.status))+' · '+esc(typeLabel(item.type))+'</p></div></div><div class="site-map-actions"><span class="module-summary">'+(item.modules.length ? item.modules.map(function(m){return esc(MODULE_LABELS[m]);}).join(" · ") : esc(item.nota || "Sem módulo conectado"))+'</span><a class="btn btn--sm" href="'+esc(publicHref(item))+'" target="_blank" rel="noopener">Ver página</a>'+(canEditCatalogItem(item)?'<a class="btn btn--sm btn--primary" href="#page/'+esc(item.id)+'">Abrir edição</a>':'')+'</div>'+(children?'<ul class="site-map-children">'+children+'</ul>':'')+'</article>';
     }).join("");
     var editable=SITE_CATALOG.filter(function(i){return canEditCatalogItem(i);});
     pages.innerHTML=editable.length ? editable.map(function(item){return '<a class="editable-page-row" href="#page/'+esc(item.id)+'"><div><h2>'+esc(item.name)+'</h2><p>'+esc(statusLabel(item.status))+' · '+item.modules.length+' módulo'+(item.modules.length===1?'':'s')+'</p></div><div class="module-chips">'+item.modules.map(function(m){return '<span class="module-chip">'+esc(MODULE_LABELS[m])+'</span>';}).join("")+'</div><span class="row-action">Abrir</span></a>';}).join(""):'<div class="empty-state"><h2>Nenhuma página editável disponível</h2><p>Quando uma página for autorizada para sua conta, ela aparecerá aqui.</p></div>';
@@ -405,7 +390,6 @@
       if(routeModule === "home"){ renderEditingContext("#capaContext","home"); loadCapa(); }
       if(routeModule === "schedules"){ renderEditingContext("#horariosContext","schedules"); loadSchedules(); }
       if(routeModule === "events"){ renderEditingContext("#eventosContext","events"); loadEvents(); }
-      if(routeModule === "menu") loadMenu();
       modules.innerHTML='<div class="active-editor-note"><a href="#page/'+esc(item.id)+'">Voltar para '+esc(item.name)+'</a><p>Editor de '+esc(MODULE_LABELS[routeModule])+'.</p></div>';
     }
   }
@@ -443,7 +427,7 @@
   /* ---------- seletor de página (site) ---------- */
   var siteSelect = $("#siteSelect"), siteOptions = $("#siteOptions"), siteRows = [];
   var activeTab = "eventos";
-  function updateChips(){ ["#siteChip","#siteChip2","#siteChip3","#siteChip4"].forEach(function(sel){ var el=$(sel); if(el) el.textContent = siteName; }); }
+  function updateChips(){ ["#siteChip","#siteChip2","#siteChip4"].forEach(function(sel){ var el=$(sel); if(el) el.textContent = siteName; }); }
   function loadSites(){
     if (!sb) return Promise.resolve([]);
     return sb.from("sites").select("id,name").order("name").then(function(res){
@@ -482,7 +466,7 @@
   siteOptions.addEventListener("keydown", function(e){ var opts=$$('[data-site]',siteOptions), i=opts.indexOf(document.activeElement); if(e.key==="Escape"){e.preventDefault();toggleChoice(siteSelect,siteOptions,false);siteSelect.focus();} if(e.key==="Home"){e.preventDefault();opts[0].focus();} if(e.key==="End"){e.preventDefault();opts[opts.length-1].focus();} if(e.key==="ArrowDown"){e.preventDefault();(opts[i+1]||opts[0]).focus();} if(e.key==="ArrowUp"){e.preventDefault();(opts[i-1]||opts[opts.length-1]).focus();} if(e.key==="Enter"&&document.activeElement.dataset.site) chooseSite(document.activeElement.dataset.site); });
 
   /* ---------- tabs ---------- */
-  var PANELS = ["capa","eventos","horarios","cardapio","usuarios"];
+  var PANELS = ["capa","eventos","horarios","usuarios"];
   $$(".tab").forEach(function(t){
     t.addEventListener("click", function(){
       if (t.classList.contains("hidden")) return;
@@ -492,7 +476,6 @@
         var el = $("#tab-"+name);
         if (el) el.classList.toggle("hidden", name !== activeTab);
       });
-      if (activeTab==="cardapio") loadMenu();
       if (activeTab==="usuarios") loadUsers();
     });
   });
@@ -870,361 +853,6 @@
         return;
       }
       toast("Evento salvo"); closeModal(); loadEvents();
-    }).catch(function(){ btn.disabled=false; setMsg(msg,"Erro ao salvar."); });
-  });
-
-  /* =====================================================================
-     CARDÁPIO (categorias, produtos, disponibilidade, informações do café)
-     ===================================================================== */
-  var menuCats = [], menuProds = [];
-
-  var WD_SHORT = ["D","S","T","Q","Q","S","S"];
-  var WD_ABBR  = ["dom","seg","ter","qua","qui","sex","sáb"];
-  var WD_FULL  = ["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
-  function cap(s){ return String(s||"").charAt(0).toUpperCase()+String(s||"").slice(1); }
-  function fmtDMY(d){ if(!d) return ""; var p=String(d).slice(0,10).split("-"); return p[2]+"/"+p[1]; }
-  function weekdaysLabel(wd){
-    if (!wd || !wd.length) return "";
-    var s = wd.slice().sort(function(a,b){ return a-b; });
-    if (s.length===1) return "Toda "+WD_FULL[s[0]];
-    var contiguous=true; for (var i=1;i<s.length;i++){ if(s[i]!==s[i-1]+1){ contiguous=false; break; } }
-    if (contiguous) return cap(WD_ABBR[s[0]])+" a "+WD_ABBR[s[s.length-1]];
-    return s.map(function(x){ return cap(WD_ABBR[x]); }).join(", ");
-  }
-  // Selo curto de disponibilidade (mesma regra do banco). "" = perene.
-  function availShort(p){
-    if (p.weekdays && p.weekdays.length) return weekdaysLabel(p.weekdays);
-    var s=p.start_date, e=p.end_date;
-    if (s && e && String(s).slice(0,10)===String(e).slice(0,10)) return (String(s).slice(0,10)===todaySP()) ? "Só hoje" : "Somente "+fmtDMY(s);
-    if (s && e) return fmtDMY(s)+" a "+fmtDMY(e);
-    if (e) return "Até "+fmtDMY(e);
-    if (s) return "A partir de "+fmtDMY(s);
-    return "";
-  }
-
-  function loadMenu(){
-    if (!sb) return;
-    $("#catList").innerHTML='<p class="center" style="color:var(--ink-faint)">Carregando…</p>';
-    $("#prodList").innerHTML='<p class="center" style="color:var(--ink-faint)">Carregando…</p>';
-    loadCafeInfo();
-    Promise.all([
-      sb.from("menu_categories").select("*").eq("site",site).order("position",{ascending:true}),
-      sb.from("menu_products").select("*").eq("site",site).order("position",{ascending:true})
-    ]).then(function(r){
-      if (r[0].error){ $("#catList").innerHTML='<p class="notice notice--err">Erro ao carregar categorias: '+esc(r[0].error.message)+'</p>'; menuCats=[]; }
-      else { menuCats = r[0].data||[]; renderCats(); }
-      if (r[1].error){ $("#prodList").innerHTML='<p class="notice notice--err">Erro ao carregar produtos: '+esc(r[1].error.message)+'</p>'; menuProds=[]; }
-      else { menuProds = r[1].data||[]; renderProds(); }
-    }).catch(function(){ $("#prodList").innerHTML='<p class="notice notice--err">Erro ao carregar o cardápio.</p>'; });
-  }
-
-  /* ---------- Informações do café (settings/cafe_info) ---------- */
-  function loadCafeInfo(){
-    if (!sb) return;
-    sb.from("settings").select("value").eq("site",site).eq("key","cafe_info").limit(1).then(function(res){
-      var v=(res.data && res.data[0] && res.data[0].value) || {};
-      $("#ci-nome").value=v.nome||""; $("#ci-subtitulo").value=v.subtitulo||"";
-      $("#ci-endereco").value=v.endereco||""; $("#ci-instagram").value=v.instagram||"";
-      $("#ci-whatsapp").value=v.whatsapp||""; $("#ci-aviso").value=v.aviso||"";
-    });
-  }
-  $("#saveCafeInfoBtn").addEventListener("click", function(){
-    if (!sb) return;
-    var btn=this, msg=$("#cafeInfoMsg");
-    var value={
-      nome:$("#ci-nome").value.trim(), subtitulo:$("#ci-subtitulo").value.trim(),
-      endereco:$("#ci-endereco").value.trim(), instagram:$("#ci-instagram").value.trim(),
-      whatsapp:$("#ci-whatsapp").value.trim(), aviso:$("#ci-aviso").value.trim()
-    };
-    btn.disabled=true; setMsg(msg,"Salvando…",true);
-    sb.from("settings").upsert({ site:site, key:"cafe_info", value:value, updated_at:new Date().toISOString() }, { onConflict:"site,key" }).then(function(res){
-      btn.disabled=false;
-      if (res.error){ if(isRlsError(res.error)){ setMsg(msg,"Sem permissão para editar esta página."); toast("Sem permissão para editar esta página."); } else setMsg(msg,"Erro ao salvar: "+res.error.message); return; }
-      setMsg(msg,"Informações salvas!",true); toast("Informações salvas");
-    }).catch(function(){ btn.disabled=false; setMsg(msg,"Erro ao salvar."); });
-  });
-
-  /* ---------- Categorias ---------- */
-  function renderCats(){
-    var host=$("#catList");
-    if (!menuCats.length){ host.innerHTML='<p class="hint">Nenhuma categoria ainda. Adicione a primeira acima.</p>'; return; }
-    host.innerHTML = menuCats.map(function(c,i){
-      return '<div class="cat-row" data-id="'+esc(c.id)+'">'+
-        '<span class="cat-row__name'+(c.active?'':' is-off')+'">'+esc(c.name)+'</span>'+
-        (c.active?'':'<span class="badge-pill badge-off">Inativa</span>')+
-        '<div class="cat-row__actions">'+
-          '<button class="icon-btn" data-cup="'+i+'" title="Subir" aria-label="Subir categoria" '+(i===0?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>'+
-          '<button class="icon-btn" data-cdown="'+i+'" title="Descer" aria-label="Descer categoria" '+(i===menuCats.length-1?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>'+
-          '<button class="icon-btn" data-crename="'+esc(c.id)+'" title="Renomear" aria-label="Renomear categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
-          '<button class="icon-btn" data-ctoggle="'+esc(c.id)+'" title="'+(c.active?'Desativar':'Ativar')+'" aria-label="'+(c.active?'Desativar':'Ativar')+' categoria">'+(c.active?
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>':
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/></svg>')+'</button>'+
-          '<button class="icon-btn" data-cdel="'+esc(c.id)+'" title="Excluir" aria-label="Excluir categoria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>'+
-        '</div></div>';
-    }).join("");
-    $$("[data-cup]",host).forEach(function(b){ b.addEventListener("click",function(){ moveCat(+b.dataset.cup,-1); }); });
-    $$("[data-cdown]",host).forEach(function(b){ b.addEventListener("click",function(){ moveCat(+b.dataset.cdown,1); }); });
-    $$("[data-crename]",host).forEach(function(b){ b.addEventListener("click",function(){ renameCat(b.dataset.crename); }); });
-    $$("[data-ctoggle]",host).forEach(function(b){ b.addEventListener("click",function(){ toggleCat(b.dataset.ctoggle); }); });
-    $$("[data-cdel]",host).forEach(function(b){ b.addEventListener("click",function(){ delCat(b.dataset.cdel); }); });
-  }
-  function addCategory(){
-    if (!sb) return;
-    var name=$("#newCatName").value.trim(); if(!name) return;
-    var slug=slugify(name); if(!slug){ toast("Nome inválido."); return; }
-    var pos = menuCats.reduce(function(m,c){ return Math.max(m,c.position); }, -1) + 1;
-    sb.from("menu_categories").insert({ site:site, slug:slug, name:name, position:pos, active:true }).then(function(res){
-      if (res.error){ if(res.error.code==="23505"){ toast("Já existe uma categoria com esse nome."); } else reportError(res.error,"Erro ao criar categoria."); return; }
-      $("#newCatName").value=""; toast("Categoria criada"); loadMenu();
-    });
-  }
-  $("#addCatBtn").addEventListener("click", addCategory);
-  $("#newCatName").addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); addCategory(); } });
-
-  function moveCat(i,dir){
-    var j=i+dir; if(j<0||j>=menuCats.length) return;
-    var a=menuCats[i], b=menuCats[j];
-    var pa=a.position, pb=b.position; if(pa===pb){ pa=i; pb=j; }
-    Promise.all([
-      sb.from("menu_categories").update({position:pb}).eq("id",a.id),
-      sb.from("menu_categories").update({position:pa}).eq("id",b.id)
-    ]).then(function(r){ var e=(r[0]&&r[0].error)||(r[1]&&r[1].error); if(e) reportError(e); loadMenu(); });
-  }
-  function renameCat(id){
-    var c=menuCats.filter(function(x){return x.id===id;})[0]; if(!c) return;
-    var name=prompt("Novo nome da categoria:", c.name); if(name==null) return;
-    name=name.trim(); if(!name) return;
-    sb.from("menu_categories").update({ name:name }).eq("id",id).then(function(res){
-      if(res.error){ reportError(res.error,"Erro ao renomear."); return; }
-      toast("Categoria renomeada"); loadMenu();
-    });
-  }
-  function toggleCat(id){
-    var c=menuCats.filter(function(x){return x.id===id;})[0]; if(!c) return;
-    sb.from("menu_categories").update({ active: !c.active }).eq("id",id).then(function(res){
-      if(res.error){ reportError(res.error); return; }
-      toast(c.active?"Categoria desativada":"Categoria ativada"); loadMenu();
-    });
-  }
-  function delCat(id){
-    var c=menuCats.filter(function(x){return x.id===id;})[0]; if(!c) return;
-    if(!confirm('Excluir a categoria "'+c.name+'"?\nOs produtos dela ficarão "sem categoria".')) return;
-    sb.from("menu_categories").delete().eq("id",id).then(function(res){
-      if(res.error){ reportError(res.error,"Erro ao excluir."); return; }
-      toast("Categoria excluída"); loadMenu();
-    });
-  }
-
-  /* ---------- Produtos ---------- */
-  function prodRowHTML(p, items){
-    var idx=items.indexOf(p);
-    var thumb = p.image_url ? '<img class="prod-row__thumb" src="'+esc(p.image_url)+'" alt="">'
-      : '<div class="prod-row__thumb prod-row__thumb--ph">'+esc((p.name||"?").charAt(0).toUpperCase())+'</div>';
-    var badges='';
-    if (p.active===false) badges += '<span class="badge-pill badge-off">Inativo</span>';
-    var av=availShort(p); if (av) badges += '<span class="badge-pill badge-info">'+esc(av)+'</span>';
-    if (p.badge) badges += '<span class="badge-pill badge-info">'+esc(p.badge)+'</span>';
-    return '<div class="prod-row" data-id="'+esc(p.id)+'">'+thumb+
-      '<div class="prod-row__main"><h3>'+esc(p.name)+'</h3>'+
-        '<div class="prod-row__meta">'+fmtBRL(p.price)+(badges?' &nbsp; '+badges:'')+'</div></div>'+
-      '<div class="prod-row__actions">'+
-        '<button class="icon-btn" data-pup="'+esc(p.id)+'" title="Subir" aria-label="Subir produto" '+(idx===0?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>'+
-        '<button class="icon-btn" data-pdown="'+esc(p.id)+'" title="Descer" aria-label="Descer produto" '+(idx===items.length-1?'disabled':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>'+
-        '<button class="icon-btn" data-pedit="'+esc(p.id)+'" title="Editar" aria-label="Editar produto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
-        '<button class="icon-btn" data-pdel="'+esc(p.id)+'" title="Excluir" aria-label="Excluir produto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>'+
-      '</div></div>';
-  }
-  function renderProds(){
-    var host=$("#prodList");
-    if (!menuProds.length){ host.innerHTML='<p class="hint">Nenhum produto ainda. Clique em "Novo produto".</p>'; return; }
-    var norm=function(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,""); };
-    var qn=norm(($("#prodSearch").value||"").trim());
-    var list=menuProds.filter(function(p){ return !qn || norm(p.name).indexOf(qn)!==-1; });
-    var groups=menuCats.map(function(c){ return { id:c.id, name:c.name, active:c.active, items:[] }; });
-    var noCat={ id:null, name:"Sem categoria", active:true, items:[] };
-    var byId={}; groups.forEach(function(g){ byId[g.id]=g; });
-    list.forEach(function(p){ var g=(p.category_id && byId[p.category_id]) ? byId[p.category_id] : noCat; g.items.push(p); });
-    var ordered=groups.concat([noCat]).filter(function(g){ return g.items.length; });
-    ordered.forEach(function(g){ g.items.sort(function(a,b){ return a.position-b.position; }); });
-    if (!ordered.length){ host.innerHTML='<p class="hint">Nenhum produto encontrado.</p>'; return; }
-    host.innerHTML = ordered.map(function(g){
-      return '<div class="prod-group"><h4 class="prod-group__title">'+esc(g.name)+(g.active?'':' <span class="badge-pill badge-off">inativa</span>')+'</h4>'+
-        g.items.map(function(p){ return prodRowHTML(p,g.items); }).join("")+'</div>';
-    }).join("");
-    $$("[data-pedit]",host).forEach(function(b){ b.addEventListener("click",function(){ openProductModal(menuProds.filter(function(x){return x.id===b.dataset.pedit;})[0]); }); });
-    $$("[data-pdel]",host).forEach(function(b){ b.addEventListener("click",function(){ delProduct(b.dataset.pdel); }); });
-    $$("[data-pup]",host).forEach(function(b){ b.addEventListener("click",function(){ moveProduct(b.dataset.pup,-1); }); });
-    $$("[data-pdown]",host).forEach(function(b){ b.addEventListener("click",function(){ moveProduct(b.dataset.pdown,1); }); });
-  }
-  $("#prodSearch").addEventListener("input", renderProds);
-
-  function moveProduct(id,dir){
-    var p=menuProds.filter(function(x){return x.id===id;})[0]; if(!p) return;
-    var sibs=menuProds.filter(function(x){ return (x.category_id||null)===(p.category_id||null); }).sort(function(a,b){ return a.position-b.position; });
-    var i=sibs.indexOf(p), j=i+dir; if(j<0||j>=sibs.length) return;
-    var a=sibs[i], b=sibs[j];
-    var pa=a.position, pb=b.position; if(pa===pb){ pa=i; pb=j; }
-    Promise.all([
-      sb.from("menu_products").update({position:pb}).eq("id",a.id),
-      sb.from("menu_products").update({position:pa}).eq("id",b.id)
-    ]).then(function(r){ var e=(r[0]&&r[0].error)||(r[1]&&r[1].error); if(e) reportError(e); loadMenu(); });
-  }
-  function delProduct(id){
-    var p=menuProds.filter(function(x){return x.id===id;})[0]; if(!p) return;
-    if(!confirm('Excluir o produto "'+p.name+'"? Esta ação não pode ser desfeita.')) return;
-    sb.from("menu_products").delete().eq("id",id).then(function(res){
-      if(res.error){ reportError(res.error,"Erro ao excluir."); return; }
-      toast("Produto excluído"); loadMenu();
-    });
-  }
-
-  /* ---------- Editor de produto ---------- */
-  var productModal=$("#productModal");
-  function fillCategorySelect(selected){
-    var val=selected || "", chosen=menuCats.filter(function(c){return String(c.id)===String(val);})[0];
-    $("#pm-category").value = val;
-    $("#pm-category-trigger").textContent = chosen ? chosen.name+(chosen.active?'':' (inativa)') : "Sem categoria";
-    $("#pm-category-options").innerHTML = '<button type="button" class="choice-menu__option" role="option" data-category="" aria-selected="'+(!val)+'">Sem categoria</button>' + menuCats.map(function(c){
-      return '<button type="button" class="choice-menu__option" role="option" data-category="'+esc(c.id)+'" aria-selected="'+(String(c.id)===String(val))+'">'+esc(c.name)+(c.active?'':' (inativa)')+'</button>';
-    }).join("");
-  }
-  $("#pm-category-trigger").addEventListener("click",function(){ var o=$("#pm-category-options"), open=o.hidden; toggleChoice(this,o,open); });
-  $("#pm-category-options").addEventListener("click",function(e){ var b=e.target.closest("[data-category]"); if(!b)return; fillCategorySelect(b.dataset.category); this.hidden=true; $("#pm-category-trigger").setAttribute("aria-expanded","false"); });
-  $("#pm-category-options").addEventListener("keydown",function(e){ var o=this, trigger=$("#pm-category-trigger"), opts=$$('[data-category]',o), i=opts.indexOf(document.activeElement); if(e.key==="Escape"){e.preventDefault();toggleChoice(trigger,o,false);trigger.focus();} if(e.key==="Home"){e.preventDefault();opts[0].focus();} if(e.key==="End"){e.preventDefault();opts[opts.length-1].focus();} if(e.key==="ArrowDown"){e.preventDefault();(opts[i+1]||opts[0]).focus();} if(e.key==="ArrowUp"){e.preventDefault();(opts[i-1]||opts[opts.length-1]).focus();} if(e.key==="Enter"&&document.activeElement.dataset.category!==undefined){fillCategorySelect(document.activeElement.dataset.category);toggleChoice(trigger,o,false);trigger.focus();} });
-  document.addEventListener("click",function(e){ [$("#categoryMenu")].forEach(function(menu){ if(menu && !menu.contains(e.target)){ var o=$("#pm-category-options"), t=$("#pm-category-trigger"); toggleChoice(t,o,false); } }); });
-  function setActiveChoice(value){ $("#pm-active").value=String(value)==="true"?"true":"false"; $$('[data-active]').forEach(function(b){ b.classList.toggle("is-selected",b.dataset.active===$("#pm-active").value); b.setAttribute("aria-pressed",String(b.dataset.active===$("#pm-active").value)); }); }
-  $$('[data-active]').forEach(function(b){ b.addEventListener("click",function(){setActiveChoice(b.dataset.active);}); });
-  function setPmPreview(url){
-    var el=$("#pm-preview");
-    if (url) el.innerHTML='<img src="'+esc(url)+'" alt="">'; else el.textContent="sem imagem";
-    $("#pm-image-url").value = url||"";
-  }
-  function buildWeekdayChips(){
-    var host=$("#weekdayChips"); if(!host || host.dataset.built) return;
-    host.dataset.built="1";
-    host.innerHTML = WD_SHORT.map(function(l,i){ return '<button type="button" class="wd-chip" data-dow="'+i+'" title="'+cap(WD_FULL[i])+'" aria-label="Selecionar '+cap(WD_FULL[i])+'">'+l+'</button>'; }).join("");
-    $$(".wd-chip",host).forEach(function(c){ c.addEventListener("click",function(){ c.classList.toggle("on"); updateAvailUI(); }); });
-  }
-  function currentPreset(){ var r=$('input[name="pm-avail"]:checked'); return r?r.value:"sempre"; }
-  function selectedWeekdays(){ return $$("#weekdayChips .wd-chip.on").map(function(c){ return parseInt(c.dataset.dow,10); }).sort(function(a,b){ return a-b; }); }
-  function updateAvailUI(){
-    var p=currentPreset();
-    $("#avail-semana").classList.toggle("hidden", p!=="semana");
-    $("#avail-periodo").classList.toggle("hidden", p!=="periodo");
-    var txt="";
-    if (p==="sempre") txt="Disponível todos os dias.";
-    else if (p==="semana"){ var wd=selectedWeekdays(); txt=wd.length?("Disponível: "+weekdaysLabel(wd)):"Escolha ao menos um dia."; }
-    else if (p==="periodo"){
-      var s=$("#pm-start").value, e=$("#pm-end").value;
-      if (s&&e) txt="Disponível de "+fmtDMY(s)+" a "+fmtDMY(e)+".";
-      else if (e) txt="Disponível até "+fmtDMY(e)+".";
-      else if (s) txt="Disponível a partir de "+fmtDMY(s)+".";
-      else txt="Defina uma data de início ou fim.";
-    } else if (p==="hoje") txt="Disponível somente hoje ("+fmtDMY(todaySP())+").";
-    $("#availPreview").textContent=txt;
-  }
-  $$('input[name="pm-avail"]').forEach(function(r){ r.addEventListener("change", updateAvailUI); });
-  $("#pm-start").addEventListener("change", updateAvailUI);
-  $("#pm-end").addEventListener("change", updateAvailUI);
-
-  function openProductModal(p){
-    buildWeekdayChips();
-    setMsg($("#pmMsg"),"");
-    $("#pmTitle").textContent = p ? "Editar produto" : "Novo produto";
-    $("#pm-id").value = p ? p.id : "";
-    $("#pm-name").value = p ? (p.name||"") : "";
-    $("#pm-slug").value = p ? (p.slug||"") : "";
-    $("#pm-slug").dataset.touched = p ? "1" : "";
-    $("#pm-price").value = p ? String(p.price==null?"":p.price).replace(".",",") : "";
-    $("#pm-description").value = p ? (p.description||"") : "";
-    $("#pm-badge").value = p ? (p.badge||"") : "";
-    setActiveChoice(p ? String(p.active!==false) : "true");
-    $("#pm-position").value = p ? (p.position||0) : menuProds.length;
-    fillCategorySelect(p ? (p.category_id||"") : "");
-    setPmPreview(p ? p.image_url : "");
-    $("#pm-upload-status").textContent = IMAGE_HINT;
-    $$("#weekdayChips .wd-chip").forEach(function(c){ c.classList.remove("on"); });
-    $("#pm-start").value=""; $("#pm-end").value="";
-    var preset="sempre";
-    if (p && p.weekdays && p.weekdays.length){
-      preset="semana";
-      p.weekdays.forEach(function(d){ var c=$('#weekdayChips .wd-chip[data-dow="'+d+'"]'); if(c) c.classList.add("on"); });
-    } else if (p && (p.start_date || p.end_date)){
-      var s=p.start_date?String(p.start_date).slice(0,10):"", e=p.end_date?String(p.end_date).slice(0,10):"";
-      if (s && e && s===e && s===todaySP()) preset="hoje";
-      else { preset="periodo"; $("#pm-start").value=s; $("#pm-end").value=e; }
-    }
-    var radio=$('input[name="pm-avail"][value="'+preset+'"]'); if(radio) radio.checked=true;
-    updateAvailUI();
-    focusModal(productModal);
-  }
-  function closeProductModal(){ productModal.classList.add("hidden"); if(lastModalFocus&&lastModalFocus.focus) lastModalFocus.focus(); }
-
-  $("#newProductBtn").addEventListener("click", function(){ openProductModal(null); });
-  $("#pmClose").addEventListener("click", closeProductModal);
-  $("#pmCancel").addEventListener("click", closeProductModal);
-  productModal.addEventListener("click", function(e){ if(e.target===productModal) closeProductModal(); });
-  productModal.addEventListener("keydown", function(e){ if(e.key==="Escape") closeProductModal(); else trapModalFocus(productModal,e); });
-  $("#pm-name").addEventListener("input", function(){ var s=$("#pm-slug"); if(!s.dataset.touched) s.value=slugify(this.value); });
-  $("#pm-slug").addEventListener("input", function(){ this.dataset.touched="1"; this.value=slugify(this.value); });
-
-  $("#pm-upload-btn").addEventListener("click", function(){ $("#pm-image-file").click(); });
-  $("#pm-image-clear").addEventListener("click", function(){ setPmPreview(""); });
-  $("#pm-image-file").addEventListener("change", function(){
-    var file=this.files && this.files[0]; this.value="";
-    if (!file || !sb) return;
-    var status=$("#pm-upload-status"), target=site;
-    status.textContent="Preparando a imagem…";
-    compressImage(file, { maxDim:1200, limitBytes:IMAGE_LIMIT_BYTES }).then(function(out){
-      status.textContent="Enviando a imagem ("+kbLabel(out.bytes)+")…";
-      var path=target+"/"+uuid()+"."+out.ext;
-      return sb.storage.from("cardapio").upload(path, out.blob, { upsert:true, cacheControl:"3600", contentType:out.contentType }).then(function(res){
-        if (res.error){ if(isRlsError(res.error)){ status.textContent="Sem permissão para enviar imagem."; toast("Sem permissão para editar esta página."); } else status.textContent="Não foi possível enviar a imagem: "+res.error.message; return; }
-        var pub=sb.storage.from("cardapio").getPublicUrl(path);
-        setPmPreview((pub && pub.data && pub.data.publicUrl) || "");
-        status.textContent="Imagem enviada ("+kbLabel(out.bytes)+").";
-      });
-    }).catch(function(err){ status.textContent=(err && err.message) || "Não foi possível preparar a imagem. Tente outro arquivo."; });
-  });
-
-  $("#pmSave").addEventListener("click", function(){
-    if (!sb) return;
-    var msg=$("#pmMsg"), btn=this;
-    var name=$("#pm-name").value.trim();
-    var slug=slugify($("#pm-slug").value || name);
-    if (!name){ setMsg(msg,"Informe o nome."); return; }
-    if (!slug){ setMsg(msg,"Informe um slug válido."); return; }
-    var preset=currentPreset(), weekdays=null, start_date=null, end_date=null;
-    if (preset==="semana"){
-      var wd=selectedWeekdays();
-      if (!wd.length){ setMsg(msg,"Escolha ao menos um dia da semana."); return; }
-      weekdays=wd;
-    } else if (preset==="periodo"){
-      start_date=$("#pm-start").value||null; end_date=$("#pm-end").value||null;
-      if (!start_date && !end_date){ setMsg(msg,"Defina uma data de início ou fim."); return; }
-    } else if (preset==="hoje"){ start_date=todaySP(); end_date=todaySP(); }
-    var row={
-      site:site, slug:slug, name:name,
-      description:$("#pm-description").value.trim()||null,
-      price:parsePrice($("#pm-price").value),
-      category_id:$("#pm-category").value||null,
-      image_url:$("#pm-image-url").value.trim()||null,
-      badge:$("#pm-badge").value.trim()||null,
-      active:$("#pm-active").value==="true",
-      position:parseInt($("#pm-position").value,10)||0,
-      weekdays:weekdays, start_date:start_date, end_date:end_date
-    };
-    var id=$("#pm-id").value;
-    btn.disabled=true; setMsg(msg,"Salvando…",true);
-    var op = id ? sb.from("menu_products").update(row).eq("id",id) : sb.from("menu_products").insert(row);
-    op.then(function(res){
-      btn.disabled=false;
-      if (res.error){
-        if (res.error.code==="23505"){ setMsg(msg,"Já existe um produto com esse slug nesta página."); return; }
-        if (isRlsError(res.error)){ setMsg(msg,"Sem permissão para editar esta página."); toast("Sem permissão para editar esta página."); return; }
-        setMsg(msg,"Erro ao salvar: "+res.error.message); return;
-      }
-      toast("Produto salvo"); closeProductModal(); loadMenu();
     }).catch(function(){ btn.disabled=false; setMsg(msg,"Erro ao salvar."); });
   });
 
