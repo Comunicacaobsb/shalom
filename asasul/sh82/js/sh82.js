@@ -56,6 +56,11 @@
   function ler(k, padrao) { try { var v = localStorage.getItem(k); return v == null ? padrao : JSON.parse(v); } catch (e) { return padrao; } }
   function gravar(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* aparelho sem armazenamento: segue sem lembrar */ } }
   function $(s, c) { return (c || document).querySelector(s); }
+  /* Luminância relativa (WCAG) de #RRGGBB: acima de ~0,18 o texto escuro lê melhor que o claro. */
+  function luminancia(hex) {
+    var c = [1, 3, 5].map(function (i) { var v = parseInt(String(hex).slice(i, i + 2), 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
 
   /* ---------------- conexão ---------------- */
   function configuracao() {
@@ -271,12 +276,13 @@
     var raiz = document.documentElement.style;
     if (u.cor) raiz.setProperty("--y", u.cor);
     if (u.cor_fundo) { raiz.setProperty("--ink", u.cor_fundo); var tc = $('meta[name="theme-color"]'); if (tc) tc.setAttribute("content", u.cor_fundo); }
+    if (u.cor_fundo) document.documentElement.toggleAttribute("data-claro", luminancia(u.cor_fundo) > 0.18);
     document.title = nome + " | " + marca + " · Cardápio";
     var i = nome.indexOf(" ");
     var h1 = $("#heroNome");
     h1.innerHTML = (i > 0 ? "<span>" + esc(nome.slice(0, i)) + "</span> <span>" + esc(nome.slice(i + 1)) + "</span>" : "<span>" + esc(nome) + "</span>") + '<span class="sr"> | ' + esc(marca) + "</span>";
-    var evento = u.tipo === "evento" ? marca + " · " + ddmm(u.inicio) + " a " + ddmm(u.fim) + " · " : "";
-    $("#heroSub").textContent = evento + (u.local ? u.local + " · " : "") + "Cardápio";
+    // Evento: nome e datas (o local, que costuma ser longo, fica no rodapé).
+    $("#heroSub").textContent = u.tipo === "evento" ? marca + " · " + ddmm(u.inicio) + " a " + ddmm(u.fim) + " · Cardápio" : (u.local ? u.local + " · " : "") + "Cardápio";
   }
 
   function botaoItem(it, grande) {

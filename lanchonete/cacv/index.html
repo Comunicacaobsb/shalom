@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-claro>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#F7EFE8" />
+  <title>Lanchonete Shalom | CACV · Cardápio</title>
+  <meta name="description" content="Cardápio da Lanchonete Shalom no CACV Centro-Oeste 2026: pedido pelo celular para confirmar no balcão." />
+  <meta property="og:site_name" content="Shalom Brasília" />
+  <meta property="og:title" content="Lanchonete Shalom | CACV · Cardápio" />
+  <meta property="og:description" content="Especiais do dia, menu padrão e pedido pelo celular. Pagamento e confirmação no balcão." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:url" content="https://brasilia.comshalom.org/lanchonete/cacv/" />
+  <meta property="og:image" content="https://brasilia.comshalom.org/images/shalom-asa-sul.webp" />
+  <link rel="canonical" href="https://brasilia.comshalom.org/lanchonete/cacv/" />
+  <meta name="robots" content="noindex" />
+
+  <link rel="apple-touch-icon" sizes="180x180" href="../../favicon/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png" />
+
+  <link rel="stylesheet" href="../../asasul/sh82/css/sh82.css" />
+  <!-- Identidade do CACV Centro-Oeste 2026 (comshalom.org/cacvco): creme e marrom, com o logo do encontro.
+       As cores vêm do painel (Informações); aqui ficam só as do primeiro desenho, para não piscar escuro. -->
+  <style>
+    :root { --y: #743719; --ink: #F7EFE8; }
+    .logo-evento { position: absolute; right: var(--gut); top: 1.6rem; width: 6.5rem; height: auto; }
+    @media (min-width: 40rem) { .logo-evento { width: 9rem; top: 2.25rem; } }
+  </style>
+
+  <!-- Google Analytics (mesmo ID do restante do site; não recebe nome nem telefone) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YXNT4YQP1H"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YXNT4YQP1H');
+  </script>
+</head>
+<body data-unidade="cacv">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+      <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20zM12 10v4M12 17h.01"/></symbol>
+      <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8a3 3 0 0 1 6 0"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></symbol>
+    </defs>
+  </svg>
+
+  <a class="pular" href="#conteudo">Pular para o cardápio</a>
+
+  <div id="app">
+    <header class="hero">
+      <div class="hero__in">
+        <div class="hero__disco" aria-hidden="true"></div>
+        <h1 class="hero__nome" id="heroNome"><span>Lanchonete</span> <span>Shalom</span></h1>
+        <p class="hero__sub" id="heroSub">Cardápio</p>
+        <img class="logo-evento" src="https://comshalom.org/wp-content/uploads/2026/10/cacv-logo-centro-oeste.png" alt="CACV Centro-Oeste" width="1325" height="585" />
+      </div>
+    </header>
+
+    <main id="conteudo" tabindex="-1">
+      <div id="pub" aria-busy="true">
+        <div class="esqueleto" aria-hidden="true">
+          <span class="esq esq--linha"></span>
+          <span class="esq esq--titulo"></span>
+          <span class="esq esq--bloco"></span>
+          <span class="esq esq--bloco"></span>
+          <span class="esq esq--titulo"></span>
+          <span class="esq esq--linha"></span>
+          <span class="esq esq--linha"></span>
+          <span class="esq esq--linha"></span>
+        </div>
+        <p class="sr" role="status">Carregando o cardápio…</p>
+      </div>
+      <noscript><p class="falha-carga">Para ver o cardápio e pedir pelo celular, ative o JavaScript do navegador.</p></noscript>
+    </main>
+
+    <footer class="rodape" id="rodape"></footer>
+  </div>
+
+  <div id="barra"></div>
+  <div id="camada"></div>
+  <p class="sr" id="anuncio" aria-live="polite" aria-atomic="true"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
+  <script src="../../js/config.js"></script>
+  <script src="../../asasul/sh82/js/sh82.js"></script>
+</body>
+</html>
