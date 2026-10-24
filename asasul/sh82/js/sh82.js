@@ -285,8 +285,22 @@
     $("#heroSub").textContent = u.tipo === "evento" ? marca + " · " + ddmm(u.inicio) + " a " + ddmm(u.fim) + " · Cardápio" : (u.local ? u.local + " · " : "") + "Cardápio";
   }
 
+  /* Horário do item (ex.: almoço a partir das 12h): fora dele o item aparece, mas não dá para pedir. */
+  function hm(t) { var p = String(t).split(":"); return Number(p[0]) + "h" + (p[1] && p[1] !== "00" ? p[1] : ""); }
+  function horarioItem(it) {
+    if (it.hora_de && it.hora_ate) return "das " + hm(it.hora_de) + " às " + hm(it.hora_ate);
+    if (it.hora_de) return "a partir das " + hm(it.hora_de);
+    if (it.hora_ate) return "até as " + hm(it.hora_ate);
+    return "";
+  }
+  function foraDaHora(it) {
+    var a = new Intl.DateTimeFormat("en-GB", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date());
+    return !!((it.hora_de && a < it.hora_de) || (it.hora_ate && a >= it.hora_ate));
+  }
+
   function botaoItem(it, grande) {
     if (it.esgotado) return '<span class="tag">Acabou hoje</span>';
+    if (foraDaHora(it)) return '<span class="tag">' + esc(cap(horarioItem(it))) + "</span>";
     var pode = podePedir(), q = qtdDe(it.id), nome = esc(it.nome);
     if (it.sabores && it.sabores.length) {
       return '<button class="' + (grande ? "btn-y" : "mais") + '" type="button" data-act="sabor" data-id="' + esc(it.id) + '" data-k="sab-' + esc(it.id) + '"' + (pode ? "" : " disabled") +
@@ -335,10 +349,24 @@
     if (!s.aberto) h += '<div class="alerta" role="note">' + ic("i-clock") + '<div class="alerta__txt"><strong>Pedidos pelo celular abrem no horário.</strong>Você já pode olhar o cardápio.</div></div>';
     else if (!s.recebendo) h += '<div class="alerta" role="note">' + ic("i-info") + '<div class="alerta__txt"><strong>Pedidos pelo celular pausados agora.</strong>Faça seu pedido direto no balcão.</div></div>';
 
+    // Evento: tudo o que sai hoje (todos os dias e só hoje) num bloco só, pelos grupos do painel.
+    if (u.tipo === "evento") {
+      var todos = (C.padrao || []).concat(esp);
+      var gs = (C.categorias || []).map(function (c) { return { nome: c.nome, itens: todos.filter(function (i) { return i.categoria_id === c.id; }) }; });
+      var cs = {}; (C.categorias || []).forEach(function (c) { cs[c.id] = 1; });
+      var fora = todos.filter(function (i) { return !cs[i.categoria_id]; });
+      if (fora.length) gs.push({ nome: "Outros", itens: fora });
+      gs = gs.filter(function (g) { return g.itens.length; });
+      h += '<section class="sec" aria-labelledby="hHoje"><h2 class="h" id="hHoje">Hoje <small>' + esc(DIAS[d]) + ", " + esc(ddmm(C.hoje)) + "</small></h2>";
+      h += gs.length ? gs.map(function (g) { return '<h3 class="grupo">' + esc(g.nome) + '</h3><ul class="lista">' + g.itens.map(linhaItem).join("") + "</ul>"; }).join("")
+        : '<p class="vazio">O cardápio de hoje ainda não foi cadastrado.</p>';
+      if (notaDoDia(d)) h += '<p class="nota">' + ic("i-info") + esc(notaDoDia(d)) + "</p>";
+      h += "</section>";
+    } else {
     // Hoje
     h += '<section class="sec" aria-labelledby="hHoje"><h2 class="h" id="hHoje">Hoje <small>' + esc(DIAS[d]) + ", " + esc(ddmm(C.hoje)) + "</small></h2>";
     h += esp.length ? esp.map(function (it) {
-      var desc = it.descricao || (it.sabores && it.sabores.length ? it.sabores.map(function (x) { return x.nome; }).join(", ") : "");
+      var desc = [it.descricao || (it.sabores && it.sabores.length ? it.sabores.map(function (x) { return x.nome; }).join(", ") : ""), cap(horarioItem(it))].filter(Boolean).join(" · ");
       return '<article class="esp"' + (it.esgotado ? " data-acabou" : "") + '><h3 class="esp__nm">' + esc(it.nome) + (it.esgotado ? '<span class="sr"> (acabou hoje)</span>' : "") + "</h3>" +
         '<p class="esp__preco">' + precoTxt(it) + "</p>" + (desc ? '<p class="esp__desc">' + esc(desc) + "</p>" : "") +
         '<div class="esp__acao">' + botaoItem(it, true) + "</div></article>";
@@ -354,13 +382,10 @@
     grupos = grupos.filter(function (g) { return g.itens.length; });
     h += '<section class="sec" aria-labelledby="hPadrao"><h2 class="h" id="hPadrao">Menu padrão <small>todo dia</small></h2>';
     h += grupos.length ? grupos.map(function (g) {
-      return '<h3 class="grupo">' + esc(g.nome) + '</h3><ul class="lista">' + g.itens.map(function (it) {
-        return "<li" + (it.esgotado ? " data-acabou" : "") + '><div class="lin"><span class="lin__nm">' + esc(it.nome) + (it.esgotado ? '<span class="sr"> (acabou hoje)</span>' : "") +
-          '</span><span class="lin__guia" aria-hidden="true"></span><span class="lin__preco">' + precoTxt(it) + "</span></div><div>" + botaoItem(it) + "</div>" +
-          (it.descricao ? '<p class="lista__desc">' + esc(it.descricao) + "</p>" : "") + "</li>";
-      }).join("") + "</ul>";
+      return '<h3 class="grupo">' + esc(g.nome) + '</h3><ul class="lista">' + g.itens.map(linhaItem).join("") + "</ul>";
     }).join("") : '<p class="vazio">O menu padrão ainda não foi cadastrado.</p>';
     h += "</section>";
+    }
 
     // Próximos dias
     var prox = (C.dias || []).slice(1, 8);
@@ -376,10 +401,18 @@
       var sel = prox.filter(function (x) { return x.data === S.diaSel; })[0], sd = dow(sel.data), se = sel.especiais || [];
       h += '<div class="diainfo" aria-live="polite"><p class="diainfo__t">' + esc(cap(DIAS[sd]) + ", " + ddmm(sel.data)) + "</p>" +
         (se.length ? '<ul class="lista">' + se.map(function (it) { return '<li><div class="lin"><span class="lin__nm">' + esc(it.nome) + '</span><span class="lin__guia" aria-hidden="true"></span><span class="lin__preco">' + precoTxt(it) + "</span></div><span></span></li>"; }).join("") + "</ul>"
-          : '<p class="vazio">Só o menu padrão.</p>') +
+          : '<p class="vazio">' + (u.tipo === "evento" ? "Só os itens de todos os dias." : "Só o menu padrão.") + "</p>") +
         (notaDoDia(sd) ? '<p class="nota">' + ic("i-info") + esc(notaDoDia(sd)) + "</p>" : "") + "</div></section>";
     }
     host.innerHTML = h;
+  }
+
+  function linhaItem(it) {
+    // Fora do horário, o horário já está no lugar do botão; não repete na descrição.
+    var desc = [it.descricao, foraDaHora(it) ? "" : cap(horarioItem(it))].filter(Boolean).join(" · ");
+    return "<li" + (it.esgotado ? " data-acabou" : "") + '><div class="lin"><span class="lin__nm">' + esc(it.nome) + (it.esgotado ? '<span class="sr"> (acabou hoje)</span>' : "") +
+      '</span><span class="lin__guia" aria-hidden="true"></span><span class="lin__preco">' + precoTxt(it) + "</span></div><div>" + botaoItem(it) + "</div>" +
+      (desc ? '<p class="lista__desc">' + esc(desc) + "</p>" : "") + "</li>";
   }
 
   function linkInstagram(v) {
