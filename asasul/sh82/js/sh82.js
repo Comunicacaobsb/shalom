@@ -17,8 +17,11 @@
 (function () {
   "use strict";
 
-  var UNIDADE = document.body.getAttribute("data-unidade") || "asasul";
-  var CHAVE = { carrinho: "sh82_carrinho", cliente: "sh82_cliente", pedidos: "sh82_pedidos" };
+  // A página da unidade diz qual é (data-unidade); a página de evento recebe ?u=<id>.
+  var UNIDADE = document.body.getAttribute("data-unidade") || new URLSearchParams(location.search).get("u") || "asasul";
+  // Carrinho e pedidos guardados por unidade; a Asa Sul mantém as chaves de antes.
+  var PREFIXO = UNIDADE === "asasul" ? "sh82" : "lanche_" + UNIDADE;
+  var CHAVE = { carrinho: PREFIXO + "_carrinho", cliente: "sh82_cliente", pedidos: PREFIXO + "_pedidos" };
   var MAX_TOKENS = 10, MAX_LINHA = 20, MAX_TOTAL = 50;
   var ACOMPANHAR_MS = 8000, RECARREGAR_MS = 60000;
 
@@ -265,10 +268,15 @@
   function renderTopo() {
     if (!S.C) return;
     var u = S.C.unidade || {}, nome = String(u.nome || "Lanchonete Shalom").trim(), marca = u.marca || "SH82";
+    var raiz = document.documentElement.style;
+    if (u.cor) raiz.setProperty("--y", u.cor);
+    if (u.cor_fundo) { raiz.setProperty("--ink", u.cor_fundo); var tc = $('meta[name="theme-color"]'); if (tc) tc.setAttribute("content", u.cor_fundo); }
+    document.title = nome + " | " + marca + " · Cardápio";
     var i = nome.indexOf(" ");
     var h1 = $("#heroNome");
     h1.innerHTML = (i > 0 ? "<span>" + esc(nome.slice(0, i)) + "</span> <span>" + esc(nome.slice(i + 1)) + "</span>" : "<span>" + esc(nome) + "</span>") + '<span class="sr"> | ' + esc(marca) + "</span>";
-    $("#heroSub").textContent = (u.local ? u.local + " · " : "") + "Cardápio";
+    var evento = u.tipo === "evento" ? marca + " · " + ddmm(u.inicio) + " a " + ddmm(u.fim) + " · " : "";
+    $("#heroSub").textContent = evento + (u.local ? u.local + " · " : "") + "Cardápio";
   }
 
   function botaoItem(it, grande) {
