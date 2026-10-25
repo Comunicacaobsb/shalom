@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#1F1F1F" />
+  <title>Lanchonete Shalom | SH82</title>
+  <meta name="description" content="Lanchonetes Shalom | SH82 nos centros de evangelização e nos eventos: escolha a sua e peça pelo celular." />
+  <meta property="og:site_name" content="Shalom Brasília" />
+  <meta property="og:title" content="Lanchonete Shalom | SH82" />
+  <meta property="og:description" content="Especiais do dia, menu padrão e pedido pelo celular. Pagamento e confirmação no balcão." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:url" content="https://brasilia.comshalom.org/sh82/" />
+  <meta property="og:image" content="https://brasilia.comshalom.org/images/shalom-asa-sul.webp" />
+  <link rel="canonical" href="https://brasilia.comshalom.org/sh82/" />
+  <meta name="robots" content="index,follow" />
+
+  <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png" />
+
+  <link rel="stylesheet" href="css/sh82.css" />
+
+  <!-- Google Analytics (mesmo ID do restante do site; não recebe nome nem telefone) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YXNT4YQP1H"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YXNT4YQP1H');
+  </script>
+  <style>
+    .hub { display: grid; gap: .75rem; padding-top: 1rem; }
+    .hub__card { display: flex; align-items: center; gap: .9rem; min-height: 4.5rem; padding: 1rem 1.1rem; border: 1.5px solid var(--rule); border-radius: 1.1rem;
+      background: var(--ink-2); color: var(--bone); text-decoration: none; }
+    .hub__card:hover { border-color: var(--y); }
+    .hub__txt { flex: 1; min-width: 0; display: grid; gap: .2rem; }
+    .hub__nome { font-weight: 900; font-size: 1.15rem; letter-spacing: -.01em; }
+    .hub__sit { font-size: .9rem; color: var(--mute); }
+    .hub__sit[data-aberto="sim"] { color: var(--ok); font-weight: 700; }
+    .hub__card .ic { flex: none; color: var(--y); }
+    .hub__card--evento { border-color: var(--ev-cor); background: var(--ev-fundo); color: var(--ev-texto); }
+    .hub__card--evento .hub__sit { color: inherit; opacity: .85; }
+    .hub__card--evento .ic { color: var(--ev-cor); }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs><symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol></defs>
+  </svg>
+  <a class="pular" href="#conteudo">Pular para as lanchonetes</a>
+  <header class="hero">
+    <div class="hero__in">
+      <div class="hero__disco" aria-hidden="true"></div>
+      <h1 class="hero__nome"><span>Lanchonete</span> <span>Shalom</span><span class="sr"> | SH82</span></h1>
+      <p class="hero__sub">Escolha a lanchonete</p>
+      <span class="logo82" aria-hidden="true"><span>SH</span><span>82</span></span>
+    </div>
+  </header>
+  <main id="conteudo" tabindex="-1">
+    <div id="hub" aria-busy="true">
+      <section class="sec"><p class="vazio" role="status">Carregando as lanchonetes…</p></section>
+    </div>
+    <noscript><p class="falha-carga">Para ver as lanchonetes, ative o JavaScript do navegador.</p></noscript>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
+  <script src="../js/config.js"></script>
+  <script src="js/hub.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 import sys, segno
 from PIL import Image, ImageDraw, ImageFont
-URL = "https://brasilia.comshalom.org/asasul/sh82/"
+URL = "https://brasilia.comshalom.org/sh82/asasul/"
 Y, K = (253, 215, 32), (31, 31, 31)
 W, H = 1748, 2480                      # A5 a 300 dpi
 F = "/Users/joaoroque/Library/Fonts/Montserrat-{}.ttf"
@@ -41,7 +41,7 @@ for i, t in enumerate(("Aponte a câmera, monte seu pedido", "e confirme no balc
 # Faixa carvão com o endereço em amarelo
 by = H - 250
 d.rectangle((0, by, W, H), fill=K)
-t = "brasilia.comshalom.org/asasul/sh82"; fu = f("Bold", 64)
+t = "brasilia.comshalom.org/sh82/asasul"; fu = f("Bold", 64)
 d.text(((W - d.textlength(t, font=fu)) / 2, by + 88), t, font=fu, fill=Y)
 
 out = sys.argv[1]
