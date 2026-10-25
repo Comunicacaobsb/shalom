@@ -440,7 +440,7 @@
     if (u.pagamento && u.pagamento.length) h += '<div><h2>Pagamento no balcão</h2><ul class="chips">' + u.pagamento.map(function (p) { return '<li class="tag">' + esc(p) + "</li>"; }).join("") + "</ul></div>";
     if (u.endereco) h += "<div><h2>Onde fica</h2><p>" + esc(u.endereco) + "</p></div>";
     if (u.instagram || u.whatsapp) h += "<div><h2>Contato</h2><p>" + [u.instagram ? linkInstagram(u.instagram) : "", u.whatsapp ? linkWhats(u.whatsapp) : ""].filter(Boolean).join(" · ") + "</p></div>";
-    h += '<p class="rodape__casa">Pedidos pelo celular valem depois da confirmação no balcão. <a href="../">Shalom Asa Sul</a></p>';
+    h += '<p class="rodape__casa">Pedidos pelo celular valem depois da confirmação no balcão. <a href="../">SH82</a></p>';
     f.innerHTML = h;
   }
 
