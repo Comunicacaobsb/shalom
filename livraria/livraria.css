@@ -1,0 +1,129 @@
+/* =====================================================================
+   Livraria Shalom · Brasília · página pública (catálogo + reserva)
+   Identidade da loja online (livrariashalom.org): azul #01478D, creme
+   #FBFAF7, Gabarito nos títulos e Outfit no texto. Aprovada no protótipo
+   shalom-brasilia-sistemas/docs/prototipos/2026-10-27-livraria.html.
+   ===================================================================== */
+:root {
+  --az: #01478D; --az-2: #003A73; --az-claro: #E8EFF7; --cre: #FBFAF7;
+  --txt: #2E2E2E; --mut: #5F5F5F; --lin: #E4E1DA; --borda: #C9C4BA; --pouco: #8A4B00; --erro: #A1271B;
+  --larg: 46rem;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--cre); color: var(--txt); font-family: "Outfit", system-ui, sans-serif; font-size: 1rem; line-height: 1.45; font-variant-numeric: tabular-nums; }
+body.travado { overflow: hidden; }
+button { font: inherit; color: inherit; cursor: pointer; }
+h1, h2, h3, p { margin: 0; }
+ul, ol { list-style: none; margin: 0; padding: 0; }
+:focus-visible { outline: 2px solid var(--az); outline-offset: 3px; border-radius: 8px; }
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.pular { position: absolute; left: 1rem; top: -4rem; z-index: 30; padding: .7rem 1rem; border-radius: .6rem; background: #fff; color: var(--az); font-weight: 700; }
+.pular:focus { top: 1rem; }
+.ic { width: 1.25rem; height: 1.25rem; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+main, .rodape, .meus, .promo, .busca__in { max-width: var(--larg); margin-inline: auto; }
+main { padding-bottom: 7rem; }
+main:focus { outline: 0; }
+
+/* Cabeçalho */
+.topo { background: var(--az); color: #fff; padding: 1.1rem 1.25rem 1.25rem; }
+.topo > * { max-width: var(--larg); margin-inline: auto; }
+.topo__marca { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.topo__logo { height: 2.6rem; width: auto; display: block; filter: brightness(0) invert(1); } /* o arquivo da loja é azul; no cabeçalho azul vai em branco, como na loja */
+.topo__nome { font-family: "Gabarito", sans-serif; font-weight: 800; font-size: 1.5rem; }
+.topo__cidade { font-family: "Gabarito", sans-serif; font-weight: 700; font-size: .95rem; opacity: .95; }
+.topo__sit { display: flex; align-items: center; gap: .5rem; margin-top: 1rem; font-weight: 600; font-size: .95rem; }
+.topo__ponto { width: .6rem; height: .6rem; border-radius: 50%; background: #7EE08A; box-shadow: 0 0 0 4px rgba(126, 224, 138, .25); }
+.topo__ponto[data-fechada] { background: var(--borda); box-shadow: none; }
+.topo__end { margin-top: .2rem; font-size: .88rem; opacity: .9; }
+
+/* Avisos, promoções e reservas do aparelho */
+.aviso, .promo { margin: 1rem 1.25rem 0; padding: .85rem 1rem; border-radius: .9rem; display: flex; gap: .65rem; align-items: flex-start; }
+.aviso { background: #FFF4E0; color: #5C3600; }
+.promo { background: var(--az-claro); color: var(--az-2); }
+.promo b { font-family: "Gabarito", sans-serif; }
+@media (min-width: 49rem) { .aviso, .promo { margin-inline: auto; } }
+.meus { display: grid; gap: .5rem; padding: 1rem 1.25rem 0; }
+.meu { display: flex; align-items: center; gap: .6rem; width: 100%; min-height: 3rem; padding: .6rem .9rem; border: 1.5px solid var(--az); border-radius: .9rem; background: #fff; text-align: left; color: var(--az-2); font-weight: 600; }
+.meu span { flex: 1; }
+
+/* Busca e grupos */
+.busca { position: sticky; top: 0; z-index: 3; background: var(--cre); padding: .9rem 1.25rem .6rem; border-bottom: 1px solid var(--lin); }
+.busca__campo { display: flex; align-items: center; gap: .5rem; height: 2.9rem; padding: 0 .9rem; border: 1.5px solid var(--borda); border-radius: .8rem; background: #fff; }
+.busca__campo:focus-within { border-color: var(--az); }
+.busca__campo input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: inherit; color: var(--txt); }
+.fichas { display: flex; gap: .5rem; overflow-x: auto; margin-top: .7rem; padding-bottom: .2rem; scrollbar-width: none; }
+.ficha { flex: none; min-height: 2.4rem; padding: 0 .95rem; border: 1.5px solid var(--borda); border-radius: 999px; background: #fff; font-weight: 600; font-size: .9rem; }
+.ficha[aria-pressed="true"] { background: var(--az); border-color: var(--az); color: #fff; }
+.grupo { padding: 1.4rem 1.25rem 0; }
+.grupo__t { font-family: "Gabarito", sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--az); padding-bottom: .45rem; border-bottom: 2px solid var(--az); display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.grupo__t small { font-family: "Outfit", sans-serif; font-weight: 500; font-size: .85rem; color: var(--mut); }
+
+/* Linha do catálogo */
+.lin { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: .15rem .75rem; align-items: center; padding: .7rem 0; border-bottom: 1px solid var(--lin); }
+.lin__txt { display: grid; gap: .1rem; min-width: 0; }
+.lin__nm { font-weight: 600; }
+.lin__sub { font-size: .85rem; color: var(--mut); display: flex; flex-wrap: wrap; gap: .25rem .6rem; }
+.lin__preco { font-weight: 700; white-space: nowrap; text-align: right; display: grid; line-height: 1.2; }
+.lin__preco s { font-weight: 500; color: var(--mut); font-size: .8rem; }
+.lin__preco small { font-weight: 500; color: var(--mut); font-size: .75rem; }
+.lin[data-esgotado] .lin__nm, .lin[data-esgotado] .lin__preco { color: var(--mut); }
+.pouco { color: var(--pouco); font-weight: 600; }
+.tag { display: inline-flex; align-items: center; min-height: 1.6rem; padding: 0 .6rem; border-radius: 999px; background: #EDEAE3; color: var(--mut); font-size: .8rem; font-weight: 600; }
+.mais { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 1.5px solid var(--az); background: #fff; color: var(--az); }
+.mais:disabled { opacity: .4; cursor: not-allowed; }
+.passos { display: flex; align-items: center; gap: .25rem; padding: .2rem; border-radius: 999px; background: var(--az); color: #fff; }
+.passos button { display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border: 0; border-radius: 50%; background: none; }
+.passos button:disabled { opacity: .4; cursor: not-allowed; }
+.passos output { min-width: 1.4rem; text-align: center; font-weight: 700; }
+.vazio { padding: 1.2rem 1.25rem; color: var(--mut); }
+.rodape { padding: 1.2rem 1.25rem 7rem; margin-top: 1rem; border-top: 1px solid var(--lin); font-size: .88rem; color: var(--mut); display: grid; gap: .4rem; }
+.rodape a { color: var(--az); font-weight: 600; }
+
+/* Barra fixa no rodapé */
+.barra { position: fixed; left: .75rem; right: .75rem; bottom: max(.75rem, env(safe-area-inset-bottom)); z-index: 5; max-width: calc(var(--larg) - 1.5rem); margin-inline: auto; display: flex; align-items: center; gap: .75rem; padding: .55rem .55rem .55rem 1.1rem; border-radius: 999px; background: var(--az); color: #fff; box-shadow: 0 14px 30px -12px rgba(1, 71, 141, .7); }
+.barra__txt { flex: 1; font-weight: 600; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; min-height: 2.9rem; padding: 0 1.2rem; border-radius: 999px; border: 0; font-weight: 700; text-decoration: none; }
+.btn--az { background: var(--az); color: #fff; }
+.btn--claro { background: #fff; color: var(--az); }
+.btn--borda { background: #fff; color: var(--az); border: 1.5px solid var(--az); }
+.btn--link { background: none; color: var(--az); text-decoration: underline; min-height: 2.75rem; }
+.btn--larga { width: 100%; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Folha (diálogo de baixo para cima) */
+.camada { position: fixed; inset: 0; z-index: 10; display: flex; align-items: flex-end; justify-content: center; background: rgba(10, 20, 40, .45); }
+.folha { width: 100%; max-width: 34rem; max-height: 92dvh; display: flex; flex-direction: column; background: #fff; border-radius: 1.4rem 1.4rem 0 0; animation: subir .22s ease-out; }
+.folha--fixa { animation: none; }
+.folha:focus { outline: 0; }
+@keyframes subir { from { transform: translateY(1.5rem); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .folha { animation: none; } }
+@media (min-width: 49rem) { .camada { align-items: center; } .folha { border-radius: 1.4rem; max-height: 86dvh; } }
+.folha__topo { display: flex; align-items: flex-start; gap: .75rem; padding: 1.2rem 1.25rem .6rem; }
+.folha__topo > div { flex: 1; }
+.folha__topo h2 { font-family: "Gabarito", sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--az-2); }
+.folha__topo p { font-size: .9rem; color: var(--mut); margin-top: .2rem; }
+.fechar { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 0; border-radius: 50%; background: #EDEAE3; flex: none; }
+.folha__corpo { overflow-y: auto; padding: .4rem 1.25rem 1rem; display: grid; gap: 1rem; }
+.folha__pe { padding: .8rem 1.25rem max(1.1rem, env(safe-area-inset-bottom)); border-top: 1px solid var(--lin); display: grid; gap: .5rem; }
+.campo { display: grid; gap: .3rem; }
+.campo label, .campo__rot { font-weight: 700; font-size: .92rem; }
+.campo input { height: 3rem; padding: 0 .9rem; border: 1.5px solid var(--borda); border-radius: .8rem; font: inherit; background: #fff; color: var(--txt); }
+.campo input:focus { outline: 0; border-color: var(--az); box-shadow: 0 0 0 3px rgba(1, 71, 141, .2); }
+.campo input[aria-invalid="true"] { border-color: var(--erro); }
+.campo__erro { color: var(--erro); font-size: .85rem; font-weight: 600; }
+.isca { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.dias { display: flex; flex-wrap: wrap; gap: .45rem; }
+.dia { min-height: 2.75rem; padding: 0 .85rem; border: 1.5px solid var(--borda); border-radius: .8rem; background: #fff; font-weight: 600; font-size: .9rem; }
+.dia[aria-checked="true"] { background: var(--az); border-color: var(--az); color: #fff; }
+.linha-res { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .55rem 0; border-bottom: 1px solid var(--lin); }
+.total { display: flex; justify-content: space-between; font-weight: 800; font-size: 1.2rem; }
+.nota { font-size: .85rem; color: var(--mut); }
+.erro { padding: .7rem .9rem; border-radius: .8rem; background: #FBE9E7; color: var(--erro); font-weight: 600; font-size: .9rem; }
+.cod { font-family: "Gabarito", sans-serif; font-weight: 800; font-size: 3rem; color: var(--az); line-height: 1; }
+.etapas { display: grid; gap: .6rem; }
+.etapa { display: flex; align-items: center; gap: .7rem; color: var(--mut); }
+.etapa__m { width: 1.9rem; height: 1.9rem; border-radius: 50%; border: 2px solid var(--borda); display: grid; place-items: center; font-weight: 700; font-size: .85rem; background: #fff; }
+.etapa[data-feito] { color: var(--txt); font-weight: 600; }
+.etapa[data-feito] .etapa__m { background: var(--az); border-color: var(--az); color: #fff; }
