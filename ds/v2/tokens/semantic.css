@@ -1,0 +1,696 @@
+/* ARQUIVO GERADO por scripts/gerar-tokens.mjs a partir de tokens/tokens.json — NÃO EDITE À MÃO; edite o JSON e regenere */
+
+/* ===========================================================================
+   Shalom DS — Camada 2: semânticos
+   Tema base: Shalom institucional / Brasília, esquema claro.
+   Esta é a ÚNICA camada que componentes podem consumir.
+   Todo par texto/fundo aqui foi verificado em WCAG 2.2 (AA 4.5:1 para texto,
+   3:1 para limites e indicadores). Os ratios estão anotados nos casos justos.
+   =========================================================================== */
+
+@layer sh.tokens {
+  :root {
+    color-scheme: light;
+
+    /* -------------------------------------------------------- superfícies */
+    --sh-surface-page:           var(--sh-neutral-50);
+    --sh-surface-sunken:         var(--sh-neutral-100);
+    --sh-surface-default:        var(--sh-white);
+    --sh-surface-raised:         var(--sh-white);
+    --sh-surface-subtle:         var(--sh-navy-50);
+    --sh-surface-inverse:        var(--sh-navy-800);
+    --sh-surface-brand:          var(--sh-navy-700);
+    --sh-surface-brand-subtle:   var(--sh-navy-100);
+    --sh-surface-accent:         var(--sh-ember-500);
+    --sh-surface-accent-subtle:  var(--sh-ember-100);
+    --sh-surface-accent-border:  var(--sh-ember-700);
+    --sh-surface-disabled:       var(--sh-neutral-100);
+    --sh-surface-hover:          var(--sh-neutral-100);
+    --sh-surface-active:         var(--sh-neutral-200);
+    --sh-surface-selected:       var(--sh-navy-50);
+
+    /* 0.62 e não 0.56: o véu tem de garantir --sh-text-on-scrim mesmo quando a
+       foto por baixo é branca. A 0.56 o composto sobe a #768292 e o branco cai
+       a 3.89:1; a 0.62 fica em #687587 e marca 4.70:1. Diferença invisível num
+       modal, decisiva num herói com imagem. */
+    --sh-surface-scrim: rgb(var(--sh-shadow-rgb) / 0.62);
+
+    /* Brilho que varre uma superfície em espera (esqueleto de carregamento).
+       É superfície, não texto: nunca carrega informação e não tem piso de
+       contraste. Aponta para o gradiente do emblema — a luz da pomba. */
+    --sh-surface-sheen: var(--sh-gradient-breath);
+
+    /* -------------------------------------------------------------- texto */
+    --sh-text-strong:       var(--sh-navy-900);  /* 15.45 sobre page */
+    --sh-text-default:      var(--sh-neutral-800);  /* 10.92 sobre page */
+    --sh-text-muted:        var(--sh-neutral-600);  /* 4.97 sobre page */
+    --sh-text-placeholder:  var(--sh-neutral-600);
+    --sh-text-disabled:     var(--sh-neutral-500);  /* só em controle inerte */
+    --sh-text-inverse:      var(--sh-navy-50);  /* 12.56 sobre inverse */
+    --sh-text-on-brand:     var(--sh-white);  /* 8.62 sobre brand */
+    --sh-text-on-accent:    var(--sh-navy-950);  /* 6.78 sobre accent */
+
+    /* O conjunto `on-brand` existe porque --sh-surface-brand muda de claridade
+       por tema e por esquema (navy-700 aqui, navy-400 no escuro, gold-light no
+       jubileu escuro, creme no acamp's). Quem escreve sobre a marca tem de
+       acompanhar. Ver o escopo [data-sh-surface="brand"] no fim do arquivo. */
+    --sh-text-on-brand-muted:       var(--sh-navy-100);  /* 7.39 sobre brand */
+    --sh-text-on-brand-link:        var(--sh-ember-200);  /* 6.60 sobre brand */
+    --sh-text-on-brand-link-hover:  var(--sh-white);  /* 8.62 sobre brand */
+
+    /* Par de --sh-surface-scrim. NÃO É REMAPEADO POR ESQUEMA — de propósito, e
+       este é o único token de texto do sistema com essa regra. Uma foto de
+       herói não escurece quando a pessoa liga o modo escuro; o véu também não.
+       Quem inverte junto com o esquema acaba pintando tinta escura sobre um véu
+       escuro (medido: 1.00:1). Se aparecer em dark.css ou no bloco escuro de um
+       tema, é bug. Pior caso (foto branca sob o véu): 4.70:1. */
+    --sh-text-on-scrim:      var(--sh-white);
+    --sh-text-brand:         var(--sh-navy-700);  /* 8.17 sobre page */
+    --sh-text-accent:        var(--sh-ember-700);  /* 5.29 sobre page */
+    --sh-text-link:          var(--sh-navy-700);
+    --sh-text-link-hover:    var(--sh-navy-800);
+    --sh-text-link-visited:  var(--sh-navy-800);
+    --sh-text-success:       var(--sh-success-700);
+    --sh-text-warning:       var(--sh-warning-700);
+    --sh-text-danger:        var(--sh-danger-700);
+    --sh-text-info:          var(--sh-info-700);
+
+    /* ------------------------------------------------------------- bordas */
+    --sh-border-subtle:           var(--sh-neutral-200);  /* decorativa */
+    --sh-border-default:          var(--sh-neutral-300);  /* decorativa */
+    --sh-border-control:          var(--sh-neutral-500);  /* 3.36 sobre branco — mínimo de 1.4.11 */
+    --sh-border-strong:           var(--sh-neutral-600);
+    --sh-border-brand:            var(--sh-navy-700);
+    --sh-border-accent:           var(--sh-ember-700);
+    --sh-border-inverse:          var(--sh-navy-600);
+    --sh-border-on-brand:         var(--sh-navy-500);  /* decorativa dentro da marca */
+    --sh-border-on-brand-strong:  var(--sh-navy-300);  /* 4.83 sobre brand — limite de controle */
+
+    /* Limite de indicador pequeno (caixa de seleção, marca de option-card).
+       Não pode ser --sh-border-control: neutral-500 cai a 2.97 sobre o
+       rebaixado no claro base. Segue --sh-border-strong, que os temas e o
+       escuro já remapeiam; pior caso medido nos 6 cenários: 4.63 sobre
+       --sh-surface-sunken, 5.06 sobre --sh-surface-default. Um tema pode
+       afinar a caixa sem mexer no campo. */
+    --sh-border-indicator:  var(--sh-border-strong);
+    --sh-border-disabled:   var(--sh-neutral-300);
+    --sh-border-success:    var(--sh-success-600);
+    --sh-border-warning:    var(--sh-warning-600);
+    --sh-border-danger:     var(--sh-danger-600);
+    --sh-border-info:       var(--sh-info-600);
+
+    /* -------------------------------------------------------------- ações */
+    --sh-action-primary-bg:         var(--sh-navy-700);
+    --sh-action-primary-bg-hover:   var(--sh-navy-800);
+    --sh-action-primary-bg-active:  var(--sh-navy-900);
+    --sh-action-primary-fg:         var(--sh-white);
+    --sh-action-primary-border:     var(--sh-navy-700);
+
+    --sh-action-secondary-bg:         var(--sh-white);
+    --sh-action-secondary-bg-hover:   var(--sh-navy-50);
+    --sh-action-secondary-bg-active:  var(--sh-navy-100);
+    --sh-action-secondary-fg:         var(--sh-navy-700);
+    --sh-action-secondary-border:     var(--sh-navy-700);
+
+    --sh-action-ghost-bg:         transparent;
+    --sh-action-ghost-bg-hover:   var(--sh-navy-50);
+    --sh-action-ghost-bg-active:  var(--sh-navy-100);
+    --sh-action-ghost-fg:         var(--sh-navy-700);
+    --sh-action-ghost-border:     transparent;
+
+    /* O botão de acento é o único que exige contorno: o preenchido
+       #f27c23 marca 2.59 contra o canvas e não cumpre 1.4.11 sozinho. */
+    --sh-action-accent-bg:         var(--sh-ember-500);
+    --sh-action-accent-bg-hover:   var(--sh-ember-600);
+    --sh-action-accent-bg-active:  var(--sh-ember-700);
+    --sh-action-accent-fg:         var(--sh-navy-950);
+    --sh-action-accent-border:     var(--sh-ember-700);  /* 5.29 sobre page */
+
+    --sh-action-danger-bg:         var(--sh-danger-700);
+    --sh-action-danger-bg-hover:   var(--sh-danger-800);
+    --sh-action-danger-bg-active:  var(--sh-danger-900);
+    --sh-action-danger-fg:         var(--sh-white);
+    --sh-action-danger-border:     var(--sh-danger-700);
+
+    --sh-action-disabled-bg:      var(--sh-neutral-200);
+    --sh-action-disabled-fg:      var(--sh-neutral-600);
+    --sh-action-disabled-border:  var(--sh-neutral-300);
+
+    /* ------------------------------------------ ação sobre véu (on-scrim) */
+    /* Par de --sh-text-on-scrim, com a MESMA regra: NÃO É REMAPEADO POR
+       ESQUEMA. Se aparecer em dark.css, é bug — a foto do herói não escurece
+       quando a pessoa liga o modo escuro, então a ação que mora sobre ela
+       também não pode inverter. Um tema PODE remapear (o acamp's remapeia,
+       porque o "branco" dele é creme).
+
+       Por que existe: --sh-action-primary-bg é tinta calculada contra o
+       CANVAS, não contra o véu. No escuro base ele é navy-400 sobre um véu
+       rgb(2 9 24 / .72) — o texto do botão passa, mas a SILHUETA do botão
+       contra o véu fica fraca, e 1.4.11 (não-texto) pede 3:1 do limite de um
+       controle contra o que está em volta. Sobre véu, o preenchimento tem de
+       ser CLARO: a mesma tinta do texto que já se provou legível ali.
+
+       bg = --sh-text-on-scrim de propósito: um tema que troca a tinta do véu
+       (acamp's → creme) leva o botão junto sem declarar mais nada; só o par
+       escuro (fg) precisa de linha própria. */
+    --sh-action-primary-bg-on-scrim:   var(--sh-text-on-scrim);
+    --sh-action-primary-bg-hover-on-scrim: var(--sh-navy-50);
+    --sh-action-primary-bg-active-on-scrim: var(--sh-navy-100);
+    --sh-action-primary-fg-on-scrim:   var(--sh-navy-900);
+    --sh-action-primary-border-on-scrim: var(--sh-text-on-scrim);
+
+    /* -------------------------------------------------------------- vidro */
+    /* O vidro do Shalom DS é O VÉU COM DESFOQUE. Não é uma superfície nova:
+       é --sh-surface-scrim com quatro pontos a mais de alfa, o mesmo
+       --sh-text-on-scrim por cima e um fio de luz na borda. Daí sai a
+       propriedade que torna o efeito defensável: quem garante a leitura é o
+       ALFA, não o backdrop-filter. Desligue o desfoque e o contraste continua
+       de pé; ligue e ele só fica mais bonito.
+
+       O véu mínimo garantido, medido, pior caso = foto 100% BRANCA sob o vidro,
+       desfoque DESLIGADO, texto --sh-text-on-scrim:
+         alfa 0.62 (o do scrim) → composto #687587 → 4,70:1  (passa raspando)
+         alfa 0.66 (o do vidro) → composto #5e6c7f → 5,28:1  (margem de 0,78)
+       Os quatro pontos a mais existem para essa margem: o scrim mora sob um
+       herói inteiro, onde a área é grande e o olho ajuda; o vidro mora em
+       cartão e botão, onde o texto é pequeno e não há a quem apelar.
+       Não baixe daqui sem refazer a conta em prova-vidro.html.
+
+       Por que o véu é ESCURO nos dois esquemas: mesma razão de DEC-023 — a
+       foto por baixo não escurece quando a pessoa liga o modo escuro. O par
+       vidro/tinta acompanha --sh-surface-scrim e --sh-text-on-scrim, que já
+       não são remapeados por esquema (só por tema).
+
+       Os DOIS limites do vidro. WCAG 1.4.11 pede 3:1 do limite do controle
+       contra o que está em volta, e "em volta" aqui é uma foto desconhecida.
+       Um valor só nunca cobre os dois extremos, então o vidro tem dois:
+         · o VÉU, escuro — resolve a foto clara (5,28:1 contra branco);
+         · o FIO, --sh-glass-border, claro — resolve a foto escura (contra
+           preto o fio composto marca bem acima de 3:1).
+       Em qualquer foto real pelo menos um dos dois está visível. Medido nos
+       seis cenários, com e sem desfoque, em prova-vidro.html.
+
+       --sh-glass-solid é a degradação: o MESMO véu com alfa 1. Quando não há
+       backdrop-filter (ou a pessoa pediu menos transparência), o vidro vira
+       chapa opaca da mesma tinta — nunca um retângulo semitransparente
+       ilegível. Ver o bloco @supports em cada componente de vidro. */
+    --sh-glass-veil:         rgb(var(--sh-shadow-rgb) / 0.66);
+    --sh-glass-veil-hover:   rgb(var(--sh-shadow-rgb) / 0.74);
+    --sh-glass-veil-active:  rgb(var(--sh-shadow-rgb) / 0.82);
+    --sh-glass-solid:        rgb(var(--sh-shadow-rgb) / 1);
+    --sh-glass-ink:          var(--sh-text-on-scrim);
+
+    /* Os dois fios. Borda inteira, nunca de um lado só (DEC-024).
+
+       Um fio só nunca resolve foto desconhecida: contra a região clara da
+       imagem some o fio claro, contra a escura some o escuro. O vidro sobre
+       fundo cru sai então com DOIS anéis de 1px — o de dentro claro
+       (--sh-glass-border), o de fora escuro (--sh-glass-keyline, um box-shadow
+       de espalhamento 1px). Para qualquer luminância de fundo pelo menos um
+       dos dois marca 3:1, e é isso que 1.4.11 pede.
+
+       As duas dosagens saíram de medição, não de gosto. Com um fio só a 42%
+       o cartão sobre foto caía a 1,39:1. Com dois anéis, fio a 60% e anel a
+       0,9 de alfa, ainda sobrava um buraco em volta de luminância 0,17 do
+       fundo — ali o anel media 2,36 e o fio 2,49, porque os dois ficavam
+       PERTO do meio-tom. Fechar o buraco exigiu afastar os dois extremos: o
+       fio subiu para 75% da tinta e o anel virou opaco e quase preto (62% do
+       véu do tema + preto). Aí, para qualquer luminância de fundo entre 0 e
+       1, um dos dois passa de 3:1. Os números cenário a cenário estão em
+       prova-vidro.html.
+
+       O anel é escuro mas continua tingido pelo tema — 62% da tinta do véu —
+       porque preto puro sujaria a paleta fria, a mesma razão das sombras.
+
+       --sh-glass-keyline sai de --sh-glass-solid, que cada tema já declara:
+       um tema novo ganha o anel escuro certo sem escrever mais uma linha. */
+    --sh-glass-border:    color-mix(in srgb, var(--sh-glass-ink) 75%, transparent);
+    --sh-glass-keyline:   color-mix(in srgb, var(--sh-glass-solid) 62%, rgb(0 0 0));
+    --sh-glass-sheen:     color-mix(in srgb, var(--sh-glass-ink) 26%, transparent);
+    --sh-glass-shadow:    0 var(--sh-space-2) var(--sh-space-8) rgb(var(--sh-shadow-rgb) / 0.32);
+    --sh-glass-blur:      16px;
+    --sh-glass-saturate:  140%;
+
+    /* Ordem importa: satura primeiro, borra depois. O contrário lava a cor. */
+    --sh-glass-filter: saturate(var(--sh-glass-saturate)) blur(var(--sh-glass-blur));
+
+    /* Vidro de SUPERFÍCIE — a segunda família, e a última.
+       Serve a UM caso: barra fixa que atravessa a própria página (o cabeçalho
+       rolado do asasul/). Ali não há foto: o que passa por baixo é conteúdo do
+       site, com a tinta normal da página por cima. Por isso a tinta aqui é
+       --sh-text-default, e não --sh-glass-ink.
+
+       Alfa 0.86 e não 0.90: pior caso é conteúdo 100% preto passando sob a
+       barra no esquema claro; a 0.86 o composto fica em #dbdbdb e o
+       --sh-text-default marca 9,7:1. Abaixo de 0.60 o par cai de 4,5:1 — é o
+       piso teórico, e 0.86 é onde ele fica confortável sem virar chapa. */
+    --sh-glass-surface:        color-mix(in srgb, var(--sh-surface-default) 86%, transparent);
+    --sh-glass-surface-solid:  var(--sh-surface-default);
+
+    /* ---------------------------------------------------- vidro SOBRE VÉU */
+    /* O vidro se adapta ao que está por baixo, e há só dois "por baixo":
+
+       1. Fundo cru (foto, cor de seção) → o véu escuro acima. O vidro se
+          garante sozinho, porque não há nada garantindo por ele.
+       2. Área JÁ VELADA (herói com foto, cabeçalho transparente, escopo
+          scrim) → aqui o véu escuro seria o segundo véu sobre o mesmo ponto:
+          o botão afunda no fundo em vez de se levantar dele, e a silhueta
+          morre (medido: 1,01 a 2,81 nos seis cenários, com e sem desfoque).
+          Sobre véu o vidro é FILME CLARO — a mesma inversão que o conjunto
+          -on-scrim já faz com a ação preenchida (ver acima), e é o que o
+          asasul/ faz no herói dele: rgba(255,255,255,.15) sobre a foto
+          escurecida.
+
+       Quem garante o quê, no caso 2: o TEXTO é garantido pelo véu do
+       hospedeiro, que já se provou nos seis cenários; a SILHUETA é garantida
+       pelo fio, que aqui é a tinta inteira (--sh-glass-ink sem alfa), e não
+       os 42% do caso 1 — contra o véu do hospedeiro o fio a 42% mede 2,29 e
+       inteiro mede 4,70.
+
+       Degradação sem backdrop-filter: fundo transparente e fio inteiro. Não
+       é "chapa" porque chapa aqui seria uma mancha opaca no meio de uma foto
+       já velada; é o botão de contorno que o sistema já usa dentro de
+       sh-hero--cover, com contraste provado.
+
+       Quem aplica: os hospedeiros velados ([data-sh-surface="scrim"] aqui,
+       .sh-hero--cover e .sh-header--transparent na camada de componentes).
+       Vidro DENTRO de vidro continua proibido — são três camadas, e a
+       terceira não tem mais de onde tirar contraste. */
+    --sh-glass-veil-on-veil:         color-mix(in srgb, var(--sh-glass-ink) 16%, transparent);
+    --sh-glass-veil-hover-on-veil:   color-mix(in srgb, var(--sh-glass-ink) 26%, transparent);
+    --sh-glass-veil-active-on-veil:  color-mix(in srgb, var(--sh-glass-ink) 34%, transparent);
+    --sh-glass-solid-on-veil:        transparent;
+    --sh-glass-border-on-veil:       var(--sh-glass-ink);
+
+    /* Sem anel escuro sobre véu: o véu do hospedeiro já é escuro, o anel
+       sumiria nele e ainda somaria mais uma linha de sujeira à foto. Aqui
+       quem delimita é o fio inteiro. */
+    --sh-glass-keyline-on-veil: transparent;
+
+    /* O vidro do Shalom DS é O VÉU COM DESFOQUE. Não é uma superfície nova:
+       é --sh-surface-scrim com quatro pontos a mais de alfa, o mesmo
+       --sh-text-on-scrim por cima e um fio de luz na borda. Daí sai a
+       propriedade que torna o efeito defensável: quem garante a leitura é o
+       ALFA, não o backdrop-filter. Desligue o desfoque e o contraste continua
+       de pé; ligue e ele só fica mais bonito.
+
+       O véu mínimo garantido, medido, pior caso = foto 100% BRANCA sob o vidro,
+       desfoque DESLIGADO, texto --sh-text-on-scrim:
+         alfa 0.62 (o do scrim) → composto #687587 → 4,70:1  (passa raspando)
+         alfa 0.66 (o do vidro) → composto #5e6c7f → 5,28:1  (margem de 0,78)
+       Os quatro pontos a mais existem para essa margem: o scrim mora sob um
+       herói inteiro, onde a área é grande e o olho ajuda; o vidro mora em
+       cartão e botão, onde o texto é pequeno e não há a quem apelar.
+       Não baixe daqui sem refazer a conta em prova-vidro.html.
+
+       Por que o véu é ESCURO nos dois esquemas: mesma razão de DEC-023 — a
+       foto por baixo não escurece quando a pessoa liga o modo escuro. O par
+       vidro/tinta acompanha --sh-surface-scrim e --sh-text-on-scrim, que já
+       não são remapeados por esquema (só por tema).
+
+       Os DOIS limites do vidro. WCAG 1.4.11 pede 3:1 do limite do controle
+       contra o que está em volta, e "em volta" aqui é uma foto desconhecida.
+       Um valor só nunca cobre os dois extremos, então o vidro tem dois:
+         · o VÉU, escuro — resolve a foto clara (5,28:1 contra branco);
+         · o FIO, --sh-glass-border, claro — resolve a foto escura (contra
+           preto o fio composto marca bem acima de 3:1).
+       Em qualquer foto real pelo menos um dos dois está visível. Medido nos
+       seis cenários, com e sem desfoque, em prova-vidro.html.
+
+       --sh-glass-solid é a degradação: o MESMO véu com alfa 1. Quando não há
+       backdrop-filter (ou a pessoa pediu menos transparência), o vidro vira
+       chapa opaca da mesma tinta — nunca um retângulo semitransparente
+       ilegível. Ver o bloco @supports em cada componente de vidro. */
+    --sh-glass-veil:         rgb(var(--sh-shadow-rgb) / 0.66);
+    --sh-glass-veil-hover:   rgb(var(--sh-shadow-rgb) / 0.74);
+    --sh-glass-veil-active:  rgb(var(--sh-shadow-rgb) / 0.82);
+    --sh-glass-solid:        rgb(var(--sh-shadow-rgb) / 1);
+    --sh-glass-ink:          var(--sh-text-on-scrim);
+
+    /* Os dois fios. Borda inteira, nunca de um lado só (DEC-024).
+
+       Um fio só nunca resolve foto desconhecida: contra a região clara da
+       imagem some o fio claro, contra a escura some o escuro. O vidro sobre
+       fundo cru sai então com DOIS anéis de 1px — o de dentro claro
+       (--sh-glass-border), o de fora escuro (--sh-glass-keyline, um box-shadow
+       de espalhamento 1px). Para qualquer luminância de fundo pelo menos um
+       dos dois marca 3:1, e é isso que 1.4.11 pede.
+
+       As duas dosagens saíram de medição, não de gosto. Com um fio só a 42%
+       o cartão sobre foto caía a 1,39:1. Com dois anéis, fio a 60% e anel a
+       0,9 de alfa, ainda sobrava um buraco em volta de luminância 0,17 do
+       fundo — ali o anel media 2,36 e o fio 2,49, porque os dois ficavam
+       PERTO do meio-tom. Fechar o buraco exigiu afastar os dois extremos: o
+       fio subiu para 75% da tinta e o anel virou opaco e quase preto (62% do
+       véu do tema + preto). Aí, para qualquer luminância de fundo entre 0 e
+       1, um dos dois passa de 3:1. Os números cenário a cenário estão em
+       prova-vidro.html.
+
+       O anel é escuro mas continua tingido pelo tema — 62% da tinta do véu —
+       porque preto puro sujaria a paleta fria, a mesma razão das sombras.
+
+       --sh-glass-keyline sai de --sh-glass-solid, que cada tema já declara:
+       um tema novo ganha o anel escuro certo sem escrever mais uma linha. */
+    --sh-glass-border:    color-mix(in srgb, var(--sh-glass-ink) 75%, transparent);
+    --sh-glass-keyline:   color-mix(in srgb, var(--sh-glass-solid) 62%, rgb(0 0 0));
+    --sh-glass-sheen:     color-mix(in srgb, var(--sh-glass-ink) 26%, transparent);
+    --sh-glass-shadow:    0 var(--sh-space-2) var(--sh-space-8) rgb(var(--sh-shadow-rgb) / 0.32);
+    --sh-glass-blur:      16px;
+    --sh-glass-saturate:  140%;
+
+    /* Ordem importa: satura primeiro, borra depois. O contrário lava a cor. */
+    --sh-glass-filter: saturate(var(--sh-glass-saturate)) blur(var(--sh-glass-blur));
+
+    /* Vidro de SUPERFÍCIE — a segunda família, e a última.
+       Serve a UM caso: barra fixa que atravessa a própria página (o cabeçalho
+       rolado do asasul/). Ali não há foto: o que passa por baixo é conteúdo do
+       site, com a tinta normal da página por cima. Por isso a tinta aqui é
+       --sh-text-default, e não --sh-glass-ink.
+
+       Alfa 0.86 e não 0.90: pior caso é conteúdo 100% preto passando sob a
+       barra no esquema claro; a 0.86 o composto fica em #dbdbdb e o
+       --sh-text-default marca 9,7:1. Abaixo de 0.60 o par cai de 4,5:1 — é o
+       piso teórico, e 0.86 é onde ele fica confortável sem virar chapa. */
+    --sh-glass-surface:        color-mix(in srgb, var(--sh-surface-default) 86%, transparent);
+    --sh-glass-surface-solid:  var(--sh-surface-default);
+
+    /* ----------------------------------------------------------- feedback */
+    --sh-feedback-success-surface:   var(--sh-success-50);
+    --sh-feedback-success-border:    var(--sh-success-600);
+    --sh-feedback-success-text:      var(--sh-success-700);
+    --sh-feedback-success-solid:     var(--sh-success-700);
+    --sh-feedback-success-on-solid:  var(--sh-white);
+
+    --sh-feedback-warning-surface:   var(--sh-warning-50);
+    --sh-feedback-warning-border:    var(--sh-warning-600);
+    --sh-feedback-warning-text:      var(--sh-warning-700);
+    --sh-feedback-warning-solid:     var(--sh-warning-700);
+    --sh-feedback-warning-on-solid:  var(--sh-white);
+
+    --sh-feedback-danger-surface:   var(--sh-danger-50);
+    --sh-feedback-danger-border:    var(--sh-danger-600);
+    --sh-feedback-danger-text:      var(--sh-danger-700);
+    --sh-feedback-danger-solid:     var(--sh-danger-700);
+    --sh-feedback-danger-on-solid:  var(--sh-white);
+
+    --sh-feedback-info-surface:   var(--sh-info-50);
+    --sh-feedback-info-border:    var(--sh-info-600);
+    --sh-feedback-info-text:      var(--sh-info-700);
+    --sh-feedback-info-solid:     var(--sh-info-700);
+    --sh-feedback-info-on-solid:  var(--sh-white);
+
+    /* --------------------------------------------------------------- foco */
+    /* Anel de duas camadas: halo da cor do fundo + anel de marca.
+       Funciona sobre qualquer superfície, inclusive botões preenchidos. */
+    --sh-focus-halo:      var(--sh-surface-page);
+    --sh-focus-color:     var(--sh-navy-700);  /* 8.17 sobre page */
+    --sh-focus-on-brand:  var(--sh-ember-300);  /* 5.39 sobre brand */
+    --sh-focus-offset:    2px;
+    --sh-focus-width:     3px;
+    --sh-focus-ring:      0 0 0 var(--sh-focus-offset) var(--sh-focus-halo),
+                          0 0 0 calc(var(--sh-focus-offset) + var(--sh-focus-width)) var(--sh-focus-color);
+
+    /* ----------------------------------------------------------- elevação */
+    /* Sombras tingidas de navy. Preto puro suja a paleta fria. */
+    --sh-shadow-none:    none;
+    --sh-shadow-sm:      0 1px 2px rgb(var(--sh-shadow-rgb) / 0.08);
+    --sh-shadow-md:      0 2px 4px rgb(var(--sh-shadow-rgb) / 0.06),
+                         0 8px 20px rgb(var(--sh-shadow-rgb) / 0.10);
+    --sh-shadow-lg:      0 4px 8px rgb(var(--sh-shadow-rgb) / 0.06),
+                         0 16px 40px rgb(var(--sh-shadow-rgb) / 0.14);
+    --sh-shadow-xl:      0 8px 16px rgb(var(--sh-shadow-rgb) / 0.08),
+                         0 28px 72px rgb(var(--sh-shadow-rgb) / 0.20);
+    --sh-shadow-raised:  var(--sh-shadow-md);
+    --sh-shadow-inset:   inset 0 1px 2px rgb(var(--sh-shadow-rgb) / 0.08);
+
+    /* ---------------------------------------------------- forma semântica */
+    /* Temas remapeiam estes, nunca a escala bruta de raio. */
+    --sh-radius-control:  var(--sh-radius-sm);
+    --sh-radius-surface:  var(--sh-radius-md);
+    --sh-radius-media:    var(--sh-radius-lg);
+    --sh-radius-pill:     var(--sh-radius-full);
+    --sh-radius-field:    var(--sh-radius-sm);
+
+    /* Indicador pequeno: acompanha o controle, mas com teto. Sem o teto, o
+       --sh-radius-control em pílula do acamp's arredondaria a caixa de seleção
+       até virar círculo — indistinguível de um radio. */
+    --sh-radius-indicator: min(var(--sh-radius-control), var(--sh-radius-xs));
+
+    /* -------------------------------------------------------------- pomba */
+    /* ember-600 e não ember-500. O logotipo é dispensado de contraste pela
+       WCAG, mas marca invisível não serve a ninguém: ember-500 sobre a página
+       clara media 2,59:1 e sobre o cartão branco 2,73:1 — a silhueta sumia no
+       creme. ember-600 é o degrau seguinte da MESMA rampa âmbar do emblema
+       (não é outra cor, é o mesmo laranja um passo mais fundo) e leva os dois
+       casos a 3,58:1 e 3,78:1. No escuro continua confortável: 4,31 sobre
+       navy-900 e 4,90 sobre navy-950. DEC-029. */
+    --sh-dove-ink: var(--sh-ember-600);
+
+    /* navy-500 e não navy-100: a 0.08 sobre a página, navy-100 compõe #f5f8fb e
+       marca 1.008 — a marca d'água simplesmente não aparecia. navy-500 dá 1.086,
+       a mesma faixa dos temas (jubileu 1.056, acamp's 1.075). Marca d'água quer
+       ser discreta, não inexistente. */
+    --sh-dove-watermark:  var(--sh-navy-500);
+    --sh-dove-opacity:    0.08;
+  }
+
+  /* =========================================================================
+     Escopos de superfície
+
+     Um bloco com data-sh-surface reescreve texto, borda e link para os seus
+     descendentes. É assim que um cartão claro sobrevive dentro de uma seção
+     escura sem que nenhum componente saiba onde está.
+     ========================================================================= */
+
+  [data-sh-surface="page"] {
+    background-color: var(--sh-surface-page);
+  }
+
+  [data-sh-surface="panel"] {
+    background-color:  var(--sh-surface-default);
+    --sh-focus-halo:   var(--sh-surface-default);
+  }
+
+  [data-sh-surface="sunken"] {
+    background-color:  var(--sh-surface-sunken);
+    --sh-focus-halo:   var(--sh-surface-sunken);
+  }
+
+  [data-sh-surface="inverse"] {
+    background-color:  var(--sh-surface-inverse);
+    color:             var(--sh-text-inverse);
+
+    --sh-text-strong:      var(--sh-white);
+    --sh-text-default:     var(--sh-navy-50);
+    --sh-text-muted:       var(--sh-navy-200);
+    --sh-text-link:        var(--sh-ember-300);
+    --sh-text-link-hover:  var(--sh-ember-200);
+    --sh-text-brand:       var(--sh-navy-200);
+    --sh-text-accent:      var(--sh-ember-300);
+
+    --sh-border-subtle:   var(--sh-navy-700);
+    --sh-border-default:  var(--sh-navy-600);
+    --sh-border-control:  var(--sh-navy-400);
+    --sh-border-strong:   var(--sh-navy-300);
+
+    /* Limites de cor também invertem. Herdados do :root eles ficavam na faixa
+       600/700, que é tinta para canvas claro: sobre a superfície inversa
+       (navy-800) marcavam de 1,56 a 2,57 — abaixo dos 3:1 que 1.4.11 exige de
+       limite informativo. A faixa 300/400 é a leitura correta sobre escuro.
+       Medido contra --sh-surface-inverse = navy-800 #142f53. */
+    --sh-border-brand:    var(--sh-navy-300);  /* 7.54 — era navy-700 */
+    --sh-border-accent:   var(--sh-ember-300);  /* 8.41 — era ember-700, 2.41 */
+    --sh-border-success:  var(--sh-success-400);  /* 5.59 — era success-600, 2.57 */
+    --sh-border-warning:  var(--sh-warning-400);  /* 5.29 — era warning-600, 2.42 */
+    --sh-border-danger:   var(--sh-danger-400);  /* 5.04 — era danger-600, 2.24 */
+    --sh-border-info:     var(--sh-info-400);  /* 5.54 — era info-600, 2.50 */
+
+    /* O par de feedback anda junto: mesma tinta, mesmo motivo. */
+    --sh-feedback-success-border:  var(--sh-success-400);  /* 5.59 */
+    --sh-feedback-warning-border:  var(--sh-warning-400);  /* 5.29 */
+    --sh-feedback-danger-border:   var(--sh-danger-400);  /* 5.04 */
+    --sh-feedback-info-border:     var(--sh-info-400);  /* 5.54 */
+
+    --sh-focus-halo:   var(--sh-surface-inverse);
+    --sh-focus-color:  var(--sh-ember-300);
+
+    /* O conjunto INTEIRO de ações inverte, não só secondary e ghost. O
+       primário navy-700 sobre a superfície inversa navy-800 marcava 1.01:1 de
+       silhueta — um botão sem contorno visível, que reprova 1.4.11. O mesmo
+       valia para o destrutivo (danger-700 sobre navy-800: 1.46:1). Sobre fundo
+       escuro o preenchimento tem de ser claro. */
+    --sh-action-primary-bg:         var(--sh-navy-50);  /* 12.56 de silhueta */
+    --sh-action-primary-bg-hover:   var(--sh-white);
+    --sh-action-primary-bg-active:  var(--sh-navy-100);
+    --sh-action-primary-fg:         var(--sh-navy-800);  /* 12.56 sobre o preenchimento */
+    --sh-action-primary-border:     var(--sh-navy-50);
+
+    --sh-action-secondary-bg:         transparent;
+    --sh-action-secondary-bg-hover:   rgb(255 255 255 / 0.10);
+    --sh-action-secondary-bg-active:  rgb(255 255 255 / 0.18);
+    --sh-action-secondary-fg:         var(--sh-white);
+    --sh-action-secondary-border:     var(--sh-navy-300);
+
+    --sh-action-ghost-fg:        var(--sh-navy-100);
+    --sh-action-ghost-bg-hover:  rgb(255 255 255 / 0.10);
+
+    /* O acento já marca 4.92 de silhueta aqui; o contorno ember-700 do canvas
+       claro só escureceria a borda. Sobe junto com o resto. */
+    --sh-action-accent-border:     var(--sh-ember-300);
+    --sh-action-danger-bg:         var(--sh-danger-300);
+    --sh-action-danger-bg-hover:   var(--sh-danger-200);
+    --sh-action-danger-bg-active:  var(--sh-danger-100);
+    --sh-action-danger-fg:         var(--sh-danger-950);
+    --sh-action-danger-border:     var(--sh-danger-300);
+  }
+
+  /* O véu — o único escopo de superfície que NÃO PINTA FUNDO.
+     Motivo: quem pinta o véu é o elemento (sh-hero__scrim, o gradiente de
+     sh-header--transparent), com --sh-surface-scrim. Este escopo só declara
+     a TINTA de quem mora em cima dele. Pintar aqui um background-color
+     dobraria o véu.
+
+     É também o único escopo que não inverte com o esquema, pela mesma razão
+     de --sh-text-on-scrim: a foto por baixo não muda quando a pessoa liga o
+     modo escuro.
+
+     sh-hero--cover e sh-header--transparent consomem este MESMO conjunto de
+     tokens direto na camada sh.components (ver os dois arquivos), porque
+     precisam vencer um [data-sh-surface="inverse"] herdado da marcação —
+     sh.components vem depois de sh.tokens na ordem de camadas. Este escopo
+     existe para o caso de uma página querer um bloco sobre véu que não é nem
+     herói nem cabeçalho. */
+  [data-sh-surface="scrim"] {
+    color:                 var(--sh-text-on-scrim);
+    --sh-text-strong:      var(--sh-text-on-scrim);
+    --sh-text-default:     var(--sh-text-on-scrim);
+    --sh-text-muted:       var(--sh-text-on-scrim);
+    --sh-text-link:        var(--sh-text-on-scrim);
+    --sh-text-link-hover:  var(--sh-text-on-scrim);
+    --sh-text-brand:       var(--sh-text-on-scrim);
+    --sh-text-accent:      var(--sh-text-on-scrim);
+
+    --sh-border-subtle:   color-mix(in srgb, var(--sh-text-on-scrim) 40%, transparent);
+    --sh-border-default:  color-mix(in srgb, var(--sh-text-on-scrim) 65%, transparent);
+    --sh-border-control:  var(--sh-text-on-scrim);
+    --sh-border-strong:   var(--sh-text-on-scrim);
+
+    --sh-focus-color:  var(--sh-text-on-scrim);
+    --sh-focus-halo:   var(--sh-surface-scrim);
+
+    --sh-action-primary-bg:         var(--sh-action-primary-bg-on-scrim);
+    --sh-action-primary-bg-hover:   var(--sh-action-primary-bg-hover-on-scrim);
+    --sh-action-primary-bg-active:  var(--sh-action-primary-bg-active-on-scrim);
+    --sh-action-primary-fg:         var(--sh-action-primary-fg-on-scrim);
+    --sh-action-primary-border:     var(--sh-action-primary-border-on-scrim);
+
+    --sh-action-secondary-bg:         transparent;
+    --sh-action-secondary-fg:         var(--sh-text-on-scrim);
+    --sh-action-secondary-border:     var(--sh-text-on-scrim);
+    --sh-action-secondary-bg-hover:   color-mix(in srgb, var(--sh-text-on-scrim) 14%, transparent);
+    --sh-action-secondary-bg-active:  color-mix(in srgb, var(--sh-text-on-scrim) 22%, transparent);
+
+    --sh-action-ghost-fg:         var(--sh-text-on-scrim);
+    --sh-action-ghost-bg-hover:   color-mix(in srgb, var(--sh-text-on-scrim) 14%, transparent);
+    --sh-action-ghost-bg-active:  color-mix(in srgb, var(--sh-text-on-scrim) 22%, transparent);
+
+    /* Este bloco é área VELADA: o vidro que morar aqui é filme claro, não um
+       segundo véu. Ver a família --sh-glass-*-on-veil acima. */
+    --sh-glass-veil:         var(--sh-glass-veil-on-veil);
+    --sh-glass-veil-hover:   var(--sh-glass-veil-hover-on-veil);
+    --sh-glass-veil-active:  var(--sh-glass-veil-active-on-veil);
+    --sh-glass-solid:        var(--sh-glass-solid-on-veil);
+    --sh-glass-border:       var(--sh-glass-border-on-veil);
+    --sh-glass-keyline:      var(--sh-glass-keyline-on-veil);
+  }
+
+  /* O escopo brand não fixa NENHUMA cor.
+     Motivo, em uma linha: --sh-surface-brand é o único token de superfície que
+     muda de claridade conforme o eixo — navy-700 aqui, navy-400 no escuro,
+     gold-light no jubileu escuro, creme no acamp's claro. Enquanto o escopo
+     cravava branco, ele mentia em três dos seis cenários (1.05:1 no acamp's).
+     Havia ainda dois consumidores de --sh-surface-brand com necessidades
+     opostas: o badge sólido, que pinta o texto com --sh-text-on-brand, e o
+     painel/seção, que pintava branco por conta própria. Agora os dois leem o
+     mesmo par (--sh-surface-brand + --sh-text-on-brand) e não podem divergir.
+     Escuro e temas remapeiam o conjunto `on-brand` na raiz; aqui só há
+     indireção. */
+  [data-sh-surface="brand"] {
+    background-color:  var(--sh-surface-brand);
+    color:             var(--sh-text-on-brand);
+
+    --sh-text-strong:        var(--sh-text-on-brand);
+    --sh-text-default:       var(--sh-text-on-brand);
+    --sh-text-muted:         var(--sh-text-on-brand-muted);
+    --sh-text-link:          var(--sh-text-on-brand-link);
+    --sh-text-link-hover:    var(--sh-text-on-brand-link-hover);
+    --sh-text-link-visited:  var(--sh-text-on-brand-link);
+
+    /* Sem estas duas linhas, a tinta de marca e a de acento entravam no escopo
+       como vieram da página: navy-700 sobre --sh-surface-brand (navy-700) é o
+       mesmo tom, e ember-700 sobre ele mede 1,54 — medido no eyebrow de
+       prova-extras.html#countdown, a seção que existe justamente para provar o
+       par numa superfície tingida.
+
+       O acento reaproveita --sh-text-on-brand-link em vez de estrear um
+       --sh-text-on-brand-accent: sobre a marca os dois papéis pedem a mesma
+       coisa — tinta quente, forte, que não é a cor do corpo de texto — e esse
+       token JÁ é definido e verificado pelos dois esquemas e pelos dois temas
+       (6.60 base claro, 6.45 base escuro, 6.60 jubileu, 5.94/5.90 acamp's).
+       Token novo obrigaria os quatro a declarar mais uma linha, e o primeiro
+       tema que esquecesse voltaria a 1,54 sem ninguém notar. */
+    --sh-text-brand:   var(--sh-text-on-brand);
+    --sh-text-accent:  var(--sh-text-on-brand-link);
+
+    /* O primário TAMBÉM inverte aqui, pelo mesmo motivo do escopo inverso e com
+       a mesma medição: --sh-action-primary-bg É a cor da marca, e sobre a
+       superfície da marca ele é a PRÓPRIA cor — 1,00:1 de silhueta no base
+       (claro e escuro) e no jubileu claro, 1,99 e 2,02 nos dois escuros
+       restantes. Botão sem contorno visível reprova a WCAG 1.4.11; medido no
+       CTA de prova-extras.html, dentro da seção com data-sh-surface="brand".
+
+       A correção é indireção pura, fiel ao princípio deste escopo: o
+       preenchimento passa a ser --sh-text-on-brand e a tinta, --sh-surface-brand.
+       Esse par JÁ é verificado em ≥4,5:1 nos seis cenários (é o par de TEXTO do
+       escopo), então silhueta e rótulo herdam a garantia sem nenhum valor novo —
+       e um tema futuro que remapeie o conjunto on-brand acerta o botão de graça,
+       sem precisar lembrar dele. */
+    --sh-action-primary-bg:         var(--sh-text-on-brand);
+    --sh-action-primary-bg-hover:   color-mix(in srgb, var(--sh-text-on-brand) 90%, var(--sh-surface-brand));
+    --sh-action-primary-bg-active:  color-mix(in srgb, var(--sh-text-on-brand) 80%, var(--sh-surface-brand));
+    --sh-action-primary-fg:         var(--sh-surface-brand);  /* o mesmo par de texto do escopo, ao contrário — ≥4,5:1 por definição */
+    --sh-action-primary-border:     var(--sh-text-on-brand);
+
+    --sh-border-subtle:   var(--sh-border-on-brand);
+    --sh-border-default:  var(--sh-border-on-brand);
+    --sh-border-control:  var(--sh-border-on-brand-strong);
+    --sh-border-strong:   var(--sh-border-on-brand-strong);
+
+    --sh-focus-halo:   var(--sh-surface-brand);
+    --sh-focus-color:  var(--sh-focus-on-brand);
+
+    /* A pomba é a única tinta do sistema que anda nos dois sentidos: sobre
+       papel ela precisa escurecer, sobre a marca azul ela precisa clarear.
+       ember-600 (o padrão da raiz) mede 2,28 sobre navy-700 e volta a sumir;
+       ember-500, o corpo do emblema, mede 3,16 aqui. Uma linha, e o símbolo
+       fica perceptível nos dois lados. */
+    --sh-dove-ink: var(--sh-ember-500);
+  }
+
+  [data-sh-surface="accent"] {
+    background-color:  var(--sh-surface-accent);
+    color:             var(--sh-text-on-accent);
+
+    --sh-text-strong:   var(--sh-navy-950);
+    --sh-text-default:  var(--sh-navy-950);
+    --sh-text-muted:    var(--sh-ember-950);
+    --sh-text-link:     var(--sh-navy-950);
+
+    --sh-border-subtle:   var(--sh-ember-700);
+    --sh-border-default:  var(--sh-ember-700);
+    --sh-border-control:  var(--sh-ember-800);
+
+    --sh-focus-halo:   var(--sh-surface-accent);
+    --sh-focus-color:  var(--sh-navy-950);
+  }
+}

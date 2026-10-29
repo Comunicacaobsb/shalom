@@ -1,0 +1,1326 @@
+/* ==========================================================================
+   Shalom DS — Lote 0: componentes-fundação
+   sh-icon · sh-btn · sh-card · sh-panel · sh-field · sh-input · sh-badge
+   sh-chip · sh-alert · sh-skeleton · sh-spinner · sh-divider
+
+   Contrato deste arquivo
+   ----------------------
+   1. Só a camada semântica é consumida para COR (--sh-surface-*, --sh-text-*,
+      --sh-border-*, --sh-action-*, --sh-feedback-*, --sh-focus-*, --sh-shadow-*,
+      --sh-radius-* semânticos, --sh-dove-*). Nenhum primitivo de cor, nenhum hex.
+      Escalas compartilhadas sem equivalente semântico (espaço, tipo, duração,
+      largura de borda, ícone) vêm dos primitivos, como já fazem
+      foundations/typography.css e foundations/layout.css.
+   2. Nenhum seletor cita [data-sh-theme]. Os seis cenários (base, jubileu-25,
+      acamps × claro, escuro) saem do mesmo CSS, sem condicional.
+   3. Estado vem do DOM: [disabled], [aria-pressed], [aria-invalid], [readonly],
+      [data-state], [data-loading], [hidden]. Classe is-* não é usada aqui.
+   4. Cada componente expõe tokens de camada 3 (--sh-btn-bg, --sh-card-*, …) com
+      valor padrão inline apontando para a camada 2. Configurar de fora é setar
+      a custom property; nunca sobrescrever o seletor.
+   5. Zero !important — isso é privilégio de @layer sh.overrides.
+
+   Alvo de toque: 44×44 CSS px (--sh-touch-target) em tudo que se clica,
+   inclusive nos tamanhos --sm, onde a área é expandida por ::after.
+
+   Elevação: --sh-shadow-raised vira `none` no escuro por decisão de token
+   (dark.css). Onde a altura precisa sobreviver ao escuro, a superfície muda
+   para --sh-surface-raised, que é o degrau mais claro lá.
+   ========================================================================== */
+
+@layer sh.components {
+
+  /* Saída comum para blocos dispensáveis. O conteúdo permanece operável
+     durante a transição e só recebe [hidden] ao fim, pelo runtime. */
+  [data-sh-dismissible][data-state="closing"] {
+    opacity: 0;
+    translate: 0 var(--sh-space-3);
+    transition:
+      opacity var(--sh-duration-base) var(--sh-ease-standard),
+      translate var(--sh-duration-base) var(--sh-ease-standard);
+  }
+
+  /* ======================================================================
+     sh-icon
+     <svg class="sh-icon" aria-hidden="true" focusable="false">
+     <i class="ph ph-house sh-icon" aria-hidden="true"></i>
+     Herda a cor por currentColor. Nunca é o único portador de estado.
+     ====================================================================== */
+
+  .sh-icon {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-icon-size, var(--sh-icon-size-md));
+    block-size: var(--sh-icon-size, var(--sh-icon-size-md));
+    font-size: var(--sh-icon-size, var(--sh-icon-size-md));
+    line-height: 1;
+    vertical-align: middle;
+    stroke-width: var(--sh-icon-stroke);
+  }
+  .sh-icon--sm { --sh-icon-size: var(--sh-icon-size-sm); }
+  .sh-icon--lg { --sh-icon-size: var(--sh-icon-size-lg); }
+  .sh-icon--xl { --sh-icon-size: var(--sh-icon-size-xl); }
+
+  /* Ícone que carrega significado leva rótulo; este modificador só ajusta
+     o alinhamento óptico quando o ícone anda junto de texto. */
+  .sh-icon--inline { vertical-align: -0.15em; }
+
+  /* ======================================================================
+     sh-btn
+     <button class="sh-btn sh-btn--primary">
+       <svg class="sh-icon sh-btn__icon">…</svg>
+       <span class="sh-btn__label">Inscrever-se</span>
+       <span class="sh-spinner sh-btn__spinner" aria-hidden="true"></span>
+     </button>
+
+     Sem modificador, o botão é secundário: esquecer a variante nunca produz
+     a ação mais barulhenta da tela.
+     Em [data-loading="true"] o rótulo PERMANECE e o autor põe aria-busy="true".
+     --icon exige aria-label. --danger nomeia o objeto ("Excluir inscrição").
+     ====================================================================== */
+
+  .sh-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sh-space-2);
+    min-block-size: var(--sh-btn-size, var(--sh-touch-target));
+    padding-block: var(--sh-space-2);
+    padding-inline: var(--sh-btn-padding-inline, var(--sh-space-5));
+    border: var(--sh-border-width-hair) solid
+            var(--sh-btn-border, var(--sh-action-secondary-border));
+    border-radius: var(--sh-btn-radius, var(--sh-radius-control));
+    background-color: var(--sh-btn-bg, var(--sh-action-secondary-bg));
+    box-shadow: var(--sh-btn-shadow, none);
+    color: var(--sh-btn-fg, var(--sh-action-secondary-fg));
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-btn-font-size, var(--sh-font-size-md));
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color     var(--sh-duration-fast) var(--sh-ease-standard),
+      color            var(--sh-duration-fast) var(--sh-ease-standard),
+      box-shadow       var(--sh-duration-fast) var(--sh-ease-standard),
+      translate        var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  .sh-btn__label { min-inline-size: 0; }
+
+  .sh-btn__icon {
+    --sh-icon-size: var(--sh-btn-icon-size, var(--sh-icon-size-md));
+  }
+
+  .sh-btn__spinner {
+    display: none;
+    --sh-spinner-size: 1em;
+    --sh-spinner-color: currentColor;
+  }
+
+  @media (hover: hover) {
+    .sh-btn:hover:not([disabled]):not([aria-disabled="true"]) {
+      background-color: var(--sh-btn-bg-hover, var(--sh-action-secondary-bg-hover));
+      color: var(--sh-btn-fg-hover, var(--sh-btn-fg, var(--sh-action-secondary-fg)));
+    }
+  }
+
+  .sh-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+
+  .sh-btn:active:not([disabled]):not([aria-disabled="true"]) {
+    background-color: var(--sh-btn-bg-active, var(--sh-action-secondary-bg-active));
+    translate: 0 1px;
+  }
+
+  .sh-btn[disabled],
+  .sh-btn[aria-disabled="true"] {
+    --sh-btn-bg: var(--sh-action-disabled-bg);
+    --sh-btn-fg: var(--sh-action-disabled-fg);
+    --sh-btn-border: var(--sh-action-disabled-border);
+    --sh-btn-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* Carregando: spinner entra no lugar do ícone, o rótulo fica. */
+  .sh-btn[data-loading="true"] { cursor: progress; }
+  .sh-btn[data-loading="true"] .sh-btn__icon { display: none; }
+  .sh-btn[data-loading="true"] .sh-btn__spinner { display: inline-flex; }
+
+  /* Alternância: cor + profundidade invertida (não só cor).
+
+     A profundidade entra pelo TOKEN --sh-btn-shadow, nunca por um
+     `box-shadow:` próprio. Motivo, e por que isto é estrutural e não estilo:
+     no sistema o anel de foco É box-shadow, então toda declaração de
+     box-shadow fora de :focus-visible disputa o mesmo canal e pode apagar o
+     anel. `.sh-btn[aria-pressed="true"]` e `.sh-btn:focus-visible` têm a
+     MESMA especificidade (0,2,0) — o empate se resolvia por ordem de arquivo,
+     e como o pressionado vinha depois, botão pressionado + focado ficava sem
+     anel (medido: 1,93–2,60:1 no escuro). Escrevendo a profundidade no token,
+     a única declaração de box-shadow que sobra no componente é a de `.sh-btn`
+     (0,1,0), que o anel (0,2,0) vence SEMPRE, em qualquer ordem. É a mesma
+     razão pela qual --primary e --accent nunca tiveram este defeito: eles já
+     nasceram usando o token. Regra do arquivo, item 4: configurar é setar a
+     custom property, não sobrescrever o seletor. */
+  .sh-btn[aria-pressed="true"] {
+    background-color: var(--sh-btn-bg-active, var(--sh-action-secondary-bg-active));
+    --sh-btn-shadow: var(--sh-shadow-inset);
+  }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-btn--primary {
+    --sh-btn-bg:        var(--sh-action-primary-bg);
+    --sh-btn-bg-hover:  var(--sh-action-primary-bg-hover);
+    --sh-btn-bg-active: var(--sh-action-primary-bg-active);
+    --sh-btn-fg:        var(--sh-action-primary-fg);
+    --sh-btn-border:    var(--sh-action-primary-border);
+    --sh-btn-shadow:    var(--sh-shadow-raised);
+  }
+
+  .sh-btn--secondary {
+    --sh-btn-bg:        var(--sh-action-secondary-bg);
+    --sh-btn-bg-hover:  var(--sh-action-secondary-bg-hover);
+    --sh-btn-bg-active: var(--sh-action-secondary-bg-active);
+    --sh-btn-fg:        var(--sh-action-secondary-fg);
+    --sh-btn-border:    var(--sh-action-secondary-border);
+  }
+
+  .sh-btn--ghost {
+    --sh-btn-bg:        var(--sh-action-ghost-bg);
+    --sh-btn-bg-hover:  var(--sh-action-ghost-bg-hover);
+    --sh-btn-bg-active: var(--sh-action-ghost-bg-active);
+    --sh-btn-fg:        var(--sh-action-ghost-fg);
+    --sh-btn-border:    var(--sh-action-ghost-border);
+  }
+
+  /* O contorno do acento é obrigatório: o preenchido sozinho não cumpre
+     WCAG 1.4.11 contra o canvas (2.59:1). Ver 01-identidade.md §2.5. */
+  .sh-btn--accent {
+    --sh-btn-bg:        var(--sh-action-accent-bg);
+    --sh-btn-bg-hover:  var(--sh-action-accent-bg-hover);
+    --sh-btn-bg-active: var(--sh-action-accent-bg-active);
+    --sh-btn-fg:        var(--sh-action-accent-fg);
+    --sh-btn-border:    var(--sh-action-accent-border);
+    --sh-btn-shadow:    var(--sh-shadow-raised);
+  }
+
+  .sh-btn--danger {
+    --sh-btn-bg:        var(--sh-action-danger-bg);
+    --sh-btn-bg-hover:  var(--sh-action-danger-bg-hover);
+    --sh-btn-bg-active: var(--sh-action-danger-bg-active);
+    --sh-btn-fg:        var(--sh-action-danger-fg);
+    --sh-btn-border:    var(--sh-action-danger-border);
+  }
+
+  .sh-btn--link {
+    --sh-btn-bg: transparent;
+    --sh-btn-bg-hover: transparent;
+    --sh-btn-bg-active: transparent;
+    --sh-btn-fg: var(--sh-text-link);
+    --sh-btn-fg-hover: var(--sh-text-link-hover);
+    --sh-btn-border: transparent;
+    --sh-btn-padding-inline: 0;
+    text-decoration: underline;
+    text-decoration-thickness: max(0.08em, 1px);
+    text-underline-offset: 0.16em;
+  }
+
+  /* Vidro. SÓ sobre foto, herói, sobreposição ou cabeçalho transparente —
+     nunca em formulário, tabela, painel administrativo ou qualquer superfície
+     plana (ver docs-site/fundacoes/imagem-e-vidro.html).
+
+     O que sustenta a leitura é o ALFA do véu (--sh-glass-veil), não o
+     backdrop-filter. Sobre foto 100% branca, sem desfoque, o composto marca
+     5,28:1 contra --sh-glass-ink no base claro — acima dos 4,5:1 de texto e
+     dos 3:1 de limite. O desfoque é acabamento.
+
+     Os dois limites, como manda 1.4.11 contra uma foto desconhecida: o véu
+     escuro resolve a foto clara e o fio claro (--sh-glass-border) resolve a
+     foto escura. Em qualquer imagem real um dos dois está visível.
+
+     Sem --sh-btn-shadow: sombra sob vidro sujaria a foto por baixo. O relevo
+     vem do fio de luz no topo (box-shadow inset). */
+  .sh-btn--glass {
+    --sh-btn-bg:        var(--sh-glass-veil);
+    --sh-btn-bg-hover:  var(--sh-glass-veil-hover);
+    --sh-btn-bg-active: var(--sh-glass-veil-active);
+    --sh-btn-fg:        var(--sh-glass-ink);
+    --sh-btn-border:    var(--sh-glass-border);
+    --sh-focus-color:   var(--sh-glass-ink);
+    --sh-focus-halo:    var(--sh-glass-veil-active);
+    box-shadow: inset 0 1px 0 var(--sh-glass-sheen),
+                0 0 0 1px var(--sh-glass-keyline);
+    -webkit-backdrop-filter: var(--sh-glass-filter);
+    backdrop-filter: var(--sh-glass-filter);
+  }
+  /* O anel de foco precisa vencer os fios, que também são box-shadow. */
+  .sh-btn--glass:focus-visible {
+    box-shadow: inset 0 1px 0 var(--sh-glass-sheen), var(--sh-focus-ring);
+  }
+
+  /* ----------------------------------------------------------- tamanhos */
+
+  .sh-btn--sm {
+    --sh-btn-size: 2.25rem;                      /* 36px de desenho */
+    --sh-btn-padding-inline: var(--sh-space-3);
+    --sh-btn-font-size: var(--sh-font-size-sm);
+    --sh-btn-icon-size: var(--sh-icon-size-sm);
+    padding-block: var(--sh-space-1);
+  }
+  /* …com 44×44 de área real. */
+  .sh-btn--sm::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: var(--sh-touch-target);
+    translate: -50% -50%;
+  }
+
+  .sh-btn--lg {
+    --sh-btn-size: 3.25rem;                      /* 52px */
+    --sh-btn-padding-inline: var(--sh-space-6);
+    --sh-btn-font-size: var(--sh-font-size-lg);
+    --sh-btn-icon-size: var(--sh-icon-size-lg);
+  }
+
+  /* -------------------------------------------------------------- forma */
+
+  .sh-btn--icon {
+    --sh-btn-padding-inline: 0;
+    inline-size: var(--sh-btn-size, var(--sh-touch-target));
+    aspect-ratio: 1;
+  }
+
+  .sh-btn--block {
+    display: flex;
+    inline-size: 100%;
+  }
+
+  .sh-btn--pill { --sh-btn-radius: var(--sh-radius-pill); }
+
+  /* ======================================================================
+     sh-card
+     sh-card › __media › __body (__eyebrow, __title, __text, __meta) › __footer
+     Proibido cartão dentro de cartão: se parece necessário, é sh-list ou
+     sh-panel. Em --interactive existe UM link real; o ::after dele expande
+     o alvo para o cartão inteiro.
+     ====================================================================== */
+
+  .sh-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: var(--sh-card-border-width, var(--sh-border-width-hair)) solid
+            var(--sh-card-border-color, var(--sh-border-subtle));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-card-bg, var(--sh-surface-default));
+    box-shadow: var(--sh-card-shadow, none);
+    color: var(--sh-text-default);
+    transition:
+      border-color var(--sh-duration-base) var(--sh-ease-standard),
+      box-shadow   var(--sh-duration-base) var(--sh-ease-standard),
+      translate    var(--sh-duration-base) var(--sh-ease-standard);
+  }
+
+  .sh-card__media {
+    position: relative;
+    background-color: var(--sh-surface-sunken);
+  }
+  .sh-card__media > img,
+  .sh-card__media > video {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    aspect-ratio: var(--sh-card-media-ratio, 16 / 9);
+  }
+
+  .sh-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--sh-card-gap, var(--sh-space-2));
+    padding: var(--sh-card-padding, var(--sh-space-5));
+  }
+
+  .sh-card__eyebrow {
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    line-height: var(--sh-leading-snug);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+    color: var(--sh-text-accent);
+  }
+
+  .sh-card__title {
+    font-size: var(--sh-font-size-lg);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    letter-spacing: var(--sh-tracking-tight);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+
+  .sh-card__text {
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-relaxed);
+    color: var(--sh-text-default);
+  }
+
+  .sh-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2) var(--sh-space-3);
+    align-items: center;
+    margin-block-start: auto;
+    padding-block-start: var(--sh-space-1);
+    font-size: var(--sh-font-size-xs);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3);
+    align-items: center;
+    padding: var(--sh-card-padding, var(--sh-space-5));
+    padding-block-start: var(--sh-space-4);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  .sh-card__link { color: inherit; text-decoration: none; }
+  .sh-card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-card--flat { --sh-card-shadow: none; }
+
+  /* No escuro a altura vem da superfície, não da sombra (dark.css zera
+     --sh-shadow-raised e --sh-surface-raised é o degrau mais claro). */
+  .sh-card--raised {
+    --sh-card-bg: var(--sh-surface-raised);
+    --sh-card-shadow: var(--sh-shadow-raised);
+  }
+
+  .sh-card--interactive { cursor: pointer; }
+  @media (hover: hover) {
+    .sh-card--interactive:hover {
+      --sh-card-border-color: var(--sh-border-brand);
+      --sh-card-shadow: var(--sh-shadow-lg);
+      translate: 0 -2px;
+    }
+  }
+  .sh-card--interactive:focus-within {
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  /* O anel é do cartão inteiro; o link não desenha um segundo anel. */
+  .sh-card--interactive .sh-card__link:focus-visible { box-shadow: none; }
+
+  .sh-card--interactive[aria-disabled="true"] {
+    cursor: not-allowed;
+    --sh-card-bg: var(--sh-surface-disabled);
+    color: var(--sh-text-disabled);
+  }
+  .sh-card--interactive[aria-disabled="true"] .sh-card__link::after { display: none; }
+
+  /* Vira coluna sozinho quando o espaço acaba — sem media query. */
+  .sh-card--horizontal { flex-direction: row; flex-wrap: wrap; }
+  .sh-card--horizontal > .sh-card__media {
+    flex: 1 1 var(--sh-card-media-size, 14rem);
+  }
+  .sh-card--horizontal > .sh-card__media > img,
+  .sh-card--horizontal > .sh-card__media > video {
+    aspect-ratio: var(--sh-card-media-ratio, 4 / 3);
+  }
+  .sh-card--horizontal > .sh-card__body {
+    flex: 999 1 var(--sh-card-body-min, 16rem);
+  }
+
+  .sh-card--compact {
+    --sh-card-padding: var(--sh-space-4);
+    --sh-card-gap: var(--sh-space-1);
+  }
+
+  .sh-card--featured {
+    --sh-card-border-color: var(--sh-border-accent);
+    --sh-card-border-width: var(--sh-border-width-thick);
+  }
+
+  /* Cartão de vidro. SÓ existe pousado sobre foto, herói ou sobreposição —
+     sobre superfície plana ele é um cartão normal com um custo de composição
+     a mais, e o desfoque não tem o que borrar. A regra completa de onde é
+     permitido está em docs-site/fundacoes/imagem-e-vidro.html.
+
+     Por que o bloco de tinta abaixo repete [data-sh-surface="scrim"]
+     (tokens/semantic.css) em vez de pedir o atributo na marcação: o mesmo
+     motivo de sh-hero--cover. (1) sh.components vem depois de sh.tokens, então
+     declarar aqui vence um escopo herdado que a página já tenha; (2) legibilidade
+     não pode depender de alguém lembrar de escrever um atributo — o cartão de
+     vidro sem a tinta do véu é tinta escura sobre véu escuro.
+
+     Sem sombra externa: sombra sob vidro suja a foto. A profundidade vem do
+     fio de luz no topo.
+
+     VIDRO DENTRO DE VIDRO É PROIBIDO. Três camadas de véu não têm de onde
+     tirar contraste: medido, um sh-btn--glass dentro de um sh-card--glass
+     sobre foto marca 2,09:1 de silhueta contra o cartão, abaixo dos 3:1 de
+     1.4.11. Dentro de um cartão de vidro use --primary (preenchimento claro,
+     do conjunto -on-scrim, já remapeado logo abaixo) ou --secondary (fio
+     inteiro). Os dois estão provados em prova-vidro.html. */
+  .sh-card--glass {
+    --sh-card-bg:           var(--sh-glass-veil);
+    --sh-card-border-color: var(--sh-glass-border);
+    --sh-card-shadow:       none;
+
+    color: var(--sh-glass-ink);
+    --sh-text-strong:     var(--sh-glass-ink);
+    --sh-text-default:    var(--sh-glass-ink);
+    --sh-text-muted:      var(--sh-glass-ink);
+    --sh-text-brand:      var(--sh-glass-ink);
+    --sh-text-accent:     var(--sh-glass-ink);
+    --sh-text-link:       var(--sh-glass-ink);
+    --sh-text-link-hover: var(--sh-glass-ink);
+    --sh-border-subtle:   var(--sh-glass-border);
+    --sh-border-default:  var(--sh-glass-border);
+    --sh-border-control:  var(--sh-glass-ink);
+    --sh-border-strong:   var(--sh-glass-ink);
+    --sh-focus-color:     var(--sh-glass-ink);
+    --sh-focus-halo:      var(--sh-glass-veil-active);
+
+    /* Ação dentro do vidro: o conjunto -on-scrim, o mesmo de sh-hero--cover.
+       --sh-action-primary-bg é tinta calculada contra o canvas da página; no
+       véu ela some. Sobre véu o preenchimento é CLARO. */
+    --sh-action-primary-bg:        var(--sh-action-primary-bg-on-scrim);
+    --sh-action-primary-bg-hover:  var(--sh-action-primary-bg-hover-on-scrim);
+    --sh-action-primary-bg-active: var(--sh-action-primary-bg-active-on-scrim);
+    --sh-action-primary-fg:        var(--sh-action-primary-fg-on-scrim);
+    --sh-action-primary-border:    var(--sh-action-primary-border-on-scrim);
+    --sh-action-secondary-bg:        transparent;
+    --sh-action-secondary-fg:        var(--sh-glass-ink);
+    --sh-action-secondary-border:    var(--sh-glass-ink);
+    --sh-action-secondary-bg-hover:  color-mix(in srgb, var(--sh-glass-ink) 14%, transparent);
+    --sh-action-secondary-bg-active: color-mix(in srgb, var(--sh-glass-ink) 22%, transparent);
+    --sh-action-ghost-fg:            var(--sh-glass-ink);
+    --sh-action-ghost-bg-hover:      color-mix(in srgb, var(--sh-glass-ink) 14%, transparent);
+    --sh-action-ghost-bg-active:     color-mix(in srgb, var(--sh-glass-ink) 22%, transparent);
+
+    box-shadow: inset 0 1px 0 var(--sh-glass-sheen),
+                0 0 0 1px var(--sh-glass-keyline);
+    -webkit-backdrop-filter: var(--sh-glass-filter);
+    backdrop-filter: var(--sh-glass-filter);
+  }
+  /* O cartão de vidro interativo não escurece a borda de marca no hover — no
+     véu ela desaparece. Sobe o alfa do próprio véu, que é o que se enxerga. */
+  @media (hover: hover) {
+    .sh-card--glass.sh-card--interactive:hover {
+      --sh-card-bg: var(--sh-glass-veil-hover);
+      --sh-card-border-color: var(--sh-glass-ink);
+      --sh-card-shadow: none;
+    }
+  }
+  .sh-card--glass.sh-card--interactive:focus-within {
+    box-shadow: inset 0 1px 0 var(--sh-glass-sheen), var(--sh-focus-ring);
+  }
+
+  /* --------------------------------------------------- vidro: degradação
+     Duas saídas para a mesma porta. Sem backdrop-filter (Firefox com a
+     preferência desligada, WebView antigo, navegador de terminal de igreja) o
+     véu semitransparente ficaria sozinho sobre a foto; e quem liga "reduzir
+     transparência" no sistema está pedindo, literalmente, para não ver
+     através das coisas.
+
+     Nos dois casos o vidro vira CHAPA: --sh-glass-solid é o mesmo véu com
+     alfa 1. A foto some atrás do cartão em vez de brigar com o texto, e o
+     contraste sobe (o composto deixa de depender da imagem).
+
+     A troca é feita por token declarado NO ELEMENTO, e não em :root, porque
+     substituição de custom property resolve no escopo de quem declara — em
+     :root, um tema aplicado a uma subárvore devolveria a tinta da raiz. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .sh-btn--glass {
+      --sh-glass-veil:        var(--sh-glass-solid);
+      --sh-glass-veil-hover:  var(--sh-glass-solid);
+      --sh-glass-veil-active: var(--sh-glass-solid);
+    }
+    .sh-card--glass {
+      --sh-glass-veil:        var(--sh-glass-solid);
+      --sh-glass-veil-hover:  var(--sh-glass-solid);
+      --sh-glass-veil-active: var(--sh-glass-solid);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .sh-btn--glass,
+    .sh-card--glass {
+      --sh-glass-veil:        var(--sh-glass-solid);
+      --sh-glass-veil-hover:  var(--sh-glass-solid);
+      --sh-glass-veil-active: var(--sh-glass-solid);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  /* ======================================================================
+     sh-panel
+     sh-panel › __head (__title, __actions) › __body › __foot
+     __title é heading real na hierarquia da página.
+     As variantes de superfície são atalhos visuais; quem reescreve texto,
+     borda, link e foco dos FILHOS é data-sh-surface (tokens/semantic.css).
+     Para --inverse e --brand, declare os dois:
+       <section class="sh-panel sh-panel--inverse" data-sh-surface="inverse">
+     ====================================================================== */
+
+  .sh-panel {
+    display: flex;
+    flex-direction: column;
+    /* Defensivo: sem isto o painel é um item de flex/grid com mínimo
+       automático igual ao min-content do conteúdo, e um filho que não quebra
+       (um sh-badge de rótulo longo, por exemplo) empurra o painel para fora
+       da coluna e a página junto. Medido a 390px no acamp's claro em
+       prova-navegacao.html: 5px de rolagem lateral. */
+    min-inline-size: 0;
+    border: var(--sh-border-width-hair) solid
+            var(--sh-panel-border, var(--sh-border-subtle));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-panel-bg, var(--sh-surface-default));
+    color: var(--sh-panel-fg, var(--sh-text-default));
+  }
+
+  .sh-panel__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3);
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sh-panel-padding, var(--sh-space-5));
+    padding-block-end: var(--sh-space-4);
+  }
+  .sh-panel__head + .sh-panel__body { padding-block-start: 0; }
+
+  .sh-panel__title {
+    font-size: var(--sh-font-size-lg);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    letter-spacing: var(--sh-tracking-tight);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-panel__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2);
+    align-items: center;
+  }
+
+  .sh-panel__body {
+    flex: 1;
+    padding: var(--sh-panel-padding, var(--sh-space-5));
+  }
+
+  .sh-panel__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3);
+    align-items: center;
+    padding: var(--sh-panel-padding, var(--sh-space-5));
+    padding-block-start: var(--sh-space-4);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  .sh-panel--sunken  { --sh-panel-bg: var(--sh-surface-sunken); }
+  .sh-panel--inverse { --sh-panel-bg: var(--sh-surface-inverse); --sh-panel-fg: var(--sh-text-inverse); }
+  .sh-panel--brand   { --sh-panel-bg: var(--sh-surface-brand);   --sh-panel-fg: var(--sh-text-on-brand); }
+  .sh-panel--danger  {
+    --sh-panel-bg: var(--sh-feedback-danger-surface);
+    --sh-panel-border: var(--sh-feedback-danger-border);
+  }
+  .sh-panel--compact { --sh-panel-padding: var(--sh-space-4); }
+
+  /* ======================================================================
+     sh-field — o invólucro de todo controle. Nenhum input aparece sozinho.
+     sh-field › __label › __hint › <controle> › __error › __counter
+
+     Rótulo sempre visível e acima; placeholder não é rótulo.
+     __hint e __error ligados por aria-describedby; __error com aria-live.
+     O erro fica no DOM sempre (região viva estável) e só some quando vazio.
+     ====================================================================== */
+
+  .sh-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-field-gap, var(--sh-space-2));
+    min-inline-size: 0;
+  }
+
+  .sh-field__label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--sh-space-1);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-field__hint {
+    margin-block-start: calc(var(--sh-space-1) * -1);
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-field__error {
+    display: flex;
+    gap: var(--sh-space-2);
+    align-items: flex-start;
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-medium);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-danger);
+  }
+  .sh-field__error:empty { display: none; }
+
+  .sh-field__counter {
+    align-self: flex-end;
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--sh-text-muted);
+  }
+
+  .sh-field:focus-within .sh-field__label { color: var(--sh-text-brand); }
+
+  /* Estados do campo inteiro. */
+  .sh-field[data-state="error"] .sh-field__label { color: var(--sh-text-danger); }
+  .sh-field[data-state="error"] .sh-field__counter { color: var(--sh-text-danger); }
+  .sh-field[data-state="success"] .sh-field__hint { color: var(--sh-text-success); }
+
+  .sh-field[data-disabled] .sh-field__label,
+  .sh-field[data-disabled] .sh-field__hint {
+    color: var(--sh-text-disabled);
+  }
+
+  /* --required marca o rótulo com asterisco; o controle leva `required`.
+     --optional escreve a palavra, que é o que o leitor entende. */
+  .sh-field--required .sh-field__label::after {
+    content: '*';
+    color: var(--sh-text-danger);
+    font-weight: var(--sh-weight-bold);
+  }
+  .sh-field--optional .sh-field__label::after {
+    content: '(opcional)';
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-regular);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-field--compact { --sh-field-gap: var(--sh-space-1); }
+
+  .sh-field--inline {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3);
+    align-items: center;
+  }
+  .sh-field--inline > .sh-field__label { flex: 0 0 var(--sh-field-label-width, 10rem); }
+  .sh-field--inline > .sh-input,
+  .sh-field--inline > .sh-input-group { flex: 1 1 var(--sh-field-control-min, 12rem); }
+  .sh-field--inline > .sh-field__hint,
+  .sh-field--inline > .sh-field__error { flex: 1 0 100%; margin-block-start: 0; }
+
+  /* ======================================================================
+     sh-input · sh-textarea
+     Altura mínima 44px. inputmode e autocomplete corretos são obrigação do
+     autor: a maior parte destes formulários é preenchida no celular.
+     CPF, telefone e CEP são type="text" com inputmode="numeric".
+
+     Desvio registrado: a spec cita `sh-input__affix`. Um afixo precisa de um
+     contexto de layout, e um elemento não pode pertencer a um bloco que é o
+     próprio controle. Por isso o invólucro é o bloco `sh-input-group`, com o
+     elemento `sh-input-group__affix`.
+
+     <select> nativo não é estilizado aqui: é proibição permanente do sistema.
+     ====================================================================== */
+
+  .sh-input {
+    inline-size: 100%;
+    min-inline-size: 0;
+    min-block-size: var(--sh-input-size, var(--sh-touch-target));
+    padding-block: var(--sh-space-2);
+    padding-inline: var(--sh-input-padding-inline, var(--sh-space-3));
+    border: var(--sh-border-width-hair) solid
+            var(--sh-input-border, var(--sh-border-control));
+    border-radius: var(--sh-radius-field);
+    background-color: var(--sh-input-bg, var(--sh-surface-default));
+    color: var(--sh-text-default);
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-input-font-size, var(--sh-font-size-md));
+    line-height: var(--sh-leading-normal);
+    transition:
+      border-color var(--sh-duration-fast) var(--sh-ease-standard),
+      background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  textarea.sh-input {
+    min-block-size: var(--sh-input-rows, 6.5rem);
+    padding-block: var(--sh-space-3);
+    line-height: var(--sh-leading-relaxed);
+  }
+
+  @media (hover: hover) {
+    .sh-input:hover:not([disabled]):not([readonly]) {
+      --sh-input-border: var(--sh-border-strong);
+    }
+  }
+
+  .sh-input:focus-visible {
+    outline: none;
+    border-color: var(--sh-border-brand);
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  /* Somente leitura NÃO é desabilitado: o campo continua focável e o valor
+     continua sendo copiado dali. O limite fica em --sh-border-control (3:1);
+     quem muda é só o preenchimento. */
+  .sh-input[readonly] {
+    --sh-input-bg: var(--sh-surface-sunken);
+  }
+
+  .sh-input[disabled] {
+    --sh-input-bg: var(--sh-surface-disabled);
+    --sh-input-border: var(--sh-border-disabled);
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* Erro: cor + espessura. O outline interno engrossa o traço sem mover
+     o layout, e sobrevive ao foco (a camada de componente vence o reset). */
+  .sh-input[aria-invalid="true"],
+  .sh-field[data-state="error"] .sh-input {
+    --sh-input-border: var(--sh-border-danger);
+    outline: var(--sh-border-width-hair) solid var(--sh-border-danger);
+    outline-offset: calc(var(--sh-border-width-hair) * -2);
+  }
+  .sh-field[data-state="success"] .sh-input {
+    --sh-input-border: var(--sh-border-success);
+  }
+
+  .sh-input--sm {
+    --sh-input-size: 2.25rem;
+    --sh-input-font-size: var(--sh-font-size-sm);
+  }
+  .sh-input--lg {
+    --sh-input-size: 3.25rem;
+    --sh-input-font-size: var(--sh-font-size-lg);
+  }
+  .sh-input--numeric {
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+  }
+
+  /* ------------------------------------------------------ afixos */
+
+  .sh-input-group {
+    display: flex;
+    align-items: stretch;
+    min-inline-size: 0;
+  }
+  .sh-input-group > .sh-input { flex: 1; }
+
+  .sh-input-group__affix {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--sh-space-2);
+    padding-inline: var(--sh-space-3);
+    border: var(--sh-border-width-hair) solid var(--sh-border-control);
+    background-color: var(--sh-surface-sunken);
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-sm);
+    white-space: nowrap;
+  }
+
+  .sh-input-group > :first-child {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .sh-input-group > :last-child {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+  .sh-input-group > .sh-input-group__affix:first-child {
+    border-start-start-radius: var(--sh-radius-field);
+    border-end-start-radius: var(--sh-radius-field);
+    border-inline-end: 0;
+  }
+  .sh-input-group > .sh-input-group__affix:last-child {
+    border-start-end-radius: var(--sh-radius-field);
+    border-end-end-radius: var(--sh-radius-field);
+    border-inline-start: 0;
+  }
+  .sh-input-group:focus-within { z-index: var(--sh-layer-raised); }
+
+  /* ======================================================================
+     sh-badge — informa. Nunca é clicável.
+     sh-badge › __dot (opcional, decorativo) › __label
+     Estado sempre com palavra: o ponto e a cor apenas reforçam.
+     ====================================================================== */
+
+  .sh-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    padding-block: var(--sh-space-1);
+    padding-inline: var(--sh-badge-padding-inline, var(--sh-space-3));
+    border: var(--sh-border-width-hair) solid
+            var(--sh-badge-border, var(--sh-border-default));
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-badge-bg, var(--sh-surface-sunken));
+    color: var(--sh-badge-fg, var(--sh-text-default));
+    font-size: var(--sh-badge-font-size, var(--sh-font-size-sm));
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    white-space: nowrap;
+  }
+
+  .sh-badge__dot {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    flex: none;
+    border-radius: var(--sh-radius-pill);
+    background-color: currentColor;
+  }
+
+  .sh-badge--sm {
+    --sh-badge-font-size: var(--sh-font-size-xs);
+    --sh-badge-padding-inline: var(--sh-space-2);
+  }
+
+  /* Tons — soft é o padrão. */
+  .sh-badge--neutral {
+    --sh-badge-bg: var(--sh-surface-sunken);
+    --sh-badge-fg: var(--sh-text-default);
+    --sh-badge-border: var(--sh-border-default);
+  }
+  .sh-badge--brand {
+    --sh-badge-bg: var(--sh-surface-brand-subtle);
+    --sh-badge-fg: var(--sh-text-brand);
+    --sh-badge-border: var(--sh-border-brand);
+  }
+  .sh-badge--accent {
+    --sh-badge-bg: var(--sh-surface-accent-subtle);
+    --sh-badge-fg: var(--sh-text-accent);
+    --sh-badge-border: var(--sh-border-accent);
+  }
+  .sh-badge--success {
+    --sh-badge-bg: var(--sh-feedback-success-surface);
+    --sh-badge-fg: var(--sh-feedback-success-text);
+    --sh-badge-border: var(--sh-feedback-success-border);
+  }
+  .sh-badge--warning {
+    --sh-badge-bg: var(--sh-feedback-warning-surface);
+    --sh-badge-fg: var(--sh-feedback-warning-text);
+    --sh-badge-border: var(--sh-feedback-warning-border);
+  }
+  .sh-badge--danger {
+    --sh-badge-bg: var(--sh-feedback-danger-surface);
+    --sh-badge-fg: var(--sh-feedback-danger-text);
+    --sh-badge-border: var(--sh-feedback-danger-border);
+  }
+  .sh-badge--info {
+    --sh-badge-bg: var(--sh-feedback-info-surface);
+    --sh-badge-fg: var(--sh-feedback-info-text);
+    --sh-badge-border: var(--sh-feedback-info-border);
+  }
+
+  /* Preenchimentos. --solid do acento mantém o contorno obrigatório. */
+  .sh-badge--solid            { --sh-badge-bg: var(--sh-surface-inverse); --sh-badge-fg: var(--sh-text-inverse); --sh-badge-border: var(--sh-surface-inverse); }
+  .sh-badge--brand.sh-badge--solid   { --sh-badge-bg: var(--sh-surface-brand);  --sh-badge-fg: var(--sh-text-on-brand);  --sh-badge-border: var(--sh-border-brand); }
+  .sh-badge--accent.sh-badge--solid  { --sh-badge-bg: var(--sh-surface-accent); --sh-badge-fg: var(--sh-text-on-accent); --sh-badge-border: var(--sh-surface-accent-border); }
+  .sh-badge--success.sh-badge--solid { --sh-badge-bg: var(--sh-feedback-success-solid); --sh-badge-fg: var(--sh-feedback-success-on-solid); --sh-badge-border: var(--sh-feedback-success-solid); }
+  .sh-badge--warning.sh-badge--solid { --sh-badge-bg: var(--sh-feedback-warning-solid); --sh-badge-fg: var(--sh-feedback-warning-on-solid); --sh-badge-border: var(--sh-feedback-warning-solid); }
+  .sh-badge--danger.sh-badge--solid  { --sh-badge-bg: var(--sh-feedback-danger-solid);  --sh-badge-fg: var(--sh-feedback-danger-on-solid);  --sh-badge-border: var(--sh-feedback-danger-solid); }
+  .sh-badge--info.sh-badge--solid    { --sh-badge-bg: var(--sh-feedback-info-solid);    --sh-badge-fg: var(--sh-feedback-info-on-solid);    --sh-badge-border: var(--sh-feedback-info-solid); }
+
+  .sh-badge--outline { --sh-badge-bg: transparent; }
+  .sh-badge--outline.sh-badge--neutral { --sh-badge-fg: var(--sh-text-default); --sh-badge-border: var(--sh-border-strong); }
+
+  /* ======================================================================
+     sh-chip — interage. É <button> de verdade.
+     sh-chip › __icon › __label › (__remove, quando o chip não é o botão)
+
+     Chip removível: <button> dentro de <button> é HTML inválido. Nesse caso
+     o chip é <span class="sh-chip"> e só o __remove é botão.
+     Chip de filtro: <button class="sh-chip" aria-pressed="false">.
+     ====================================================================== */
+
+  .sh-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    min-block-size: var(--sh-chip-size, 2.25rem);
+    padding-block: var(--sh-space-1);
+    padding-inline: var(--sh-chip-padding-inline, var(--sh-space-4));
+    border: var(--sh-border-width-hair) solid
+            var(--sh-chip-border, var(--sh-border-control));
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-chip-bg, var(--sh-surface-default));
+    color: var(--sh-chip-fg, var(--sh-text-default));
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-chip-font-size, var(--sh-font-size-sm));
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color var(--sh-duration-fast) var(--sh-ease-standard),
+      color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  /* Desenho de 36px, alvo real de 44px. Só no chip que É o controle: num chip
+     removível o expansor cobriria o botão __remove. */
+  button.sh-chip::after,
+  a.sh-chip::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: max(100%, var(--sh-touch-target));
+    translate: -50% -50%;
+  }
+
+  .sh-chip__icon { --sh-icon-size: var(--sh-icon-size-sm); }
+
+  @media (hover: hover) {
+    button.sh-chip:hover:not([disabled]),
+    a.sh-chip:hover:not([aria-disabled="true"]) {
+      background-color: var(--sh-surface-hover);
+      border-color: var(--sh-border-strong);
+    }
+  }
+
+  .sh-chip:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+
+  .sh-chip:active:not([disabled]) { background-color: var(--sh-surface-active); }
+
+  /* Selecionado: cor + traço mais grosso (outline interno, sem reflow). */
+  .sh-chip[aria-pressed="true"],
+  .sh-chip[aria-selected="true"] {
+    --sh-chip-bg: var(--sh-surface-selected);
+    --sh-chip-border: var(--sh-border-brand);
+    --sh-chip-fg: var(--sh-text-brand);
+    outline: var(--sh-border-width-hair) solid var(--sh-border-brand);
+    outline-offset: calc(var(--sh-border-width-hair) * -2);
+  }
+
+  .sh-chip[disabled],
+  .sh-chip[aria-disabled="true"] {
+    --sh-chip-bg: var(--sh-surface-disabled);
+    --sh-chip-fg: var(--sh-text-disabled);
+    --sh-chip-border: var(--sh-border-disabled);
+    cursor: not-allowed;
+  }
+
+  .sh-chip--sm {
+    --sh-chip-size: 2rem;
+    --sh-chip-padding-inline: var(--sh-space-3);
+    --sh-chip-font-size: var(--sh-font-size-xs);
+  }
+
+  .sh-chip__remove {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-icon-size-lg);
+    block-size: var(--sh-icon-size-lg);
+    margin-inline-end: calc(var(--sh-space-2) * -1);
+    border-radius: var(--sh-radius-pill);
+    color: inherit;
+    cursor: pointer;
+  }
+  .sh-chip__remove::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: 0;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    translate: 0 -50%;
+  }
+  @media (hover: hover) {
+    .sh-chip__remove:hover { background-color: var(--sh-surface-active); }
+  }
+  .sh-chip__remove:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  /* ======================================================================
+     sh-alert
+     sh-alert › __icon › __content (__title, __text) › __actions › __dismiss
+     role="status" em info/success, role="alert" em danger.
+     Ícone + cor + palavra, sempre os três. Alerta de erro não some sozinho.
+     ====================================================================== */
+
+  .sh-alert {
+    display: flex;
+    gap: var(--sh-space-3);
+    align-items: flex-start;
+    padding: var(--sh-alert-padding, var(--sh-space-4));
+    border: var(--sh-border-width-hair) solid
+            var(--sh-alert-border, var(--sh-feedback-info-border));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-alert-bg, var(--sh-feedback-info-surface));
+    color: var(--sh-text-default);
+  }
+
+  .sh-alert__icon {
+    --sh-icon-size: var(--sh-icon-size-lg);
+    margin-block-start: calc(var(--sh-space-px) * 2);
+    color: var(--sh-alert-ink, var(--sh-feedback-info-text));
+  }
+
+  .sh-alert__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--sh-space-1);
+    min-inline-size: 0;
+  }
+
+  .sh-alert__title {
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-alert-ink, var(--sh-feedback-info-text));
+  }
+
+  .sh-alert__text {
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-relaxed);
+    color: var(--sh-text-default);
+  }
+
+  .sh-alert__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2);
+    align-items: center;
+    margin-block-start: var(--sh-space-2);
+  }
+
+  .sh-alert__dismiss {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-icon-size-xl);
+    block-size: var(--sh-icon-size-xl);
+    margin: calc(var(--sh-space-1) * -1);
+    border-radius: var(--sh-radius-control);
+    color: var(--sh-text-default);
+    cursor: pointer;
+  }
+  .sh-alert__dismiss::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    translate: -50% -50%;
+  }
+  @media (hover: hover) {
+    .sh-alert__dismiss:hover { background-color: var(--sh-surface-active); }
+  }
+  .sh-alert__dismiss:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  .sh-alert--info {
+    --sh-alert-bg: var(--sh-feedback-info-surface);
+    --sh-alert-border: var(--sh-feedback-info-border);
+    --sh-alert-ink: var(--sh-feedback-info-text);
+  }
+  .sh-alert--success {
+    --sh-alert-bg: var(--sh-feedback-success-surface);
+    --sh-alert-border: var(--sh-feedback-success-border);
+    --sh-alert-ink: var(--sh-feedback-success-text);
+  }
+  .sh-alert--warning {
+    --sh-alert-bg: var(--sh-feedback-warning-surface);
+    --sh-alert-border: var(--sh-feedback-warning-border);
+    --sh-alert-ink: var(--sh-feedback-warning-text);
+  }
+  .sh-alert--danger {
+    --sh-alert-bg: var(--sh-feedback-danger-surface);
+    --sh-alert-border: var(--sh-feedback-danger-border);
+    --sh-alert-ink: var(--sh-feedback-danger-text);
+  }
+
+  .sh-alert--inline {
+    --sh-alert-padding: var(--sh-space-3);
+    border-radius: var(--sh-radius-control);
+  }
+  .sh-alert--banner {
+    border-radius: 0;
+    border-inline: 0;
+    border-block-start: 0;
+  }
+
+  /* ======================================================================
+     sh-skeleton
+     O contêiner que vai receber o dado leva aria-busy="true";
+     o esqueleto em si é aria-hidden="true".
+     O brilho é --sh-gradient-breath: a luz da pomba varrendo a superfície.
+     A pomba não gira. Sob prefers-reduced-motion, some o brilho e fica a forma.
+     ====================================================================== */
+
+  .sh-skeleton {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    inline-size: var(--sh-skeleton-w, 100%);
+    block-size: var(--sh-skeleton-h, 1rem);
+    border-radius: var(--sh-radius-control);
+    background-color: var(--sh-surface-sunken);
+  }
+  .sh-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--sh-skeleton-sheen, var(--sh-surface-sheen, var(--sh-gradient-breath)));
+    opacity: var(--sh-skeleton-sheen-opacity, 0.5);
+    translate: -100% 0;
+    animation: sh-breath calc(var(--sh-duration-slower) * 3)
+               var(--sh-ease-standard) infinite;
+  }
+
+  .sh-skeleton--text   { --sh-skeleton-h: 0.75rem; border-radius: var(--sh-radius-pill); }
+  .sh-skeleton--title  { --sh-skeleton-h: 1.5rem;  --sh-skeleton-w: 60%; }
+  .sh-skeleton--media  { --sh-skeleton-h: auto; aspect-ratio: 16 / 9; border-radius: var(--sh-radius-media); }
+  .sh-skeleton--avatar { --sh-skeleton-h: 2.5rem; --sh-skeleton-w: 2.5rem; border-radius: var(--sh-radius-pill); }
+  .sh-skeleton--row    { --sh-skeleton-h: 3.5rem; border-radius: var(--sh-radius-surface); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sh-skeleton::after { display: none; }
+  }
+
+  /* ======================================================================
+     sh-spinner
+     <span class="sh-spinner" role="status">
+       <span class="sh-visually-hidden">Carregando eventos</span>
+     </span>
+     Sempre com texto acessível. Nunca é o único conteúdo de uma região por
+     mais de 10 segundos — depois disso vira sh-empty com explicação.
+
+     Desvio registrado: a spec previa trilho em --sh-border-strong e cabeça em
+     --sh-text-accent. Em acamps claro as duas cores ficam escuras e a cabeça
+     desaparece no trilho. O arco é de uma cor só com um quarto transparente:
+     legível nos seis cenários e dependente de um único par de contraste.
+     ====================================================================== */
+
+  .sh-spinner {
+    display: inline-flex;
+    flex: none;
+    inline-size: var(--sh-spinner-size, var(--sh-icon-size-lg));
+    block-size: var(--sh-spinner-size, var(--sh-icon-size-lg));
+    border: var(--sh-spinner-width, var(--sh-border-width-thick)) solid
+            var(--sh-spinner-color, var(--sh-text-accent));
+    border-block-start-color: transparent;
+    border-radius: var(--sh-radius-pill);
+    animation: sh-spin calc(var(--sh-duration-slower) * 1.6) linear infinite;
+  }
+  .sh-spinner--sm { --sh-spinner-size: var(--sh-icon-size-sm); --sh-spinner-width: var(--sh-border-width-thin); }
+  .sh-spinner--md { --sh-spinner-size: var(--sh-icon-size-lg); }
+  .sh-spinner--lg { --sh-spinner-size: var(--sh-icon-size-xl); --sh-spinner-width: var(--sh-border-width-heavy); }
+  .sh-spinner--inline { --sh-spinner-size: 1em; --sh-spinner-width: var(--sh-border-width-thin); vertical-align: -0.125em; }
+
+  /* ======================================================================
+     sh-divider
+     <hr class="sh-divider">
+     <div class="sh-divider sh-divider--dove" role="separator" aria-hidden="true">
+       <svg class="sh-divider__dove">…</svg>
+     </div>
+     --dove é decorativo e no máximo um por página.
+     ====================================================================== */
+
+  .sh-divider {
+    border: 0;
+    border-block-start: var(--sh-divider-width, var(--sh-border-width-hair)) solid
+                        var(--sh-divider-color, var(--sh-border-subtle));
+    margin-block: var(--sh-divider-space, var(--sh-space-6));
+  }
+  .sh-divider--subtle { --sh-divider-color: var(--sh-border-subtle); }
+  .sh-divider--strong { --sh-divider-color: var(--sh-border-strong); }
+
+  /* A única barra vertical que o sistema declara de propósito, e a exceção
+     nomeada em DEC-024: aqui o traço vertical É o componente. Ele separa
+     dois blocos irmãos; não encosta na aresta de um deles para destacá-lo. */
+  .sh-divider--vertical {
+    border-block-start: 0;
+    border-inline-start: var(--sh-divider-width, var(--sh-border-width-hair)) solid
+                         var(--sh-divider-color, var(--sh-border-subtle));
+    block-size: auto;
+    align-self: stretch;
+    margin-block: 0;
+    margin-inline: var(--sh-divider-space, var(--sh-space-4));
+  }
+
+  .sh-divider--dove {
+    display: flex;
+    align-items: center;
+    gap: var(--sh-space-4);
+    border: 0;
+  }
+  .sh-divider--dove::before,
+  .sh-divider--dove::after {
+    content: '';
+    flex: 1;
+    block-size: var(--sh-divider-width, var(--sh-border-width-hair));
+    background-color: var(--sh-divider-color, var(--sh-border-subtle));
+  }
+  .sh-divider__dove {
+    flex: none;
+    inline-size: var(--sh-dove-size, var(--sh-icon-size-md));
+    block-size: var(--sh-dove-size, var(--sh-icon-size-md));
+    color: var(--sh-dove-ink);
+  }
+
+  /* ====================================================================== */
+
+  @keyframes sh-spin {
+    to { rotate: 360deg; }
+  }
+
+  @keyframes sh-breath {
+    0%   { translate: -100% 0; }
+    60%  { translate: 100% 0; }
+    100% { translate: 100% 0; }
+  }
+}

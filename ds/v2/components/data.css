@@ -1,0 +1,2278 @@
+/* ==========================================================================
+   Shalom DS — Lote D: dados
+   sh-table · sh-list · sh-stat · sh-definition · sh-progress · sh-calendar
+
+   Contrato deste arquivo (mesmo de components/foundation.css)
+   ----------------------------------------------------------
+   1. Só a camada semântica para cor. Nenhum primitivo, nenhum hex.
+   2. Nenhum seletor cita [data-sh-theme]. Os seis cenários saem do mesmo CSS.
+   3. Estado vem do DOM: [aria-sort], [aria-selected], [aria-busy],
+      [data-state], :has(:checked). Classe is-* não é usada aqui.
+   4. Tokens de camada 3 com valor padrão inline apontando para a camada 2.
+   5. Zero !important.
+
+   Nota de escopo (registrada para o relatório do lote): docs/03 lista
+   `sh-progress` dentro de "Lote D — Feedback e dados" sem atribuir arquivo; o
+   stub original deste par de arquivos colocou `sh-progress` no comentário de
+   cabeçalho de feedback.css. A instrução de construção deste lote pede
+   `sh-progress` explicitamente em data.css — é um componente de ocupação/
+   capacidade (mesma família de sh-heat, "Reuso previsto: ocupação de vagas de
+   evento"), então fica aqui. feedback.css não repete o componente.
+   ========================================================================== */
+
+@layer sh.components {
+
+  /* ======================================================================
+     sh-table
+     sh-table-wrap (rolagem + container query) › <table class="sh-table">
+       › <caption> › thead/tbody › sh-table__cell--numeric
+
+     Duas respostas responsivas, não uma:
+       1. sh-table-wrap rola na horizontal — o padrão, sempre presente.
+       2. sh-table--stack empilha cada linha em pares rótulo/valor quando o
+          PRÓPRIO CONTÊINER (não o viewport) fica estreito — @container, não
+          media query, porque a mesma tabela pode viver numa página cheia ou
+          numa coluna lateral de admin. É opt-in: nem toda tabela deve virar
+          cartão (uma tabela financeira quer alinhamento de coluna sempre).
+
+     Desvio registrado: para --stack não quebrar a semântica de tabela para
+     leitor de tela (mudar `display` de tr/td é um ponto conhecido de
+     divergência entre navegador e AT — ver Adrian Roselli, "Tables, CSS
+     Display Properties, and ARIA"), quem usa --stack DEVE também declarar
+     role="table"/"rowgroup"/"row" no HTML, como no exemplo de prova-dados.html.
+     Sem isso, o layout empilhado ainda funciona visualmente, mas a leitura
+     por AT pode perder a relação linha/coluna.
+     ====================================================================== */
+
+  .sh-table-wrap {
+    container-type: inline-size;
+    container-name: sh-table;
+    /* Defesa contra o item-flex que não encolhe: sh-stack (layout.css) é
+       display:flex e não zera min-width nos filhos, então um item cujo
+       conteúdo tem largura mínima grande (esta tabela, sem quebra de linha)
+       infla o contêiner flex inteiro sem isto. Mesmo raciocínio de
+       .sh-field/.sh-alert__content em foundation.css. */
+    min-inline-size: 0;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    border: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    border-radius: var(--sh-radius-surface);
+    /* Sombra de rolagem: some nas pontas quando não há mais conteúdo a ver.
+       Quatro camadas — duas máscaras que rolam JUNTO com o conteúdo (escondem
+       a sombra na borda real) e duas sombras fixas ao viewport do wrap. */
+    background-color: var(--sh-table-wrap-bg, var(--sh-surface-default));
+    background-image:
+      linear-gradient(to right, var(--sh-table-wrap-bg, var(--sh-surface-default)) 40%, transparent),
+      linear-gradient(to left,  var(--sh-table-wrap-bg, var(--sh-surface-default)) 40%, transparent),
+      linear-gradient(to right, rgb(var(--sh-shadow-rgb) / 0.16), transparent),
+      linear-gradient(to left,  rgb(var(--sh-shadow-rgb) / 0.16), transparent);
+    background-repeat: no-repeat;
+    background-size: 1.5rem 100%, 1.5rem 100%, 0.75rem 100%, 0.75rem 100%;
+    background-position: left, right, left, right;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  /* Densidade sob Montserrat (DEC-029). A mesma frase em português mede 12,3%
+     mais largura em Montserrat 400 do que em Figtree 400 (medição em fontTools
+     de uma frase de 90 caracteres: 47,83em contra 42,61em). Numa tabela isso
+     empurra coluna e obriga a rolagem horizontal antes da hora. A compensação
+     é dupla e cabe na escala, sem inventar corpo novo no meio da rampa:
+       1. --sh-table-font-size, que o admin desce para --sh-font-size-dense
+          (13px). Como a altura-x da Montserrat é 5% maior, 13px aqui tem a
+          mesma altura-x que 13,65px de Figtree: a coluna encolhe 7%, o texto
+          não. Fora do admin o padrão continua sendo 14px.
+       2. tracking denso, que devolve mais ~1,5% sem tocar no corpo.
+     O cabeçalho mantém --sh-tracking-wide: caixa-alta pequena precisa do
+     contrário, e a Montserrat em versalete pede tracking positivo. */
+  .sh-table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--sh-table-font-size, var(--sh-font-size-sm));
+    letter-spacing: var(--sh-tracking-dense);
+    color: var(--sh-text-default);
+  }
+
+  .sh-table caption {
+    padding: var(--sh-space-4) var(--sh-space-4) var(--sh-space-3);
+    text-align: start;
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-strong);
+  }
+  /* Legenda dispensável visualmente continua no DOM para o leitor de tela. */
+  .sh-table caption.sh-visually-hidden { padding: 0; }
+
+  .sh-table th,
+  .sh-table td {
+    padding: var(--sh-space-3) var(--sh-space-4);
+    text-align: start;
+    vertical-align: middle;
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    white-space: var(--sh-table-cell-wrap, normal);
+  }
+
+  .sh-table thead th {
+    padding-block: var(--sh-space-2);
+    /* Altura mínima de 44px no cabeçalho padrão — a linha mais clicável
+       (ordenação) cumpre alvo de toque sem precisar de ::after.
+       --compact abre mão disso deliberadamente: ver nota na variante. */
+    min-block-size: var(--sh-touch-target);
+    background-color: var(--sh-surface-sunken);
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--sh-tracking-wide);
+    white-space: nowrap;
+  }
+
+  .sh-table tbody tr {
+    transition: background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  @media (hover: hover) {
+    .sh-table tbody tr:hover { background-color: var(--sh-surface-hover); }
+  }
+
+  .sh-table tbody tr:last-child td { border-block-end: 0; }
+
+  /* Linha em carregamento: conteúdo é sh-skeleton (composto pelo autor),
+     esta regra só neutraliza a interação enquanto o dado não chegou. */
+  .sh-table tbody tr[aria-busy="true"] {
+    pointer-events: none;
+  }
+
+  .sh-table__cell--numeric {
+    text-align: end;
+    font-family: var(--sh-font-mono);
+    /* tabular-nums já é global em toda <table> (foundations/typography.css);
+       aqui só o alinhamento e a fonte mudam. */
+  }
+
+  /* ------------------------------------------------------- ordenação */
+  /* aria-sort mora no <th>, nunca no botão — é propriedade da coluna. */
+  .sh-table__sort-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-1);
+    inline-size: 100%;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    text-transform: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+  }
+  /* O <th> já tem 44px de altura mínima (ver .sh-table thead th), mas o botão
+     dentro dele desenha só a linha de texto (18px) e o hit-test mede o BOTÃO,
+     não a célula. O ::after estende a área ao padding do cabeçalho, na largura
+     da própria coluna — nenhum outro alvo mora ali. */
+  .sh-table__sort-btn::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 50%;
+    block-size: var(--sh-touch-target);
+    translate: 0 -50%;
+  }
+  .sh-table__sort-icon {
+    --sh-icon-size: var(--sh-icon-size-sm);
+    flex: none;
+    opacity: 0.5;
+    transition: opacity var(--sh-duration-fast) var(--sh-ease-standard),
+                rotate var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  th[aria-sort="ascending"] .sh-table__sort-icon,
+  th[aria-sort="descending"] .sh-table__sort-icon {
+    opacity: 1;
+  }
+  th[aria-sort="descending"] .sh-table__sort-icon { rotate: 180deg; }
+
+  .sh-table__sort-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  /* ------------------------------------------------------------ linha */
+
+  /* Seleção: casa tanto com o atributo explícito (JS/framework) quanto com o
+     estado nativo do checkbox — DOM manda, nenhum dos dois é obrigatório. */
+  .sh-table tbody tr[data-state="selected"],
+  .sh-table tbody tr:has(> .sh-table__select:checked) {
+    background-color: var(--sh-surface-selected);
+  }
+
+  .sh-table__select {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    accent-color: var(--sh-action-primary-bg);
+    vertical-align: middle;
+    cursor: pointer;
+  }
+  /* sh-checkbox (Lote B) ainda não existe: a caixa nativa fica aqui como
+     placeholder funcional. Trocar pelo componente quando o Lote B publicar. */
+
+  /* -------------------------------------------------------- variantes */
+
+  /* A 12px a haste da Montserrat 400 mede 0,88px — 13% mais fina que a da
+     Figtree no mesmo corpo. Aqui a densidade é o requisito, então o corpo não
+     sobe; quem compensa é o peso, que passa a medium. Custa ~1,5% de largura
+     e devolve a linha de tinta que o desenho geométrico perde no miúdo. */
+  .sh-table--compact th,
+  .sh-table--compact td {
+    padding-block: var(--sh-space-2);
+    padding-inline: var(--sh-space-3);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-medium);
+  }
+  .sh-table--compact thead th { font-weight: var(--sh-weight-semibold); }
+  /* Densidade de admin: abre mão do alvo de 44px no cabeçalho por decisão
+     explícita de --compact. Documentado — não é um esquecimento. */
+  .sh-table--compact thead th { min-block-size: 0; }
+
+  .sh-table--striped tbody tr:nth-child(even) {
+    background-color: var(--sh-table-stripe-bg, var(--sh-surface-sunken));
+  }
+  @media (hover: hover) {
+    .sh-table--striped tbody tr:nth-child(even):hover {
+      background-color: var(--sh-surface-hover);
+    }
+  }
+
+  .sh-table--sticky-head thead th {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--sh-layer-raised);
+  }
+
+  /* ---------------------------------------------------- modo empilhado */
+
+  @container sh-table (max-width: 34rem) {
+    .sh-table--stack thead {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .sh-table--stack,
+    .sh-table--stack tbody,
+    .sh-table--stack tr,
+    .sh-table--stack td {
+      display: block;
+      inline-size: 100%;
+    }
+    .sh-table--stack tr {
+      padding: var(--sh-space-3) var(--sh-space-4);
+      border-block-end: var(--sh-border-width-thick) solid var(--sh-border-subtle);
+    }
+    .sh-table--stack td {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--sh-space-4);
+      padding: var(--sh-space-1) 0;
+      text-align: end;
+      border-block-end: 0;
+    }
+    .sh-table--stack td::before {
+      content: attr(data-label);
+      flex: none;
+      max-inline-size: 40%;
+      color: var(--sh-text-muted);
+      font-size: var(--sh-font-size-xs);
+      font-weight: var(--sh-weight-semibold);
+      text-align: start;
+      text-transform: uppercase;
+      letter-spacing: var(--sh-tracking-wide);
+    }
+    .sh-table--stack td:not([data-label])::before { content: none; }
+  }
+
+  /* ======================================================================
+     sh-list
+     <ul class="sh-list"> › <li class="sh-list__row"> › __thumb, __main
+       (› __title, __sub), __meta, __actions
+
+     A linha nunca é um único alvo clicável quando contém botões: o título
+     carrega um link real (ou não é link nenhum); as ações ficam à parte.
+     ====================================================================== */
+
+  .sh-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sh-list__row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* sh-list é display:flex; column — a linha também é item flex do próprio
+       sh-list, e herda o mesmo min-width:auto por padrão. Sem isto, o título
+       sem quebra de um item empurra a lista inteira, não só a própria linha. */
+    min-inline-size: 0;
+    gap: var(--sh-list-gap, var(--sh-space-4));
+    padding-block: var(--sh-list-padding, var(--sh-space-3));
+    padding-inline: var(--sh-list-padding-inline, var(--sh-space-1));
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    transition: background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-list__row:last-child { border-block-end: 0; }
+
+  @media (hover: hover) {
+    .sh-list__row:hover { background-color: var(--sh-surface-hover); }
+  }
+
+  .sh-list__thumb {
+    flex: none;
+    inline-size: var(--sh-list-thumb-size, 2.75rem);
+    block-size: var(--sh-list-thumb-size, 2.75rem);
+    overflow: hidden;
+    border-radius: var(--sh-radius-control);
+    background-color: var(--sh-surface-sunken);
+    color: var(--sh-text-muted);
+  }
+  .sh-list__thumb > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+
+  .sh-list__main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: calc(var(--sh-space-1) / 2);
+    min-inline-size: 0;
+  }
+
+  .sh-list__title {
+    /* Quebra normal por padrão, de propósito — não nowrap+ellipsis. sh-list
+       vive dentro de sh-panel/sh-switcher (foundation.css/layout.css, fora
+       do alcance deste lote), que não zeram min-width nos próprios itens
+       flex; título de uma linha só travaria a linha inteira contra o texto
+       mais longo em vez de encolher com o contêiner. --truncate é o opt-in
+       para quem sabe que o próprio contêiner já garante min-inline-size:0. */
+    min-inline-size: 0;
+    color: var(--sh-text-strong);
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    overflow-wrap: break-word;
+  }
+  .sh-list--truncate .sh-list__title,
+  .sh-list--truncate .sh-list__sub {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  a.sh-list__title {
+    position: relative;
+    color: var(--sh-text-strong);
+    text-decoration: none;
+  }
+  /* O título desenha uma linha de texto (20px) e clica 44px. Só cresce no
+     eixo vertical e só dentro da própria coluna (inset-inline: 0): o
+     excedente cai sobre o padding da linha e sobre o próprio __sub, nunca
+     sobre a caixa de seleção (que fica antes) nem sobre __meta/__actions (que
+     ficam depois) — são colunas irmãs, fora da caixa do título. Medido: 68px
+     de centro a centro entre títulos de linhas vizinhas. */
+  a.sh-list__title::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 50%;
+    block-size: var(--sh-touch-target);
+    translate: 0 -50%;
+  }
+  a.sh-list__title:hover { color: var(--sh-text-link-hover); text-decoration: underline; }
+  a.sh-list__title:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  .sh-list__sub {
+    min-inline-size: 0;
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-sm);
+    overflow-wrap: break-word;
+  }
+
+  .sh-list__meta {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-2);
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-xs);
+    white-space: nowrap;
+  }
+
+  /* --sh-space-2 e não --sh-space-1: os ícones de ação desenham 36px e clicam
+     44px pelo ::after de .sh-btn--sm. Com 4px de intervalo os alvos vizinhos
+     ficavam a 40px de centro a centro e se SOBREPUNHAM — como todos são
+     ::after irmãos sem z-index, quem respondia era sempre o botão seguinte, e
+     cada um media 40px em vez de 44. Com 8px o passo bate 44px e cada botão
+     recebe a própria área inteira. */
+  .sh-list__actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--sh-space-2);
+  }
+
+  /* ------------------------------------------------- seleção e arraste */
+
+  .sh-list__select {
+    flex: none;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    accent-color: var(--sh-action-primary-bg);
+    cursor: pointer;
+  }
+
+  .sh-list__row[data-state="selected"],
+  .sh-list__row:has(> .sh-list__select:checked) {
+    background-color: var(--sh-surface-selected);
+  }
+
+  .sh-list__row[aria-disabled="true"] {
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+  .sh-list__row[aria-disabled="true"] .sh-list__title,
+  .sh-list__row[aria-disabled="true"] .sh-list__sub { color: var(--sh-text-disabled); }
+
+  /* Arrastar move; teclado reordena. O grip é reforço de ponteiro — as
+     verdadeiras ações acessíveis são botões "Mover para cima/baixo" dentro
+     de __actions, fornecidos pela página que consome o componente. */
+  .sh-list__handle {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    margin-inline-start: calc(var(--sh-space-2) * -1);
+    border-radius: var(--sh-radius-control);
+    color: var(--sh-text-muted);
+    cursor: grab;
+    touch-action: none;
+  }
+  .sh-list__handle:active { cursor: grabbing; }
+  .sh-list__handle:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  .sh-list__row[data-state="dragging"] {
+    box-shadow: var(--sh-shadow-lg);
+    background-color: var(--sh-surface-raised);
+    opacity: 0.9;
+  }
+
+  /* -------------------------------------------------------- variantes */
+
+  .sh-list--compact { --sh-list-gap: var(--sh-space-3); --sh-list-padding: var(--sh-space-2); }
+
+  .sh-list__group-label {
+    padding-block: var(--sh-space-2);
+    padding-inline: var(--sh-list-padding-inline, var(--sh-space-1));
+    color: var(--sh-text-accent);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+  }
+  .sh-list--grouped .sh-list__group-label:not(:first-child) {
+    margin-block-start: var(--sh-space-2);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  /* ======================================================================
+     sh-stat · sh-definition
+     Stat:      __value (mono, tabular) › __label › __delta › __hint
+     Definition: <dl class="sh-definition"> de metadados
+
+     A direção do delta nunca depende só de cor: seta + palavra, sempre.
+     ====================================================================== */
+
+  .sh-stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-1);
+  }
+
+  .sh-stat__value {
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-stat-value-size, var(--sh-font-size-2xl));
+    font-weight: var(--sh-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--sh-leading-tight);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-stat__label {
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-medium);
+  }
+
+  .sh-stat__delta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-1);
+    inline-size: fit-content;
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-muted);
+  }
+  .sh-stat__delta-icon { --sh-icon-size: var(--sh-icon-size-sm); flex: none; }
+
+  /* Direção (seta) e sentido (cor) são eixos INDEPENDENTES — de propósito.
+     Vagas subindo é bom; cancelamentos subindo é ruim. A spec já diz que a
+     direção não pode depender de cor ("usar seta + palavra"), então --up/
+     --down/--flat só giram o ícone; a palavra do autor é que nomeia a
+     direção. --positive/--negative são quem decide a cor, compostos à parte:
+       <span class="sh-stat__delta sh-stat__delta--down sh-stat__delta--positive">
+         <svg class="sh-stat__delta-icon">…</svg> 6 pendências a menos
+       </span> */
+  .sh-stat__delta--down .sh-stat__delta-icon { rotate: 180deg; }
+  .sh-stat__delta--flat .sh-stat__delta-icon { rotate: 90deg; }
+  .sh-stat__delta--positive { color: var(--sh-text-success); }
+  .sh-stat__delta--negative { color: var(--sh-text-danger); }
+
+  .sh-stat__hint {
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-xs);
+  }
+
+  .sh-stat--kpi { --sh-stat-value-size: var(--sh-font-size-display-sm); gap: var(--sh-space-2); }
+
+  .sh-stat--inline {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sh-space-2);
+  }
+  .sh-stat--inline .sh-stat__value { font-size: var(--sh-stat-value-size, var(--sh-font-size-lg)); }
+
+  /* ------------------------------------------------------- definition */
+
+  .sh-definition {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--sh-definition-min, 12rem), 100%), 1fr));
+    gap: var(--sh-space-4) var(--sh-space-6);
+  }
+
+  .sh-definition__item { min-inline-size: 0; }
+
+  .sh-definition dt,
+  .sh-definition__item dt {
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--sh-tracking-wide);
+  }
+
+  .sh-definition dd,
+  .sh-definition__item dd {
+    margin-inline-start: 0;
+    color: var(--sh-text-default);
+    font-size: var(--sh-font-size-md);
+    line-height: var(--sh-leading-snug);
+  }
+  .sh-definition dd:not(:last-child),
+  .sh-definition__item dd:not(:last-child) {
+    margin-block-end: var(--sh-space-1);
+  }
+
+  /* Rótulo e valor na mesma linha, para metadados curtos. */
+  .sh-definition--inline .sh-definition__item,
+  .sh-definition--inline.sh-definition {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2);
+    align-items: baseline;
+  }
+  .sh-definition--inline dt { flex: 0 0 auto; }
+
+  /* ======================================================================
+     sh-progress
+     __track › __fill (barra) ou __track › __fill › __fill::before (anel)
+       ou __track › __step* (etapas) › __label
+
+     role="progressbar" mora em .sh-progress. Indeterminado = SEM
+     aria-valuenow, como o WAI-ARIA define — [data-state="indeterminate"]
+     é o gatilho visual, a ausência do atributo é o contrato semântico.
+     __label é o VALOR em texto (a regra de acessibilidade exige texto, não
+     só aria-*); o NOME do que está sendo medido é aria-label ou
+     aria-labelledby apontando para um rótulo externo — nunca para o próprio
+     __label, senão o nome e o valor colapsam na mesma frase.
+     ====================================================================== */
+
+  .sh-progress {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-2);
+  }
+
+  .sh-progress__track {
+    position: relative;
+    overflow: hidden;
+    inline-size: 100%;
+    block-size: var(--sh-progress-thickness, 0.625rem);
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-progress-track, var(--sh-surface-sunken));
+  }
+
+  .sh-progress__fill {
+    display: block;
+    inline-size: var(--sh-progress-value, 0%);
+    block-size: 100%;
+    border-radius: inherit;
+    /* --action-primary-BORDER, não -bg: o mesmo raciocínio do contorno
+       obrigatório em sh-btn--accent. Em acamps claro o preenchimento do
+       primário é creme (pensado para ficar sobre o botão, não sobre
+       --sh-surface-sunken) — 2.02:1 contra o trilho, reprova o mínimo de
+       3:1. O token de borda é o que este sistema já usa como a cor
+       confiavelmente escura/saturada de cada família de ação; medido nos
+       seis cenários, é o único par trilho×preenchimento que fecha em todos. */
+    background-color: var(--sh-progress-fill, var(--sh-action-primary-border));
+    /* A largura determinada é um estado, não uma propriedade animada: evite
+       transição de layout e deixe a atualização ser imediata. */
+  }
+
+  .sh-progress__label {
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* -------------------------------------------------------- indeterminado */
+  /* Track precisa do overflow:hidden acima para conter o preenchimento que
+     desliza. Ícone/forma muda (desliza vs. parado), não só a cor. */
+  .sh-progress[data-state="indeterminate"] .sh-progress__fill {
+    position: absolute;
+    inset-block: 0;
+    inline-size: 40%;
+    inset-inline-start: 0;
+    transform: translateX(-100%);
+    animation: sh-progress-slide 1.4s var(--sh-ease-standard) infinite;
+  }
+
+  @keyframes sh-progress-slide {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(350%); }
+  }
+
+  /* -------------------------------------------------------------- anel */
+
+  .sh-progress--ring {
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--sh-progress-ring-size, 6rem);
+    block-size: var(--sh-progress-ring-size, 6rem);
+  }
+  .sh-progress--ring .sh-progress__track,
+  .sh-progress--ring .sh-progress__fill {
+    grid-area: 1 / 1;
+    position: relative;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    border-radius: var(--sh-radius-pill);
+  }
+  .sh-progress--ring .sh-progress__track {
+    background: conic-gradient(var(--sh-progress-track, var(--sh-surface-sunken)) 0 100%);
+  }
+  .sh-progress--ring .sh-progress__fill {
+    background: conic-gradient(
+      var(--sh-progress-fill, var(--sh-action-primary-border)) var(--sh-progress-value, 0%),
+      transparent 0
+    );
+    transition: background var(--sh-duration-slow) var(--sh-ease-standard);
+  }
+  /* Buraco do anel: precisa bater com a superfície onde o anel está sentado.
+     --sh-progress-ring-hole é o token a sobrescrever fora de --sh-surface-default. */
+  .sh-progress--ring .sh-progress__fill::before {
+    content: '';
+    position: absolute;
+    inset: var(--sh-progress-ring-thickness, 0.7rem);
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-progress-ring-hole, var(--sh-surface-default));
+  }
+  .sh-progress--ring .sh-progress__label {
+    grid-area: 1 / 1;
+    z-index: var(--sh-layer-raised);
+    font-size: var(--sh-font-size-lg);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-progress--ring[data-state="indeterminate"] .sh-progress__fill {
+    position: static;
+    inline-size: 100%;
+    --sh-progress-value: 25%;
+    animation: sh-progress-spin 1.1s linear infinite;
+  }
+  @keyframes sh-progress-spin {
+    to { rotate: 360deg; }
+  }
+
+  /* ------------------------------------------------------------ etapas */
+
+  .sh-progress--steps .sh-progress__track {
+    display: flex;
+    gap: var(--sh-space-1);
+    overflow: visible;
+    background-color: transparent;
+  }
+  .sh-progress__step {
+    flex: 1;
+    block-size: var(--sh-progress-thickness, 0.625rem);
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-progress-track, var(--sh-surface-sunken));
+  }
+  .sh-progress__step[data-state="done"] {
+    background-color: var(--sh-progress-fill, var(--sh-action-primary-border));
+  }
+  .sh-progress__step[data-state="current"] {
+    background-color: var(--sh-progress-fill, var(--sh-action-primary-border));
+    opacity: 0.6;
+  }
+
+  /* -------------------------------------------------------------- porte */
+
+  .sh-progress--sm { --sh-progress-thickness: 0.375rem; }
+  .sh-progress--lg { --sh-progress-thickness: 1rem; }
+
+  /* ======================================================================
+     sh-calendar
+     sh-calendar[data-sh-view] › __filters
+                               › __toolbar (› __nav, __title, __views)
+                               › __daystrip › __daystriplabel
+                                            › __daystriplist › __daystripday
+                                     (› __daystripname, __daystripnum, __marks)
+                               › __gridwrap › __grid (<table role="grid">)
+                                   › __weekdays › __weekday
+                                   › __week › __day (› __dayname, __daynum,
+                                                       __marks › __mark,
+                                                       __count › __countnum,
+                                                                 __countword)
+                               › __daypanel (› __dayheading, __slots › __slot
+                                     › __slottime, __slotstate, __slotwho)
+                               › __legend › __legenditem
+                               › __status (regiao aria-live, invisivel)
+
+     TRES VISOES, e uma so grade. data-sh-view vale 'month', 'week' ou 'day'.
+     Mes e semana usam a <table role="grid">; DIA nao usa — ele esconde a
+     grade e mostra a tira de sete dias mais a lista de horarios em largura
+     inteira. A razao esta medida na pesquisa de UX de 20/08/2026: a formacao
+     dura sempre 1 hora e os horarios publicados sao poucos, entao uma regua
+     de 24 horas gastaria 24 linhas para mostrar 3 horarios.
+
+     O QUE CADA VISAO MOSTRA, sem ambiguidade (DEC-039):
+       month  o mes inteiro, 42 celulas, seis linhas fixas. Sem tira.
+       week   sete celulas, e apenas elas, com o titulo dizendo QUAL semana.
+              Sem tira: acima de 34rem as sete colunas ja sao a semana;
+              abaixo, a lista vertical escreve o nome do dia em cada linha.
+       day    UM dia: nenhuma celula de grade, a lista de horarios em largura
+              inteira e a tira rotulada como seletor de dia.
+
+     E TROCAR data-sh-view NAO REDESENHA NADA SOZINHO. Este e um componente de
+     CSS: quem troca o conteudo e a aplicacao, e o atributo so diz qual e a
+     visao pedida. O CSS projeta o que puder (ver "projecao das tres visoes",
+     mais abaixo) e js/shalom-ds-data.js avisa no console quando o DOM nao
+     confere com a visao — mas nenhum dos dois inventa dia. Prova disso e o
+     proprio arquivo prova-dados.html, que carrega um script de demonstracao
+     fazendo o papel da aplicacao: sem ele, o alternador da prova trocava o
+     atributo e mais nada, que foi o defeito relatado pelo dono em
+     20/08/2026.
+
+     A DATA E ESTADO, NAO PARAMETRO DE TELA. O atributo data-sh-anchor no
+     proprio .sh-calendar carrega o dia âncora em ISO. Trocar de visao, de
+     periodo ou voltar no navegador NUNCA pode devolver a pessoa para hoje;
+     quem renderiza le data-sh-anchor, jamais o relogio. As duas piores
+     falhas de calendario documentadas em 2025 e 2026 (Google Agenda e
+     Outlook Android) sao exatamente isto.
+
+     Por que aqui, e não em form.css: o calendário nao preenche campo nem
+     participa de submit. Ele apresenta um conjunto de dados numa grade
+     bidimensional com estado por celula, que e a familia deste arquivo, ao
+     lado de sh-table e sh-datatable. Precedente de arquitetura: sh-heat
+     (internal.css), de onde vieram tres decisoes: contexto de container
+     proprio com rolagem contida, namespace de dados proprio
+     (data-sh-slot-state, data-sh-day-state) e legenda que repete a
+     informacao em palavra, nunca so em cor.
+
+     DESVIO REGISTRADO, o mesmo de .sh-table--stack acima: .sh-calendar__day
+     e um <td> com display:flex, e trocar `display` em elemento de tabela e
+     ponto conhecido de divergencia entre navegador e tecnologia assistiva
+     (Adrian Roselli, "Tables, CSS Display Properties, and ARIA"). Por isso
+     o markup deste componente declara os papeis por extenso e eles sao
+     OBRIGATORIOS: role="grid" na <table>, role="rowgroup" em <thead> e
+     <tbody>, role="row" em cada <tr class="sh-calendar__week">,
+     role="columnheader" em cada <th class="sh-calendar__weekday"> e
+     role="gridcell" em cada <td class="sh-calendar__day">. Sem eles a
+     grade continua desenhando certo e a leitura por AT pode perder a
+     relacao linha/coluna.
+
+     O QUE ESTE COMPONENTE NAO FAZ: nao busca dado, nao conhece fuso, nao
+     conhece regra de negocio. Recebe dias com slots ja classificados e
+     emite dois eventos (sh:calendar:day, sh:calendar:slot), em
+     js/shalom-ds-data.js. O CSS nao depende desse arquivo.
+
+     ---------------------------------------------------------------------
+     ESTADO NUNCA SO POR COR (regra 5). Sao seis estados de slot, cada um
+     com DOIS canais nao cromaticos alem da cor:
+
+       estado    forma da marca                    palavra
+       free      disco cheio                       "Livre"
+       mine      disco cheio com anel externo      "Sua formacao"
+       busy      um traco horizontal               "Indisponivel"
+       blocked   dois tracos horizontais           "Bloqueado"
+       past      ponto pequeno (metade do disco)   "Ja passou"
+       none      sem marca                         "Sem horario"
+
+     A forma sai de custom properties (--sh-calendar-mark-*) declaradas no
+     portador do atributo [data-sh-slot-state]; elas atravessam para o
+     ::before porque custom property herda em pseudo-elemento. Isso faz a
+     MESMA forma aparecer nos tres lugares onde o estado se mostra (a marca
+     da celula, o botao de horario e a legenda) sem repetir geometria.
+
+     A tinta da marca muda de portador, de proposito:
+       · na celula e na legenda ela e o token de LIMITE do estado
+         (--sh-border-success, --sh-action-primary-border, ...), porque ali
+         a marca esta sobre a superficie da celula e precisa dos 3:1 da
+         WCAG 1.4.11 contra ela;
+       · dentro do __slot ela e currentColor, porque o slot pinta o proprio
+         preenchimento e a tinta verificada contra ele e a do texto.
+       Usar o "-fg" do estado na celula seria o erro classico: o -fg de
+       `mine` e --sh-action-primary-fg, que e branco, e branco sobre a
+       superficie da celula mede 1,00:1.
+
+     Os ratios medidos nos seis cenarios estao no fim deste bloco.
+     ====================================================================== */
+
+  /* ARMADILHA que custou uma rodada de medicao, registrada para o proximo:
+     regra dentro de @container casa DESCENDENTE do container, nunca o
+     proprio container. Um `.sh-calendar { grid-template-columns: … }`
+     escrito dentro de `@container sh-calendar` simplesmente nunca aplica, e
+     o sintoma e mudo: a grade continua de largura inteira e o painel de
+     horarios continua embaixo, sem erro nenhum no console. Por isso o
+     lado-a-lado do painel NAO sai de container query: sai de flex-wrap com
+     base intrinseca, que e mais barato e nao tem esse buraco. As container
+     queries deste arquivo cuidam so de descendentes.
+
+     A conta do ponto de quebra: a linha so acomoda os dois quando cabe
+     32rem (grade) + 14rem (painel) + 1,5rem (intervalo) = 47,5rem. Abaixo
+     disso o painel quebra para a linha seguinte e ocupa a largura inteira,
+     que e o comportamento pedido para celular: ver o mes, tocar o dia, ler
+     a lista de horarios ABAIXO da grade. */
+  .sh-calendar {
+    container-type: inline-size;
+    container-name: sh-calendar;
+    /* Ancora de posicionamento para __status, que e absoluto e de 1px. Sem
+       ancora ele se resolveria contra o primeiro ancestral posicionado da
+       pagina, que pode estar em qualquer lugar — e um elemento de 1px solto
+       no canto errado e capaz de criar rolagem horizontal. */
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--sh-space-5) var(--sh-space-6);
+    /* Defesa contra o item-flex que nao encolhe, a mesma de .sh-table-wrap. */
+    min-inline-size: 0;
+    /* Densidade das opcoes dos alternadores do calendario. Fica aqui, e nao em
+       cada um deles, para que a conta do piso de largura (adiante) e o tamanho
+       da opcao sejam sempre o mesmo numero. */
+    --sh-segmented-min: 5.5rem;
+    color: var(--sh-text-default);
+  }
+
+  /* ---------------------------------------------------------- barra */
+
+  .sh-calendar__toolbar {
+    flex: 1 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sh-space-2) var(--sh-space-4);
+  }
+
+  /* --sh-space-2 e nao --sh-space-1, pela mesma razao ja registrada em
+     .sh-list__actions acima: os botoes de mes sao .sh-btn--sm, que desenham
+     36px e clicam 44px pelo ::after. Com 4px de intervalo o passo fica em
+     40px, as areas vizinhas se sobrepoem e cada botao mede 40px em vez de
+     44. Com 8px o passo bate exatamente 44px. */
+  .sh-calendar__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    order: 2;
+  }
+
+  /* O titulo vem primeiro na leitura visual e no DOM: e ele que carrega o
+     mes corrente e o aria-live que anuncia a troca. */
+  .sh-calendar__title {
+    order: 1;
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    margin: 0;
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h4);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-tight);
+    color: var(--sh-text-strong);
+  }
+
+  /* TRES opcoes (Mes, Semana, Dia) e o alternador precisa caber em UMA linha
+     num aparelho de 375px. O numero abaixo e medido, nao estimado.
+
+     A conta, com o valor medido no navegador em 375px: o sh-container entrega
+     343px, o sh-panel de padding 16px devolve 311px de contexto. O trilho do
+     .sh-segmented gasta 8px de padding e 2px de limite, e sobram dois vaos de
+     4px entre as tres opcoes: 311 - 18 = 293px para as opcoes, ou 97,6px cada.
+     Com o padrao de 7rem (112px) as tres somam 336px mais trilho e QUEBRAM em
+     duas linhas — foi assim que a pesquisa encontrou o problema. Com 5,5rem
+     (88px) as tres somam 264px mais 18px de trilho, ou seja 282px, e sobram
+     29px de folga. A opcao mais larga ("Semana") mede 81px de conteudo minimo
+     com o padding do proprio botao, entao 88px tambem nao aperta o texto.
+
+     O piso de largura e obrigatorio e foi a parte que a medicao corrigiu. Um
+     .sh-segmented e flex-wrap por dentro, e a largura intrinseca de um flex
+     de varias linhas NAO e a soma das opcoes numa linha so: medido no
+     Chrome, o alternador de tres opcoes pedia 208px de largura intrinseca,
+     ou seja, ele proprio ja se dava por satisfeito quebrado em duas linhas,
+     mesmo com 308px de contexto sobrando ao lado. Nem `flex: none`, nem
+     `width: max-content` mudam isso — os tres medem 208px e duas linhas.
+     Quem resolve e um piso escrito: min-inline-size igual ao que as tres
+     opcoes precisam, ou 100% do contexto, o que for menor.
+
+     A conta do piso, e ela sai dos proprios tokens para nao poder divergir do
+     --sh-segmented-min acima: 3 x 88px de opcao + 4 x 4px (dois vaos entre as
+     opcoes mais os dois lados do padding do trilho) + 2 x 1px de limite =
+     282px. Medido: com 282px o alternador fica em UMA linha e cada opcao mede
+     exatos 88px; com 272px (17rem) ele quebra em duas. E o `min(100%, …)` e
+     que impede o piso de virar rolagem horizontal num contexto mais estreito
+     que 282px, onde quebrar em duas linhas passa a ser a saida correta.
+
+     flex: 0 1 auto, e nao flex: none: com o piso valendo, o alternador ocupa
+     282px e cede o resto da barra; sem o piso ele pode encolher, e encolher e
+     melhor que empurrar a pagina para a rolagem horizontal. */
+  .sh-calendar__views { order: 3; }
+
+  /* O piso vale para os DOIS alternadores do componente, o de visao e o de
+     origem: os dois tem tres opcoes curtas e os dois quebram pelo mesmo
+     motivo. --sh-segmented-min desce por heranca a partir do proprio
+     .sh-calendar (ver a declaracao no bloco do container), entao a conta do
+     piso e a densidade das opcoes nunca podem divergir. */
+  .sh-calendar__views,
+  .sh-calendar__filters .sh-segmented {
+    flex: 0 1 auto;
+    min-inline-size: min(
+      100%,
+      calc(3 * var(--sh-segmented-min) + 4 * var(--sh-space-1) + 2 * var(--sh-border-width-hair))
+    );
+  }
+
+  /* FILTRO DE ORIGEM (formador, turma, sala). Linha inteira, antes da barra de
+     comando na leitura. Ele NAO some por largura nenhuma: o filtro e o
+     terceiro dos quatro canais que distinguem origens (ver __slotwho, adiante)
+     e um filtro desligado no celular devolve a pessoa exatamente ao problema
+     que ele resolve. Dentro dele vai um .sh-segmented (2 ou 3 origens) ou um
+     .sh-select (4 ou mais). <select> nativo e proibido no sistema (regra 7). */
+  .sh-calendar__filters {
+    flex: 1 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-2) var(--sh-space-3);
+    min-inline-size: 0;
+  }
+
+  /* O rotulo ocupa a linha inteira, e nao e economia de estilo: com ele ao
+     lado, o alternador de origem recebe so o que sobra da linha e quebra em
+     duas ou tres, que foi exatamente o que a medicao em 375px mostrou. Rotulo
+     em cima, controle embaixo, e o controle recebe a largura toda. */
+  .sh-calendar__filterlabel {
+    flex: 1 1 100%;
+    min-inline-size: 0;
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--sh-tracking-wide);
+    color: var(--sh-text-muted);
+  }
+
+  /* Regiao de anuncio, invisivel e sempre presente. E ela que faz a troca de
+     periodo, a troca de visao e a troca de dia chegarem a quem usa leitor de
+     tela SEM depender de rolagem — a armadilha A1 da pesquisa (a pessoa toca
+     um dia da ultima linha da grade, a lista aparece abaixo da dobra e ela
+     conclui que nao ha horario). Fica no fim do DOM de proposito: o leitor
+     anuncia depois do movimento de foco, nunca por cima dele.
+     O recorte e o mesmo de .sh-visually-hidden, repetido aqui para o
+     componente nao depender de o consumidor lembrar da classe utilitaria. */
+  .sh-calendar__status {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ---------------------------------------------------------- grade */
+
+  .sh-calendar__gridwrap {
+    flex: 1 1 32rem;
+    min-inline-size: 0;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  /* border-spacing e nao gap: <table> nao aceita gap, e trocar o display de
+     tr/td para grid quebra a semantica de tabela para leitor de tela (o
+     mesmo motivo registrado em .sh-table--stack, acima neste arquivo).
+     border-collapse: separate e o que liga o border-spacing. */
+  .sh-calendar__grid {
+    inline-size: 100%;
+    /* O piso de 44px por coluna nao pode ficar por conta do reparto de
+       `table-layout: fixed`, que divide a largura em sete partes iguais e
+       ignora min-inline-size da celula. Declarado na tabela, o piso vira
+       largura minima real: quando o contexto e mais estreito que sete
+       alvos de toque, quem cede e o __gridwrap (que rola), nao o alvo.
+       Sao OITO intervalos, nao sete: border-spacing tambem pinta os dois
+       lados de fora. A conta da: 7 x 44 + 8 x 4 = 340px com o intervalo
+       padrao, e 7 x 44 = 308px na faixa estreita, onde o intervalo vai a
+       zero (ver a container query mais abaixo). Em 375px de aparelho, um
+       sh-panel de padding 16px devolve 311px de contexto e a grade cabe
+       inteira; com o padding padrao de 20px sobram 303px e o wrap rola 5px.
+       Rolar e a degradacao correta: o alvo de toque nunca desce de 44px. */
+    min-inline-size: calc(
+      7 * var(--sh-calendar-cell-min, var(--sh-touch-target)) +
+      8 * var(--sh-calendar-gap, var(--sh-space-1))
+    );
+    border-collapse: separate;
+    border-spacing: var(--sh-calendar-gap, var(--sh-space-1));
+    table-layout: fixed;
+  }
+
+  .sh-calendar__weekday {
+    padding-block: var(--sh-space-1);
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--sh-tracking-wide);
+    color: var(--sh-text-muted);
+  }
+  /* <abbr> do reset pode chegar com sublinhado pontilhado; aqui o titulo
+     completo ja e lido pelo leitor de tela e o pontilhado vira ruido numa
+     linha de sete rotulos de tres letras. */
+  .sh-calendar__weekday abbr { text-decoration: none; }
+
+  /* ----------------------------------------------------------- dia */
+
+  /* 44x44 e desenho, nao truque: a celula E o elemento focavel (roving
+     tabindex do ARIA APG), entao nao existe ::after expansor aqui, e nem
+     poderia existir sem cobrir a celula vizinha. Em 375px de viewport a
+     coluna sai com cerca de 46px, entao o piso de 2,75rem nunca aperta. */
+  /* ARMADILHA numero dois, e a mais cara desta construcao: `display: flex`
+     num <td> tira a celula do contexto de formatacao da tabela e a fila de
+     sete dias vira uma coluna vertical de trinta e cinco. O sintoma e mudo,
+     igual ao da container query: nenhum erro, so um calendario que virou
+     lista. A celula continua sendo `table-cell`, e o empilhamento interno
+     (numero, marcas, contagem) sai de fluxo de bloco com text-align, que e
+     o que uma celula de tabela sempre soube fazer. Bonus: nao trocar o
+     display tambem preserva a semantica de tabela para leitor de tela, que
+     e o motivo de o componente ser <table> e nao <div>. */
+  .sh-calendar__day {
+    position: relative;
+    display: table-cell;
+    vertical-align: middle;
+    block-size: var(--sh-calendar-cell-min, var(--sh-touch-target));
+    min-inline-size: var(--sh-calendar-cell-min, var(--sh-touch-target));
+    padding: var(--sh-space-1);
+    border: var(--sh-border-width-hair) solid var(--sh-calendar-day-border, transparent);
+    border-radius: var(--sh-calendar-radius, var(--sh-radius-control));
+    /* Transparente por padrao, e isto e decisao medida, nao economia.
+       Pintar a celula de --sh-surface-default parece bom sobre a pagina
+       (o cartao branco sobre o cinza claro), mas o MESMO calendario dentro
+       de um sh-panel branco fica branco sobre branco: 1,00:1, e a grade
+       some. Pior, a silhueta pintada mede 1,05:1 contra a pagina, abaixo
+       dos 3:1 que a WCAG 1.4.11 pede de um limite de controle. Transparente,
+       a celula e um controle "fantasma", identificado pelo proprio texto,
+       que e a excecao que o portao ja reconhece (ver ACESSIBILIDADE.md §6,
+       "controle sem preenchimento e sem borda") e o mesmo padrao de
+       .sh-btn--ghost. O que pinta e o ESTADO: hover, selecionado e hoje.
+       Quem quiser a celula pintada passa --sh-calendar-day-bg e assume a
+       conta: 3:1 contra a superficie de tras, ou um --sh-calendar-day-border
+       que tenha. */
+    background-color: var(--sh-calendar-day-bg, transparent);
+    color: var(--sh-calendar-day-fg, var(--sh-text-default));
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    cursor: pointer;
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  @media (hover: hover) {
+    .sh-calendar__day:hover {
+      background-color: var(--sh-calendar-day-bg-hover, var(--sh-surface-hover));
+    }
+  }
+
+  /* O anel de foco e o do sistema, de duas camadas. z-index porque o anel
+     e desenhado por fora da caixa e a celula seguinte, sem isso, o corta. */
+  .sh-calendar__day:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+
+  .sh-calendar__day:active {
+    background-color: var(--sh-surface-active);
+  }
+
+  /* Nome do dia da semana DENTRO da celula. Oculto por padrao, porque o <th>
+     da coluna ja o diz; reaparece quando a grade de sete colunas desmonta em
+     lista vertical (visao de semana estreita), onde nao ha mais coluna para
+     carregar o nome. Isto e troca de PORTADOR, nao supressao: a palavra
+     existe nas duas larguras, em lugares diferentes. Antes desta versao ela
+     existia so no aria-label na lista vertical, ou seja, quem enxerga perdia
+     no celular uma informacao que tinha no computador. */
+  .sh-calendar__dayname {
+    display: none;
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-calendar__daynum {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 1.75rem;
+    min-block-size: 1.75rem;
+    padding-inline: var(--sh-space-1);
+    border: var(--sh-border-width-hair) solid transparent;
+    border-radius: var(--sh-radius-pill);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-none);
+  }
+
+  .sh-calendar__marks {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sh-space-px);
+    min-block-size: var(--sh-calendar-mark-size, 0.5rem);
+    margin-block-start: var(--sh-space-px);
+  }
+
+  /* CONTAGEM. Ela e a resposta a pergunta que a pessoa tem na mao ("quantos
+     horarios tem neste dia?"), e por isso NAO some no celular. A versao 1.1.0
+     deste componente a escondia abaixo de 30rem de contexto, justamente onde
+     ela mais falta: e a causa documentada de onze anos de reclamacao sobre
+     "mes so com pontinhos" (Google 2015, Apple 2021, Outlook 2024, Samsung).
+
+     O que muda com a largura e a FORMA, nunca a existencia: o numeral fica
+     sempre, a palavra ("livres") sai quando nao cabe, e a palavra continua
+     escrita na legenda, que jamais some, e no aria-label da celula.
+
+     CONTRATO: __count sempre carrega um __countnum. Dia sem horario nao
+     escreve contagem em largura nenhuma — a ausencia de marca ja e o canal de
+     forma e "Sem horario" esta no aria-label e na legenda. Escrever a frase
+     inteira dentro de uma celula de 44px produz tres linhas de texto de 11px,
+     estica a grade e empurra a lista do dia para fora da tela, que e a
+     armadilha A1 da pesquisa. */
+  .sh-calendar__count {
+    display: block;
+    font-size: var(--sh-font-size-2xs);
+    line-height: var(--sh-leading-none);
+    color: var(--sh-text-muted);
+  }
+  .sh-calendar__countnum {
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--sh-weight-semibold);
+  }
+
+  /* -------------------------------------------- estados do dia */
+
+  /* HOJE. Pilula preenchida mais peso tipografico, exatamente o sinal de
+     "item ativo" que a DEC-024 manda usar no lugar de qualquer barra
+     lateral. O contorno nao e enfeite: --sh-action-primary-bg nao contrasta
+     3:1 com toda superficie nos seis cenarios (e o mesmo motivo pelo qual
+     .sh-pagination__link[aria-current="page"] ganhou borda em
+     navigation.css), e --sh-action-primary-border e o par que o proprio
+     conjunto de acao ja traz verificado. O fio transparente declarado acima
+     em .sh-calendar__daynum reserva o espaco, entao nada pula de tamanho
+     quando o mes vira. */
+  .sh-calendar__day[aria-current='date'] .sh-calendar__daynum {
+    border-color: var(--sh-action-primary-border);
+    background-color: var(--sh-calendar-today-bg, var(--sh-action-primary-bg));
+    color: var(--sh-calendar-today-fg, var(--sh-action-primary-fg));
+    font-weight: var(--sh-weight-bold);
+  }
+
+  /* SELECIONADO. A trinca preenchimento + limite + peso, nunca so o
+     preenchimento: --sh-surface-selected sozinho mede 1,07 a 1,23:1 contra
+     a superficie da celula em cinco dos seis cenarios, o mesmo numero que
+     ja obrigou .sh-tabs--pills a ganhar limite. Aqui o limite e de 2px
+     (--sh-border-width-thick) e nos QUATRO lados: borda de um lado so como
+     enfase e proibida no sistema inteiro (DEC-024). */
+  .sh-calendar__day[aria-selected='true'] {
+    border-width: var(--sh-border-width-thick);
+    border-color: var(--sh-calendar-selected-border, var(--sh-border-indicator));
+    background-color: var(--sh-calendar-selected-bg, var(--sh-surface-selected));
+    /* A borda engordou 1px; o padding devolve o pixel para o layout nao
+       pular quando a selecao anda de celula. */
+    padding: calc(var(--sh-space-1) - (var(--sh-border-width-thick) - var(--sh-border-width-hair)));
+  }
+  .sh-calendar__day[aria-selected='true'] .sh-calendar__daynum {
+    font-weight: var(--sh-weight-bold);
+  }
+
+  /* FORA DO MES. Nao e um dia desabilitado por regra de negocio: e um dia
+     que pertence a outro mes e esta ali so para fechar a semana. Sem marca,
+     sem contagem, fora da navegacao por setas (o JS pula). */
+  .sh-calendar__day[aria-disabled='true'] {
+    color: var(--sh-text-disabled);
+    cursor: default;
+  }
+  .sh-calendar__day[aria-disabled='true'] .sh-calendar__marks,
+  .sh-calendar__day[aria-disabled='true'] .sh-calendar__count {
+    visibility: hidden;
+  }
+  @media (hover: hover) {
+    .sh-calendar__day[aria-disabled='true']:hover {
+      background-color: var(--sh-calendar-day-bg, transparent);
+    }
+  }
+
+  /* Estado do DIA (agregado dos slots). Namespace proprio, como sh-heat, e
+     ele NAO pinta cor nenhuma: quem distingue o dia e a marca (forma) mais
+     a contagem (palavra). O atributo existe para a aplicacao filtrar e para
+     o CSS de uma pagina especifica, se precisar.
+
+     Aqui morava uma regra que apagava a contagem do dia sem horario para
+     --sh-text-disabled. Ela reprovou o portao em 18 medicoes (3,19 a 3,36:1
+     contra 4,5 exigidos, nos seis cenarios): a celula do dia sem horario
+     NAO e um controle inativo, entao a excecao de disabled da WCAG 1.4.3
+     nao vale ali, e "Sem horario" e texto que se le. A distincao ja estava
+     completa sem cor: o dia sem horario e o unico sem marca nenhuma, e a
+     palavra escrita diz exatamente isso. */
+
+  /* -------------------------------------- forma da marca por estado */
+
+  /* Geometria compartilhada. Tres portadores, uma regra:
+       .sh-calendar__mark          a marca da celula (o atributo esta nela)
+       .sh-calendar__slot::before  o botao de horario
+       .sh-calendar__legenditem::before  a legenda
+     A cor NAO entra aqui: cada portador resolve a propria (ver adiante). */
+  .sh-calendar__mark,
+  .sh-calendar__slot::before,
+  .sh-calendar__legenditem::before {
+    content: '';
+    flex: none;
+    display: inline-block;
+    box-sizing: border-box;
+    inline-size: var(--sh-calendar-mark-size, 0.5rem);
+    block-size: var(--sh-calendar-mark-block, var(--sh-calendar-mark-size, 0.5rem));
+    border-block: var(--sh-calendar-mark-rule, 0 solid currentColor);
+    border-radius: var(--sh-calendar-mark-radius, var(--sh-radius-pill));
+    outline: var(--sh-calendar-mark-outline, 0 solid transparent);
+    outline-offset: var(--sh-border-width-hair);
+    background-color: var(--sh-calendar-mark-fill, currentColor);
+  }
+
+  /* free: disco cheio. E a forma base, declarada por extenso mesmo assim,
+     para que ler um estado nao obrigue a reconstruir o default de cabeca. */
+  .sh-calendar__mark[data-sh-slot-state='free'],
+  .sh-calendar__slot[data-sh-slot-state='free'],
+  .sh-calendar__legenditem[data-sh-slot-state='free'] {
+    --sh-calendar-mark-ink: var(--sh-calendar-free-border, var(--sh-border-success));
+    --sh-calendar-mark-fill: currentColor;
+    --sh-calendar-mark-block: var(--sh-calendar-mark-size, 0.5rem);
+    --sh-calendar-mark-radius: var(--sh-radius-pill);
+    --sh-calendar-mark-rule: 0 solid currentColor;
+    --sh-calendar-mark-outline: 0 solid transparent;
+  }
+
+  /* mine: disco cheio com anel externo. O anel e outline, nao box-shadow,
+     por dois motivos. Primeiro, outline deixa o vao transparente, entao o
+     anel funciona sobre qualquer fundo sem precisar saber a cor de tras
+     (a marca aparece sobre a celula, sobre o slot preenchido e sobre a
+     pagina, na legenda). Segundo, box-shadow e o canal do anel de FOCO
+     neste sistema, e a marca nunca deve disputar esse canal (a armadilha
+     esta escrita em foundations/reset.css). A marca nao e focavel. */
+  .sh-calendar__mark[data-sh-slot-state='mine'],
+  .sh-calendar__slot[data-sh-slot-state='mine'],
+  .sh-calendar__legenditem[data-sh-slot-state='mine'] {
+    --sh-calendar-mark-ink: var(--sh-calendar-mine-border, var(--sh-action-primary-border));
+    --sh-calendar-mark-fill: currentColor;
+    --sh-calendar-mark-block: var(--sh-calendar-mark-size, 0.5rem);
+    --sh-calendar-mark-radius: var(--sh-radius-pill);
+    --sh-calendar-mark-rule: 0 solid currentColor;
+    --sh-calendar-mark-outline: var(--sh-border-width-thin) solid currentColor;
+  }
+
+  /* busy: um traco horizontal.
+     --sh-border-strong, e nao --sh-border-control, por medicao. `control` e
+     o token anotado em semantic.css como "3,36 sobre branco, minimo de
+     1.4.11", e esse numero vale contra BRANCO: contra --sh-surface-default
+     nos seis cenarios ele mede 3,14 / 2,56 / 2,88 / 3,04 / 12,74 / 2,85,
+     ou seja, reprova os 3:1 em quatro deles. `strong` mede 5,25 no pior
+     caso. A saida nao e abaixar a regua (governanca §4, passo 4): e trocar
+     por um par que passe. O slot de `busy` acompanha a mesma tinta, e o
+     limite dele sobe de 3,11 para 5,25 no pior caso. */
+  .sh-calendar__mark[data-sh-slot-state='busy'],
+  .sh-calendar__slot[data-sh-slot-state='busy'],
+  .sh-calendar__legenditem[data-sh-slot-state='busy'] {
+    --sh-calendar-mark-ink: var(--sh-calendar-busy-border, var(--sh-border-strong));
+    --sh-calendar-mark-fill: currentColor;
+    --sh-calendar-mark-block: var(--sh-border-width-thick);
+    --sh-calendar-mark-radius: var(--sh-radius-pill);
+    --sh-calendar-mark-rule: 0 solid currentColor;
+    --sh-calendar-mark-outline: 0 solid transparent;
+  }
+
+  /* blocked: dois tracos horizontais. Sem pseudo-elemento extra e sem
+     gradiente: uma caixa de 0,5rem com preenchimento transparente e borda
+     em cima e embaixo JA e, literalmente, duas linhas. */
+  .sh-calendar__mark[data-sh-slot-state='blocked'],
+  .sh-calendar__slot[data-sh-slot-state='blocked'],
+  .sh-calendar__legenditem[data-sh-slot-state='blocked'] {
+    --sh-calendar-mark-ink: var(--sh-calendar-blocked-border, var(--sh-border-warning));
+    --sh-calendar-mark-fill: transparent;
+    --sh-calendar-mark-block: var(--sh-calendar-mark-size, 0.5rem);
+    --sh-calendar-mark-radius: 0;
+    --sh-calendar-mark-rule: var(--sh-border-width-thick) solid currentColor;
+    --sh-calendar-mark-outline: 0 solid transparent;
+  }
+
+  /* past: ponto pequeno, metade do disco. A tinta e --sh-text-disabled, e
+     nao --sh-border-subtle: `subtle` esta anotado em semantic.css como
+     borda decorativa (1,13 a 1,47:1 medido) e nao serve de indicador;
+     --sh-text-disabled e o neutral-500, o token que a propria identidade
+     declara como o minimo de 1.4.11 (3,36:1 sobre branco). */
+  .sh-calendar__mark[data-sh-slot-state='past'],
+  .sh-calendar__slot[data-sh-slot-state='past'],
+  .sh-calendar__legenditem[data-sh-slot-state='past'] {
+    --sh-calendar-mark-ink: var(--sh-calendar-past-fg, var(--sh-text-disabled));
+    --sh-calendar-mark-fill: currentColor;
+    --sh-calendar-mark-block: calc(var(--sh-calendar-mark-size, 0.5rem) / 2);
+    --sh-calendar-mark-radius: var(--sh-radius-pill);
+    --sh-calendar-mark-rule: 0 solid currentColor;
+    --sh-calendar-mark-outline: 0 solid transparent;
+  }
+
+  /* none: sem marca. A ausencia E o canal de forma. O elemento continua
+     ocupando o lugar para a linha de marcas nao dancar entre dias. */
+  .sh-calendar__mark[data-sh-slot-state='none'],
+  .sh-calendar__slot[data-sh-slot-state='none'],
+  .sh-calendar__legenditem[data-sh-slot-state='none'] {
+    --sh-calendar-mark-ink: transparent;
+    --sh-calendar-mark-fill: transparent;
+    --sh-calendar-mark-block: var(--sh-calendar-mark-size, 0.5rem);
+    --sh-calendar-mark-radius: var(--sh-radius-pill);
+    --sh-calendar-mark-rule: 0 solid currentColor;
+    --sh-calendar-mark-outline: 0 solid transparent;
+  }
+
+  /* A tinta, por portador. Na celula e na legenda a marca esta sobre a
+     superficie: usa o token de LIMITE do estado, que e o que o sistema
+     garante em 3:1. Dentro do __slot ela herda currentColor, que ali e a
+     tinta ja verificada contra o preenchimento do proprio slot. */
+  .sh-calendar__mark,
+  .sh-calendar__legenditem::before {
+    color: var(--sh-calendar-mark-ink, currentColor);
+  }
+
+  /* ------------------------------------------ painel de horarios */
+
+  .sh-calendar__daypanel {
+    flex: 1 1 14rem;
+    max-inline-size: 20rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-3);
+    min-inline-size: 0;
+  }
+
+  .sh-calendar__dayheading {
+    margin: 0;
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-calendar__slots {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-2);
+    /* Lista de controles nunca tem marcador, e a garantia mora no
+       componente, nao no `ul[class]` do reset: mesma decisao de
+       .sh-nav__list em navigation.css. */
+    list-style: none;
+    margin: 0;
+    padding-inline-start: 0;
+  }
+
+  /* O slot desenha 44px de altura por conta propria (min-block-size) e
+     ocupa a largura inteira do painel: nao precisa de ::after expansor, e
+     um ::after aqui cobriria o slot vizinho, que esta a 8px. */
+  .sh-calendar__slot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--sh-space-3);
+    inline-size: 100%;
+    min-block-size: var(--sh-touch-target);
+    padding: var(--sh-space-2) var(--sh-space-3);
+    border: var(--sh-border-width-hair) solid var(--sh-calendar-slot-border, var(--sh-border-control));
+    border-radius: var(--sh-calendar-radius, var(--sh-radius-control));
+    background-color: var(--sh-calendar-slot-bg, var(--sh-surface-default));
+    color: var(--sh-calendar-slot-fg, var(--sh-text-default));
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-sm);
+    text-align: start;
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  .sh-calendar__slottime {
+    flex: none;
+    min-inline-size: 3.5rem;
+    font-family: var(--sh-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--sh-weight-semibold);
+  }
+
+  /* A palavra e obrigatoria, nao decorativa: e o segundo canal nao
+     cromatico de cada estado. Ela nunca some, nem na variante compacta. */
+  .sh-calendar__slotstate {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    overflow-wrap: break-word;
+    font-weight: var(--sh-weight-medium);
+  }
+
+  /* ------------------------------------- de quem e este horario */
+
+  /* Um formando tem de 1 a 3 formadores e precisa saber de quem e cada
+     horario. QUATRO canais empilhados, na ordem em que a pesquisa os
+     classificou, e a cor e o ULTIMO deles:
+
+       1. o NOME escrito, em __slotwho. E o canal que nunca falha e e o que o
+          leitor de tela le. Com uma origem so, o nome e ruido e nao se
+          escreve; com duas ou mais ele aparece em TODOS os horarios, sem
+          excecao, porque nome que aparece so as vezes vira charada.
+       2. as INICIAIS em .sh-avatar, ao lado do nome, para reconhecimento
+          periferico. O contrato do sh-avatar e explicito e vale aqui a risca:
+          as iniciais ACOMPANHAM o nome, nunca o substituem, e o bloco vai
+          aria-hidden quando nao ha foto.
+       3. a POSICAO, via __filters no topo: ver uma origem de cada vez e o
+          canal mais barato de todos, porque desambigua sem exigir leitura.
+       4. a COR, so como reforco, em data-sh-who, e jamais sozinha.
+
+     Na celula do MES o nome nao entra: 44px nao comportam "Formacao com Ana",
+     e a celula continua mostrando contagem e marcas por ESTADO. Quem e quem se
+     descobre na lista do dia. O aria-label da celula acompanha: "Terca, 19 de
+     agosto. 3 horarios livres, com Ana e com Pedro." */
+  .sh-calendar__slotwho {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    min-inline-size: 0;
+    font-weight: var(--sh-weight-medium);
+  }
+
+  /* A avatar cabe nos 44px do horario sem disputar altura, e nao precisa de
+     alvo de toque: ela e aria-hidden e nao e clicavel. */
+  .sh-calendar__slot .sh-avatar {
+    flex: none;
+    --sh-avatar-size: 1.5rem;
+    --sh-avatar-font-size: var(--sh-font-size-2xs);
+  }
+
+  /* A cor por origem, o quarto canal. Ela pinta a AVATAR, nunca o
+     preenchimento do horario: o preenchimento ja e o canal do ESTADO (livre,
+     sua formacao, indisponivel, bloqueado, ja passou, sem horario) e sobrepor
+     origem ali faria dois significados dividirem uma propriedade — que e
+     exatamente o erro que a regra 5 do sistema proibe.
+
+     Tres origens e o teto do produto. Os tres pares saem da camada semantica e
+     ja existem verificados: marca, acento e info. Nenhum valor novo, nenhum hex.
+
+     O limite entra nas TRES, inclusive na primeira, e isso e medicao, nao
+     simetria: o padrao do sh-avatar e --sh-border-subtle, que a propria
+     semantic.css anota como borda decorativa (1,21:1 medido aqui, no base
+     claro). Deixar a origem 1 com o padrao e as outras duas com limite de 3:1
+     faria a mesma informacao ter forca diferente conforme a pessoa. */
+  .sh-calendar__slot[data-sh-who='1'] .sh-avatar {
+    --sh-avatar-bg: var(--sh-surface-brand-subtle);
+    --sh-avatar-fg: var(--sh-text-brand);
+    --sh-avatar-border: var(--sh-border-brand);
+  }
+  .sh-calendar__slot[data-sh-who='2'] .sh-avatar {
+    --sh-avatar-bg: var(--sh-surface-accent-subtle);
+    --sh-avatar-fg: var(--sh-text-accent);
+    --sh-avatar-border: var(--sh-border-accent);
+  }
+  .sh-calendar__slot[data-sh-who='3'] .sh-avatar {
+    --sh-avatar-bg: var(--sh-feedback-info-surface);
+    --sh-avatar-fg: var(--sh-feedback-info-text);
+    --sh-avatar-border: var(--sh-feedback-info-border);
+  }
+
+  button.sh-calendar__slot { cursor: pointer; }
+
+  @media (hover: hover) {
+    button.sh-calendar__slot:hover {
+      background-color: var(--sh-calendar-slot-bg-hover, var(--sh-surface-hover));
+    }
+  }
+  button.sh-calendar__slot:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  button.sh-calendar__slot:active {
+    background-color: var(--sh-surface-active);
+  }
+
+  /* O horario indisponivel e <span aria-disabled="true">, nao
+     <button disabled>: ele continua na leitura sequencial e continua
+     explicando POR QUE esta indisponivel, em vez de sumir da navegacao. */
+  .sh-calendar__slot[aria-disabled='true'] { cursor: not-allowed; }
+
+  /* -------------------------------- preenchimento do slot por estado */
+
+  .sh-calendar__slot[data-sh-slot-state='free'] {
+    --sh-calendar-slot-bg: var(--sh-calendar-free-bg, var(--sh-feedback-success-surface));
+    --sh-calendar-slot-border: var(--sh-calendar-free-border, var(--sh-border-success));
+    --sh-calendar-slot-fg: var(--sh-calendar-free-fg, var(--sh-feedback-success-text));
+    --sh-calendar-slot-bg-hover: var(--sh-surface-hover);
+  }
+  .sh-calendar__slot[data-sh-slot-state='mine'] {
+    --sh-calendar-slot-bg: var(--sh-calendar-mine-bg, var(--sh-action-primary-bg));
+    --sh-calendar-slot-border: var(--sh-calendar-mine-border, var(--sh-action-primary-border));
+    --sh-calendar-slot-fg: var(--sh-calendar-mine-fg, var(--sh-action-primary-fg));
+    --sh-calendar-slot-bg-hover: var(--sh-action-primary-bg-hover);
+  }
+  .sh-calendar__slot[data-sh-slot-state='busy'] {
+    --sh-calendar-slot-bg: var(--sh-calendar-busy-bg, var(--sh-surface-sunken));
+    --sh-calendar-slot-border: var(--sh-calendar-busy-border, var(--sh-border-strong));
+    --sh-calendar-slot-fg: var(--sh-calendar-busy-fg, var(--sh-text-muted));
+  }
+  .sh-calendar__slot[data-sh-slot-state='blocked'] {
+    --sh-calendar-slot-bg: var(--sh-calendar-blocked-bg, var(--sh-feedback-warning-surface));
+    --sh-calendar-slot-border: var(--sh-calendar-blocked-border, var(--sh-border-warning));
+    --sh-calendar-slot-fg: var(--sh-calendar-blocked-fg, var(--sh-feedback-warning-text));
+  }
+  .sh-calendar__slot[data-sh-slot-state='past'] {
+    --sh-calendar-slot-bg: var(--sh-surface-default);
+    --sh-calendar-slot-border: var(--sh-border-subtle);
+    --sh-calendar-slot-fg: var(--sh-calendar-past-fg, var(--sh-text-disabled));
+  }
+  .sh-calendar__slot[data-sh-slot-state='none'] {
+    --sh-calendar-slot-bg: var(--sh-surface-default);
+    --sh-calendar-slot-border: var(--sh-border-subtle);
+    --sh-calendar-slot-fg: var(--sh-text-muted);
+  }
+
+  /* O horario que E a formacao de quem esta olhando ganha o terceiro sinal
+     (alem de cor e forma): peso. aria-current="true" e o atributo, nunca
+     uma classe. */
+  .sh-calendar__slot[aria-current='true'] .sh-calendar__slotstate {
+    font-weight: var(--sh-weight-bold);
+  }
+
+  /* --------------------------------------------------- legenda */
+
+  .sh-calendar__legend {
+    flex: 1 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-2) var(--sh-space-4);
+    font-size: var(--sh-font-size-xs);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-calendar__legenditem {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+  }
+
+  /* ------------------------------------------ tira de sete dias */
+
+  /* UM bloco, UM uso: a tira e o SELETOR DE DIA da visao de DIA, e nao
+     aparece em nenhuma outra visao. Ate a versao 1.2.0 ela tinha dois usos (a
+     visao de dia e o cabecalho da semana estreita) e o resultado, na prova do
+     dono em 20/08/2026, foi a leitura errada: sete celulas de mesma altura
+     ocupando a largura inteira sao lidas como "a semana de novo", que e
+     exatamente o que a visao de DIA nao pode parecer. Na semana estreita quem
+     carrega o nome do dia e o proprio __dayname da linha, que ja existe; a
+     tira saiu de la. DEC-039.
+
+     TRES SINAIS fazem a tira ser lida como navegacao, e nao como grade:
+       1. um ROTULO VISIVEL por cima (__daystriplabel), que diz o que ela faz;
+       2. um TRILHO (limite, raio e superficie afundada), o mesmo vocabulario
+          visual do .sh-segmented que esta logo acima dela na barra — quem ve
+          reconhece "controle de N opcoes", nao "grade de sete dias";
+       3. a ausencia da linha de cabecalho de coluna (<th>), que so a grade
+          tem, e a presenca do dia por extenso no titulo da barra.
+     Nenhum dos tres e cor: o primeiro e palavra, o segundo e forma e o
+     terceiro e estrutura.
+
+     <nav> com sete botoes, e NAO role="grid": sete paradas de Tab numa linha
+     sao aceitaveis, e o padrao de grade nao acrescenta nada num eixo so. As
+     setas continuam funcionando (js/shalom-ds-data.js) porque quem ja esta na
+     tira espera setas — e porque setas antes de gesto e regra, nao gosto
+     (WCAG 2.5.7 e 2.5.1: alternativa de ponteiro unico nunca pode ser outro
+     gesto de caminho).
+
+     A conta da largura e a mesma da grade de mes: sete alvos de 44px pedem
+     308px, e um aparelho de 375px entrega cerca de 309px dentro de um
+     sh-panel de padding 16px (os 311px anotados na conta da grade esqueciam
+     o limite de 1px do painel, dos dois lados). O trilho cobra 8px de padding
+     e 2px de limite, entao a conta vira 7 x 44 + 10 = 318px: o intervalo cai
+     a zero abaixo de 24rem, junto com o border-spacing da grade, e o proprio
+     trilho sai abaixo de 20rem, que e a faixa em que ele custaria o alvo de
+     toque. O overflow-x e rede de seguranca para contexto ainda mais
+     estreito: a tira rola dentro de si mesma, a pagina nunca. */
+  .sh-calendar__daystrip {
+    display: none;
+    flex: 1 1 100%;
+    min-inline-size: 0;
+  }
+
+  /* O rotulo e o primeiro dos tres sinais. Ele nao e enfeite nem redundancia
+     do aria-label: e a resposta visual a pergunta "o que sao esses sete
+     botoes?", e quem le por leitor de tela recebe a MESMA palavra, porque o
+     <nav> aponta para ele com aria-labelledby em vez de repetir um
+     aria-label diferente. */
+  .sh-calendar__daystriplabel {
+    margin: 0 0 var(--sh-space-1);
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-2xs);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-none);
+    text-transform: uppercase;
+    letter-spacing: var(--sh-tracking-wide);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-calendar__daystriplist {
+    display: flex;
+    gap: var(--sh-calendar-daystrip-gap, var(--sh-space-1));
+    /* O trilho, segundo sinal. Limite, raio e respiro do .sh-segmented
+       (form.css), de proposito: --sh-border-default e decorativo (1,55:1 no
+       base claro) e nao serve de limite de controle; --sh-border-control tem
+       os 3:1.
+
+       SEM O PREENCHIMENTO AFUNDADO do .sh-segmented, e a diferenca foi
+       medida, nao escolhida. Com --sh-surface-sunken atras, as marcas de
+       estado dentro dos botoes da tira caem abaixo dos 3:1 da WCAG 1.4.11 em
+       cinco dos seis cenarios claros — a marca `past` mede 2,97:1 no base
+       claro e 1,58:1 no acamp's claro contra o afundado, contra 3,19:1 no
+       pior caso sobre a superficie do painel. O limite sozinho ja entrega a
+       leitura de "controle de N opcoes", e as marcas continuam legiveis:
+       trocar o preenchimento pelo limite nao custa sinal nenhum e devolve o
+       contraste. Quem quiser o afundado precisa refazer a conta das seis
+       marcas antes. */
+    padding: var(--sh-space-1);
+    border: var(--sh-border-width-hair) solid var(--sh-border-control);
+    border-radius: var(--sh-radius-control);
+    /* Rede de seguranca de largura: rola a tira, nunca a pagina. */
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    /* Lista de controles nunca tem marcador, e a garantia mora no componente:
+       mesma decisao de .sh-calendar__slots e de .sh-nav__list. */
+    list-style: none;
+    margin: 0;
+    padding-inline-start: var(--sh-space-1);
+  }
+
+  /* min-inline-size igual ao alvo, e nao 0: e o que faz a tira ROLAR quando o
+     contexto aperta, em vez de encolher os sete alvos abaixo de 44px. Com 0,
+     o item cede, o botao vaza por baixo e a rolagem nunca dispara — o alvo
+     morre em silencio, que e o pior dos dois defeitos. */
+  .sh-calendar__daystriplist > li {
+    flex: 1 1 var(--sh-calendar-cell-min, var(--sh-touch-target));
+    min-inline-size: var(--sh-calendar-cell-min, var(--sh-touch-target));
+  }
+
+  .sh-calendar__daystripday {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sh-space-px);
+    inline-size: 100%;
+    min-inline-size: var(--sh-calendar-cell-min, var(--sh-touch-target));
+    min-block-size: var(--sh-touch-target);
+    padding: var(--sh-space-1) var(--sh-space-px);
+    border: var(--sh-border-width-hair) solid var(--sh-calendar-day-border, transparent);
+    /* Raio de opcao DENTRO de trilho, a mesma conta do .sh-segmented__option:
+       o raio do trilho menos o padding dele. Sem isso o canto do botao encosta
+       no canto do trilho e os dois raios brigam. */
+    border-radius: calc(var(--sh-calendar-radius, var(--sh-radius-control)) - var(--sh-space-1));
+    /* Transparente pelo mesmo motivo medido da celula da grade: pintada de
+       --sh-surface-default a tira some dentro de um sh-panel branco e a
+       silhueta mede 1,05:1 contra a pagina. Quem pinta e o ESTADO. */
+    background-color: var(--sh-calendar-day-bg, transparent);
+    color: var(--sh-calendar-day-fg, var(--sh-text-default));
+    font-family: var(--sh-font-text);
+    cursor: pointer;
+    transition:
+      background-color var(--sh-duration-fast) var(--sh-ease-standard),
+      border-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  .sh-calendar__daystripname {
+    font-size: var(--sh-font-size-2xs);
+    line-height: var(--sh-leading-none);
+    text-transform: uppercase;
+    letter-spacing: var(--sh-tracking-wide);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-calendar__daystripnum {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 1.5rem;
+    min-block-size: 1.5rem;
+    border: var(--sh-border-width-hair) solid transparent;
+    border-radius: var(--sh-radius-pill);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--sh-leading-none);
+  }
+
+  @media (hover: hover) {
+    .sh-calendar__daystripday:hover {
+      background-color: var(--sh-calendar-day-bg-hover, var(--sh-surface-hover));
+    }
+  }
+  .sh-calendar__daystripday:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  .sh-calendar__daystripday:active {
+    background-color: var(--sh-surface-active);
+  }
+
+  /* HOJE na tira: a mesma pilula preenchida da grade, do mesmo token. A pessoa
+     nao aprende dois vocabularios para o mesmo conceito. */
+  .sh-calendar__daystripday[aria-current='date'] .sh-calendar__daystripnum {
+    border-color: var(--sh-action-primary-border);
+    background-color: var(--sh-calendar-today-bg, var(--sh-action-primary-bg));
+    color: var(--sh-calendar-today-fg, var(--sh-action-primary-fg));
+    font-weight: var(--sh-weight-bold);
+  }
+
+  /* DIA MOSTRADO. aria-pressed, e nao aria-selected: aria-selected so vale
+     dentro de grid, listbox ou tab, e a tira e um <nav> de botoes. E nao pode
+     ser aria-current, que ja esta ocupado pelo valor "date" (hoje) — o erro
+     classico e usar aria-current para os dois e o leitor anunciar "data atual"
+     num dia que a pessoa apenas escolheu. Dois canais nao cromaticos, os
+     mesmos da celula selecionada: limite de 2px nos QUATRO lados (borda de um
+     lado so como enfase e proibida no sistema inteiro, DEC-024) e peso. */
+  .sh-calendar__daystripday[aria-pressed='true'] {
+    border-width: var(--sh-border-width-thick);
+    border-color: var(--sh-calendar-selected-border, var(--sh-border-indicator));
+    background-color: var(--sh-calendar-selected-bg, var(--sh-surface-selected));
+    /* A borda engordou 1px; o padding devolve o pixel para a tira nao pular
+       de altura quando a selecao anda de dia. */
+    padding-block: calc(var(--sh-space-1) - (var(--sh-border-width-thick) - var(--sh-border-width-hair)));
+  }
+  .sh-calendar__daystripday[aria-pressed='true'] .sh-calendar__daystripnum {
+    font-weight: var(--sh-weight-bold);
+  }
+  .sh-calendar__daystripday[aria-pressed='true'] .sh-calendar__daystripname {
+    color: var(--sh-text-strong);
+  }
+
+  /* Dia sem horario publicado continua alcancavel e continua dizendo o que e:
+     aria-disabled, nunca disabled. <button disabled> some da navegacao por
+     teclado e o leitor de tela costuma pular. */
+  .sh-calendar__daystripday[aria-disabled='true'] {
+    color: var(--sh-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* ------------------------------------------------- variantes */
+
+  /* Semana: uma linha de sete colunas, com os horarios empilhados dentro
+     da celula. A celula cresce; a grade e a mesma. */
+  .sh-calendar[data-sh-view='week'] .sh-calendar__day {
+    block-size: auto;
+    min-block-size: calc(var(--sh-calendar-cell-min, var(--sh-touch-target)) * 2);
+    vertical-align: top;
+  }
+  .sh-calendar[data-sh-view='week'] .sh-calendar__slots {
+    margin-block-start: var(--sh-space-1);
+  }
+  /* Na visao de semana a coluna vale cerca de um setimo do contexto, entao o
+     horario e a palavra empilham em vez de dividir a linha: lado a lado, o
+     texto corta. A marca continua acima dos dois, e a palavra continua
+     inteira, que e o que nao pode faltar. */
+  .sh-calendar[data-sh-view='week'] .sh-calendar__slot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding-inline: var(--sh-space-2);
+    font-size: var(--sh-font-size-xs);
+  }
+  .sh-calendar[data-sh-view='week'] .sh-calendar__slottime {
+    min-inline-size: 0;
+  }
+  .sh-calendar[data-sh-view='week'] .sh-calendar__slots {
+    gap: var(--sh-space-1);
+  }
+
+  /* --------------------------------------------------- visao de dia */
+
+  /* A visao de DIA e a lista do dia em tela cheia, e nao uma regua de 24
+     horas. Tres razoes medidas: a formacao dura sempre 1 hora, os horarios
+     publicados sao poucos por dia, e uma regua em 375px obriga a rolar as 24
+     horas para achar 3 horarios. Aqui nao ha geometria nova nenhuma: e o
+     __daypanel promovido a largura inteira, com a tira de sete dias por cima
+     servindo de SELETOR DE DIA — nao de contexto de semana.
+
+     A diferenca entre as duas leituras nao e sutil, e foi ela que o dono
+     apontou em 20/08/2026: uma faixa de sete celulas de mesma altura, sem
+     rotulo, ocupando a largura inteira logo abaixo do alternador, e lida como
+     "a semana de novo". Os tres sinais que corrigem isso estao escritos no
+     bloco da tira, mais acima: rotulo visivel, trilho de controle e ausencia
+     de cabecalho de coluna. Somados ao dia por extenso no __title e a
+     contagem no __dayheading, a tela responde "voce esta vendo UM dia" antes
+     de qualquer leitura de detalhe.
+
+     A <table role="grid"> NAO aparece: nao existe grade bidimensional em um
+     dia so, e uma tabela de uma celula e ruido para leitor de tela.
+
+     O que esta visao NAO muda sozinha, e e trabalho de quem monta a pagina:
+     o rotulo das setas ("Dia anterior" / "Proximo dia", nunca "Mes anterior"),
+     o texto do __title ("Terca, 19 de agosto") e o do __dayheading, que na
+     visao de dia diz a CONTAGEM ("3 horarios"), nao a data — repetir a data
+     do titulo tres centimetros abaixo dele gasta uma linha para nao dizer
+     nada, e a contagem e a pergunta que a pessoa tem na mao. Rotulo de seta
+     que sobrou da visao anterior e falha de acessibilidade direta, e e facil
+     de esquecer. O modulo js/shalom-ds-data.js emite o evento com a unidade
+     certa lida de data-sh-view e reclama no console do que ficou para tras,
+     mas nao reescreve texto de ninguem. */
+  /* ------------------------------------ projecao das tres visoes
+
+     QUEM RENDERIZA E A APLICACAO. Este componente nao inventa dia, nao sabe
+     que mes e hoje e nao busca dado; ao trocar data-sh-view, quem monta a
+     pagina TEM de reescrever o conteudo: 42 celulas no mes, 7 na semana,
+     nenhuma no dia. O contrato inteiro esta em 03-inventario-componentes.md,
+     e js/shalom-ds-data.js reclama no console quando o DOM nao confere.
+
+     As regras abaixo sao a REDE DE SEGURANCA desse contrato, nao o contrato.
+     Elas existem porque, em 20/08/2026, a prova do proprio sistema trocava o
+     atributo e nao trocava nada mais: a grade do mes continuava inteira sob o
+     rotulo "Semana", e o alternador virou enfeite. Uma tela errada em
+     silencio e pior do que uma tela quebrada. Com estas regras, o pior caso
+     de uma aplicacao que esqueceu de redesenhar deixa de ser "mes com nome de
+     semana" e passa a ser "a semana certa, com celulas a menos do que a
+     aplicacao poderia ter enviado" — que e recuperavel e visivelmente
+     incompleto, nunca enganoso.
+
+     Elas NAO substituem o redesenho: as celulas escondidas continuam no DOM,
+     a contagem de gridcell nao muda e a rolagem da grade tambem nao. Quem
+     mede o componente conta celula VISIVEL. */
+
+  /* MES: a tira nunca aparece. Ela e o seletor de dia da visao de dia, e o
+     mes ja tem a grade inteira para escolher dia. */
+  .sh-calendar[data-sh-view='month'] .sh-calendar__daystrip { display: none; }
+
+  /* SEMANA: sete dias, e apenas eles. Se a aplicacao entregou o mes inteiro,
+     fica de pe so a linha que contem o dia selecionado.
+
+     O :has externo no <tbody> e a trava de seguranca, e nao sobra de codigo:
+     sem ele, uma grade que chegasse sem nenhum dia selecionado teria TODAS as
+     linhas escondidas, e a tela ficaria vazia — trocar "mes demais" por "nada"
+     nao e conserto. Com ele, a regra so age quando existe um dia selecionado
+     para ancorar a semana. */
+  .sh-calendar[data-sh-view='week']
+    .sh-calendar__grid
+    tbody:has(.sh-calendar__day[aria-selected='true'])
+    .sh-calendar__week:not(:has(.sh-calendar__day[aria-selected='true'])) {
+    display: none;
+  }
+  .sh-calendar[data-sh-view='week'] .sh-calendar__daystrip { display: none; }
+  /* E o painel lateral do dia tambem nao: na semana cada dia ja carrega a
+     propria lista dentro da celula, e um painel ao lado repetindo UM dos sete
+     produz a leitura de dois dias selecionados ao mesmo tempo. Quem quiser a
+     lista de um dia so tem a visao de dia, que e exatamente para isso. */
+  .sh-calendar[data-sh-view='week'] .sh-calendar__daypanel { display: none; }
+
+  /* DIA: um dia. A grade some pelos DOIS caminhos, o embrulho e a propria
+     <table>. Ate a 1.2.0 so o embrulho estava escrito, e markup sem
+     __gridwrap (que a documentacao permitia) deixava a tabela de pe na visao
+     de dia — foi o defeito medido na prova em 20/08/2026. */
+  .sh-calendar[data-sh-view='day'] .sh-calendar__gridwrap,
+  .sh-calendar[data-sh-view='day'] .sh-calendar__grid { display: none; }
+  .sh-calendar[data-sh-view='day'] .sh-calendar__daystrip { display: block; }
+  .sh-calendar[data-sh-view='day'] .sh-calendar__daypanel {
+    flex: 1 1 100%;
+    max-inline-size: none;
+  }
+
+  /* -------------------------------------- cabecalho fixo, opcional */
+
+  /* Uma linha so, e por opcao de quem monta a pagina: em 375px cada linha fixa
+     come cerca de 48px de uma tela de 667px, e duas linhas fixas ja comem 15%
+     da tela. O scroll-margin nao e enfeite e vale mesmo sem barra fixa (com
+     deslocamento zero nao custa nada): sem ele, o elemento que recebe foco por
+     teclado desliza para debaixo da barra e some, que e falha direta do
+     criterio 2.4.11 da WCAG 2.2. Fica nos tres focaveis do componente. */
+  .sh-calendar__day,
+  .sh-calendar__slot,
+  .sh-calendar__daystripday {
+    scroll-margin-block-start: var(--sh-calendar-sticky-offset, 0px);
+  }
+
+  .sh-calendar--sticky .sh-calendar__toolbar {
+    position: sticky;
+    inset-block-start: var(--sh-calendar-sticky-top, 0px);
+    z-index: var(--sh-layer-raised);
+    background-color: var(--sh-calendar-sticky-bg, var(--sh-surface-default));
+  }
+
+  /* Compacta: cabe em painel lateral. Perde a contagem e o painel de
+     horarios, nunca a marca nem a legenda (que sao os canais nao
+     cromaticos).
+
+     ATENCAO, e a regra transversal desta versao: --compact e escolha de quem
+     monta a pagina, NAO condicao de largura. Aplicar esta variante dentro de
+     uma media query de celular reproduz exatamente o defeito que o resto
+     deste bloco acabou de corrigir — o visitante de celular recebendo a
+     versao mais pobre da pagina. Se o calendario compacto for a versao de
+     celular de alguma tela, a lista do dia precisa aparecer em outro lugar
+     visivel, e nao simplesmente sumir. */
+  .sh-calendar--compact .sh-calendar__count,
+  .sh-calendar--compact .sh-calendar__daypanel { display: none; }
+  .sh-calendar--compact { --sh-calendar-gap: var(--sh-space-px); }
+
+  /* Somente leitura: a visao do mestre. Sem hover e sem active; a celula
+     continua focavel, porque ler com teclado continua sendo navegar. */
+  .sh-calendar--readonly .sh-calendar__day { cursor: default; }
+  .sh-calendar--readonly .sh-calendar__day:active {
+    background-color: var(--sh-calendar-day-bg, transparent);
+  }
+  @media (hover: hover) {
+    .sh-calendar--readonly .sh-calendar__day:hover {
+      background-color: var(--sh-calendar-day-bg, transparent);
+    }
+  }
+
+  /* --------------------------------------- resposta ao container */
+
+  /* Abaixo de 34rem a visao de semana desmonta a grade de sete colunas e
+     vira lista vertical de dias. thead some porque a linha ja diz o dia
+     (o __dayname da propria celula, que reaparece aqui). A tira de sete dias
+     NAO entra: ela e o seletor da visao de dia, e por cima de uma lista que
+     ja tem os sete dias escritos ela so repetia a semana e roubava 52px de
+     altura. Saiu na 1.3.0, DEC-039.
+
+     34rem e nao 22rem, e o numero saiu de medicao. Em 22rem (352px) a
+     coluna vale 50px, e a palavra do estado ("Indisponivel", 12px) mede 65px
+     e corta. O ponto em que as sete colunas voltam a caber um horario e uma
+     palavra e 7 x 78px, ou seja 546px, arredondado para 34rem. Abaixo disso
+     a lista vertical le melhor do que sete colunas cortadas, que era
+     justamente o que a especificacao queria evitar ao propor 22rem. */
+  @container sh-calendar (inline-size < 34rem) {
+    .sh-calendar[data-sh-view='week'] .sh-calendar__weekdays { display: none; }
+    .sh-calendar[data-sh-view='week'] .sh-calendar__grid,
+    .sh-calendar[data-sh-view='week'] .sh-calendar__grid tbody,
+    .sh-calendar[data-sh-view='week'] .sh-calendar__week {
+      display: block;
+      inline-size: 100%;
+    }
+    /* A LINHA DO DIA, e nao o bloco do dia. Ate a 1.2.0 cada dia da lista
+       vertical era um bloco de 88px (o dobro do alvo, herdado da COLUNA da
+       semana larga, onde a altura sobra por que existem sete colunas lado a
+       lado). Numa lista vertical isso custa caro: quatro dias sem horario
+       gastam 352px de um aparelho de 812px, e a pessoa rola por vazio ate
+       chegar no dia que tem alguma coisa. Foi a reclamacao de "conteudo
+       apertado" do dono em 20/08/2026, lida ao contrario: o que aperta a
+       informacao util e o espaco gasto com o que nao tem informacao.
+
+       A forma muda, a informacao nao: nome, numero e contagem passam a
+       dividir UMA linha de 44px, e os horarios ocupam a linha seguinte em
+       largura inteira. Dia sem horario ocupa uma linha; dia com horario
+       cresce o quanto precisar. Nada foi desligado. */
+    .sh-calendar[data-sh-view='week'] .sh-calendar__day {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sh-space-1) var(--sh-space-2);
+      inline-size: 100%;
+      min-block-size: var(--sh-touch-target);
+      margin-block-end: var(--sh-space-1);
+      text-align: start;
+    }
+    /* O nome do dia troca de portador: sai do <th> da coluna, que acabou de
+       sumir, e entra na propria celula. NADA e desligado aqui — o que muda e
+       onde a palavra mora. Ate a versao 1.1.0 a lista vertical mostrava so o
+       numero, e o nome do dia existia apenas no aria-label: quem enxerga
+       perdia no celular uma informacao que tinha no computador. */
+    .sh-calendar[data-sh-view='week'] .sh-calendar__dayname { display: block; }
+    /* Numa linha, as marcas e a contagem perdem a margem de cima (que existia
+       para empilhar) e a contagem vai para a ponta oposta, onde o olho ja
+       procura numero em lista. */
+    .sh-calendar[data-sh-view='week'] .sh-calendar__marks { margin-block-start: 0; }
+    .sh-calendar[data-sh-view='week'] .sh-calendar__count { margin-inline-start: auto; }
+    /* Os horarios quebram para a linha de baixo, inteiros. */
+    .sh-calendar[data-sh-view='week'] .sh-calendar__slots {
+      flex: 1 1 100%;
+      margin-block-start: 0;
+    }
+    /* E voltam a ser UMA linha cada. O empilhamento (hora em cima, palavra
+       embaixo) existe para a coluna de um setimo da semana larga, onde lado a
+       lado o texto corta. Aqui a celula tem a largura inteira, e manter o
+       empilhamento gastava duas linhas de 11px para dizer "09h Ja passou" —
+       o mesmo desperdicio do dia vazio de 88px, na escala de baixo. */
+    .sh-calendar[data-sh-view='week'] .sh-calendar__slot {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--sh-space-2);
+      font-size: var(--sh-font-size-sm);
+    }
+  }
+
+  /* Abaixo de 47,5rem a linha nao acomoda grade e painel lado a lado, e o
+     painel cai para a linha seguinte (a conta esta no topo do bloco). Aqui ele
+     tambem larga o teto de 20rem e ocupa a largura inteira: no celular, mes e
+     SEMPRE grade em cima e lista do dia embaixo, acopladas na mesma tela.
+     E o arranjo que o Cal.com forca em todo aparelho abaixo de 768px,
+     descartando as tres disposicoes que ele mesmo oferece no computador, e o
+     modo List que a Apple introduziu na visao de mes do iOS 18. Grade de mes
+     sozinha em 375px nao responde a pergunta que a pessoa tem na mao: a celula
+     de 44px cabe numero, marcas e contagem, e nada mais. */
+  @container sh-calendar (inline-size < 47.5rem) {
+    .sh-calendar__daypanel { max-inline-size: none; }
+  }
+
+  /* Abaixo de 24rem o intervalo entre celulas cai a zero. Nao e estetica:
+     com `table-layout: fixed` e largura de 100%, a coluna vale
+     (contexto menos border-spacing) dividido por 7, e o border-spacing conta
+     OITO vezes, porque tambem pinta os dois lados de fora. Sete alvos de
+     44px pedem 308px de contexto sem intervalo, ou 340px com os 4px
+     padrao. Um aparelho de 375px entrega 343px de sh-container; dentro de um
+     sh-panel de padding padrao (20px) sobram 303px, e a grade nao cabe.
+     Zerando o intervalo nessa faixa ela cabe em 308px, e um painel com
+     --sh-panel-padding: var(--sh-space-4) entrega 311px. E por isso que a
+     receita de celular, escrita em prova-dados.html e na pagina de
+     documentacao, e essa: painel com padding de 16px no celular.
+     Nesta faixa, e so nela, --sh-calendar-gap fica sem efeito: a regra mira
+     a <table>, porque regra dentro de @container nunca casa o proprio
+     container (ver a armadilha anotada no topo do bloco). */
+  @container sh-calendar (inline-size < 24rem) {
+    .sh-calendar__grid {
+      border-spacing: 0;
+      min-inline-size: calc(7 * var(--sh-calendar-cell-min, var(--sh-touch-target)));
+    }
+    /* A tira paga a mesma conta e pela mesma razao: sete alvos de 44px
+       precisam de 308px, e o intervalo e o unico lugar de onde tirar pixel sem
+       encolher o alvo. Ao contrario da grade, aqui a regra mira um
+       DESCENDENTE (a lista), entao a custom property funciona normalmente.
+       A conta completa da tira, para o proximo que mexer:
+         7 x 44 (alvos) + 6 x intervalo + 10 (trilho: 8 de padding + 2 de
+         limite). Com intervalo de 4px sao 342px, ou 21,4rem; com intervalo
+         zero, 318px, ou 19,9rem; sem o trilho, 308px, ou 19,25rem. Dai os
+         dois degraus: 24rem tira o intervalo, 20rem tira o trilho. */
+    .sh-calendar__daystriplist { --sh-calendar-daystrip-gap: 0px; }
+  }
+
+  /* Abaixo de 20rem o trilho da tira sai, e a saida NAO fere a regra 16.
+     O trilho e FORMA (ele diz "isto e um controle"); a informacao e o rotulo
+     escrito por cima, que fica. Em 19,3rem — que e exatamente o contexto que
+     um aparelho de 375px devolve dentro de um sh-panel de padding 16px com
+     limite — os 10px do trilho sao a diferenca entre sete alvos de 44px e uma
+     tira que rola com o setimo dia cortado. Entre perder a moldura e perder o
+     alvo de toque, perde a moldura. */
+  @container sh-calendar (inline-size < 20rem) {
+    .sh-calendar__daystriplist {
+      padding: 0;
+      padding-inline-start: 0;
+      border-width: 0;
+    }
+  }
+
+  /* Abaixo de 30rem a contagem troca de FORMA: fica o numeral, sai a palavra.
+     A contagem inteira nao some mais — ate a versao 1.1.0 ela sumia, e era a
+     unica coisa do componente desligada so no celular, justo a informacao que
+     mais falta ali. A palavra continua na legenda, que jamais some, e no
+     aria-label da celula.
+
+     O :has e a trava do contrato: se a contagem nao tiver um numeral para
+     sustentar a informacao, a palavra FICA. Nada deste componente pode ser
+     desligado por largura sem um portador equivalente do outro lado. */
+  @container sh-calendar (inline-size < 30rem) {
+    .sh-calendar__count:has(.sh-calendar__countnum) .sh-calendar__countword {
+      display: none;
+    }
+  }
+
+  /* ---------------------------------------------------- movimento */
+
+  /* O reset ja neutraliza movimento no documento inteiro sob
+     prefers-reduced-motion. Esta repeticao e deliberada e local: ela deixa
+     a regra visivel para quem le so o componente, e nao usa !important. */
+  @media (prefers-reduced-motion: reduce) {
+    .sh-calendar__day,
+    .sh-calendar__slot,
+    .sh-calendar__daystripday { transition: none; }
+  }
+
+  /* ======================================================================
+     CONTRASTE MEDIDO — sh-calendar
+     Medido no navegador (Chrome headless, cor resolvida por canvas, mesma
+     matematica WCAG 2.x de scripts/verificar-acessibilidade.mjs), nos seis
+     cenarios: base, jubileu-25 e acamps, cada um em claro e escuro.
+     PIOR CASO de cada par entre os seis cenarios. Piso: 4,5:1 texto,
+     3:1 limite, indicador e anel de foco.
+
+     PAR                                        PIOR   PISO   ONDE
+     texto do dia sobre a celula                11,53   4,5   base claro
+     contagem de horarios livres                 5,25   4,5   base claro
+     cabecalho de dia da semana                  5,25   4,5   base claro
+     hoje: texto sobre a pilula                  8,16   4,5   base escuro
+     hoje: silhueta da pilula                    5,51   3,0   base escuro
+     selecionado: limite de 2px                  4,80   3,0   acamp's escuro
+     anel de foco da celula                      7,83   3,0   acamp's escuro
+     marca free                                  4,25   3,0   jubileu claro
+     marca mine                                  5,51   3,0   base escuro
+     marca busy                                  4,00   3,0   base escuro
+     marca blocked                               5,29   3,0   acamp's claro
+     marca past                                  3,19   3,0   acamp's claro
+     texto do slot free                          7,64   4,5   base claro
+     texto do slot mine                          8,16   4,5   base escuro
+     texto do slot busy                          4,63   4,5   base claro
+     texto do slot blocked                       7,96   4,5   base claro
+     texto do slot none                          5,25   4,5   base claro
+     limite do slot free                         4,96   3,0   acamp's claro
+     limite do slot mine                         6,68   3,0   base escuro
+     limite do slot busy                         4,80   3,0   acamp's escuro
+     limite do slot blocked                      5,29   3,0   acamp's claro
+
+     ISENTOS por WCAG 1.4.3 e 1.4.11 (componente inativo, aria-disabled):
+     texto do horario past 3,19; limite dos horarios past e none 1,13;
+     numero do dia fora do mes 3,19. Nenhum deles carrega informacao que nao
+     esteja escrita em outro lugar da tela.
+
+     ALVO DE TOQUE, por hit-test real: 44,1 x 47px em 375px de aparelho e
+     112,8 x 58,4px em 1280px. A grade nao rola na horizontal em nenhum dos
+     dois, com a receita de painel descrita acima.
+
+     A medicao completa, com o valor de cada cenario, esta na DEC-037.
+
+     ---------------------------------------------------------------------
+     O QUE A VERSAO 1.2.0 ACRESCENTOU, medido do mesmo jeito, nos mesmos
+     seis cenarios, com o calendario dentro de um sh-panel de padding 16px
+     (que e a receita de celular e o pior caso de superficie). Medido no
+     navegador, cor resolvida por canvas, cada cenario carregado do zero.
+
+     PAR                                        PIOR   PISO   ONDE
+     nome do dia na tira                         5,25   4,5   base claro
+     numero do dia na tira                      10,44   4,5   base escuro
+     tira, hoje: texto sobre a pilula            8,16   4,5   base escuro
+     tira, hoje: limite da pilula                6,68   3,0   base escuro
+     tira, mostrado: limite de 2px               4,80   3,0   acamp's escuro
+     tira, mostrado: numero do dia              10,44   4,5   base escuro
+     tira, mostrado: nome do dia                12,74   4,5   base escuro
+     rotulo do filtro de origem                  5,25   4,5   base claro
+     contagem: numeral e palavra                 4,90   4,5   base claro
+     nome do dia dentro da celula (semana)       5,25   4,5   base claro
+     nome do formador, horario livre             7,64   4,5   base claro
+     nome do formador, horario indisponivel      4,63   4,5   base claro
+     avatar da origem 1: iniciais                6,76   4,5   acamp's escuro
+     avatar da origem 2: iniciais                4,85   4,5   base claro
+     avatar da origem 3: iniciais                7,79   4,5   base claro
+     avatar da origem 1: limite                  6,34   3,0   base escuro
+     avatar da origem 2: limite                  4,30   3,0   jubileu claro
+     avatar da origem 3: limite                  4,51   3,0   jubileu claro
+
+     ---------------------------------------------------------------------
+     O QUE A VERSAO 1.3.0 MEXEU, e o que isso custou de medicao.
+
+     · __daystriplabel (rotulo visivel da tira) usa --sh-text-muted sobre a
+       superficie do painel, exatamente o mesmo par de __daystripname, que ja
+       esta medido acima: 5,25:1 no pior dos seis cenarios, piso 4,5.
+     · O TRILHO da tira usa --sh-border-control, o mesmo limite de controle do
+       .sh-segmented, e por isso nao abre par novo.
+     · O trilho NAO usa --sh-surface-sunken, e essa e a unica conta que a
+       versao mudou de verdade. Com o afundado atras, as marcas de estado
+       dentro dos botoes da tira caem abaixo dos 3:1 da 1.4.11: a marca `past`
+       mede 2,97:1 no base claro e 1,58:1 no acamp's claro, contra os 3,19:1
+       do pior caso sobre a superficie do painel. Trocar o preenchimento pelo
+       limite devolveu o contraste sem custar sinal nenhum — quem diz
+       "controle de N opcoes" ali e a moldura mais o rotulo, nao a tinta.
+       Quem quiser o afundado de volta refaz a conta das seis marcas antes.
+     · A lista vertical da semana trocou geometria, nao tinta: nenhum par
+       novo, nenhum par alterado.
+
+     ---------------------------------------------------------------------
+     DOIS PARES QUE NAO SAO CANAL, e por isso nao entram na tabela acima. Os
+     dois repetem, com o mesmo token, o que a celula da grade ja fazia desde
+     a 1.1.0, e a leitura correta e a mesma:
+
+     · preenchimento do dia mostrado na tira: 1,07 a 1,23:1 contra a
+       superficie, nos seis cenarios. --sh-surface-selected sozinho nunca foi
+       indicador neste sistema; quem cumpre a 1.4.11 e o limite de 2px acima
+       (4,80 no pior caso), e o peso tipografico e o segundo canal;
+     · silhueta da pilula de hoje na tira: 6,68 a 15,81:1 em cinco cenarios e
+       1,00:1 no acamp's CLARO, onde --sh-action-primary-bg resolve para o
+       mesmo creme da superficie. Nao e defeito novo nem regressao: e o
+       motivo pelo qual a pilula de hoje tem contorno desde a 1.1.0, e o
+       contorno mede 11,91:1 exatamente nesse cenario (6,68 no pior de
+       todos). Quem carrega "hoje" ali e o limite mais o peso mais o
+       aria-current="date", nunca o preenchimento.
+
+     ALVO DE TOQUE da tira, por medicao real em 375px de aparelho dentro do
+     sh-panel de 16px: 44,1 x 56,4px por botao, sete botoes, e a tira nao rola
+     na horizontal (309px de conteudo em 309px de caixa).
+
+     GRADE DE HERMANN, a ilusao de pontos cinza fantasmas nos cruzamentos que
+     o redesenho do Google Agenda produziu em agosto de 2025: verificada na
+     faixa de risco (28,07rem de contexto, intervalo de 4px, claro e escuro).
+     Nao acontece, e a razao e estrutural, nao sorte: a ilusao precisa de
+     LADRILHOS PINTADOS separados por vaos claros, e aqui 41 das 42 celulas
+     medem background-color transparente. So o dia selecionado pinta. E a
+     consequencia direta da decisao de celula transparente, tomada na 1.1.0
+     por outro motivo (contraste dentro de um sh-panel branco).
+
+     TEXTO DO NAVEGADOR EM 200% (raiz em 32px), medido em 375px de aparelho:
+     a contagem e as marcas SOBREVIVEM (a marca dobra para 16px, a celula vai
+     a 88 x 91px), a grade cresce para 616px e rola dentro do proprio
+     __gridwrap, a tira rola dentro de si mesma, e a pagina NAO rola na
+     horizontal. O alternador quebra em tres linhas, que e a degradacao
+     desenhada: o min(100%, …) do piso cede antes de empurrar a pagina.
+
+     ALTERNADOR DE TRES OPCOES em 375px: 282px de trilho, UMA linha, 88,0px
+     por opcao. Sem o piso de largura escrito em .sh-calendar__views ele mede
+     208px e quebra em duas linhas, mesmo com contexto sobrando ao lado.
+     ====================================================================== */
+}

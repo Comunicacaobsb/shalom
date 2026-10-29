@@ -1,0 +1,67 @@
+/* ==========================================================================
+   Shalom DS — ponto de entrada
+   Um único <link> resolve ordem de camadas, tokens e fundações.
+
+     <link rel="stylesheet" href="/ds/v2/shalom-ds.css">
+
+   A ordem das camadas é declarada UMA vez, aqui. Quem vem depois não precisa
+   de !important para vencer: precisa da camada certa.
+
+     sh.reset       normalização
+     sh.tokens      primitivos + semânticos + esquema escuro
+     sh.theme       temas de evento
+     sh.base        tipografia e elementos
+     sh.layout      containers, grade, primitivos de composição
+     sh.components  componentes sh-*
+     sh.utilities   utilitários pontuais
+     sh.overrides   correção local, temporária, sempre comentada
+
+   CSS fora de qualquer camada ainda vence tudo isto. É o último recurso e
+   deve ser tratado como dívida.
+   ========================================================================== */
+
+@layer sh.reset, sh.tokens, sh.theme, sh.base,
+       sh.layout, sh.components, sh.utilities, sh.overrides;
+
+/* Fontes auto-hospedadas. Primeiro import de todos, para o navegador começar a
+   baixar a Montserrat antes de resolver o resto. Nenhuma requisição a
+   fonts.googleapis.com: a página não precisa de <link> nenhum de fonte. */
+@import url("./assets/fonts/fonts.css");
+
+@import url("./tokens/primitives.css") layer(sh.tokens);
+@import url("./tokens/semantic.css")   layer(sh.tokens);
+@import url("./tokens/dark.css")       layer(sh.tokens);
+
+@import url("./foundations/reset.css")      layer(sh.reset);
+@import url("./foundations/typography.css") layer(sh.base);
+@import url("./foundations/layout.css")     layer(sh.layout);
+
+/* Temas de evento: importe apenas o que a página usa.
+@import url("./tokens/themes/jubileu-25.css") layer(sh.theme);
+@import url("./tokens/themes/acamps.css")     layer(sh.theme);
+*/
+
+/* Componentes: um arquivo por lote, conforme docs/03-inventario-componentes.md.
+   TODOS os imports já estão declarados — inclusive os dos lotes ainda não
+   construídos, cujos arquivos existem como reserva. Nenhum agente de lote
+   precisa editar este arquivo, o que elimina o conflito entre lotes paralelos.
+
+   A ordem abaixo é a ordem da cascata dentro de sh.components: a fundação vem
+   primeiro e qualquer lote posterior pode ajustar o que herdou. Cada arquivo
+   declara `@layer sh.components { … }` internamente, então todos caem na mesma
+   sub-camada e a ordem entre eles continua sendo a ordem destes imports. */
+
+@import url("./components/foundation.css") layer(sh.components);  /* Lote 0 */
+@import url("./components/navigation.css") layer(sh.components);  /* Lote A */
+@import url("./components/form.css")       layer(sh.components);  /* Lote B */
+@import url("./components/surface.css")    layer(sh.components);  /* Lote C */
+@import url("./components/feedback.css")   layer(sh.components);  /* Lote D */
+@import url("./components/data.css")       layer(sh.components);  /* Lote D */
+@import url("./components/flow.css")       layer(sh.components);  /* Lote E */
+@import url("./components/internal.css")   layer(sh.components);  /* Lote F */
+@import url("./components/admin.css")      layer(sh.components);  /* Lote G */
+@import url("./components/extras.css")     layer(sh.components);  /* Lote H */
+
+/* Comportamento opcional (dismiss de alerta, chip de filtro, contador de
+   caractere). Progressivo: o CSS acima não depende dele.
+   <script src="/ds/v2/js/shalom-ds.js" defer></script> */

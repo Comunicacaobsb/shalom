@@ -1,0 +1,692 @@
+/* ==========================================================================
+   Shalom DS — Lote H: Marketing e evento
+   sh-countdown · sh-carousel · sh-share · sh-map · sh-embed · sh-pix · sh-reveal
+
+   Contrato deste arquivo (o mesmo de components/foundation.css)
+   -------------------------------------------------------------
+   1. Só a camada semântica é consumida para COR (--sh-surface-*, --sh-text-*,
+      --sh-border-*, --sh-action-*, --sh-feedback-*, --sh-focus-*). Nenhum
+      primitivo de cor, nenhum hex. Espaço, tipo, duração, largura de borda e
+      ícone vêm dos primitivos, como já fazem as fundações.
+   2. Nenhum seletor cita [data-sh-theme]. Os seis cenários (base, jubileu-25,
+      acamps × claro, escuro) saem do mesmo CSS, sem condicional.
+   3. Estado vem do DOM: [hidden], [disabled], [aria-selected], [data-sh-*].
+      Classe is-* não é usada aqui.
+   4. Zero !important — isso é privilégio de @layer sh.overrides.
+
+   Alvo de toque: 44×44 CSS px (--sh-touch-target) em tudo que se clica,
+   inclusive nas bolinhas do carrossel, onde o desenho é bem menor. Uma
+   exceção, documentada na regra: a LARGURA do alvo das bolinhas para no
+   passo da fila (20px), porque alvos de 44px a cada 20px de centro se
+   sobrepõem — a altura de 44px continua inteira.
+
+   Este lote é o que mais COMPÕE em vez de inventar: sh-pix é sh-copy
+   (Lote C) + sh-definition (Lote D) + sh-media (Lote C) com uma moldura ao
+   redor; sh-share é sh-btn (Lote 0) + sh-copy (Lote C) + um link estático;
+   sh-carousel é .sh-reel (foundations/layout.css, Lote 0) + controles que só
+   existem quando há JS. Nenhum dos três reimplementa cópia, rolagem ou botão
+   — só arruma a composição e documenta o encaixe.
+
+   -------------------------------------------------------------------------
+   sh-countdown — a decisão de acessibilidade do lote
+   -------------------------------------------------------------------------
+   Um relógio que atualiza a cada SEGUNDO não pode carregar aria-live: mesmo
+   "off" é uma armadilha de manutenção — basta alguém trocar para "polite"
+   depois (ou um leitor de tela mais permissivo interpretar o "off" com
+   folga) e a região passa a narrar "12… 11… 10…" a cada tique. A garantia
+   deste sistema não é um valor de aria-live: é os dígitos NUNCA estarem na
+   árvore de acessibilidade. Por isso __clock inteiro nasce aria-hidden="true"
+   no HTML (contrato, não decoração deste arquivo) e quem substitui é
+   __summary — uma frase ESTÁTICA, escrita por extenso pelo autor, lida uma
+   única vez como qualquer parágrafo. __label (dias/horas/min/seg) fica
+   dentro do bloco escondido também: sem o número ao lado, a palavra sozinha
+   não informa nada a quem usa leitor de tela, e repeti-la fora do bloco
+   duplicaria texto sem necessidade — a frase de __summary já é o
+   equivalente completo.
+
+   -------------------------------------------------------------------------
+   sh-reveal — a garantia "nunca opacity:0 sem saída"
+   -------------------------------------------------------------------------
+   A cascata clássica de "reveal ao rolar" é: `.reveal{opacity:0}` no CSS,
+   uma classe `.visivel` que o JS acrescenta. Se o script falhar, atrasar ou
+   for bloqueado, o conteúdo fica invisível PARA SEMPRE — a página quebra
+   silenciosamente. Este arquivo NUNCA aplica opacity:0 a um .sh-reveal por
+   conta própria: a regra que esconde só existe dentro de DOIS portões ao
+   mesmo tempo — (a) `prefers-reduced-motion: no-preference` E (b) o
+   documento inteiro marcado com `[data-sh-reveal-armed]`, um atributo que
+   SÓ js/shalom-ds-extras.js escreve, e só depois de confirmar que
+   IntersectionObserver existe. Sem JS, sem atributo, sem esconder: o
+   conteúdo nasce visível e assim permanece. É o mesmo raciocínio do
+   botão de copiar de sh-copy (Lote C), que nasce [hidden] e só quem revela é
+   o script — aqui o sentido é invertido (o script é quem ESCONDE, não quem
+   revela), então a garantia tem de vir de um portão explícito, não de um
+   atributo [hidden] que o HTML já traz pronto.
+
+   Especificação: docs/03-inventario-componentes.md · Lote H
+   JS: js/shalom-ds-extras.js (countdown, carousel, share, reveal — sh-pix
+   não tem comportamento próprio: a única interação dele é copiar a chave, e
+   isso já é js/shalom-ds-surface.js via data-sh-copy)
+   ========================================================================== */
+
+@layer sh.components {
+
+  /* ======================================================================
+     sh-countdown
+     <div class="sh-countdown" data-sh-countdown
+          data-sh-countdown-target="2026-09-12T09:00:00-03:00">
+       <p class="sh-countdown__summary">
+         Começa em <time datetime="2026-09-12T09:00:00-03:00">12 de setembro de 2026, 9h</time>
+       </p>
+       <div class="sh-countdown__clock" aria-hidden="true">
+         <div class="sh-countdown__block">
+           <span class="sh-countdown__value" data-sh-countdown-unit="days">00</span>
+           <span class="sh-countdown__label">dias</span>
+         </div>
+         <div class="sh-countdown__block">
+           <span class="sh-countdown__value" data-sh-countdown-unit="hours">00</span>
+           <span class="sh-countdown__label">horas</span>
+         </div>
+         <div class="sh-countdown__block">
+           <span class="sh-countdown__value" data-sh-countdown-unit="minutes">00</span>
+           <span class="sh-countdown__label">min</span>
+         </div>
+         <div class="sh-countdown__block">
+           <span class="sh-countdown__value" data-sh-countdown-unit="seconds">00</span>
+           <span class="sh-countdown__label">seg</span>
+         </div>
+       </div>
+       <p class="sh-countdown__ended" hidden>O evento já começou.</p>
+     </div>
+
+     Sem JS: os blocos mostram o valor estático escrito no HTML (ou "00") e
+     __summary já diz a data por extenso — nunca fica ilegível, só para de
+     contar. Ver o banner deste arquivo para o raciocínio de __clock
+     aria-hidden. __ended nasce [hidden] e js/shalom-ds-extras.js troca a
+     visibilidade dos dois blocos quando a diferença chega a zero.
+     ====================================================================== */
+
+  .sh-countdown {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-countdown-gap, var(--sh-space-3));
+    min-inline-size: 0;
+  }
+
+  .sh-countdown__summary {
+    max-inline-size: var(--sh-measure);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-medium);
+    color: var(--sh-countdown-summary-ink, var(--sh-text-muted));
+  }
+  .sh-countdown__summary time {
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-countdown-summary-strong, var(--sh-text-default));
+  }
+
+  .sh-countdown__clock {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-countdown-block-gap, var(--sh-space-5));
+  }
+
+  .sh-countdown__block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sh-space-1);
+    min-inline-size: var(--sh-countdown-block-min, 3.75rem);
+  }
+
+  /* tabular-nums garante que "01" e "12" ocupam a MESMA largura: é isso que
+     elimina o pulo de layout a cada tique, não um min-width no valor. O
+     min-inline-size do __block acima é só para as legendas mais longas
+     ("horas") não espremerem o bloco. */
+  .sh-countdown__value {
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-countdown-value-size, var(--sh-font-size-display-sm));
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-none);
+    color: var(--sh-text-strong);
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+  }
+
+  .sh-countdown__label {
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+    color: var(--sh-countdown-label-ink, var(--sh-text-muted));
+  }
+
+  .sh-countdown__ended {
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h3);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-countdown--lg .sh-countdown__value { --sh-countdown-value-size: var(--sh-font-size-display-md); }
+  .sh-countdown--lg .sh-countdown__block { --sh-countdown-block-min: 4.5rem; }
+
+  .sh-countdown--compact {
+    --sh-countdown-gap: var(--sh-space-2);
+    --sh-countdown-block-gap: var(--sh-space-3);
+  }
+  .sh-countdown--compact .sh-countdown__value { --sh-countdown-value-size: var(--sh-font-size-h2); }
+  .sh-countdown--compact .sh-countdown__block { --sh-countdown-block-min: 2.75rem; }
+
+  /* ======================================================================
+     sh-carousel
+     <div class="sh-carousel" data-sh-carousel data-sh-carousel-label="Fotos do Acamp's">
+       <ul class="sh-reel sh-carousel__track" data-sh-carousel-track>
+         <li class="sh-carousel__slide"><figure class="sh-frame">…</figure></li>
+         …
+       </ul>
+       <div class="sh-carousel__controls">
+         <div class="sh-carousel__arrows">
+           <button type="button" class="sh-btn sh-btn--icon sh-btn--secondary sh-carousel__arrow"
+                   data-sh-carousel-prev hidden aria-label="Foto anterior">…</button>
+           <button type="button" class="sh-btn sh-btn--icon sh-btn--secondary sh-carousel__arrow"
+                   data-sh-carousel-next hidden aria-label="Próxima foto">…</button>
+         </div>
+         <div class="sh-carousel__dots" role="tablist" data-sh-carousel-dots hidden aria-label="Selecionar foto"></div>
+       </div>
+       <div class="sh-progress sh-carousel__progress" data-sh-carousel-progress-wrap hidden aria-hidden="true">
+         <div class="sh-progress__track"><div class="sh-progress__fill" data-sh-carousel-progress></div></div>
+       </div>
+     </div>
+
+     A BASE é .sh-reel (foundations/layout.css, já do Lote 0): rolagem nativa
+     com scroll-snap, sem JS. Este arquivo não redeclara nem overflow nem
+     snap — só acrescenta a moldura em volta. Setas, bolinhas e a barra de
+     progresso nascem [hidden] no HTML e js/shalom-ds-extras.js os revela e
+     preenche (as bolinhas são geradas ali, uma por slide — não são
+     escritas à mão, para nunca dessincronizar da contagem real de fotos).
+     Sem JS: a pessoa rola por toque, arrasto, roda do mouse ou teclado (o
+     trilho leva tabindex="0"; com scroll-snap, mesmo a rolagem nativa por
+     seta acaba encaixando no slide mais próximo) — nenhum controle extra
+     aparece, e nada quebra.
+     Nunca avança sozinho: não existe temporizador de auto-avanço neste
+     arquivo nem no JS, de propósito — o inventário do sistema proíbe
+     sh-carousel--auto (docs/03-inventario-componentes.md).
+     ====================================================================== */
+
+  .sh-carousel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-carousel-gap, var(--sh-space-3));
+    min-inline-size: 0;
+  }
+
+  .sh-carousel__track {
+    min-inline-size: 0;
+  }
+  .sh-carousel__track:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-media);
+  }
+
+  .sh-carousel__slide { min-inline-size: 0; }
+
+  .sh-carousel__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sh-space-3);
+  }
+
+  .sh-carousel__arrows {
+    display: flex;
+    gap: var(--sh-space-2);
+  }
+  .sh-carousel__arrow { flex: none; }
+
+  .sh-carousel__dots {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-carousel-dot-gap, var(--sh-space-3));
+  }
+
+  /* Bolinha: forma muda de círculo pequeno para pílula alongada quando
+     selecionada — a diferença NÃO é só de cor (01-identidade.md §2.5),
+     porque um ponto colorido sozinho falha para quem não distingue as duas
+     cores em jogo. O alvo de toque de 44px vem do mesmo truque de ::after
+     que sh-chip e sh-avatar já usam: a bolinha desenha pequena, mas clica
+     grande. */
+  .sh-carousel__dot {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    inline-size: var(--sh-carousel-dot-size, 0.5rem);
+    block-size: var(--sh-carousel-dot-size, 0.5rem);
+    padding: 0;
+    border: 0;
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-carousel-dot-bg, var(--sh-border-strong));
+    cursor: pointer;
+    transition:
+      scale var(--sh-duration-fast) var(--sh-ease-standard),
+      background-color var(--sh-duration-fast) var(--sh-ease-standard);
+    transform-origin: start center;
+  }
+  .sh-carousel__dot::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    /* Altura: os 44px cheios. Largura: no máximo o passo da fila (bolinha +
+       intervalo = 20px), e o motivo é que 44px de largura a cada 20px de
+       centro NUNCA existiram de verdade — os alvos de bolinhas vizinhas se
+       sobrepunham, e como todos são ::after irmãos sem z-index, quem ficava
+       por cima era sempre a bolinha SEGUINTE. Medido antes desta linha: a
+       primeira bolinha respondia em 27px, as do meio em 20px, e a área
+       "extra" de cada uma caía toda à esquerda do próprio desenho — tocar
+       logo à direita de uma bolinha selecionava a de trás. Limitar ao passo
+       entrega o mesmo tamanho útil de antes, agora centrado no desenho, e
+       resolve o efeito colateral que motivou esta mudança: com o alvo
+       centrado de 44px, a última bolinha de uma fila que termina rente à
+       borda do container jogava ~18px para fora da página e a 390px de
+       largura isso virava 1px de rolagem lateral (o alvo chegava a
+       391,54px). Cortar com overflow não serve: overflow-clip-margin só vale
+       quando os DOIS eixos cortam, e cortar em Y comeria justamente os 44px
+       de altura que este ::after existe para garantir.
+       O botão em si continua clicável pelo próprio quadro, então a pílula de
+       24px do estado selecionado não perde área. */
+    inline-size: min(
+      var(--sh-touch-target),
+      calc(var(--sh-carousel-dot-size, 0.5rem) + var(--sh-carousel-dot-gap, var(--sh-space-3)))
+    );
+    block-size: var(--sh-touch-target);
+    translate: -50% -50%;
+  }
+  @media (hover: hover) {
+    .sh-carousel__dot:hover { background-color: var(--sh-border-brand); }
+  }
+  .sh-carousel__dot:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  .sh-carousel__dot[aria-selected="true"] {
+    scale: calc(var(--sh-carousel-dot-active-size, 1.5rem) / var(--sh-carousel-dot-size, 0.5rem)) 1;
+    background-color: var(--sh-carousel-dot-bg-active, var(--sh-action-primary-border));
+  }
+
+  /* Trilha auxiliar para carrosséis com muitas fotos — decorativa
+     (aria-hidden no HTML: quem informa a posição de verdade são as
+     bolinhas). Reaproveita .sh-progress do Lote D sem redesenhar a barra;
+     só afina a espessura para o contexto de carrossel. */
+  .sh-carousel__progress { --sh-progress-thickness: 0.25rem; }
+
+  /* ======================================================================
+     sh-share
+     <div class="sh-share" data-sh-share
+          data-sh-share-title="Acamp's 2026.2"
+          data-sh-share-text="Vem viver o Acamp's com a gente!"
+          data-sh-share-url="https://exemplo.org/acamps">
+       <p class="sh-share__label">Compartilhar</p>
+       <div class="sh-share__actions">
+         <button type="button" class="sh-btn sh-btn--secondary sh-share__button"
+                 data-sh-share-native hidden>
+           <svg class="sh-icon sh-btn__icon" aria-hidden="true">…</svg>
+           <span class="sh-btn__label">Compartilhar</span>
+         </button>
+         <a class="sh-btn sh-btn--secondary sh-share__button sh-share__button--whatsapp"
+            href="https://wa.me/?text=Vem%20viver%20o%20Acamp's%20com%20a%20gente!%20https://exemplo.org/acamps"
+            target="_blank" rel="noopener">
+           <svg class="sh-icon sh-btn__icon" aria-hidden="true">…</svg>
+           <span class="sh-btn__label">WhatsApp</span>
+         </a>
+         <div class="sh-copy sh-share__copy" data-sh-copy>
+           <code class="sh-copy__value">https://exemplo.org/acamps</code>
+           <button class="sh-btn sh-btn--sm sh-copy__button" data-sh-copy-button hidden>
+             <span class="sh-btn__label">Copiar link</span>
+           </button>
+           <span class="sh-copy__status" role="status" aria-live="polite"></span>
+         </div>
+       </div>
+     </div>
+
+     Três caminhos, dois deles vivos sem uma linha de JS: o link do WhatsApp
+     é um <a href> de verdade, escrito pelo autor — abre e funciona sozinho.
+     O bloco de copiar é sh-copy do Lote C tal e qual: este arquivo NÃO cria
+     um segundo mecanismo de cópia, só marca data-sh-copy e deixa
+     js/shalom-ds-surface.js (se carregado) revelar o botão e copiar. O
+     botão nativo (Web Share API) nasce [hidden] e SÓ js/shalom-ds-extras.js
+     o revela — e só quando navigator.share existe. Sem JS algum: sobram
+     WhatsApp + o valor selecionável à mão, os dois funcionais.
+     ====================================================================== */
+
+  .sh-share {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-3);
+    min-inline-size: 0;
+  }
+
+  .sh-share__label {
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-share__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3);
+    align-items: center;
+  }
+
+  .sh-share__button { flex: none; }
+
+  .sh-share__copy {
+    flex: 1 1 16rem;
+    min-inline-size: 0;
+  }
+
+  /* Mesma decisão e o mesmo motivo já registrado em sh-fab--whatsapp
+     (components/navigation.css): não existe token de marca de terceiro na
+     camada semântica, e a família feedback-success é a leitura verde mais
+     próxima sem recorrer a hex fora da paleta. Seletor composto
+     (.sh-btn.sh-share__button--whatsapp) para não depender da ordem de
+     cascata com .sh-btn--secondary — os dois têm a mesma especificidade. */
+  .sh-btn.sh-share__button--whatsapp {
+    --sh-btn-bg: var(--sh-feedback-success-solid);
+    --sh-btn-bg-hover: var(--sh-feedback-success-solid);
+    --sh-btn-bg-active: var(--sh-feedback-success-solid);
+    --sh-btn-fg: var(--sh-feedback-success-on-solid);
+    --sh-btn-border: var(--sh-feedback-success-solid);
+  }
+
+  /* ======================================================================
+     sh-pix
+     <div class="sh-pix">
+       <div class="sh-pix__qr">
+         <figure class="sh-media sh-media--square sh-pix__qr-frame">
+           <div class="sh-media__frame">
+             <div class="sh-pix__qr-placeholder" aria-hidden="true">
+               <svg class="sh-icon">…</svg>
+               <span class="sh-caption">QR Code</span>
+             </div>
+           </div>
+           <figcaption class="sh-media__caption">Espaço reservado — insira o QR gerado pelo banco.</figcaption>
+         </figure>
+       </div>
+       <div class="sh-pix__details">
+         <h3 class="sh-pix__title">Contribua por PIX</h3>
+         <p class="sh-pix__lede">Sem taxas. Qualquer valor ajuda a missão.</p>
+         <div class="sh-copy sh-pix__key" data-sh-copy>
+           <code class="sh-copy__value" id="pix-chave">comunidade@comshalom.org</code>
+           <button class="sh-btn sh-btn--sm sh-copy__button" data-sh-copy-button
+                   aria-describedby="pix-chave" hidden>
+             <span class="sh-btn__label">Copiar chave</span>
+           </button>
+           <span class="sh-copy__status" role="status" aria-live="polite"></span>
+         </div>
+         <dl class="sh-definition sh-pix__meta">
+           <div class="sh-definition__item"><dt>Tipo de chave</dt><dd>E-mail</dd></div>
+           <div class="sh-definition__item"><dt>Favorecido</dt><dd>Comunidade Católica Shalom</dd></div>
+         </dl>
+       </div>
+     </div>
+
+     sh-pix não desenha cartão, cor de fundo nem borda própria — como
+     sh-media e sh-timeline (Lote C), é conteúdo, não superfície. Quem
+     precisa de moldura envolve com sh-panel ou sh-card (Lote 0). A chave
+     copiável É sh-copy, sem segunda implementação; os metadados bancários
+     são sh-definition (Lote D); o QR é reserva de espaço via sh-media — este
+     arquivo não desenha um QR de verdade (isso é um <img> ou <canvas> que a
+     integração real gera), só o rótulo do placeholder, sempre marcado
+     aria-hidden para nunca ser confundido com um código escaneável.
+     ====================================================================== */
+
+  .sh-pix {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-6);
+    align-items: flex-start;
+  }
+
+  .sh-pix__qr {
+    flex: 0 0 auto;
+    inline-size: var(--sh-pix-qr-size, 9rem);
+  }
+
+  .sh-pix__qr-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sh-space-2);
+    inline-size: 100%;
+    block-size: 100%;
+    color: var(--sh-text-muted);
+  }
+  .sh-pix__qr-placeholder .sh-icon { --sh-icon-size: var(--sh-icon-size-xl); }
+
+  .sh-pix__details {
+    flex: 1 1 16rem;
+    min-inline-size: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-4);
+  }
+
+  .sh-pix__title {
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h4);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-pix__lede {
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-relaxed);
+    color: var(--sh-text-default);
+  }
+
+  /* --------------------------------------------------------- variantes */
+
+  .sh-pix--compact { gap: var(--sh-space-4); }
+  .sh-pix--compact .sh-pix__qr { --sh-pix-qr-size: 6.5rem; }
+
+  /* ======================================================================
+     sh-map · sh-embed
+
+     Os dois componentes compartilham o primitivo visual `sh-frame`, mas
+     mantêm papéis semânticos diferentes. Um mapa anuncia localização; um
+     embed anuncia conteúdo de terceiro (vídeo, formulário ou widget). Um
+     iframe com `data-src` começa sem carregar o terceiro: o usuário ativa
+     explicitamente o conteúdo pelo botão `data-sh-integration-activate`.
+     Um iframe com `src` pode ser usado quando a página já obteve consentimento
+     por outro fluxo, mas `title`, `loading="lazy"` e o aviso continuam sendo
+     obrigatórios. Sem JS, o aviso e o link de fallback permanecem úteis.
+     ====================================================================== */
+
+  .sh-map,
+  .sh-embed {
+    display: grid;
+    gap: var(--sh-space-3);
+    min-inline-size: 0;
+  }
+
+  .sh-map__frame,
+  .sh-embed__frame {
+    position: relative;
+    overflow: hidden;
+    min-block-size: 14rem;
+    border: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    border-radius: var(--sh-radius-media);
+    background-color: var(--sh-surface-sunken);
+  }
+
+  .sh-map__frame { aspect-ratio: var(--sh-map-ratio, 16 / 9); }
+  .sh-embed__frame { aspect-ratio: var(--sh-embed-ratio, 16 / 9); }
+  .sh-map__frame iframe,
+  .sh-embed__frame iframe {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    border: 0;
+  }
+
+  .sh-map__placeholder,
+  .sh-embed__placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    gap: var(--sh-space-2);
+    min-block-size: inherit;
+    padding: var(--sh-space-6);
+    color: var(--sh-text-muted);
+    text-align: center;
+    transition:
+      opacity var(--sh-duration-base, 480ms) var(--sh-ease-standard, ease-in-out),
+      translate var(--sh-duration-base, 480ms) var(--sh-ease-standard, ease-in-out);
+  }
+  .sh-map__placeholder > :first-child,
+  .sh-embed__placeholder > :first-child {
+    color: var(--sh-text-strong);
+    font-weight: var(--sh-weight-semibold);
+  }
+  .sh-map__placeholder[hidden],
+  .sh-embed__placeholder[hidden] { display: none; }
+
+  .sh-map__notice,
+  .sh-embed__notice {
+    margin: 0;
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-relaxed);
+  }
+
+  .sh-map__status,
+  .sh-embed__status {
+    min-block-size: 1.5em;
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-sm);
+  }
+  .sh-map__status[data-state="error"],
+  .sh-embed__status[data-state="error"] { color: var(--sh-feedback-danger-text); }
+
+  .sh-map[data-sh-integration-active] .sh-map__placeholder,
+  .sh-embed[data-sh-integration-active] .sh-embed__placeholder {
+    opacity: 0;
+    translate: 0 var(--sh-space-2);
+  }
+  .sh-map[data-sh-integration-active] .sh-map__frame,
+  .sh-embed[data-sh-integration-active] .sh-embed__frame {
+    animation: sh-integration-enter var(--sh-duration-base, 480ms) var(--sh-ease-standard, ease-in-out) both;
+  }
+
+  @keyframes sh-integration-enter {
+    from { opacity: 0; scale: .985; }
+    to { opacity: 1; scale: 1; }
+  }
+
+  /* ======================================================================
+     sh-reveal
+     <div class="sh-reveal" data-sh-reveal="up">…</div>
+     <div class="sh-reveal" data-sh-reveal="fade">…</div>
+
+     data-sh-reveal aceita: "up" (padrão, o próprio atributo vazio já vale
+     como "up") · "down" · "left" · "right" · "fade" (só opacidade). As duas
+     direções horizontais NÃO deslocam: elas crescem a partir da borda
+     oposta, porque deslocamento no eixo inline pode empurrar a página —
+     veja o comentário na regra.
+     --sh-reveal-delay e --sh-reveal-offset são os tokens de camada 3 para
+     escalonar uma grade de cartões sem duplicar regra: cada elemento recebe
+     o próprio atraso por `style="--sh-reveal-delay: 120ms"`.
+     --sh-reveal-offset vale para "up"/"down" (deslocamento, em px);
+     --sh-reveal-scale vale para "left"/"right" (fator, padrão 0.94).
+
+     A GARANTIA deste bloco está descrita no banner do arquivo: a regra que
+     esconde só existe sob prefers-reduced-motion:no-preference E
+     html[data-sh-reveal-armed] ao mesmo tempo. Sem as duas condições, .sh-reveal
+     nunca recebe opacity:0 — nasce e permanece visível.
+     ====================================================================== */
+
+  .sh-reveal {
+    transition:
+      opacity var(--sh-reveal-duration, var(--sh-duration-base, 480ms)) var(--sh-reveal-ease, var(--sh-ease-standard, ease-in-out)),
+      translate var(--sh-reveal-duration, var(--sh-duration-base, 480ms)) var(--sh-reveal-ease, var(--sh-ease-standard, ease-in-out)),
+      scale var(--sh-reveal-duration, var(--sh-duration-base, 480ms)) var(--sh-reveal-ease, var(--sh-ease-standard, ease-in-out));
+    transition-delay: var(--sh-reveal-delay, 0ms);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html[data-sh-reveal-armed] .sh-reveal:not([data-sh-reveal-visible]) {
+      opacity: 0;
+      translate: 0 var(--sh-reveal-offset, 1.25rem);
+    }
+    html[data-sh-reveal-armed] .sh-reveal[data-sh-reveal="fade"]:not([data-sh-reveal-visible]) {
+      translate: none;
+    }
+    html[data-sh-reveal-armed] .sh-reveal[data-sh-reveal="down"]:not([data-sh-reveal-visible]) {
+      translate: 0 calc(var(--sh-reveal-offset, 1.25rem) * -1);
+    }
+    /* O eixo inline é o único que pode empurrar a página: um item que já
+       ocupa a largura inteira da coluna termina rente à borda do container,
+       e aí QUALQUER deslocamento em X vira rolagem lateral enquanto o item
+       não entra na tela. O eixo de bloco não tem esse problema: a página
+       rola em Y de qualquer jeito.
+
+       A tentativa anterior limitava o deslocamento à calha
+       (`min(offset, gutter - 1px)`). Aritmética certa, garantia errada: ela
+       supõe que o item está dentro de um contêiner recuado exatamente por
+       --sh-gutter. Um .sh-reveal dentro de um cartão com padding menor, ou
+       numa página que não usa .sh-container, volta a estourar — e foi o que
+       apareceu a 390px em prova-extras.html.
+
+       A correção não é um número melhor: é tirar o deslocamento do eixo.
+       Aqui as duas direções horizontais CRESCEM a partir da borda oposta em
+       vez de deslizar (`scale` no eixo inline, ancorada por
+       transform-origin). Uma caixa reduzida nunca ultrapassa a própria
+       caixa de layout, então o estouro deixa de ser possível por
+       construção, em qualquer contêiner e em qualquer largura — não por
+       cálculo que depende da página.
+
+       O sentido continua legível: em "left" a âncora é a borda de fim, e é
+       a borda de início que avança para a esquerda; em "right", o inverso.
+       transform-origin não tem forma lógica, então em RTL o sentido espelha
+       — mas como a caixa só encolhe, nem lá existe risco de estouro. */
+    html[data-sh-reveal-armed] .sh-reveal[data-sh-reveal="left"]:not([data-sh-reveal-visible]) {
+      translate: none;
+      scale: var(--sh-reveal-scale, 0.94) 1;
+      transform-origin: 100% 50%;
+    }
+    html[data-sh-reveal-armed] .sh-reveal[data-sh-reveal="right"]:not([data-sh-reveal-visible]) {
+      translate: none;
+      scale: var(--sh-reveal-scale, 0.94) 1;
+      transform-origin: 0 50%;
+    }
+  }
+
+  /* Estado final explícito: redundante com a ausência das regras acima
+     (a transição já resolveria sozinha), mas escrito por clareza — o mesmo
+     motivo que faz cada componente do sistema redeclarar :focus-visible
+     mesmo quando foundations/reset.css já cobre o caso geral. */
+  .sh-reveal[data-sh-reveal-visible] {
+    opacity: 1;
+    translate: none;
+    scale: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sh-map__placeholder,
+    .sh-embed__placeholder,
+    .sh-reveal { transition-duration: var(--sh-duration-instant, 0ms); }
+    .sh-map[data-sh-integration-active] .sh-map__frame,
+    .sh-embed[data-sh-integration-active] .sh-embed__frame { animation: none; }
+  }
+}

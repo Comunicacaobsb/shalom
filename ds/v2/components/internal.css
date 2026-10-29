@@ -1,0 +1,748 @@
+/* ==========================================================================
+   Shalom DS — Lote F — Sistemas internos
+   sh-heat · sh-heat-legend (Adoração) · sh-dish (SH-82 Café) ·
+   sh-need-item · sh-skill-card (Providência) · sh-cart-bar
+
+   Contrato deste arquivo (mesmo de components/foundation.css e data.css)
+   ----------------------------------------------------------------------
+   1. Só a camada semântica para cor (--sh-surface-*, --sh-text-*,
+      --sh-border-*, --sh-action-*, --sh-feedback-*, --sh-focus-*). Nenhum
+      primitivo de cor, nenhum hex.
+   2. Nenhum seletor cita [data-sh-theme]. Os seis cenários saem do mesmo CSS.
+   3. Estado vem do DOM: [disabled], [data-state], [aria-disabled]. Classe
+      is-* não é usada aqui.
+   4. Tokens de camada 3 com valor padrão inline apontando para a camada 2,
+      como em sh-btn (`var(--sh-btn-bg, var(--sh-action-primary-bg))`).
+   5. Zero !important — estados que precisam vencer (bloqueado, indisponível)
+      ficam depois no arquivo e resolvem por ordem de cascata, não por peso.
+
+   Decisões deste lote (para o relatório)
+   ---------------------------------------
+   - NOMES: a spec de 03-inventario-componentes.md chamava o item de cardápio
+     de `sh-menu-item`. Decisão do orquestrador: o nome é `sh-dish`, porque
+     `sh-menu` já é o dropdown do Lote A (components/navigation.css). Este
+     arquivo não declara nenhum `sh-menu-item`.
+   - ESCOPO: o mesmo parágrafo do orquestrador descreve `sh-dish` só como
+     "nome, descrição, preço, disponibilidade, categoria" — sem carrinho.
+   - CART-BAR: `sh-cart-bar` é uma barra fixa progressiva. O total fica em
+     `aria-live="polite"`, o botão de pedido é explícito e o script mede a
+     própria altura para reservar espaço ao fim do fluxo. Sem JS, o fallback
+     de reserva continua válido via `--sh-cart-bar-reserve`.
+   - ESCALA DO HEAT: 03-inventario-componentes.md pede 5 níveis "derivados de
+     danger → warning → success das rampas do DS". A camada semântica só
+     expõe 3 famílias de feedback (não uma rampa contínua), então os dois
+     níveis intermediários (25 e 75) são `color-mix()` em oklch entre as
+     famílias vizinhas — ainda camada semântica, nenhum primitivo tocado.
+     `@supports` cobre o navegador sem `color-mix()` com as 3 famílias puras.
+     Todos os 5×6 pares (nível × cenário) foram medidos depois de escrito —
+     números no relatório do lote.
+   - JS: nenhum arquivo novo. Nenhum dos três sistemas pede comportamento que
+     shalom-ds.js (dismiss/toggle/counter) não cubra, e a página de prova só
+     usa o alternador de cenário já padrão nas outras provas. Ver relatório.
+   - Namespace próprio, sem colisão com surface.js/feedback.js/form.js/base/
+     navigation.js: `data-sh-heat-level`, `data-sh-heat-week-state`.
+   ========================================================================== */
+
+@layer sh.components {
+
+  /* ========================================================================
+     sh-heat · sh-heat-legend
+     sh-heat-wrap (rolagem, padrão de sh-table-wrap) › sh-heat › __header
+       (__corner, __day) › __row (__time, __cell › __pct, __weeks › __week)
+
+     Duas variantes de leitura, não uma trocando sozinha por breakpoint —
+     como o par sh-table (rola) / sh-table--stack (empilha via @container),
+     aqui a página escolhe: --grid (padrão, hora × dia, pede sh-heat-wrap
+     para rolar) ou --week (lista de um dia, já pensada para celular).
+     `sh-heat-legend` é um bloco à parte, não `sh-heat__legend`: uma grade e
+     sua legenda podem viver em lugares diferentes da página (a spec do
+     inventário já as lista como dois nomes).
+     ====================================================================== */
+
+  /* ------------------------------------------------------- wrap (rolagem) */
+  /* Cópia do padrão de .sh-table-wrap (components/data.css): mesmas quatro
+     camadas de sombra de rolagem, mesmo raciocínio de min-inline-size:0.
+     Aviso do lote: grade larga (7 dias × N horários) rola no próprio
+     contêiner no celular — não estoura a página em 390px. */
+  .sh-heat-wrap {
+    container-type: inline-size;
+    container-name: sh-heat;
+    min-inline-size: 0;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    border: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-heat-wrap-bg, var(--sh-surface-default));
+    background-image:
+      linear-gradient(to right, var(--sh-heat-wrap-bg, var(--sh-surface-default)) 40%, transparent),
+      linear-gradient(to left,  var(--sh-heat-wrap-bg, var(--sh-surface-default)) 40%, transparent),
+      linear-gradient(to right, rgb(var(--sh-shadow-rgb) / 0.16), transparent),
+      linear-gradient(to left,  rgb(var(--sh-shadow-rgb) / 0.16), transparent);
+    background-repeat: no-repeat;
+    background-size: 1.5rem 100%, 1.5rem 100%, 0.75rem 100%, 0.75rem 100%;
+    background-position: left, right, left, right;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  /* --------------------------------------------------------- grade (padrão) */
+  /* CSS Grid com display:contents nos agrupadores: __header e cada __row não
+     desenham nada — só deixam os filhos (__corner/__day, __time/__cell)
+     caírem nas colunas do grid do pai. O "gap" faz de linha de grade; cada
+     célula pinta seu próprio fundo, então a linha aparece como um traço de
+     --sh-border-subtle de 1px entre elas, sem precisar de borda por célula. */
+  .sh-heat {
+    display: grid;
+    grid-template-columns: var(--sh-heat-label-col, 3.75rem) repeat(var(--sh-heat-cols, 7), minmax(3.25rem, 1fr));
+    gap: var(--sh-border-width-hair);
+    padding: var(--sh-border-width-hair);
+    background-color: var(--sh-border-subtle);
+    border-radius: inherit;
+    min-inline-size: fit-content;
+  }
+
+  .sh-heat__header,
+  .sh-heat__row {
+    display: contents;
+  }
+
+  .sh-heat__corner,
+  .sh-heat__day,
+  .sh-heat__time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--sh-space-8);
+    padding-inline: var(--sh-space-2);
+    background-color: var(--sh-surface-sunken);
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .sh-heat__day {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: var(--sh-tracking-wide);
+  }
+  .sh-heat__time { justify-content: flex-end; }
+
+  .sh-heat__cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sh-space-px);
+    min-block-size: var(--sh-heat-cell-size, var(--sh-touch-target));
+    padding: var(--sh-space-1);
+    /* O limite da célula é BORDA de verdade, não box-shadow inset. Os dois
+       desenham igual num retângulo sólido, mas só a borda é limite para quem
+       audita (e para quem usa alto contraste do sistema): a silhueta medida
+       de uma célula sem borda ficava em 1,04–1,36:1 contra a grade, porque o
+       preenchimento de cada nível é quase a cor do traço que separa as
+       células. currentColor herda o --fg do nível, que já é o par verificado
+       contra o próprio --bg (≥4,5:1) — o limite sai em 6,28–10,02:1 nos seis
+       cenários, sem token novo. Ver o comentário da escala, abaixo. */
+    border: var(--sh-border-width-hair) solid currentColor;
+    background-color: var(--sh-heat-cell-bg, var(--sh-surface-sunken));
+    color: var(--sh-heat-cell-fg, var(--sh-text-muted));
+    font-family: var(--sh-font-text);
+    text-align: center;
+    cursor: default;
+    transition: box-shadow var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+
+  .sh-heat__pct {
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Só quando a célula É um controle real (button/a) — não um <span> de
+     leitura. :hover/:focus-visible simplesmente não casam com elemento sem
+     foco, então não é preciso duplicar a regra com :not(). */
+  button.sh-heat__cell,
+  a.sh-heat__cell {
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    button.sh-heat__cell:hover:not([disabled]),
+    a.sh-heat__cell:hover {
+      box-shadow: inset 0 0 0 2px var(--sh-border-strong);
+    }
+  }
+  button.sh-heat__cell:focus-visible,
+  a.sh-heat__cell:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  button.sh-heat__cell:active:not([disabled]) {
+    box-shadow: inset 0 0 0 2px var(--sh-border-strong), var(--sh-shadow-inset);
+  }
+
+  /* ---------------------------------------------- escala de ocupação (5) */
+  /* REGRA CRÍTICA: a cor nunca é o único portador do nível — __pct (ou o
+     aria-label, quando o texto não cabe) está sempre presente. As duas
+     pontas (0 e 100) e o meio (50) reusam os trios já verificados de
+     --sh-feedback-{danger,warning,success}-{surface,border,text} — os
+     mesmos pares que sh-badge e sh-alert já usam, portanto já dentro dos
+     ≥4,5:1 documentados em semantic.css. Os dois níveis intermediários (25,
+     75) são color-mix() em oklch entre as famílias vizinhas: ainda camada
+     semântica (nenhum primitivo/hex entra aqui), mas um par NOVO — por isso
+     os 5 níveis × 6 cenários foram medidos depois de escritos (números no
+     relatório do lote), não deduzidos. O limite de 1px (a borda declarada em
+     .sh-heat__cell) reforça o nível sem competir com o traço de grade que já
+     separa as células. */
+  /* O limite de 1px é sempre currentColor, nunca um token de borda à parte:
+     como color já é o --fg verificado (≥4,5:1 contra o próprio --bg), pedir
+     ao limite a MESMA tinta garante o piso de 3:1 do WCAG 1.4.11 por
+     construção — 4,5 já cobre 3. A primeira versão usava um par --border
+     dedicado (inclusive um color-mix próprio) e media 2,70–2,96:1 no
+     escuro: --sh-feedback-*-border não foi desenhado para render contra a
+     própria -surface (ele resolve texto/ícone, não limite). currentColor
+     elimina a classe de erro inteira em vez de escolher outro par torcido. */
+  .sh-heat__cell[data-sh-heat-level="0"] {
+    background-color: var(--sh-heat-0-bg, var(--sh-feedback-danger-surface));
+    color: var(--sh-heat-0-fg, var(--sh-feedback-danger-text));
+  }
+  .sh-heat__cell[data-sh-heat-level="25"] {
+    background-color: var(--sh-heat-25-bg, color-mix(in oklch, var(--sh-feedback-danger-surface) 50%, var(--sh-feedback-warning-surface) 50%));
+    color: var(--sh-heat-25-fg, color-mix(in oklch, var(--sh-feedback-danger-text) 50%, var(--sh-feedback-warning-text) 50%));
+  }
+  .sh-heat__cell[data-sh-heat-level="50"] {
+    background-color: var(--sh-heat-50-bg, var(--sh-feedback-warning-surface));
+    color: var(--sh-heat-50-fg, var(--sh-feedback-warning-text));
+  }
+  .sh-heat__cell[data-sh-heat-level="75"] {
+    background-color: var(--sh-heat-75-bg, color-mix(in oklch, var(--sh-feedback-warning-surface) 50%, var(--sh-feedback-success-surface) 50%));
+    color: var(--sh-heat-75-fg, color-mix(in oklch, var(--sh-feedback-warning-text) 50%, var(--sh-feedback-success-text) 50%));
+  }
+  .sh-heat__cell[data-sh-heat-level="100"] {
+    background-color: var(--sh-heat-100-bg, var(--sh-feedback-success-surface));
+    color: var(--sh-heat-100-fg, var(--sh-feedback-success-text));
+  }
+
+  /* Sem color-mix(): recua para as 3 famílias puras nos níveis 25/75 em vez
+     de perder a cor (o limite já segue de graça via currentColor). Compatível
+     com qualquer navegador que já rode o resto do sistema (:has() em
+     data.css exige o mesmo patamar ou mais recente). */
+  @supports not (color: color-mix(in oklch, red, blue)) {
+    .sh-heat__cell[data-sh-heat-level="25"] {
+      background-color: var(--sh-feedback-danger-surface);
+      color: var(--sh-feedback-danger-text);
+    }
+    .sh-heat__cell[data-sh-heat-level="75"] {
+      background-color: var(--sh-feedback-success-surface);
+      color: var(--sh-feedback-success-text);
+    }
+  }
+
+  /* Bloqueado/indisponível não é "nível 0": é ausência de escala. Vem depois
+     no arquivo de propósito — mesma especificidade de [data-sh-heat-level],
+     vence por ordem de cascata, sem !important. Cor: --sh-text-disabled é
+     --sh-neutral-500, documentado em 01-identidade.md como suficiente para
+     LIMITE (3:1) mas não para TEXTO (4,5:1) — correto para um rótulo
+     decorativo dentro de um controle inerte, curto demais aqui: o texto da
+     célula ("Bloqueado") é a única informação da célula, não decoração, e
+     merece o mesmo piso dos outros níveis. --sh-text-muted já é o par
+     verificado que sh-table/sh-list usam para texto secundário legível. */
+  .sh-heat__cell[disabled],
+  .sh-heat__cell[data-state="blocked"] {
+    background-color: var(--sh-surface-disabled);
+    color: var(--sh-text-muted);
+    box-shadow: none;
+  }
+  .sh-heat__cell[disabled] { cursor: not-allowed; }
+
+  /* ------------------------------------------------ semanas dentro da célula */
+  /* Decorativo — reforça o nível já dito em __pct/aria-label, nunca o
+     substitui, por isso aria-hidden no HTML. currentColor herda o --fg do
+     nível, então nunca precisa de um token próprio nem quebra contraste. */
+  .sh-heat__weeks {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px;
+  }
+  .sh-heat__week {
+    inline-size: 0.4rem;
+    block-size: 0.4rem;
+    border: var(--sh-border-width-hair) solid currentColor;
+    border-radius: var(--sh-radius-pill);
+    opacity: 0.6;
+  }
+  .sh-heat__week[data-sh-heat-week-state="full"] {
+    background-color: currentColor;
+    opacity: 1;
+  }
+  .sh-heat__week[data-sh-heat-week-state="empty"] {
+    background-color: transparent;
+    border-style: dashed;
+  }
+
+  /* -------------------------------------------------------------- --compact */
+  /* Desenho menor para uso embutido (widget de painel). O clique real
+     continua 44px via ::after — mesmo mecanismo de .sh-btn--sm — registrado
+     porque numa grade compacta o alvo expandido de células vizinhas pode se
+     sobrepor; aceitável pelo mesmo motivo que já vale para uma barra de
+     botões pequenos, não para uso com dedo em campo aberto. */
+  .sh-heat--compact .sh-heat__cell {
+    --sh-heat-cell-size: 2.25rem;
+  }
+  .sh-heat--compact .sh-heat__pct { font-size: var(--sh-font-size-2xs); }
+  .sh-heat--compact button.sh-heat__cell::after,
+  .sh-heat--compact a.sh-heat__cell::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: max(100%, var(--sh-touch-target));
+    translate: -50% -50%;
+  }
+
+  /* ------------------------------------------------------ --week (celular) */
+  /* Um dia por vez, uma linha por horário — o mesmo par __row/__cell da
+     grade, só que __row layout:contents cede lugar a uma linha real (a
+     lista não está mais dentro do grid do sh-heat) e __cell vira uma faixa
+     inteira em vez de um quadrado, mesma cor e mesmo texto. */
+  .sh-heat--week {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .sh-heat--week .sh-heat__row {
+    display: flex;
+    align-items: center;
+    gap: var(--sh-space-3);
+  }
+  .sh-heat--week .sh-heat__time {
+    flex: none;
+    inline-size: 3.25rem;
+    justify-content: flex-start;
+    padding-inline: 0;
+    background-color: transparent;
+    color: var(--sh-text-strong);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+  }
+  .sh-heat--week .sh-heat__cell {
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-between;
+    min-block-size: var(--sh-touch-target);
+    padding-inline: var(--sh-space-3);
+    border-radius: var(--sh-radius-control);
+  }
+  .sh-heat--week .sh-heat__pct { font-size: var(--sh-font-size-sm); }
+
+  /* ============================================================ sh-heat-legend
+     <ul class="sh-heat-legend"> › <li class="sh-heat-legend__item">
+       › __swatch[data-sh-heat-level] › __label
+     "A legenda repete valor e cor": __label carrega a faixa em número E a
+     palavra (Vazio/Baixo/Médio/Bom/Cheio) — nunca só o quadrado colorido. */
+  .sh-heat-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-2) var(--sh-space-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .sh-heat-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-default);
+  }
+  /* Mesmo par bg/fg de cada __cell (a legenda tem de casar exatamente com a
+     grade), e o mesmo truque de currentColor no limite — ver comentário em
+     .sh-heat__cell[data-sh-heat-level]. Aqui `color` nunca pinta texto (o
+     rótulo mora em __label, fora do swatch): existe só para o box-shadow
+     herdar uma tinta já verificada contra este --bg. */
+  .sh-heat-legend__swatch {
+    inline-size: 1rem;
+    block-size: 1rem;
+    flex: none;
+    border-radius: var(--sh-radius-control);
+  }
+  .sh-heat-legend__swatch[data-sh-heat-level="0"] {
+    background-color: var(--sh-heat-0-bg, var(--sh-feedback-danger-surface));
+    color: var(--sh-heat-0-fg, var(--sh-feedback-danger-text));
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+  .sh-heat-legend__swatch[data-sh-heat-level="25"] {
+    background-color: var(--sh-heat-25-bg, color-mix(in oklch, var(--sh-feedback-danger-surface) 50%, var(--sh-feedback-warning-surface) 50%));
+    color: var(--sh-heat-25-fg, color-mix(in oklch, var(--sh-feedback-danger-text) 50%, var(--sh-feedback-warning-text) 50%));
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+  .sh-heat-legend__swatch[data-sh-heat-level="50"] {
+    background-color: var(--sh-heat-50-bg, var(--sh-feedback-warning-surface));
+    color: var(--sh-heat-50-fg, var(--sh-feedback-warning-text));
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+  .sh-heat-legend__swatch[data-sh-heat-level="75"] {
+    background-color: var(--sh-heat-75-bg, color-mix(in oklch, var(--sh-feedback-warning-surface) 50%, var(--sh-feedback-success-surface) 50%));
+    color: var(--sh-heat-75-fg, color-mix(in oklch, var(--sh-feedback-warning-text) 50%, var(--sh-feedback-success-text) 50%));
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+  .sh-heat-legend__swatch[data-sh-heat-level="100"] {
+    background-color: var(--sh-heat-100-bg, var(--sh-feedback-success-surface));
+    color: var(--sh-heat-100-fg, var(--sh-feedback-success-text));
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+  @supports not (color: color-mix(in oklch, red, blue)) {
+    .sh-heat-legend__swatch[data-sh-heat-level="25"] {
+      background-color: var(--sh-feedback-danger-surface);
+      color: var(--sh-feedback-danger-text);
+    }
+    .sh-heat-legend__swatch[data-sh-heat-level="75"] {
+      background-color: var(--sh-feedback-success-surface);
+      color: var(--sh-feedback-success-text);
+    }
+  }
+  .sh-heat-legend__swatch[data-sh-heat-level="blocked"] {
+    background-color: var(--sh-surface-disabled);
+    box-shadow: inset 0 0 0 1px var(--sh-border-strong);
+  }
+  .sh-heat-legend__label { font-weight: var(--sh-weight-medium); }
+
+
+  /* ========================================================================
+     sh-dish (SH-82 Café)
+     sh-dish › __media (ou __media--empty) › __body (__category, __name,
+       __desc, __footer › __price)
+
+     Bloco de exibição, não de interação: nenhum link envolve o cartão
+     inteiro (não há "ver detalhes" no escopo deste lote — ver relatório).
+     Disponibilidade é [data-state] no próprio elemento; o rótulo textual que
+     a acompanha (sh-badge, no HTML de quem consome) é o que cumpre "nunca só
+     cor" — o mesmo contrato que sh-badge já assina sozinho.
+     ====================================================================== */
+
+  .sh-dish {
+    position: relative;
+    display: flex;
+    gap: var(--sh-space-4);
+    align-items: stretch;
+    padding: var(--sh-dish-padding, var(--sh-space-3));
+    border: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-default);
+    transition: border-color var(--sh-duration-base) var(--sh-ease-standard);
+  }
+
+  .sh-dish__media {
+    flex: none;
+    inline-size: var(--sh-dish-media-size, 4.75rem);
+    block-size: var(--sh-dish-media-size, 4.75rem);
+    overflow: hidden;
+    border-radius: var(--sh-radius-media);
+    background-color: var(--sh-surface-sunken);
+  }
+  .sh-dish__media > img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  /* Sem foto ainda: iniciais do prato, mesmo raciocínio de sh-avatar. */
+  .sh-dish__media--empty {
+    display: grid;
+    place-items: center;
+    color: var(--sh-text-muted);
+    font-weight: var(--sh-weight-bold);
+    font-size: var(--sh-font-size-lg);
+  }
+
+  .sh-dish__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--sh-space-1);
+    min-inline-size: 0;
+  }
+
+  /* Mesma linguagem de sh-card__eyebrow (foundation.css): text-accent aqui é
+     categoria/taxonomia, não estado — 01-identidade.md §2.4 é claro que
+     ember nunca comunica situação; "Bebida quente" não é uma situação. */
+  .sh-dish__category {
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+    color: var(--sh-text-accent);
+  }
+
+  .sh-dish__name {
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+    overflow-wrap: break-word;
+  }
+
+  .sh-dish__desc {
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-muted);
+    overflow-wrap: break-word;
+  }
+
+  .sh-dish__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sh-space-2);
+    margin-block-start: auto;
+    padding-block-start: var(--sh-space-1);
+  }
+
+  .sh-dish__price {
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-bold);
+    font-variant-numeric: tabular-nums;
+    color: var(--sh-text-strong);
+    white-space: nowrap;
+  }
+
+  /* --------------------------------------------------------- disponibilidade */
+  /* [data-state] descreve o prato inteiro; o rótulo (sh-badge) que o autor
+     põe em __footer é a parte textual obrigatória — esta regra só cuida do
+     resto do cartão parar de competir visualmente com um item que não se
+     pode pedir agora. Cor: --sh-text-muted, não --sh-text-disabled — mesma
+     correção e mesmo motivo do estado "blocked" de sh-heat__cell logo acima
+     neste arquivo. Nome, descrição e preço continuam informação real (o
+     prato só não está disponível AGORA), então pedem o piso de 4,5:1 que
+     --sh-text-disabled (--sh-neutral-500, documentado em 01-identidade.md
+     como suficiente só para limite/3:1) não cobre. */
+  .sh-dish[data-state="indisponivel"] {
+    background-color: var(--sh-surface-sunken);
+  }
+  /* Só a FOTO esmaece — nunca o monograma-placeholder: opacity dilui a tinta
+     já verificada de --sh-dish__media--empty (texto, ainda que decorativo e
+     aria-hidden) e não há como recalcular ≥4,5:1 sobre uma mistura de
+     opacidade sem medir por cenário. A foto é imagem, não texto: 1.4.3/1.4.11
+     não se aplicam a ela. */
+  .sh-dish[data-state="indisponivel"] .sh-dish__media > img { opacity: 0.5; }
+  /* __category entra na mesma lista que __name/__desc/__price. Ficar de fora
+     não era detalhe estético: a categoria é a única peça do cartão que usa
+     --sh-text-accent, e o indisponível troca o fundo para --sh-surface-sunken.
+     No tema base o rebaixado é quase branco e o acento passa; no acamp's ele é
+     um laranja de meio-tom (#e7a45d) e o acento (teal-deep #296b5e) cai a
+     2,94:1 — medido em prova-internos.html, cenário acamp's claro.
+     --sh-text-muted é o par que o próprio tema calibrou contra esse laranja
+     (5,29:1), e é a leitura certa: o cartão inteiro recua quando o item não
+     está disponível. */
+  .sh-dish[data-state="indisponivel"] .sh-dish__name,
+  .sh-dish[data-state="indisponivel"] .sh-dish__desc,
+  .sh-dish[data-state="indisponivel"] .sh-dish__price,
+  .sh-dish[data-state="indisponivel"] .sh-dish__category {
+    color: var(--sh-text-muted);
+  }
+
+  .sh-dish--compact {
+    --sh-dish-padding: var(--sh-space-2);
+    --sh-dish-media-size: 3.5rem;
+  }
+
+
+  /* ========================================================================
+     sh-need-item (Providência — necessidades)
+     <li class="sh-need-item" data-state="aberto|atendido">
+       › __body (__name, __meta) › __action (sh-badge + sh-btn)
+
+     Estado no próprio item, igual sh-list__row[data-state="selected"]. O
+     WhatsApp é sh-btn--primary de verdade (componha com o Lote 0): ganha
+     hover/focus/active de graça e evita inventar o verde de marca do
+     WhatsApp fora da camada semântica (proibido por 02-arquitetura-tokens,
+     "hex fora dos primitivos declarados" — e este arquivo não declara
+     primitivo nenhum).
+     ====================================================================== */
+
+  .sh-need-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sh-space-3);
+    padding: var(--sh-space-3) var(--sh-space-4);
+    border: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-default);
+  }
+
+  .sh-need-item__body {
+    display: flex;
+    flex: 1 1 12rem;
+    flex-direction: column;
+    gap: calc(var(--sh-space-1) / 2);
+    min-inline-size: 0;
+  }
+
+  .sh-need-item__name {
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+    overflow-wrap: break-word;
+  }
+
+  .sh-need-item__meta {
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-muted);
+    overflow-wrap: break-word;
+  }
+
+  .sh-need-item__action {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sh-space-2);
+  }
+
+  /* Atendida: sh-badge (no HTML) já diz a palavra; aqui só baixa o peso
+     visual do resto da linha, como sh-list__row[aria-disabled]. */
+  .sh-need-item[data-state="atendido"] {
+    background-color: var(--sh-surface-sunken);
+  }
+  .sh-need-item[data-state="atendido"] .sh-need-item__name,
+  .sh-need-item[data-state="atendido"] .sh-need-item__meta {
+    color: var(--sh-text-muted);
+  }
+
+
+  /* ========================================================================
+     sh-skill-card (Providência — diretório de habilidades)
+     sh-skill-card › __name › __skills (ul de sh-badge) › __footer (contato)
+     ====================================================================== */
+
+  .sh-skill-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-3);
+    padding: var(--sh-space-5);
+    border: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-default);
+  }
+
+  .sh-skill-card__name {
+    font-size: var(--sh-font-size-lg);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-skill-card__skills {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--sh-space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sh-skill-card__footer {
+    display: flex;
+    margin-block-start: auto;
+    padding-block-start: var(--sh-space-3);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  /* ========================================================================
+     sh-cart-bar · resumo persistente do pedido
+
+     A barra é uma superfície de ação, não um alerta. O HTML deve ficar no
+     fim do fluxo principal, depois dos itens do cardápio:
+
+     <aside class="sh-cart-bar" data-sh-cart-bar data-state="open"
+            aria-label="Resumo do pedido">
+       <span class="sh-cart-bar__count">2 itens</span>
+       <span class="sh-cart-bar__total" aria-live="polite">R$ 18,00</span>
+       <button class="sh-btn sh-btn--primary sh-cart-bar__action"
+               data-sh-cart-bar-action>Ver pedido</button>
+     </aside>
+
+     O espaçamento final é reservado pelo módulo progressivo e pelo fallback
+     da regra `:has`; nunca se deve esconder conteúdo atrás de uma barra fixa.
+     ====================================================================== */
+
+  body:has(.sh-cart-bar:not([hidden])) {
+    padding-block-end: var(--sh-cart-bar-reserve, 7rem);
+  }
+
+  .sh-cart-bar {
+    position: fixed;
+    inset-block-end: 0;
+    inset-inline: 0;
+    z-index: var(--sh-layer-raised, 20);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: var(--sh-space-4);
+    min-block-size: var(--sh-cart-bar-min-height, 4.5rem);
+    padding: var(--sh-space-3) max(var(--sh-gutter), env(safe-area-inset-left, 0px))
+      max(var(--sh-space-3), env(safe-area-inset-bottom, 0px))
+      max(var(--sh-gutter), env(safe-area-inset-right, 0px));
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-strong);
+    background: var(--sh-surface-default);
+    color: var(--sh-text-strong);
+    box-shadow: var(--sh-shadow-raised);
+    transition:
+      opacity var(--sh-duration-base, 480ms) var(--sh-ease-standard, ease-in-out),
+      translate var(--sh-duration-base, 480ms) var(--sh-ease-standard, ease-in-out);
+  }
+
+  .sh-cart-bar[data-state="closing"],
+  .sh-cart-bar[data-state="closed"] {
+    opacity: 0;
+    translate: 0 100%;
+    pointer-events: none;
+  }
+  .sh-cart-bar[hidden] { display: none; }
+
+  .sh-cart-bar__count,
+  .sh-cart-bar__total { min-inline-size: 0; }
+  .sh-cart-bar__count {
+    overflow: hidden;
+    color: var(--sh-text-muted);
+    font-size: var(--sh-font-size-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sh-cart-bar__total {
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--sh-weight-bold);
+    white-space: nowrap;
+  }
+  .sh-cart-bar__action { flex: none; }
+
+  @media (max-width: 36rem) {
+    body:has(.sh-cart-bar:not([hidden])) { padding-block-end: var(--sh-cart-bar-reserve, 8rem); }
+    .sh-cart-bar {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--sh-space-2) var(--sh-space-3);
+    }
+    .sh-cart-bar__count { grid-column: 1; }
+    .sh-cart-bar__total { grid-column: 2; grid-row: 1; }
+    .sh-cart-bar__action { grid-column: 1 / -1; grid-row: 2; inline-size: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sh-cart-bar { transition-duration: var(--sh-duration-instant, 0ms); }
+  }
+}

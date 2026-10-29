@@ -1,0 +1,1038 @@
+/* ==========================================================================
+   Shalom DS — Lote E — Fluxo de inscrição
+   sh-stepper · sh-ticket · sh-summary · sh-payment-option ·
+   sh-credential · sh-scanner
+
+   Contrato deste arquivo (o mesmo de components/foundation.css)
+   -------------------------------------------------------------
+   1. Só a camada semântica é consumida para COR (--sh-surface-*, --sh-text-*,
+      --sh-border-*, --sh-action-*, --sh-feedback-*, --sh-focus-*). Nenhum
+      primitivo de cor, nenhum hex. Escalas sem equivalente semântico
+      (espaço, tipo, duração, largura de borda, ícone, camada) vêm dos
+      primitivos, como as fundações já fazem.
+   2. Nenhum seletor cita [data-sh-theme]. Os seis cenários (base,
+      jubileu-25, acamp's × claro/escuro) saem do mesmo CSS.
+   3. Estado vem do DOM: [aria-current="step"], [data-state], [open],
+      :has(:checked) (via composição com o Lote B). Variante de CONTEÚDO
+      (lote esgotado, forma de pagamento, tamanho) é classe --modificador,
+      não [data-state] — a mesma distinção que o inventário já faz para
+      sh-badge/sh-alert. [data-state] fica reservado para condição
+      transitória: passo corrente, leitura em andamento, item já somado ao
+      pedido.
+   4. Cada componente expõe tokens de camada 3 (--sh-ticket-*, --sh-scanner-*,
+      …) com valor padrão inline apontando para a camada 2. Configurar de
+      fora é setar a custom property; nunca sobrescrever o seletor.
+   5. Zero !important.
+
+   Alvo de toque: 44×44 CSS px (--sh-touch-target) em tudo que se clica.
+
+   -------------------------------------------------------------------------
+   JS: nenhum novo. js/shalom-ds-flow.js NÃO foi criado.
+   -------------------------------------------------------------------------
+   O inventário condiciona JS a "a spec exigir (ex.: stepper navegável)".
+   Nenhum dos seis componentes exige:
+     · sh-stepper é um <ol> estático cujo [data-state]/[aria-current] a SPA
+       escreve a cada troca de etapa — o mesmo contrato que sh-tabs (Lote A)
+       já usa para [aria-selected]. Quando um passo concluído precisa ser
+       revisitável, ele vira um <a> real (.sh-stepper__link, com
+       :hover/:focus-visible completos aqui mesmo): navegação é do link, não
+       de um handler.
+     · sh-summary usa <details> nativo para o colapso no celular — o mesmo
+       caminho que sh-accordion (Lote A) já usa para o FAQ. Zero JS.
+     · sh-ticket compõe sh-quantity (Lote B); o +/- já tem JS próprio em
+       shalom-ds-form.js.
+     · sh-credential e sh-scanner são superfícies de ESTADO. Quem gera o QR
+       é a biblioteca da SPA (html5-qrcode/qrcode.js); quem lê a câmera e
+       decide idle→reading→success/error também. Este arquivo só estiliza
+       [data-state] — impor esse contrato aqui evitaria reimplementar,
+       mal, o que a SPA já faz bem.
+   Registrado para a revisão final não perguntar "cadê o JS deste lote".
+
+   -------------------------------------------------------------------------
+   COMPOSIÇÃO — o que este arquivo NÃO redesenha
+   -------------------------------------------------------------------------
+   sh-stepper__progress   é uma instância de .sh-progress.sh-progress--steps
+                          (Lote D, components/data.css). Zero CSS novo para
+                          a barra em si — só o texto __status ao lado.
+   sh-payment-option      é MIXIN sobre .sh-option-card (Lote B): o autor
+                          escreve class="sh-option-card sh-payment-option"
+                          no mesmo <label>. Este arquivo só acrescenta
+                          __icon e __fee; indicador, seleção (:has(:checked)),
+                          foco e erro continuam sendo os de sh-option-card.
+   sh-ticket__quantity    recebe o sh-quantity inteiro do Lote B, com o
+                          data-sh-quantity de sempre.
+   sh-credential__qr      é um sh-media (Lote C) com --square; a moldura e a
+                          legenda são as de lá.
+   sh-credential__meta    é um sh-definition--inline (Lote D).
+   sh-credential__code    é um sh-copy (Lote C) — herda o botão copiar e o
+                          [data-copied] de shalom-ds-surface.js.
+   sh-scanner__fallback   é <details> + sh-field/sh-input (Lote B) para a
+                          digitação manual do código.
+
+   Especificação: docs/03-inventario-componentes.md · Lote E
+   ========================================================================== */
+
+@layer sh.components {
+
+  /* ======================================================================
+     sh-stepper
+     <nav class="sh-stepper" aria-label="Etapas da inscrição">
+       <ol class="sh-stepper__list">
+         <li class="sh-stepper__step" data-state="done">
+           <span class="sh-stepper__index" aria-hidden="true">
+             <svg class="sh-icon"><use href="#i-check"/></svg>
+           </span>
+           <span class="sh-stepper__label">Dados</span>
+           <span class="sh-stepper__state">Concluída</span>
+         </li>
+         <li class="sh-stepper__step" aria-current="step">
+           <span class="sh-stepper__index" aria-hidden="true">2</span>
+           <span class="sh-stepper__label">Opções</span>
+           <span class="sh-stepper__state">Em andamento</span>
+         </li>
+         <li class="sh-stepper__step" data-state="todo">
+           <span class="sh-stepper__index" aria-hidden="true">3</span>
+           <span class="sh-stepper__label">Resumo</span>
+           <span class="sh-stepper__state">A seguir</span>
+         </li>
+       </ol>
+       <p class="sh-stepper__progress">
+         <span class="sh-progress sh-progress--steps sh-progress--sm" aria-hidden="true">
+           <span class="sh-progress__track">
+             <span class="sh-progress__step" data-state="done"></span>
+             <span class="sh-progress__step" data-state="current"></span>
+             <span class="sh-progress__step"></span>
+           </span>
+         </span>
+         <span class="sh-stepper__status">Passo 2 de 3 <span aria-hidden="true">·</span> Opções</span>
+       </p>
+     </nav>
+
+     Desvio registrado: o inventário lista __progress como filho de
+     sh-stepper ao lado de __step, mas <ol> só aceita <li> como filho direto
+     — o mesmo problema que criou sh-input-group em foundation.css.
+     __list resolve isso (o mesmo caminho que sh-nav, no mesmo documento, já
+     usa): __step vira <li> de .sh-stepper__list, e __progress é irmão do
+     <ol>, os dois descendentes reais de .sh-stepper. HTML válido, BEM
+     intacto — elemento não precisa ser filho DIRETO do bloco.
+
+     __list fica SEMPRE no DOM e SEMPRE completo para leitor de tela: a
+     etapa concluída, a atual e as pendentes são lidas por inteiro em
+     qualquer largura. O que muda no container estreito é só a PINTURA —
+     rótulo e estado dos passos que não são o atual encolhem para o recorte
+     (clip-path, não display:none: continuam na árvore de acessibilidade) —
+     e __progress, decorativo na barra e com texto real no status, assume a
+     leitura em palavras ("Passo 2 de 3") que o inventário pede para o
+     celular. Nenhum passo desaparece de verdade.
+
+     Passo navegável sem JS: quando um passo concluído pode ser revisitado,
+     o autor troca __index+__label por um <a class="sh-stepper__link"> —
+     link real, com :hover/:focus-visible próprios logo abaixo.
+     ====================================================================== */
+
+  .sh-stepper {
+    container-type: inline-size;
+    container-name: sh-stepper;
+    min-inline-size: 0;
+  }
+
+  .sh-stepper__list {
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sh-stepper__step {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sh-space-2);
+    min-inline-size: 0;
+    padding-inline: var(--sh-space-1);
+    text-align: center;
+  }
+
+  /* Trilho: um segmento por passo, medido contra a LARGURA DO PRÓPRIO passo
+     (-50% alcança o centro do vizinho anterior, que tem a mesma largura).
+     "Percorrido" é lido de trás para frente: o trilho pertence ao passo de
+     CHEGADA — se cheguei aqui (feito ou corrente), o trecho está andado. */
+  .sh-stepper__step:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    inset-inline: -50% 50%;
+    inset-block-start: calc(var(--sh-stepper-index-size, 2.25rem) / 2 - var(--sh-border-width-thick) / 2);
+    block-size: var(--sh-border-width-thick);
+    background-color: var(--sh-stepper-rail, var(--sh-border-default));
+    z-index: var(--sh-layer-base);
+  }
+  .sh-stepper__step[data-state="done"]:not(:first-child)::before,
+  .sh-stepper__step[aria-current="step"]:not(:first-child)::before {
+    background-color: var(--sh-border-brand);
+  }
+
+  .sh-stepper__index {
+    position: relative;
+    z-index: var(--sh-layer-raised);
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: var(--sh-stepper-index-size, 2.25rem);
+    block-size: var(--sh-stepper-index-size, 2.25rem);
+    border: var(--sh-border-width-thick) solid
+            var(--sh-stepper-index-border, var(--sh-border-strong));
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-stepper-index-bg, var(--sh-surface-default));
+    color: var(--sh-stepper-index-fg, var(--sh-text-muted));
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-bold);
+    font-variant-numeric: tabular-nums;
+    transition:
+      background-color var(--sh-duration-base) var(--sh-ease-standard),
+      border-color     var(--sh-duration-base) var(--sh-ease-standard),
+      color            var(--sh-duration-base) var(--sh-ease-standard);
+  }
+  .sh-stepper__index > .sh-icon { --sh-icon-size: var(--sh-icon-size-md); }
+
+  .sh-stepper__label {
+    max-inline-size: 8rem;
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-medium);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-default);
+  }
+
+  .sh-stepper__state {
+    font-size: var(--sh-font-size-xs);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-muted);
+  }
+
+  /* ------------------------------------------------------------- estados */
+  /* done/current/todo por FORMA (cheio+ícone / oco+anel duplo / oco simples)
+     + cor + a palavra em __state. Nunca só cor. */
+
+  .sh-stepper__step[data-state="done"] .sh-stepper__index {
+    --sh-stepper-index-bg: var(--sh-action-primary-bg);
+    --sh-stepper-index-border: var(--sh-action-primary-border);
+    --sh-stepper-index-fg: var(--sh-action-primary-fg);
+  }
+  .sh-stepper__step[data-state="done"] .sh-stepper__state { color: var(--sh-text-default); }
+
+  /* Corrente: oco (não cheio, ao contrário de "done") com anel duplo — a
+     mesma lógica de forma de sh-timeline[aria-current="step"] (Lote C). */
+  .sh-stepper__step[aria-current="step"] .sh-stepper__index {
+    --sh-stepper-index-bg: var(--sh-surface-default);
+    --sh-stepper-index-border: var(--sh-action-accent-border);
+    --sh-stepper-index-fg: var(--sh-text-accent);
+    outline: var(--sh-border-width-thick) solid var(--sh-action-accent-border);
+    outline-offset: var(--sh-border-width-thin);
+  }
+  .sh-stepper__step[aria-current="step"] .sh-stepper__label {
+    font-weight: var(--sh-weight-bold);
+    color: var(--sh-text-strong);
+  }
+  .sh-stepper__step[aria-current="step"] .sh-stepper__state {
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-accent);
+  }
+
+  .sh-stepper__step[data-state="todo"] .sh-stepper__label,
+  .sh-stepper__step[data-state="todo"] .sh-stepper__state { color: var(--sh-text-muted); }
+
+  /* ---------------------------------------------------- passo navegável */
+
+  .sh-stepper__link {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: inherit;
+    border-radius: var(--sh-radius-control);
+    color: inherit;
+    text-decoration: none;
+  }
+  @media (hover: hover) {
+    .sh-stepper__link:hover .sh-stepper__index { --sh-stepper-index-border: var(--sh-border-brand); }
+    .sh-stepper__link:hover .sh-stepper__label { color: var(--sh-text-brand); }
+  }
+  .sh-stepper__link:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+  /* Alvo de 44px sem estourar o desenho de 36px do índice. */
+  .sh-stepper__link::after {
+    content: '';
+    position: absolute;
+    inset-block-start: var(--sh-space-1);
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: var(--sh-touch-target);
+    translate: -50% 0;
+  }
+
+  /* -------------------------------------------------------------- __progress */
+
+  .sh-stepper__progress {
+    display: none;
+    align-items: center;
+    gap: var(--sh-space-3);
+    margin: 0;
+    min-inline-size: 0;
+  }
+  .sh-stepper__progress > .sh-progress { flex: 1; min-inline-size: 0; }
+
+  .sh-stepper__status {
+    flex: none;
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-strong);
+    white-space: nowrap;
+  }
+
+  /* ---------------------------------------------------- versão compacta */
+  /* "3 de 5 por extenso", nunca rótulos espremidos: abaixo do limiar, só o
+     passo CORRENTE mantém rótulo+estado visíveis; os demais encolhem para
+     o índice (recorte de tela, não de acessibilidade) e __progress assume
+     a leitura textual do conjunto. */
+  @container sh-stepper (width < 28rem) {
+    .sh-stepper__step:not([aria-current="step"]) .sh-stepper__label,
+    .sh-stepper__step:not([aria-current="step"]) .sh-stepper__state {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .sh-stepper__progress { display: flex; }
+  }
+
+  /* ======================================================================
+     sh-ticket
+     <article class="sh-ticket">
+       <div class="sh-ticket__main">
+         <p class="sh-ticket__name">Lote 1 — Participante</p>
+         <p class="sh-ticket__deadline">Até 30 de junho</p>
+         <p class="sh-ticket__note">Alojamento, cinco refeições por dia e camiseta.</p>
+       </div>
+       <div class="sh-ticket__side">
+         <p class="sh-ticket__price">R$&nbsp;380,00</p>
+         <p class="sh-ticket__fee">+ R$&nbsp;12,40 na taxa do cartão</p>
+         <p class="sh-ticket__stock">
+           <span class="sh-badge sh-badge--sm sh-badge--warning">12 vagas</span>
+         </p>
+         <div class="sh-ticket__quantity">
+           <div class="sh-quantity" data-sh-quantity> … (Lote B) … </div>
+         </div>
+       </div>
+     </article>
+
+     __fee é renderizado sempre que existir taxa — nunca atrás de mais um
+     passo: "taxa sempre visível antes da escolha" (inventário). Se a forma
+     de pagamento ainda não foi escolhida, escreva a taxa do pior caso (a do
+     cartão); PIX sem taxa é o texto "Sem taxa no PIX", não a ausência do
+     elemento.
+
+     --sold-out/--closed trocam __quantity por uma frase de status — nunca
+     apagam o cartão em cinza. "Lote esgotado continua legível, não some"
+     (inventário): por isso as duas variantes não tocam --sh-text-muted nem
+     --sh-text-disabled em __name/__price, só a região de ação.
+     ====================================================================== */
+
+  .sh-ticket {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3) var(--sh-space-5);
+    justify-content: space-between;
+    min-inline-size: 0;
+    padding: var(--sh-ticket-padding, var(--sh-space-5));
+    border: var(--sh-border-width-hair) solid var(--sh-ticket-border, var(--sh-border-default));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-ticket-bg, var(--sh-surface-default));
+    transition:
+      border-color     var(--sh-duration-base) var(--sh-ease-standard),
+      background-color var(--sh-duration-base) var(--sh-ease-standard);
+  }
+
+  .sh-ticket__main {
+    display: flex;
+    flex: 1 1 14rem;
+    flex-direction: column;
+    gap: var(--sh-space-1);
+    min-inline-size: 0;
+  }
+
+  .sh-ticket__name {
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-ticket__deadline {
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-semibold);
+    letter-spacing: var(--sh-tracking-wide);
+    text-transform: uppercase;
+    color: var(--sh-text-muted);
+  }
+
+  .sh-ticket__note {
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-relaxed);
+    color: var(--sh-text-default);
+  }
+
+  .sh-ticket__side {
+    display: flex;
+    flex: 0 1 auto;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--sh-space-2);
+    min-inline-size: 8rem;
+    text-align: end;
+  }
+
+  .sh-ticket__price {
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-lg);
+    font-weight: var(--sh-weight-bold);
+    font-variant-numeric: tabular-nums;
+    color: var(--sh-text-strong);
+  }
+
+  .sh-ticket__fee {
+    font-size: var(--sh-font-size-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--sh-text-muted);
+  }
+
+  .sh-ticket__stock { min-inline-size: 0; }
+
+  .sh-ticket__quantity { margin-block-start: var(--sh-space-1); }
+  /* .sh-quantity nasce align-self:start (form.css) para não esticar dentro
+     de uma coluna flex; aqui a coluna é alinhada ao FIM (__side), então o
+     controle acompanha — só alinhamento, o resto do componente é intocado. */
+  .sh-ticket__quantity > .sh-quantity { align-self: flex-end; }
+
+  /* Indisponível: ocupa o lugar de __quantity. Ícone + palavra, texto no
+     mesmo tom de __note — nunca --sh-text-disabled. */
+  .sh-ticket__unavailable {
+    display: flex;
+    align-items: center;
+    gap: var(--sh-space-2);
+    margin-block-start: var(--sh-space-1);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-default);
+  }
+  .sh-ticket__unavailable > .sh-icon { --sh-icon-size: var(--sh-icon-size-sm); flex: none; }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-ticket--limited { --sh-ticket-border: var(--sh-feedback-warning-border); }
+
+  .sh-ticket--free .sh-ticket__price { color: var(--sh-text-success); }
+  .sh-ticket--free .sh-ticket__fee   { color: var(--sh-text-success); }
+
+  .sh-ticket--sold-out,
+  .sh-ticket--closed { --sh-ticket-bg: var(--sh-surface-sunken); }
+
+  /* Ativo: quando a SPA já somou esta linha ao pedido. Mesmo contrato de
+     .sh-quantity[data-state="active"] (Lote B) — estado do DOM, nunca
+     inferido do valor do input por CSS (o atributo [value] não acompanha
+     mudança feita via JS, só a propriedade). */
+  .sh-ticket[data-state="active"] {
+    --sh-ticket-border: var(--sh-action-primary-border);
+    --sh-ticket-bg: var(--sh-surface-selected);
+  }
+
+  /* ======================================================================
+     sh-summary
+     <details class="sh-summary" open>
+       <summary class="sh-summary__head">
+         <span class="sh-summary__head-label">Resumo do pedido</span>
+         <span class="sh-summary__total">
+           <span class="sh-summary__total-label">Total</span>
+           <span class="sh-summary__total-value">R$&nbsp;380,00</span>
+         </span>
+         <svg class="sh-icon sh-summary__caret" aria-hidden="true">…</svg>
+       </summary>
+       <div class="sh-summary__body">
+         <div class="sh-summary__row">
+           <p class="sh-summary__row-label">Lote 1 — Participante</p>
+           <p class="sh-summary__row-value">R$&nbsp;380,00</p>
+         </div>
+         <div class="sh-summary__row sh-summary__row--discount">
+           <p class="sh-summary__row-label">Desconto — código JUBILEU25</p>
+           <p class="sh-summary__row-value">− R$&nbsp;38,00</p>
+         </div>
+         <p class="sh-summary__installments">ou 3× de R$&nbsp;118,13 sem juros no cartão</p>
+       </div>
+     </details>
+
+     <details> nativo: o colapso no celular não pede JS — o mesmo caminho de
+     sh-accordion (Lote A). __total mora DENTRO de __head (o próprio
+     <summary>), por isso continua visível mesmo fechado: "o total sempre à
+     vista" é ESTRUTURA (fora da região que colapsa), não uma regra de
+     exibição condicional que dependeria de estado.
+
+     "O total não muda no último passo" é contrato de DADO, não de CSS — a
+     SPA reusa o mesmo valor em __total-value do início ao fim; nenhuma
+     regra aqui poderia impor isso.
+     ====================================================================== */
+
+  .sh-summary {
+    min-inline-size: 0;
+    border: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-default);
+  }
+
+  .sh-summary__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2) var(--sh-space-4);
+    align-items: center;
+    min-block-size: var(--sh-touch-target);
+    padding: var(--sh-space-4) var(--sh-space-5);
+    list-style: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sh-summary__head::-webkit-details-marker { display: none; }
+  .sh-summary__head::marker { content: ''; }
+
+  .sh-summary__head-label {
+    flex: 1 1 8rem;
+    min-inline-size: 0;
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-summary__total {
+    display: flex;
+    flex: none;
+    align-items: baseline;
+    gap: var(--sh-space-2);
+  }
+  .sh-summary__total-label {
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-muted);
+  }
+  .sh-summary__total-value {
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-lg);
+    font-weight: var(--sh-weight-bold);
+    font-variant-numeric: tabular-nums;
+    color: var(--sh-text-strong);
+  }
+
+  .sh-summary__caret {
+    --sh-icon-size: var(--sh-icon-size-md);
+    flex: none;
+    color: var(--sh-text-muted);
+    transition: rotate var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-summary[open] > .sh-summary__head .sh-summary__caret { rotate: 180deg; }
+
+  .sh-summary__head:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-surface);
+  }
+  @media (hover: hover) {
+    .sh-summary__head:hover { background-color: var(--sh-surface-hover); }
+  }
+
+  .sh-summary__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-3);
+    padding: var(--sh-space-4) var(--sh-space-5) var(--sh-space-5);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  .sh-summary__row {
+    display: flex;
+    gap: var(--sh-space-3);
+    justify-content: space-between;
+    min-inline-size: 0;
+  }
+  .sh-summary__row-label {
+    min-inline-size: 0;
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-default);
+  }
+  .sh-summary__row-value {
+    flex: none;
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--sh-text-default);
+  }
+  .sh-summary__row--discount .sh-summary__row-value { color: var(--sh-text-success); }
+
+  .sh-summary__installments {
+    padding-block-start: var(--sh-space-2);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    font-size: var(--sh-font-size-sm);
+    color: var(--sh-text-muted);
+  }
+
+  /* Sticky é opt-in — o autor decide o layout (coluna lateral do desktop)
+     em que faz sentido, o mesmo caminho de .sh-form-actions--sticky. */
+  .sh-summary--sticky {
+    position: sticky;
+    inset-block-start: var(--sh-summary-sticky-offset, var(--sh-space-4));
+  }
+
+  /* ======================================================================
+     sh-payment-option — MIXIN sobre sh-option-card (Lote B).
+     <div class="sh-option-list">
+       <label class="sh-option-card sh-payment-option">
+         <input class="sh-option-card__input" type="radio" name="pagamento" value="pix" checked>
+         <span class="sh-option-card__indicator"></span>
+         <svg class="sh-icon sh-payment-option__icon" aria-hidden="true">…</svg>
+         <span class="sh-option-card__body">
+           <span class="sh-option-card__title">PIX</span>
+           <span class="sh-option-card__text">Aprovação em minutos.</span>
+         </span>
+         <span class="sh-payment-option__fee sh-payment-option__fee--free">Sem taxa</span>
+       </label>
+     </div>
+
+     Só __icon e __fee são deste bloco. __indicator, __body, __title,
+     __text, a seleção (:has(:checked)), o foco e o [data-state="error"] são
+     os de .sh-option-card — não redeclarados aqui. O padrão que o acamp's
+     já expressa em .opcao-principal/.opcao-secundaria (inventário) é esta
+     composição: PIX sem taxa vs. cartão com taxa, no mesmo cartão-rádio que
+     o Lote B construiu para "tipo de ingresso".
+     ====================================================================== */
+
+  .sh-payment-option__icon {
+    --sh-icon-size: var(--sh-icon-size-lg);
+    flex: none;
+    align-self: center;
+    color: var(--sh-text-muted);
+  }
+  .sh-payment-option:has(.sh-option-card__input:checked) .sh-payment-option__icon {
+    color: var(--sh-text-brand);
+  }
+
+  .sh-payment-option__fee {
+    flex: none;
+    margin-inline-start: auto;
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    color: var(--sh-text-default);
+    white-space: nowrap;
+  }
+  .sh-payment-option__fee--free { color: var(--sh-text-success); }
+
+  .sh-payment-option:has(.sh-option-card__input:disabled) .sh-payment-option__icon,
+  .sh-payment-option:has(.sh-option-card__input:disabled) .sh-payment-option__fee {
+    color: var(--sh-text-disabled);
+  }
+
+  /* ======================================================================
+     sh-credential
+     <article class="sh-credential">
+       <header class="sh-credential__head">
+         <p class="sh-credential__event">
+           <span class="sh-dove sh-dove--seal" aria-hidden="true"><svg viewBox="0 0 108.05 103.84">…</svg></span>
+           Jubileu de 25 anos
+         </p>
+         <span class="sh-badge sh-badge--success sh-credential__status">
+           <span class="sh-badge__dot" aria-hidden="true"></span>Confirmada
+         </span>
+       </header>
+
+       <figure class="sh-media sh-media--square sh-credential__qr">
+         <div class="sh-media__frame">
+           <!-- Reservado: a SPA troca este <div> pelo <canvas>/<img> que o
+                html5-qrcode ou qrcode.js gerar. O DS não carrega biblioteca
+                de QR nem desenha um código falso. -->
+           <div class="sh-credential__qr-placeholder" aria-hidden="true">
+             <svg class="sh-icon sh-credential__qr-icon"><use href="#i-target"/></svg>
+             <span>QR gerado no app</span>
+           </div>
+         </div>
+         <figcaption class="sh-visually-hidden">Código em QR da credencial</figcaption>
+       </figure>
+
+       <div class="sh-copy sh-credential__code" data-sh-copy>
+         <code class="sh-copy__value">SH-2026-004182</code>
+         <button class="sh-btn sh-btn--sm sh-copy__button" data-sh-copy-button hidden>…</button>
+         <span class="sh-copy__status" role="status" aria-live="polite"></span>
+       </div>
+
+       <p class="sh-credential__name">Ana Beatriz Rodrigues de Sá</p>
+
+       <dl class="sh-definition sh-definition--inline sh-credential__meta">
+         <div class="sh-definition__item"><dt>Lote</dt><dd>Lote 1 — Participante</dd></div>
+         <div class="sh-definition__item"><dt>Local</dt><dd>Chácara Shalom, Planaltina</dd></div>
+       </dl>
+     </article>
+
+     __code é a mesma informação do QR em texto — "o código também aparece
+     em texto, para digitação manual quando a câmera falha" (inventário,
+     nota compartilhada com sh-scanner) — já dentro de um sh-copy (Lote C)
+     para reforçar o código no check-in sem reescrever cópia para a área de
+     transferência.
+
+     O selo (sh-dove--seal) dentro de __event é o que identifica esta peça
+     como Comunidade Católica Shalom — sem ele a credencial só nomeia o
+     evento ("Jubileu de 25 anos"), nunca a instituição por trás. Mesmo
+     mecanismo de dove.html: 16px, currentColor, aria-hidden — nunca o único
+     portador de informação, só reforço visual ao lado do nome do evento.
+
+     "Precisa funcionar impressa e em tela sob sol": por isso a borda é
+     GROSSA por padrão (não fina) e a profundidade vem da SUPERFÍCIE
+     (--sh-surface-raised, o mesmo caminho de sh-card--raised) mais uma
+     sombra que também é OPCIONAL de fato — no papel e ao sol, sombra some;
+     borda não. @media print no fim do bloco remove a sombra e garante que
+     a borda imprima sólida.
+     ====================================================================== */
+
+  .sh-credential {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-4);
+    min-inline-size: 0;
+    max-inline-size: var(--sh-credential-width, 22rem);
+    padding: var(--sh-space-5);
+    border: var(--sh-border-width-thick) solid var(--sh-credential-border, var(--sh-border-strong));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-credential-bg, var(--sh-surface-raised));
+    box-shadow: var(--sh-credential-shadow, var(--sh-shadow-raised));
+  }
+
+  .sh-credential__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2) var(--sh-space-3);
+    align-items: center;
+    justify-content: space-between;
+    min-inline-size: 0;
+  }
+
+  .sh-credential__event {
+    min-inline-size: 0;
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-lg);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-credential__qr {
+    align-self: center;
+    inline-size: min(100%, 14rem);
+  }
+  .sh-credential__qr > .sh-media__frame {
+    /* Traço tracejado: o mesmo vocabulário de "aqui vai algo que falta" que
+       sh-file__drop (Lote B) já usa para a área de soltar arquivo.
+       --sh-border-strong, não --sh-border-control: o mesmo motivo já medido
+       e registrado em form.css para a caixa de sh-checkbox — este traço
+       também cai sobre --sh-surface-sunken (o preenchimento de
+       .sh-media__frame), onde --sh-border-control mede 2.97:1 no claro
+       base e no jubileu claro, abaixo do piso de 3:1. */
+    border: var(--sh-border-width-hair) dashed var(--sh-border-strong);
+  }
+
+  .sh-credential__qr-placeholder {
+    display: flex;
+    inline-size: 100%;
+    block-size: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sh-space-2);
+    text-align: center;
+    padding: var(--sh-space-4);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-default);
+  }
+  .sh-credential__qr-icon { --sh-icon-size: var(--sh-icon-size-xl); color: var(--sh-text-muted); }
+
+  .sh-credential__code { justify-content: center; }
+  .sh-credential__code .sh-copy__value {
+    flex: none;
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    letter-spacing: var(--sh-tracking-wide);
+  }
+
+  .sh-credential__name {
+    min-inline-size: 0;
+    text-align: center;
+    font-size: var(--sh-font-size-xl);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+
+  .sh-credential__meta {
+    --sh-definition-min: 9rem;
+    justify-content: center;
+    text-align: center;
+    padding-block-start: var(--sh-space-3);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  @media print {
+    /* Só ajustes de impressão — os mesmos tokens semânticos, nunca cor
+       fora da camada 2. body{background:#fff;color:#000} já vem do reset
+       global (foundations/reset.css); aqui só a sombra sai e a borda
+       garante estar em tinta sólida. */
+    .sh-credential {
+      box-shadow: none;
+      border-color: var(--sh-border-strong);
+      break-inside: avoid;
+    }
+    .sh-credential__qr > .sh-media__frame { border-style: solid; }
+  }
+
+  /* ======================================================================
+     sh-scanner
+     <div class="sh-scanner" data-state="idle">
+       <div class="sh-scanner__viewport">
+         <!-- <video> da câmera entra aqui, plugado pela SPA (html5-qrcode) -->
+         <div class="sh-scanner__frame" aria-hidden="true">
+           <span class="sh-scanner__corner sh-scanner__corner--tl"></span>
+           <span class="sh-scanner__corner sh-scanner__corner--tr"></span>
+           <span class="sh-scanner__corner sh-scanner__corner--bl"></span>
+           <span class="sh-scanner__corner sh-scanner__corner--br"></span>
+         </div>
+       </div>
+
+       <p class="sh-scanner__status" role="status" aria-live="assertive">
+         <svg class="sh-icon sh-scanner__icon sh-scanner__icon--idle" aria-hidden="true"><use href="#i-target"/></svg>
+         <span class="sh-spinner sh-spinner--sm sh-scanner__icon sh-scanner__icon--reading" aria-hidden="true"></span>
+         <svg class="sh-icon sh-scanner__icon sh-scanner__icon--success" aria-hidden="true"><use href="#i-success"/></svg>
+         <svg class="sh-icon sh-scanner__icon sh-scanner__icon--error" aria-hidden="true"><use href="#i-danger"/></svg>
+         <span class="sh-scanner__text">Aponte a câmera para o QR da credencial</span>
+       </p>
+
+       <details class="sh-scanner__fallback">
+         <summary>O código não está sendo lido? Digite manualmente</summary>
+         <div class="sh-field">
+           <label class="sh-field__label" for="scan-code">Código da credencial</label>
+           <input class="sh-input sh-input--numeric" id="scan-code" type="text" inputmode="text" autocomplete="off">
+         </div>
+       </details>
+     </div>
+
+     Câmera e leitura de QR são da SPA (html5-qrcode). Este arquivo só
+     estiliza [data-state] — quem troca idle → reading → success/error é
+     quem está lendo o vídeo de verdade.
+
+     idle/reading/success/error por FORMA+ícone+texto: idle/reading mostram
+     quatro cantos abertos (moldura de mira); success/error FECHAM a moldura
+     num contorno sólido — mudança de forma, não só de cor — e o ícone troca
+     de mira → sh-spinner (Lote 0) → check → x. O texto em __status é a
+     terceira camada, sempre.
+
+     aria-live="assertive", diferente de sh-alert (que reserva assertive só
+     para --danger): aqui TODA transição é urgente por natureza — fila, sol,
+     barulho (inventário) — e cada leitura substitui o sentido da anterior
+     no mesmo instante. Som/vibração citados no inventário são efeitos que
+     só a SPA pode disparar (Vibration API, áudio) no momento em que ela
+     detecta o QR; não há gancho de CSS para isso além do próprio
+     [data-state], que já é o sinal que a SPA está observando.
+
+     Fallback de texto: a mesma exigência de sh-credential — o código
+     também existe como algo que dá para digitar quando a câmera falha.
+     ====================================================================== */
+
+  .sh-scanner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-4);
+    min-inline-size: 0;
+    max-inline-size: var(--sh-scanner-width, 22rem);
+  }
+
+  .sh-scanner__viewport {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1;
+    border-radius: var(--sh-radius-media);
+    background-color: var(--sh-surface-inverse);
+    outline: 0 solid transparent;
+    outline-offset: calc(var(--sh-border-width-heavy) * -1);
+    transition: outline-color var(--sh-duration-base) var(--sh-ease-standard);
+  }
+  .sh-scanner__viewport > video,
+  .sh-scanner__viewport > img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .sh-scanner__frame {
+    position: absolute;
+    inset: var(--sh-space-6);
+  }
+
+  .sh-scanner__corner {
+    position: absolute;
+    inline-size: var(--sh-space-8);
+    block-size: var(--sh-space-8);
+    border-color: var(--sh-scanner-ink, var(--sh-text-inverse));
+    border-style: solid;
+    border-width: 0;
+    filter: drop-shadow(0 1px 2px rgb(var(--sh-shadow-rgb) / 0.5));
+    transition:
+      border-color var(--sh-duration-base) var(--sh-ease-standard),
+      opacity      var(--sh-duration-base) var(--sh-ease-standard);
+  }
+  .sh-scanner__corner--tl {
+    inset-block-start: 0; inset-inline-start: 0;
+    border-width: var(--sh-border-width-heavy) 0 0 var(--sh-border-width-heavy);
+    border-start-start-radius: var(--sh-radius-control);
+  }
+  .sh-scanner__corner--tr {
+    inset-block-start: 0; inset-inline-end: 0;
+    border-width: var(--sh-border-width-heavy) var(--sh-border-width-heavy) 0 0;
+    border-start-end-radius: var(--sh-radius-control);
+  }
+  .sh-scanner__corner--bl {
+    inset-block-end: 0; inset-inline-start: 0;
+    border-width: 0 0 var(--sh-border-width-heavy) var(--sh-border-width-heavy);
+    border-end-start-radius: var(--sh-radius-control);
+  }
+  .sh-scanner__corner--br {
+    inset-block-end: 0; inset-inline-end: 0;
+    border-width: 0 var(--sh-border-width-heavy) var(--sh-border-width-heavy) 0;
+    border-end-end-radius: var(--sh-radius-control);
+  }
+
+  .sh-scanner__status {
+    display: flex;
+    gap: var(--sh-space-2);
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--sh-touch-target);
+    padding: var(--sh-space-3) var(--sh-space-4);
+    border: var(--sh-border-width-hair) solid var(--sh-scanner-status-border, var(--sh-border-subtle));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-scanner-status-bg, var(--sh-surface-sunken));
+    color: var(--sh-scanner-status-ink, var(--sh-text-default));
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-semibold);
+    text-align: center;
+  }
+  .sh-scanner__icon { flex: none; }
+
+  /* Troca de ícone por estado — o mesmo padrão de .sh-btn[data-loading]
+     (Lote 0) trocando __icon por __spinner, só que com quatro faces. */
+  .sh-scanner__icon--reading,
+  .sh-scanner__icon--success,
+  .sh-scanner__icon--error { display: none; }
+
+  .sh-scanner[data-state="reading"] .sh-scanner__icon--idle,
+  .sh-scanner[data-state="success"] .sh-scanner__icon--idle,
+  .sh-scanner[data-state="error"] .sh-scanner__icon--idle { display: none; }
+
+  .sh-scanner[data-state="reading"] .sh-scanner__icon--reading { display: inline-flex; }
+  .sh-scanner[data-state="success"] .sh-scanner__icon--success { display: inline-flex; }
+  .sh-scanner[data-state="error"] .sh-scanner__icon--error     { display: inline-flex; }
+
+  /* ------------------------------------------------------------- estados */
+  /* idle fica em --sh-surface-inverse + --sh-text-inverse (Lote 0, par já
+     garantido nos seis cenários). reading/success/error trocam o
+     PREENCHIMENTO do viewport para o par surface+border de uma família de
+     feedback (info/success/danger) em vez de tentar ler --sh-border-accent/
+     --sh-border-success/--sh-border-danger sobre um fundo que continuaria
+     escuro: nenhum desses três é remapeado por [data-sh-surface="inverse"]
+     (só --sh-text-* e --sh-border-{subtle,default,control,strong} são —
+     ver tokens/semantic.css), e medido caía a até 1.38:1. Trocando o
+     preenchimento para a superfície clara da própria família, o par
+     surface+border é o mesmo que sh-alert já usa — garantido nos seis
+     cenários por construção. */
+
+  .sh-scanner[data-state="reading"] .sh-scanner__viewport {
+    background-color: var(--sh-feedback-info-surface);
+  }
+  .sh-scanner[data-state="reading"] .sh-scanner__corner {
+    --sh-scanner-ink: var(--sh-feedback-info-border);
+    animation: sh-scanner-pulse 1.4s var(--sh-ease-standard) infinite;
+  }
+  .sh-scanner[data-state="reading"] .sh-scanner__status {
+    --sh-scanner-status-bg: var(--sh-feedback-info-surface);
+    --sh-scanner-status-border: var(--sh-feedback-info-border);
+    --sh-scanner-status-ink: var(--sh-feedback-info-text);
+  }
+
+  /* Sucesso e erro: a moldura de quatro cantos FECHA num contorno sólido —
+     forma diferente de idle/reading, que a cor sozinha não daria. */
+  .sh-scanner[data-state="success"] .sh-scanner__corner,
+  .sh-scanner[data-state="error"] .sh-scanner__corner { opacity: 0; }
+
+  .sh-scanner[data-state="success"] .sh-scanner__viewport {
+    background-color: var(--sh-feedback-success-surface);
+    outline-width: var(--sh-border-width-heavy);
+    outline-color: var(--sh-feedback-success-border);
+  }
+  .sh-scanner[data-state="success"] .sh-scanner__status {
+    --sh-scanner-status-bg: var(--sh-feedback-success-surface);
+    --sh-scanner-status-border: var(--sh-feedback-success-border);
+    --sh-scanner-status-ink: var(--sh-feedback-success-text);
+  }
+
+  .sh-scanner[data-state="error"] .sh-scanner__viewport {
+    background-color: var(--sh-feedback-danger-surface);
+    outline-width: var(--sh-border-width-heavy);
+    outline-color: var(--sh-feedback-danger-border);
+  }
+  .sh-scanner[data-state="error"] .sh-scanner__status {
+    --sh-scanner-status-bg: var(--sh-feedback-danger-surface);
+    --sh-scanner-status-border: var(--sh-feedback-danger-border);
+    --sh-scanner-status-ink: var(--sh-feedback-danger-text);
+  }
+
+  /* --------------------------------------------------------- fallback */
+
+  .sh-scanner__fallback {
+    min-inline-size: 0;
+    font-size: var(--sh-font-size-sm);
+  }
+  .sh-scanner__fallback > summary {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--sh-touch-target);
+    color: var(--sh-text-link);
+    font-weight: var(--sh-weight-semibold);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+    cursor: pointer;
+    list-style: none;
+  }
+  .sh-scanner__fallback > summary::-webkit-details-marker { display: none; }
+  .sh-scanner__fallback > summary:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+  .sh-scanner__fallback[open] > summary { margin-block-end: var(--sh-space-2); }
+
+  /* ====================================================================== */
+
+  @keyframes sh-scanner-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.45; }
+  }
+}

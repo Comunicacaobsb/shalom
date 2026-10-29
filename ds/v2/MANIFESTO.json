@@ -1,0 +1,271 @@
+{
+  "sistema": "Shalom DS",
+  "versao": "2.0.1",
+  "trilha": "v2",
+  "publicado_em": "2026-08-24",
+  "fonte": "ShalomProject/design-system (canônico). Não edite esta cópia.",
+  "arquivos_total": 65,
+  "bytes_total": 3113726,
+  "arquivos": {
+    "assets/brand/README.md": {
+      "sha256": "0ac22e6945268f832b9023988601b063e1d457eee9cf20b82854780edeb79f81",
+      "bytes": 5986
+    },
+    "assets/brand/favicons/README.md": {
+      "sha256": "89742ebcc9e4cc381b8fd2a6fa67a555cadbc555b94d6fbbd4cc31dfab76e57c",
+      "bytes": 8423
+    },
+    "assets/brand/favicons/favicon-interno.svg": {
+      "sha256": "c1a42be9992b9f3695043e44073f4a84d65c67ba28b5acc81d2005f7d2bf2aaf",
+      "bytes": 3962
+    },
+    "assets/brand/favicons/favicon-jubileu-25.svg": {
+      "sha256": "0ea81d95dddf12d94ad6ce022459fee85bff4d4f4c847f8b7bf8a4cec71f76c0",
+      "bytes": 32977
+    },
+    "assets/brand/favicons/favicon-publico.svg": {
+      "sha256": "84496da0c1fa86c3e66b71ee1e48e1541e20355be890fdc43a9e9629b71271b3",
+      "bytes": 3520
+    },
+    "assets/brand/jubileu-25/README.md": {
+      "sha256": "0c87a35096dfddc93513a033f904443baf6c13a8c76692a407291c04b0f10ec7",
+      "bytes": 10905
+    },
+    "assets/brand/jubileu-25/logo-completa-tema.svg": {
+      "sha256": "fa362586cd21a9b40ecb77c688c03c58e68903fee92ad8f306339fb8dd097611",
+      "bytes": 161436
+    },
+    "assets/brand/jubileu-25/logo-completa.svg": {
+      "sha256": "47db1f245ef77315226a4fb6afcb99e68778718e030b46098fcec87091085140",
+      "bytes": 82176
+    },
+    "assets/brand/jubileu-25/logo-icon-tema.svg": {
+      "sha256": "c8a51e9dbcf24eca7baa2f5c2b4ee5c61e006693724b3256eff7dd3bb159d269",
+      "bytes": 119390
+    },
+    "assets/brand/jubileu-25/logo-icon.svg": {
+      "sha256": "6ee416618de06ddbf4a793f37f721359a62e1e2ba508901edfac1c8c06014075",
+      "bytes": 25225
+    },
+    "assets/brand/jubileu-25/logo-nome-tema.svg": {
+      "sha256": "482773a2536a96f69c2682685f94efbc8cbc340d9ac050cfa0eed5099efa0b58",
+      "bytes": 147680
+    },
+    "assets/brand/jubileu-25/logo-nome.svg": {
+      "sha256": "5bc94232351df701bd4df462e594b0334aaf2916dd474308eb3f790179b3f3b3",
+      "bytes": 69917
+    },
+    "assets/brand/jubileu-25/logo-shalom-25.svg": {
+      "sha256": "6d4ea82d8b5fdbbbe5afc01236db875fdeaa80f9178d24ca481bd6f11af0dbbb",
+      "bytes": 38516
+    },
+    "assets/brand/jubileu-25/logo-small.svg": {
+      "sha256": "de5b78bf984f1c386e08b9b326f259c7353f51b21ddc79a7d1f000be93e9f5af",
+      "bytes": 32715
+    },
+    "assets/brand/logo-shalom-icon.svg": {
+      "sha256": "b2920ea4846effeb42d61d3d86e58dced27a5bc1f2161c1ae734eac6fac85525",
+      "bytes": 3219
+    },
+    "assets/brand/logo-shalom.svg": {
+      "sha256": "1fd673c99f7e8960a4d62fdcb7b902d3a9d7b7dba08bff233bc6357245d02dd4",
+      "bytes": 12708
+    },
+    "assets/fonts/archivo-italic-latin-ext.woff2": {
+      "sha256": "11b6dd9960cbffe23dd7192d2ca1995ad81a857001afff29a8b84d4b1a38f3b5",
+      "bytes": 93252
+    },
+    "assets/fonts/archivo-italic-latin.woff2": {
+      "sha256": "d2a3a083e983d78b2e2fd848a990200b34fcb1392ed11f695096b7535ef74d88",
+      "bytes": 101888
+    },
+    "assets/fonts/archivo-normal-latin-ext.woff2": {
+      "sha256": "a75c792f980dc1dbe0e85efb721808267e32d2e7ef6c4a99d525c842d8712a08",
+      "bytes": 85856
+    },
+    "assets/fonts/archivo-normal-latin.woff2": {
+      "sha256": "4c98b9d490d1698ec95f2ff17a6c7d0e72691864c0c5d7bc2a2c161b45afe5ad",
+      "bytes": 90096
+    },
+    "assets/fonts/caveat-normal-latin-ext.woff2": {
+      "sha256": "93b3fdd6ded70837e67eb686a5ed3a896b03d0cd5f7e4be62f07a4efeaebfcfd",
+      "bytes": 29528
+    },
+    "assets/fonts/caveat-normal-latin.woff2": {
+      "sha256": "7a0049db01fdd8fc7af7ef36675862a72a5c76d0cb45ae63c9f5b6f1b769dac7",
+      "bytes": 74572
+    },
+    "assets/fonts/fonts.css": {
+      "sha256": "705d4d1178e32b70ec3e98744551380ea10b0fbc740a2282ae1f16899d44a2f3",
+      "bytes": 11790
+    },
+    "assets/fonts/fraunces-italic-latin-ext.woff2": {
+      "sha256": "6e929bb741281c850e883e874c7c91d620227e01b70a424fd62617e018f87d0f",
+      "bytes": 130100
+    },
+    "assets/fonts/fraunces-italic-latin.woff2": {
+      "sha256": "f6cb5ecfce80bdb07f44a1a330e7258d0c7618eb6b0a8043b7ba2afe19fcbfa8",
+      "bytes": 149512
+    },
+    "assets/fonts/fraunces-normal-latin-ext.woff2": {
+      "sha256": "bfbcc574c88f5008f497dd150b7d043db484b5d5866c949b1c6e64f50a085ad8",
+      "bytes": 105476
+    },
+    "assets/fonts/fraunces-normal-latin.woff2": {
+      "sha256": "94bb7e04bb1a32237a67935c72526e42a3e52ee4aebd50299802b18a93114251",
+      "bytes": 120800
+    },
+    "assets/fonts/jetbrains-italic-latin-ext.woff2": {
+      "sha256": "bdce8a4f00f61bed7141af8ac231a91be56de82f41ca2b981b34ff48359c288a",
+      "bytes": 16540
+    },
+    "assets/fonts/jetbrains-italic-latin.woff2": {
+      "sha256": "6548575d68391672486bf3815a8dd9fe0ae251d1087875581ac8912d5cb52baa",
+      "bytes": 42928
+    },
+    "assets/fonts/jetbrains-normal-latin-ext.woff2": {
+      "sha256": "7db7affbce1fdee69c1ffc2641bbca289b049867f524c9d861fe35ab6670bf29",
+      "bytes": 15204
+    },
+    "assets/fonts/jetbrains-normal-latin.woff2": {
+      "sha256": "1e06740a02a443fb7f3eeda8fcaa685a0f6c620e3f01e6666e847295469ce3ad",
+      "bytes": 40480
+    },
+    "assets/fonts/montserrat-italic-latin-ext.woff2": {
+      "sha256": "30cf10b2e32e189a39ee3ae4e241ab281c5224046d673ad7f767758ce62f6eff",
+      "bytes": 72452
+    },
+    "assets/fonts/montserrat-italic-latin.woff2": {
+      "sha256": "86589d0b59b311712c3cbaac0b94eb054ecda4be7b52d695588548e4754b3165",
+      "bytes": 37120
+    },
+    "assets/fonts/montserrat-normal-latin-ext.woff2": {
+      "sha256": "920711de9ae96c18970fa4faca73cd302b93ac5ed57ebeb6bfec2ddeff930082",
+      "bytes": 68224
+    },
+    "assets/fonts/montserrat-normal-latin.woff2": {
+      "sha256": "6438d7b8ea9c7c3992d5e2fd2afdb1ff948570a3ef0bedae76247b51632960ba",
+      "bytes": 35508
+    },
+    "assets/fonts/permanentmarker-normal-latin.woff2": {
+      "sha256": "37202f2915830dbf5ca57d32ee0a2a9e8dc876e92720214ddef1e0c4bfe8bb98",
+      "bytes": 29296
+    },
+    "components/admin.css": {
+      "sha256": "950ad2612a2c3849772bf5131f517a4772674e21b5b5efc6f3339ece1a4a9450",
+      "bytes": 56169
+    },
+    "components/data.css": {
+      "sha256": "b7f2913c97517f9f7c29c7fc834a415f4bfc5d1f2a787ea3a8cfa34de3e38437",
+      "bytes": 104988
+    },
+    "components/extras.css": {
+      "sha256": "4dbcd6d33008de4aca17d5727cdb365a1e45929592cc71d427eacb22754e8823",
+      "bytes": 30305
+    },
+    "components/feedback.css": {
+      "sha256": "970e2c9bbe415f1ee9998262c6d406815cd54db3cbf2ff5b7861cee7764356c8",
+      "bytes": 11489
+    },
+    "components/flow.css": {
+      "sha256": "5c832afe78a8da18ca19f8db7a81334e0f8940fc77b7e2536e92c0f7e5cb27f0",
+      "bytes": 42766
+    },
+    "components/form.css": {
+      "sha256": "bb026b6c78d4b5c693d348d1f77e86dd734eccb7e3ddf593e0d48e57ca20f9d0",
+      "bytes": 61919
+    },
+    "components/foundation.css": {
+      "sha256": "3940ef501bc4473e116d781da04b59616ec28a9dbf9bad560249a7bbcdc627e8",
+      "bytes": 51153
+    },
+    "components/internal.css": {
+      "sha256": "cd038181a895856bd06501d9a2d8502a6e8a6121f563d43de380f50686374440",
+      "bytes": 31518
+    },
+    "components/navigation.css": {
+      "sha256": "cc480ba800561cb7fbb3f70b69db10ced64847508aee8e89080d7cd692aafc14",
+      "bytes": 66971
+    },
+    "components/surface.css": {
+      "sha256": "3f7d30b7bec375abc212290b28184a11f592bd091305a7501719843d60ec4437",
+      "bytes": 74763
+    },
+    "foundations/layout.css": {
+      "sha256": "f36cf17f9810c0c267253fd63ce1f5018d3e0d9b4f1d371a190433cf564a7b82",
+      "bytes": 9753
+    },
+    "foundations/reset.css": {
+      "sha256": "5919a4e404abdba97880be69173354a795834c0ca20139c47ad9994ab6c9c11c",
+      "bytes": 4471
+    },
+    "foundations/typography.css": {
+      "sha256": "d47e0abefe65a02496511a8cf923ebf4ed4a43f938724d059606167a270d6efc",
+      "bytes": 11088
+    },
+    "js/shalom-ds-admin.js": {
+      "sha256": "8ef7ebc9124c1d10292687e4e22f267c5160b458bd46059e25bc92f7cd2d1387",
+      "bytes": 10902
+    },
+    "js/shalom-ds-data.js": {
+      "sha256": "80ab21e1b71c51631a8ec00636fad90052e9e07e96c17f67c1a90b48745a0aa1",
+      "bytes": 35969
+    },
+    "js/shalom-ds-extras.js": {
+      "sha256": "de279cc3d08b7eae9d3ab74efa0eb4c15ae589a22726d160385aece7ed39594d",
+      "bytes": 22138
+    },
+    "js/shalom-ds-feedback.js": {
+      "sha256": "a946248c109b1253b78201dcfb61cd108d84a22725670cf3207258435a3fe6e4",
+      "bytes": 9221
+    },
+    "js/shalom-ds-form.js": {
+      "sha256": "7de9d4016c3d48629362829bad23a9ae6a86a9ab7fda09405e1264b6e61889a4",
+      "bytes": 45855
+    },
+    "js/shalom-ds-integrations.js": {
+      "sha256": "30fcbcab7bcf52e37d83290eac83d082e14947c6885effbb3aec43b131e02667",
+      "bytes": 5395
+    },
+    "js/shalom-ds-navigation.js": {
+      "sha256": "f2786f22c5c78046cde8ca981bb36bb09050db1302366a8c17cf335406a1d04e",
+      "bytes": 20318
+    },
+    "js/shalom-ds-surface.js": {
+      "sha256": "1a6c77004f8c853e467a8bff9a39f22eec4835f1603f4ae07438e8d85d70e862",
+      "bytes": 24816
+    },
+    "js/shalom-ds.js": {
+      "sha256": "8f188190c3983d18e72c98c34f56468f24c6083c7b87842e2498d4f0661b824c",
+      "bytes": 8723
+    },
+    "shalom-ds.css": {
+      "sha256": "180f8bab105f0388d756430ceffb918c72e575436588ec37c4649c2dfef030c5",
+      "bytes": 3505
+    },
+    "tokens/dark.css": {
+      "sha256": "90c0399805e563e2a35bc0bfa3ed35ad2d4e6ef34a7dd0f25ecb543ff4ff6a76",
+      "bytes": 29654
+    },
+    "tokens/primitives.css": {
+      "sha256": "5c342d4bebd0410295df95c1c9fa333621f44aef3c347bbac6f5dd3c1cc17f9d",
+      "bytes": 14270
+    },
+    "tokens/semantic.css": {
+      "sha256": "8a17df3081fbd6283d4cc9815e142ed30a12dc441cfc2b92c64ae265cb64a0de",
+      "bytes": 39342
+    },
+    "tokens/themes/acamps.css": {
+      "sha256": "a25c8e5d6f21ccfbfaef76d5618d93f4f22ad97e433e990c91dd5791c86311ea",
+      "bytes": 29808
+    },
+    "tokens/themes/jubileu-25.css": {
+      "sha256": "58862ea31c363635b28e96c6976112b53539aa7bad436f663ccc1b934ba68f53",
+      "bytes": 16754
+    },
+    "tokens/tokens.json": {
+      "sha256": "7b1a386ad71a4eea759058f6ab3b5fb7a6c3fa76f892831e3c7e9d9c78102267",
+      "bytes": 130326
+    }
+  }
+}

@@ -1,0 +1,1917 @@
+/* ==========================================================================
+   Shalom DS — Lote C — Superfícies e conteúdo
+   sh-hero · sh-modal · sh-sheet · sh-tooltip · sh-popover · sh-media ·
+   sh-avatar · sh-logo · sh-dove · sh-timeline · sh-copy · sh-prose
+
+   Contrato deste arquivo (o mesmo de components/foundation.css)
+   -------------------------------------------------------------
+   1. Só a camada semântica é consumida para COR. Nenhum primitivo, nenhum hex
+      — inclusive na pomba, que pinta por currentColor e por --sh-dove-*.
+      Escalas sem equivalente semântico (espaço, tipo, duração, borda, ícone,
+      camada) vêm dos primitivos, como já fazem as fundações.
+   2. Nenhum seletor cita [data-sh-theme]. Os seis cenários saem do mesmo CSS.
+   3. Estado vem do DOM: [open] do <dialog>, :popover-open, [aria-expanded],
+      [aria-current], [data-state], [data-copied], [hidden].
+   4. Cada componente expõe tokens de camada 3 com valor padrão inline
+      apontando para a camada 2. Configurar de fora é setar a custom property.
+   5. Zero !important.
+
+   Alvo de toque: 44×44 (--sh-touch-target) em tudo que se clica.
+
+   -------------------------------------------------------------------------
+   O contrato do SCRIM (a decisão mais importante deste lote)
+   -------------------------------------------------------------------------
+   Texto sobre foto tem de cumprir 4,5:1 contra a região MAIS CLARA da imagem,
+   e a imagem é desconhecida em tempo de escrita. A única garantia possível é
+   fazer o scrim opaco o bastante para que a foto não desloque o par de cor
+   além do limite — e usar um par que a camada de token já garante nos seis
+   cenários. O par escolhido é --sh-surface-inverse / --sh-text-inverse, que é
+   remapeado em claro E escuro pelo tema base e pelos dois temas de evento.
+
+   Consequência assumida: no escuro o bloco inverso é claro, então o herói com
+   foto fica com scrim claro e texto escuro. É a mesma inversão que
+   sh-panel--inverse já faz no Lote 0 — coerência, não exceção.
+
+   Pior caso medido (opacidade 0,86 do scrim sobre foto 100% branca no claro e
+   100% preta no escuro), nos seis cenários: título 5,57 · sobrancelha 5,57 ·
+   subtítulo 5,20, todos no acamp's claro, que é o cenário mais apertado.
+   Não baixe a opacidade sem refazer essa conta.
+
+   Dependência registrada: o escopo [data-sh-surface="inverse"] ainda não
+   remapeia --sh-action-primary-* nem --sh-text-accent. Por isso a sobrancelha
+   de --cover troca para --sh-text-strong (ver o modificador) e o botão
+   primário dentro de um herói com foto fica com limite fraco até a camada de
+   token cobrir esse escopo. Está descrito na prova e no relatório do lote.
+
+   Especificação: docs/03-inventario-componentes.md · Lote C
+   ========================================================================== */
+
+@layer sh.components {
+
+  /* ======================================================================
+     sh-hero
+     sh-hero › __media › __scrim › __inner (__eyebrow, __title, __sub,
+     __actions, __meta) › __cue
+
+     <section class="sh-hero sh-hero--cover" data-sh-surface="inverse">
+       <div class="sh-hero__media">
+         <img src="…" alt="" fetchpriority="high" decoding="async">
+       </div>
+       <div class="sh-hero__scrim" aria-hidden="true"></div>
+       <div class="sh-hero__inner">
+         <p class="sh-hero__eyebrow">Acamp's 2026.2</p>
+         <h1 class="sh-hero__title">Fecundos pelo Coração do Kyrios</h1>
+         <p class="sh-hero__sub">Cinco dias na Chácara Shalom.</p>
+         <div class="sh-hero__actions"> … </div>
+         <ul class="sh-hero__meta"> … </ul>
+       </div>
+     </section>
+
+     __title é o <h1> da página. Em --cover o __scrim é OBRIGATÓRIO.
+     Como em sh-panel--inverse, --cover pede os dois: a classe e o escopo
+     data-sh-surface="inverse", que reescreve texto, borda, link e foco dos
+     filhos.
+     ====================================================================== */
+
+  .sh-hero {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: var(--sh-hero-justify, center);
+    overflow: hidden;
+    padding-block: var(--sh-hero-padding-block, var(--sh-space-section));
+    padding-inline: var(--sh-hero-padding-inline, var(--sh-gutter));
+    border-radius: var(--sh-hero-radius, 0);
+    background-color: var(--sh-hero-bg, transparent);
+    color: var(--sh-text-default);
+  }
+
+  .sh-hero__media {
+    position: relative;
+    z-index: var(--sh-layer-base);
+    overflow: hidden;
+    aspect-ratio: var(--sh-hero-media-ratio, 4 / 3);
+    border-radius: var(--sh-radius-media);
+    background-color: var(--sh-surface-sunken);
+  }
+  .sh-hero__media > img,
+  .sh-hero__media > video {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    /* Ponto de fuga do recorte, como em sh-media. O asasul/ enquadra o herói
+       dele em `center 30%` — num salão alto, o `center` puro corta o mosaico
+       e sobra chão. Token, não regra fixa: cada foto tem o seu ponto. */
+    object-position: var(--sh-hero-media-position, center);
+  }
+
+  /* O scrim é uma camada de superfície, não uma sombra: cor chapada de token
+     com opacidade declarada, degradê só para soltar o topo da foto. O texto
+     mora na faixa 100% coberta. */
+  .sh-hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: var(--sh-layer-raised);
+    pointer-events: none;
+    background-color: var(--sh-hero-scrim-bg, var(--sh-surface-scrim));
+    /* Duas camadas, como no asasul/. A vertical é a que garante o contraste e
+       está sempre ligada. A do eixo em linha é opcional (padrão `transparent`,
+       nada muda em quem já usa o herói): ela escurece o lado onde o texto
+       começa, que é o truque de enquadramento do asasul/ — a foto continua
+       inteira do outro lado. Ligue com --sh-hero-scrim-inline. */
+    background-image:
+      linear-gradient(
+        to right,
+        var(--sh-hero-scrim-inline, transparent) 0%,
+        transparent var(--sh-hero-scrim-inline-stop, 62%)),
+      linear-gradient(
+      to top,
+      var(--sh-hero-scrim-bg, var(--sh-surface-scrim)) 0%,
+      var(--sh-hero-scrim-bg, var(--sh-surface-scrim)) var(--sh-hero-scrim-stop, 64%),
+      transparent 100%);
+    /* Sem opacity própria: --sh-surface-scrim já carrega o alfa calibrado
+       (0,62 no claro, 0,72 no escuro). Multiplicar os dois diluiria o véu —
+       0,62 × 0,86 = 0,53 derruba o par contra foto branca. */
+    opacity: var(--sh-hero-scrim-opacity, 1);
+  }
+
+  .sh-hero__inner {
+    position: relative;
+    z-index: var(--sh-layer-sticky);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-hero-gap, var(--sh-space-4));
+    inline-size: 100%;
+    max-inline-size: var(--sh-hero-width, var(--sh-container));
+    margin-inline: auto;
+  }
+
+  .sh-hero__eyebrow {
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    line-height: var(--sh-leading-snug);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+    color: var(--sh-hero-eyebrow-ink, var(--sh-text-accent));
+  }
+
+  /* Pílula de vidro. É a sobrancelha do asasul/ — a linha de contexto
+     ("Comunidade Católica Shalom · Brasília") pousada sobre a foto, com um
+     ponto de acento antes. Só faz sentido dentro de --cover: fora dele não há
+     foto para o vidro filtrar, e aí é uma pílula opaca sem motivo.
+
+     align-self: start impede que a pílula estique até a largura do herói —
+     __inner é um flex column, e sem isto todo filho ocupa a linha inteira. */
+  .sh-hero__eyebrow--glass {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: var(--sh-space-2);
+    padding: var(--sh-space-2) var(--sh-space-4);
+    border: var(--sh-border-width-hair) solid var(--sh-glass-border);
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-glass-veil);
+    box-shadow: inset 0 1px 0 var(--sh-glass-sheen),
+                0 0 0 1px var(--sh-glass-keyline);
+    color: var(--sh-glass-ink);
+    -webkit-backdrop-filter: var(--sh-glass-filter);
+    backdrop-filter: var(--sh-glass-filter);
+  }
+  .sh-hero__eyebrow--glass::before {
+    content: '';
+    inline-size: var(--sh-space-2);
+    block-size: var(--sh-space-2);
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-surface-accent);
+    flex: none;
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .sh-hero__eyebrow--glass { --sh-glass-veil: var(--sh-glass-solid); }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .sh-hero__eyebrow--glass {
+      --sh-glass-veil: var(--sh-glass-solid);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  .sh-hero__title {
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-hero-title-size, var(--sh-font-size-display-lg));
+    font-weight: var(--sh-font-display-weight);
+    font-stretch: var(--sh-font-display-stretch);
+    /* DEC-029: --sh-font-display-optical saiu com a Newsreader (nenhuma família
+       do sistema tem eixo opsz hoje). O substituto é --sh-font-display-axes, o
+       mesmo que foundations/typography.css usa nas classes de display. */
+    font-variation-settings: var(--sh-font-display-axes);
+    line-height: var(--sh-leading-tight);
+    letter-spacing: var(--sh-tracking-tighter);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+
+  .sh-hero__sub {
+    max-inline-size: var(--sh-measure);
+    font-size: var(--sh-font-size-lg);
+    line-height: var(--sh-leading-relaxed);
+    /* --sh-text-default, não --muted: sobre foto o texto secundário é o
+       primeiro a cair, e no escopo inverso do escuro o muted fica a 4,38:1
+       (defeito de token registrado no relatório do lote). */
+    color: var(--sh-text-default);
+    text-wrap: pretty;
+  }
+
+  .sh-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3);
+    align-items: center;
+    margin-block-start: var(--sh-space-2);
+  }
+
+  .sh-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2) var(--sh-space-5);
+    align-items: center;
+    margin-block-start: var(--sh-space-2);
+    padding: 0;
+    list-style: none;
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-medium);
+    color: var(--sh-text-default);
+  }
+  .sh-hero__meta > li {
+    display: inline-flex;
+    gap: var(--sh-space-2);
+    align-items: center;
+  }
+
+  /* Seta de rolagem. Decorativa quando é <span>; quando é <a href="#…">
+     ganha alvo de 44px e anel de foco. */
+  .sh-hero__cue {
+    position: relative;
+    z-index: var(--sh-layer-sticky);
+    display: flex;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sh-space-1);
+    margin-block-start: var(--sh-space-8);
+    border-radius: var(--sh-radius-pill);
+    color: var(--sh-text-strong);
+    font-size: var(--sh-font-size-xs);
+    text-decoration: none;
+    animation: sh-hero-cue calc(var(--sh-duration-slower) * 4)
+               var(--sh-ease-standard) infinite;
+  }
+  .sh-hero__cue::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: var(--sh-touch-target);
+    translate: -50% -50%;
+  }
+  .sh-hero__cue:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  /* ---------------------------------------------------------- variantes */
+
+  /* Só texto. É o herói padrão de página interna. */
+  .sh-hero--plain {
+    --sh-hero-title-size: var(--sh-font-size-display-md);
+    --sh-hero-bg: var(--sh-surface-page);
+  }
+
+  /* Foto de fundo. Exige __scrim.
+
+     A tinta é fixada em --sh-text-on-scrim, o único token de texto do sistema
+     que NÃO inverte com o esquema — porque o véu também não inverte: uma foto
+     de herói não escurece quando a pessoa liga o modo escuro. Fixar aqui, na
+     camada sh.components, vence o [data-sh-surface="inverse"] herdado da
+     marcação (sh.tokens vem antes na ordem de camadas), então a página que
+     ainda declara o escopo continua correta sem precisar ser reescrita. */
+  .sh-hero--cover {
+    color: var(--sh-text-on-scrim);
+    --sh-text-strong:     var(--sh-text-on-scrim);
+    --sh-text-default:    var(--sh-text-on-scrim);
+    --sh-text-muted:      var(--sh-text-on-scrim);
+    --sh-text-link:       var(--sh-text-on-scrim);
+    --sh-text-link-hover: var(--sh-text-on-scrim);
+    --sh-hero-eyebrow-ink: var(--sh-text-on-scrim);
+
+    /* O botão PREENCHIDO também mora no véu. O texto dele sempre passou —
+       o problema era a SILHUETA: --sh-action-primary-bg é tinta calculada
+       contra o canvas, e no escuro base ela é navy-400 sobre um véu
+       rgb(2 9 24 / .72). WCAG 1.4.11 (não-texto) pede 3:1 do limite do
+       controle contra o que está em volta, e ali não havia limite visível.
+       O conjunto -on-scrim (tokens/semantic.css) inverte a lógica: sobre véu
+       o preenchimento é CLARO — a mesma tinta que já se provou legível como
+       texto no mesmo lugar — com tinta escura por cima. Não é remapeado por
+       esquema, pelo mesmo motivo que --sh-text-on-scrim não é. */
+    --sh-action-primary-bg:        var(--sh-action-primary-bg-on-scrim);
+    --sh-action-primary-bg-hover:  var(--sh-action-primary-bg-hover-on-scrim);
+    --sh-action-primary-bg-active: var(--sh-action-primary-bg-active-on-scrim);
+    --sh-action-primary-fg:        var(--sh-action-primary-fg-on-scrim);
+    --sh-action-primary-border:    var(--sh-action-primary-border-on-scrim);
+
+    /* O botão de contorno mora no véu como o texto, então a tinta dele é a
+       mesma. Sem isto o secundário herdava --sh-text-default do escopo em
+       volta: no escuro deu 1,43 sobre o véu (medido em prova-superficies).
+       Os preenchimentos de hover/ativo saem do próprio on-scrim por
+       color-mix — nada de branco fixo, então o acamp's continua com o creme
+       dele em vez de um branco que o tema não usa. */
+    --sh-action-secondary-bg:        transparent;
+    --sh-action-secondary-fg:        var(--sh-text-on-scrim);
+    --sh-action-secondary-border:    var(--sh-text-on-scrim);
+    --sh-action-secondary-bg-hover:  color-mix(in srgb, var(--sh-text-on-scrim) 14%, transparent);
+    --sh-action-secondary-bg-active: color-mix(in srgb, var(--sh-text-on-scrim) 22%, transparent);
+    --sh-action-ghost-fg:            var(--sh-text-on-scrim);
+    --sh-action-ghost-bg-hover:      color-mix(in srgb, var(--sh-text-on-scrim) 14%, transparent);
+    --sh-action-ghost-bg-active:     color-mix(in srgb, var(--sh-text-on-scrim) 22%, transparent);
+    --sh-focus-color:                var(--sh-text-on-scrim);
+
+    /* O herói com foto é área VELADA: o vidro que morar dentro dele é filme
+       claro com fio inteiro, não um segundo véu. É o botão de vidro do
+       asasul/. Explicação completa em tokens/semantic.css, família
+       --sh-glass-*-on-veil. */
+    --sh-glass-veil:        var(--sh-glass-veil-on-veil);
+    --sh-glass-veil-hover:  var(--sh-glass-veil-hover-on-veil);
+    --sh-glass-veil-active: var(--sh-glass-veil-active-on-veil);
+    --sh-glass-solid:       var(--sh-glass-solid-on-veil);
+    --sh-glass-border:      var(--sh-glass-border-on-veil);
+    --sh-glass-keyline:     var(--sh-glass-keyline-on-veil);
+
+    justify-content: flex-end;
+    min-block-size: var(--sh-hero-min, 28rem);
+  }
+  .sh-hero--cover > .sh-hero__media {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+    border-radius: 0;
+  }
+
+  /* Texto e imagem lado a lado; vira coluna sozinho, sem media query. */
+  .sh-hero--split {
+    --sh-hero-title-size: var(--sh-font-size-display-md);
+    display: grid;
+    gap: var(--sh-space-10);
+    align-items: center;
+    grid-template-columns:
+      repeat(auto-fit, minmax(min(var(--sh-hero-split-min, 20rem), 100%), 1fr));
+  }
+  .sh-hero--split > .sh-hero__inner { max-inline-size: none; margin-inline: 0; }
+
+  /* Cabeça de evento: centrada, superfície de marca discreta, metadados em
+     linha. Não usa foto — quando usar, some com --event e usa --cover. */
+  .sh-hero--event {
+    --sh-hero-bg: var(--sh-surface-brand-subtle);
+    --sh-hero-title-size: var(--sh-font-size-display-md);
+    text-align: center;
+  }
+  .sh-hero--event > .sh-hero__inner {
+    align-items: center;
+    max-inline-size: var(--sh-container-text);
+  }
+  .sh-hero--event .sh-hero__meta {
+    justify-content: center;
+    padding-block-start: var(--sh-space-4);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    inline-size: 100%;
+  }
+
+  .sh-hero--compact {
+    --sh-hero-padding-block: var(--sh-space-12);
+    --sh-hero-title-size: var(--sh-font-size-display-sm);
+    --sh-hero-min: 18rem;
+  }
+  .sh-hero--rounded { --sh-hero-radius: var(--sh-radius-media); }
+
+  /* ======================================================================
+     sh-modal · sh-sheet
+     Os dois são <dialog> aberto com showModal(). Daí vêm de graça, pelo
+     navegador: foco preso, fundo inerte, Esc, ::backdrop e devolução do foco.
+     shalom-ds-surface.js acrescenta o que o elemento não dá: trava de rolagem
+     do corpo, fechar por clique no backdrop e devolução explícita do foco ao
+     gatilho (garantida, não dependente da implementação do navegador).
+
+     <button class="sh-btn sh-btn--primary" data-sh-open="#confirmar">…</button>
+
+     <dialog class="sh-modal sh-modal--md" id="confirmar"
+             aria-labelledby="confirmar-titulo">
+       <div class="sh-modal__box">
+         <header class="sh-modal__head">
+           <h2 class="sh-modal__title" id="confirmar-titulo">Cancelar inscrição</h2>
+           <button class="sh-modal__close" data-sh-close aria-label="Fechar">…</button>
+         </header>
+         <div class="sh-modal__body"> … </div>
+         <footer class="sh-modal__foot"> … </footer>
+       </div>
+     </dialog>
+
+     Modal não é a primeira opção para formulário: página dedicada quase
+     sempre é melhor (03-inventario-componentes.md).
+     ====================================================================== */
+
+  .sh-modal,
+  .sh-sheet {
+    margin: auto;
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--sh-text-default);
+  }
+
+  .sh-modal[open],
+  .sh-sheet[open] {
+    position: fixed;
+    inset: 0;
+    z-index: var(--sh-layer-modal);
+    display: grid;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    block-size: 100%;
+    max-block-size: 100%;
+    overflow: hidden;
+  }
+
+  .sh-modal[open] {
+    place-items: center;
+    padding: var(--sh-modal-inset, var(--sh-space-4));
+  }
+
+  .sh-modal::backdrop,
+  .sh-sheet::backdrop {
+    background-color: var(--sh-surface-scrim);
+  }
+
+  .sh-modal__box,
+  .sh-sheet__box {
+    display: flex;
+    flex-direction: column;
+    inline-size: 100%;
+    max-block-size: 100%;
+    overflow: hidden;
+    border: var(--sh-border-width-hair) solid
+            var(--sh-overlay-border, var(--sh-border-subtle));
+    background-color: var(--sh-overlay-bg, var(--sh-surface-raised));
+    box-shadow: var(--sh-shadow-xl);
+    color: var(--sh-text-default);
+  }
+
+  .sh-modal__box {
+    max-inline-size: var(--sh-modal-width, 34rem);
+    border-radius: var(--sh-radius-surface);
+  }
+
+  .sh-modal__head,
+  .sh-sheet__head {
+    display: flex;
+    flex: none;
+    gap: var(--sh-space-4);
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--sh-overlay-padding, var(--sh-space-5));
+    padding-block-end: var(--sh-space-4);
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  .sh-modal__title,
+  .sh-sheet__title {
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h4);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    letter-spacing: var(--sh-tracking-tight);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+
+  .sh-modal__lede,
+  .sh-sheet__lede {
+    margin-block-start: var(--sh-space-1);
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-modal__close,
+  .sh-sheet__close {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-icon-size-xl);
+    block-size: var(--sh-icon-size-xl);
+    margin: calc(var(--sh-space-1) * -1);
+    border-radius: var(--sh-radius-control);
+    color: var(--sh-text-default);
+    cursor: pointer;
+    transition: background-color var(--sh-duration-fast) var(--sh-ease-standard);
+  }
+  .sh-modal__close::after,
+  .sh-sheet__close::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    translate: -50% -50%;
+  }
+  @media (hover: hover) {
+    .sh-modal__close:hover,
+    .sh-sheet__close:hover { background-color: var(--sh-surface-active); }
+  }
+  .sh-modal__close:focus-visible,
+  .sh-sheet__close:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+  .sh-modal__close:active,
+  .sh-sheet__close:active { background-color: var(--sh-surface-active); }
+
+  .sh-modal__body,
+  .sh-sheet__body {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--sh-overlay-padding, var(--sh-space-5));
+    font-size: var(--sh-font-size-md);
+    line-height: var(--sh-leading-relaxed);
+  }
+
+  .sh-modal__foot,
+  .sh-sheet__foot {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3);
+    align-items: center;
+    justify-content: flex-end;
+    padding: var(--sh-overlay-padding, var(--sh-space-5));
+    padding-block-start: var(--sh-space-4);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+  /* Ação secundária empurrada para o começo: "Cancelar" nunca encosta em
+     "Confirmar" por acidente do polegar. */
+  .sh-modal__foot > .sh-modal__foot-start,
+  .sh-sheet__foot > .sh-sheet__foot-start { margin-inline-end: auto; }
+
+  /* ----------------------------------------------------- tamanhos do modal */
+
+  .sh-modal--sm { --sh-modal-width: 24rem; }
+  .sh-modal--md { --sh-modal-width: 34rem; }
+  .sh-modal--lg { --sh-modal-width: 48rem; }
+  .sh-modal--full {
+    --sh-modal-inset: 0;
+    --sh-modal-width: none;
+  }
+  .sh-modal--full > .sh-modal__box {
+    block-size: 100%;
+    border: 0;
+    border-radius: 0;
+  }
+
+  /* Entrada. Saída é instantânea de propósito: overlay que demora a sumir
+     esconde o resultado da ação. O reset já zera duração sob
+     prefers-reduced-motion. */
+  .sh-modal__box,
+  .sh-sheet__box {
+    transition:
+      opacity   var(--sh-duration-base) var(--sh-ease-standard),
+      translate var(--sh-duration-base) var(--sh-ease-standard);
+  }
+  .sh-modal[data-state="closing"] > .sh-modal__box,
+  .sh-sheet[data-state="closing"] > .sh-sheet__box {
+    opacity: 0;
+    translate: 0 var(--sh-space-3);
+  }
+  @starting-style {
+    .sh-modal[open] > .sh-modal__box {
+      opacity: 0;
+      translate: 0 var(--sh-space-3);
+    }
+  }
+  .sh-modal::backdrop,
+  .sh-sheet::backdrop {
+    transition: opacity var(--sh-duration-base) var(--sh-ease-standard);
+  }
+  @starting-style {
+    .sh-modal[open]::backdrop,
+    .sh-sheet[open]::backdrop { opacity: 0; }
+  }
+
+  /* ------------------------------------------------------------- sh-sheet */
+  /* Painel deslizante. --bottom é o padrão (o do sh82cafe/); --start e --end
+     são as gavetas laterais. Arrastar para fechar é extra; Esc e o botão de
+     fechar são obrigatórios e existem sempre. */
+
+  .sh-sheet[open] { place-items: end stretch; }
+
+  .sh-sheet__box {
+    --sh-overlay-bg: var(--sh-surface-raised);
+    max-inline-size: var(--sh-sheet-width, 40rem);
+    max-block-size: var(--sh-sheet-height, 86%);
+    margin-inline: auto;
+    border-start-start-radius: var(--sh-radius-media);
+    border-start-end-radius: var(--sh-radius-media);
+    border-block-end: 0;
+  }
+
+  /* Pega decorativa: sinaliza "isto sobe e desce". Nunca é o único controle. */
+  .sh-sheet__grip {
+    flex: none;
+    inline-size: 2.5rem;
+    block-size: var(--sh-border-width-heavy);
+    margin: var(--sh-space-3) auto 0;
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-border-strong);
+  }
+  .sh-sheet__grip + .sh-sheet__head { border-block-end-width: var(--sh-border-width-hair); }
+
+  .sh-sheet--start[open] { place-items: stretch start; }
+  .sh-sheet--end[open]   { place-items: stretch end; }
+  .sh-sheet--start > .sh-sheet__box,
+  .sh-sheet--end > .sh-sheet__box {
+    max-inline-size: var(--sh-sheet-width, 24rem);
+    max-block-size: 100%;
+    block-size: 100%;
+    margin-inline: 0;
+    border-radius: 0;
+    border-block-end: var(--sh-border-width-hair) solid
+                      var(--sh-overlay-border, var(--sh-border-subtle));
+  }
+  .sh-sheet--start > .sh-sheet__box {
+    border-start-end-radius: var(--sh-radius-media);
+    border-end-end-radius: var(--sh-radius-media);
+  }
+  .sh-sheet--end > .sh-sheet__box {
+    border-start-start-radius: var(--sh-radius-media);
+    border-end-start-radius: var(--sh-radius-media);
+  }
+
+  @starting-style {
+    .sh-sheet[open] > .sh-sheet__box       { translate: 0 100%; }
+    .sh-sheet--start[open] > .sh-sheet__box { translate: -100% 0; }
+    .sh-sheet--end[open] > .sh-sheet__box   { translate: 100% 0; }
+  }
+
+  /* Trava de rolagem do corpo enquanto há overlay aberto. O atributo é posto
+     e retirado por shalom-ds-surface.js, com contador — dois overlays
+     empilhados não destravam a página no fechamento do primeiro.
+     O padding compensa a barra de rolagem que some (0 onde ela é sobreposta). */
+  :root[data-sh-scroll-lock] {
+    overflow: hidden;
+    padding-inline-end: var(--sh-scroll-lock-gutter, 0);
+  }
+
+  /* ======================================================================
+     sh-tooltip
+     CSS primeiro: aparece em hover E em foco, sem JS. Só complementa —
+     nunca carrega informação essencial nem ação (WCAG 1.4.13).
+
+     <span class="sh-tooltip" data-position="top">
+       <button class="sh-btn sh-btn--icon" aria-describedby="tt-pix">…</button>
+       <span class="sh-tooltip__bubble" role="tooltip" id="tt-pix">
+         Copia a chave PIX para a área de transferência
+       </span>
+     </span>
+
+     Persistente: fica enquanto o ponteiro estiver sobre o gatilho OU sobre a
+     bolha — a ponte invisível cobre o vão entre os dois.
+     Dispensável: Esc fecha (shalom-ds-surface.js põe data-dismissed).
+
+     Duas coisas dependem do JS e degradam sem quebrar: o Esc acima e o
+     enquadramento na janela (--sh-tooltip-shift). Uma bolha centrada num
+     gatilho colado na lateral do celular sai da tela e CSS não sabe onde o
+     gatilho está; sem JS a dica ainda aparece, só pode ficar cortada.
+     ====================================================================== */
+
+  .sh-tooltip {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+  }
+
+  .sh-tooltip__bubble {
+    position: absolute;
+    z-index: var(--sh-layer-tooltip);
+    inline-size: max-content;
+    /* Nunca mais larga que a janela: no celular a bolha é o componente que
+       mais estoura a lateral. O ajuste fino de posição é do JS. */
+    max-inline-size: min(var(--sh-tooltip-width, 18rem),
+                         calc(100vw - var(--sh-space-8)));
+    padding: var(--sh-space-2) var(--sh-space-3);
+    border: var(--sh-border-width-hair) solid
+            var(--sh-tooltip-border, var(--sh-border-inverse));
+    border-radius: var(--sh-radius-control);
+    background-color: var(--sh-tooltip-bg, var(--sh-surface-inverse));
+    box-shadow: var(--sh-shadow-md);
+    color: var(--sh-tooltip-fg, var(--sh-text-inverse));
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-medium);
+    line-height: var(--sh-leading-snug);
+    text-align: start;
+    text-transform: none;
+    letter-spacing: var(--sh-tracking-normal);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity    var(--sh-duration-fast) var(--sh-ease-standard),
+      visibility var(--sh-duration-fast) var(--sh-ease-standard);
+    /* posição padrão: acima, centrada.
+       --sh-tooltip-shift é a correção que shalom-ds-surface.js aplica quando
+       a bolha encostaria na borda da janela. Sem JS vale 0 e nada muda. */
+    inset-block-end: calc(100% + var(--sh-tooltip-gap, var(--sh-space-2)));
+    inset-inline-start: 50%;
+    translate: calc(-50% + var(--sh-tooltip-shift, 0px)) 0;
+  }
+
+  /* Ponte: mantém a bolha alcançável com o ponteiro (1.4.13 "hoverable"). */
+  .sh-tooltip__bubble::before {
+    content: '';
+    position: absolute;
+    inset-inline: calc(var(--sh-space-4) * -1);
+    inset-block-start: 100%;
+    block-size: var(--sh-tooltip-gap, var(--sh-space-2));
+  }
+
+  .sh-tooltip__bubble::after {
+    content: '';
+    position: absolute;
+    inline-size: var(--sh-space-2);
+    block-size: var(--sh-space-2);
+    border: var(--sh-border-width-hair) solid
+            var(--sh-tooltip-border, var(--sh-border-inverse));
+    background-color: var(--sh-tooltip-bg, var(--sh-surface-inverse));
+    rotate: 45deg;
+    inset-block-start: 100%;
+    /* Anda ao contrário do deslocamento da bolha: o bico continua sobre o
+       gatilho mesmo com a bolha empurrada para dentro da janela. */
+    inset-inline-start: calc(50% - var(--sh-tooltip-shift, 0px));
+    translate: -50% -50%;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
+
+  @media (hover: hover) {
+    .sh-tooltip:hover > .sh-tooltip__bubble {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition-delay: var(--sh-tooltip-delay, 400ms);
+    }
+  }
+  .sh-tooltip:focus-within > .sh-tooltip__bubble {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: var(--sh-tooltip-delay-focus, 0ms);
+  }
+  .sh-tooltip[data-dismissed="true"] > .sh-tooltip__bubble {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition-delay: 0ms;
+  }
+
+  /* ------------------------------------------------------------ posições */
+
+  .sh-tooltip[data-position="bottom"] > .sh-tooltip__bubble {
+    inset-block-end: auto;
+    inset-block-start: calc(100% + var(--sh-tooltip-gap, var(--sh-space-2)));
+  }
+  .sh-tooltip[data-position="bottom"] > .sh-tooltip__bubble::before {
+    inset-block-start: auto;
+    inset-block-end: 100%;
+  }
+  .sh-tooltip[data-position="bottom"] > .sh-tooltip__bubble::after {
+    inset-block-start: auto;
+    inset-block-end: 100%;
+    inset-inline-start: calc(50% - var(--sh-tooltip-shift, 0px));
+    translate: -50% 50%;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+
+  .sh-tooltip[data-position="start"] > .sh-tooltip__bubble,
+  .sh-tooltip[data-position="end"] > .sh-tooltip__bubble {
+    inset-block-end: auto;
+    inset-block-start: 50%;
+    inset-inline-start: auto;
+    translate: 0 -50%;
+  }
+  .sh-tooltip[data-position="start"] > .sh-tooltip__bubble {
+    inset-inline-end: calc(100% + var(--sh-tooltip-gap, var(--sh-space-2)));
+  }
+  .sh-tooltip[data-position="end"] > .sh-tooltip__bubble {
+    inset-inline-start: calc(100% + var(--sh-tooltip-gap, var(--sh-space-2)));
+  }
+  .sh-tooltip[data-position="start"] > .sh-tooltip__bubble::before,
+  .sh-tooltip[data-position="end"] > .sh-tooltip__bubble::before {
+    inset-block: calc(var(--sh-space-3) * -1);
+    inset-inline: auto;
+    inline-size: var(--sh-tooltip-gap, var(--sh-space-2));
+    block-size: auto;
+  }
+  .sh-tooltip[data-position="start"] > .sh-tooltip__bubble::before { inset-inline-start: 100%; }
+  .sh-tooltip[data-position="end"] > .sh-tooltip__bubble::before   { inset-inline-end: 100%; }
+  .sh-tooltip[data-position="start"] > .sh-tooltip__bubble::after,
+  .sh-tooltip[data-position="end"] > .sh-tooltip__bubble::after {
+    inset-block-start: 50%;
+    inset-inline-start: auto;
+  }
+  .sh-tooltip[data-position="start"] > .sh-tooltip__bubble::after {
+    inset-inline-start: 100%;
+    translate: -50% -50%;
+    clip-path: polygon(100% 0, 0 100%, 100% 100%);
+  }
+  .sh-tooltip[data-position="end"] > .sh-tooltip__bubble::after {
+    inset-inline-end: 100%;
+    translate: 50% -50%;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+
+  .sh-tooltip--instant { --sh-tooltip-delay: 0ms; }
+  .sh-tooltip--wide    { --sh-tooltip-width: 26rem; }
+
+  /* ======================================================================
+     sh-popover
+     [popover] nativo. Diferente do tooltip, PODE conter ação e receber foco.
+     Abrir, fechar por clique fora e Esc são do navegador; posicionar em
+     relação ao gatilho e sincronizar aria-expanded é de
+     shalom-ds-surface.js — sem biblioteca, quatro lados por data-position.
+
+     <button class="sh-btn sh-btn--secondary" popovertarget="filtros"
+             aria-expanded="false">Filtros</button>
+
+     <div class="sh-popover" id="filtros" popover data-position="bottom">
+       <div class="sh-popover__head">
+         <h3 class="sh-popover__title">Filtrar inscritos</h3>
+         <button class="sh-popover__close" data-sh-close aria-label="Fechar">…</button>
+       </div>
+       <div class="sh-popover__body"> … </div>
+       <div class="sh-popover__actions"> … </div>
+     </div>
+
+     Sem JS ele ainda abre e fecha; só aparece centralizado, como um mini
+     diálogo, em vez de ancorado.
+     ====================================================================== */
+
+  .sh-popover {
+    position: fixed;
+    z-index: var(--sh-layer-popover);
+    inset: auto;
+    inset-block-start: var(--sh-popover-y, 50%);
+    inset-inline-start: var(--sh-popover-x, 50%);
+    inline-size: max-content;
+    max-inline-size: var(--sh-popover-width, 22rem);
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    /* Diferente do modal, o popover NÃO tem scrim atrás: o limite dele contra
+       o conteúdo da página precisa dos 3:1 de 1.4.11 por conta própria, e é
+       --sh-border-control que a camada de token garante nessa medida. */
+    border: var(--sh-border-width-hair) solid
+            var(--sh-popover-border, var(--sh-border-control));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-popover-bg, var(--sh-surface-raised));
+    box-shadow: var(--sh-shadow-lg);
+    color: var(--sh-text-default);
+  }
+  /* Enquanto o JS não posicionou (ou não existe), fica centralizado. */
+  .sh-popover:not([data-sh-anchored]) {
+    translate: -50% -50%;
+  }
+
+  /* O VÃO entre gatilho e painel é daqui, não do JS: o JS encosta o painel
+     na aresta do gatilho e o token afasta. Assim o respiro continua sendo
+     --sh-space-2 em qualquer tema. */
+  .sh-popover[data-sh-anchored][data-position="bottom"] {
+    translate: 0 var(--sh-popover-gap, var(--sh-space-2));
+  }
+  .sh-popover[data-sh-anchored][data-position="top"] {
+    translate: 0 calc(var(--sh-popover-gap, var(--sh-space-2)) * -1);
+  }
+  .sh-popover[data-sh-anchored][data-position="end"] {
+    translate: var(--sh-popover-gap, var(--sh-space-2)) 0;
+  }
+  .sh-popover[data-sh-anchored][data-position="start"] {
+    translate: calc(var(--sh-popover-gap, var(--sh-space-2)) * -1) 0;
+  }
+
+  /* Só opacidade na entrada: animar a posição faria o painel deslizar do
+     centro da tela até o gatilho no primeiro quadro. */
+  .sh-popover:popover-open {
+    opacity: 1;
+    transition:
+      opacity var(--sh-duration-base) var(--sh-ease-standard),
+      translate var(--sh-duration-base) var(--sh-ease-standard);
+  }
+  @starting-style {
+    .sh-popover:popover-open { opacity: 0; }
+  }
+
+  .sh-popover__head {
+    display: flex;
+    gap: var(--sh-space-3);
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--sh-popover-padding, var(--sh-space-4));
+    padding-block-end: var(--sh-space-2);
+  }
+
+  .sh-popover__title {
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-popover__close {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-icon-size-lg);
+    block-size: var(--sh-icon-size-lg);
+    margin: calc(var(--sh-space-1) * -1);
+    border-radius: var(--sh-radius-control);
+    color: var(--sh-text-default);
+    cursor: pointer;
+  }
+  .sh-popover__close::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    translate: -50% -50%;
+  }
+  @media (hover: hover) {
+    .sh-popover__close:hover { background-color: var(--sh-surface-active); }
+  }
+  .sh-popover__close:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+  .sh-popover__close:active { background-color: var(--sh-surface-active); }
+
+  .sh-popover__body {
+    padding: var(--sh-popover-padding, var(--sh-space-4));
+    padding-block-start: var(--sh-space-2);
+    max-block-size: var(--sh-popover-max-height, 22rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-relaxed);
+  }
+  .sh-popover__head + .sh-popover__body { padding-block-start: 0; }
+
+  .sh-popover__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2);
+    align-items: center;
+    justify-content: flex-end;
+    padding: var(--sh-popover-padding, var(--sh-space-4));
+    padding-block-start: var(--sh-space-3);
+    border-block-start: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+  }
+
+  /* Bico. Só aparece quando o JS ancorou: centralizado, um bico apontaria
+     para nada. */
+  .sh-popover__arrow {
+    position: absolute;
+    inline-size: var(--sh-space-3);
+    block-size: var(--sh-space-3);
+    border: var(--sh-border-width-hair) solid
+            var(--sh-popover-border, var(--sh-border-control));
+    background-color: var(--sh-popover-bg, var(--sh-surface-raised));
+    rotate: 45deg;
+    display: none;
+  }
+  .sh-popover[data-sh-anchored] > .sh-popover__arrow { display: block; }
+  .sh-popover[data-position="bottom"] > .sh-popover__arrow {
+    inset-block-start: 0;
+    inset-inline-start: var(--sh-popover-arrow-x, 50%);
+    translate: -50% -50%;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+  .sh-popover[data-position="top"] > .sh-popover__arrow {
+    inset-block-end: 0;
+    inset-inline-start: var(--sh-popover-arrow-x, 50%);
+    translate: -50% 50%;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
+  .sh-popover[data-position="end"] > .sh-popover__arrow {
+    inset-inline-start: 0;
+    inset-block-start: var(--sh-popover-arrow-y, 50%);
+    translate: -50% -50%;
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
+  }
+  .sh-popover[data-position="start"] > .sh-popover__arrow {
+    inset-inline-end: 0;
+    inset-block-start: var(--sh-popover-arrow-y, 50%);
+    translate: 50% -50%;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+  }
+
+  .sh-popover--sm { --sh-popover-width: 16rem; }
+  .sh-popover--lg { --sh-popover-width: 30rem; }
+
+  /* ======================================================================
+     sh-media
+     <figure class="sh-media sh-media--wide">
+       <div class="sh-media__frame"> <img src="…" alt="Missa de envio"> </div>
+       <figcaption class="sh-media__caption">
+         Missa de envio, julho de 2025.
+         <span class="sh-media__credit">Foto: Comunicação Shalom</span>
+       </figcaption>
+     </figure>
+     A proporção também pode vir de .sh-frame (foundations/layout.css); aqui
+     ela é um token de componente para não obrigar a duas classes.
+     ====================================================================== */
+
+  .sh-media {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-media-gap, var(--sh-space-2));
+    margin: 0;
+    min-inline-size: 0;
+  }
+
+  .sh-media__frame {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: var(--sh-media-ratio, 16 / 9);
+    border: var(--sh-media-border, 0) solid var(--sh-border-subtle);
+    border-radius: var(--sh-media-radius, var(--sh-radius-media));
+    background-color: var(--sh-media-bg, var(--sh-surface-sunken));
+    box-shadow: var(--sh-media-shadow, none);
+  }
+  .sh-media__frame > img,
+  .sh-media__frame > video,
+  .sh-media__frame > iframe {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: var(--sh-media-fit, cover);
+    /* O recorte tem ponto de fuga. `center` corta cabeça em foto de gente e
+       corta o céu em foto de fachada; o asasul/ resolve o herói dele com
+       `center 30%`. Aqui isso vira token de componente: quem publica a foto
+       escolhe o ponto sem escrever CSS. */
+    object-position: var(--sh-media-position, center);
+    transition: scale var(--sh-duration-slow) var(--sh-ease-out);
+  }
+
+  /* Véu sobre a foto. Reaproveita --sh-surface-scrim: é a MESMA tinta e o
+     MESMO alfa calibrado do herói, não um segundo véu com outra conta. O
+     degradê existe para o topo da imagem respirar; o texto mora na faixa
+     100% coberta, como em sh-hero__scrim. */
+  .sh-media__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: var(--sh-layer-raised);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: var(--sh-space-1);
+    padding: var(--sh-media-overlay-padding, var(--sh-space-5));
+    background-color: var(--sh-media-overlay-bg, transparent);
+    background-image: linear-gradient(
+      to top,
+      var(--sh-surface-scrim) 0%,
+      var(--sh-surface-scrim) var(--sh-media-overlay-stop, 42%),
+      transparent 100%);
+    /* Mesma regra do herói: a tinta do véu não inverte com o esquema, porque
+       a foto por baixo também não (DEC-023). */
+    color: var(--sh-text-on-scrim);
+    --sh-text-strong:  var(--sh-text-on-scrim);
+    --sh-text-default: var(--sh-text-on-scrim);
+    --sh-text-muted:   var(--sh-text-on-scrim);
+    --sh-text-accent:  var(--sh-text-on-scrim);
+  }
+  .sh-media__eyebrow {
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+  }
+  .sh-media__headline {
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h4);
+    font-weight: var(--sh-font-display-weight);
+    line-height: var(--sh-leading-tight);
+    letter-spacing: var(--sh-tracking-tight);
+    text-wrap: balance;
+  }
+
+  .sh-media__caption {
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-muted);
+    text-wrap: pretty;
+  }
+
+  .sh-media__credit {
+    display: inline-block;
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-medium);
+    color: var(--sh-text-muted);
+  }
+  .sh-media__caption > .sh-media__credit::before {
+    content: '';
+    display: inline-block;
+    inline-size: var(--sh-space-2);
+  }
+
+  /* ------------------------------------------------- proporções nomeadas
+     Sete nomes, e nenhum número solto na página. O padrão é 16/9. A escolha
+     não é estética: é o que a foto É. Cartaz de evento é --portrait (4/5, a
+     proporção que o asasul/ usa nos oito eventos), retrato de pessoa é
+     --square, foto de fachada é --photo, faixa de topo é --wide. */
+  .sh-media--square   { --sh-media-ratio: 1 / 1; }
+  .sh-media--portrait { --sh-media-ratio: 4 / 5; }
+  .sh-media--poster   { --sh-media-ratio: 3 / 4; }
+  .sh-media--photo    { --sh-media-ratio: 3 / 2; }
+  .sh-media--wide     { --sh-media-ratio: 21 / 9; }
+  .sh-media--story    { --sh-media-ratio: 9 / 16; }
+  .sh-media--free     { --sh-media-ratio: auto; }
+
+  /* ------------------------------------------------- tratamento da foto */
+  /* --contain existe para CARTAZ, que é arte fechada e não pode ser cortada.
+     O fundo do quadro fica aparecendo dos lados: por isso ele vem com o
+     degradê da marca, e não com o cinza da superfície rebaixada — é o mesmo
+     recurso que o asasul/ usa atrás dos cartazes 4/5. */
+  .sh-media--contain {
+    --sh-media-fit: contain;
+    --sh-media-bg: var(--sh-surface-brand);
+  }
+  .sh-media--framed   { --sh-media-border: var(--sh-border-width-hair); }
+  .sh-media--flush    { --sh-media-radius: 0; }
+  /* Foto que se levanta da página. A sombra é a do sistema, tingida de navy;
+     nunca sombra preta larga (docs/01-identidade.md §6). */
+  .sh-media--raised   { --sh-media-shadow: var(--sh-shadow-lg); }
+  /* Aproximação lenta no ponteiro. Só onde há ponteiro de verdade, e nunca
+     com movimento reduzido: é decoração, não informação. */
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .sh-media--zoom:hover > .sh-media__frame > img,
+    .sh-media--zoom:focus-within > .sh-media__frame > img { scale: 1.04; }
+  }
+
+  /* ======================================================================
+     sh-avatar
+     <span class="sh-avatar sh-avatar--lg">
+       <img class="sh-avatar__img" src="…" alt="">
+     </span>
+     <span class="sh-avatar" aria-hidden="true">
+       <span class="sh-avatar__initials">JR</span>
+     </span>
+
+     Iniciais são o fallback, não a decoração: quando não há foto, o bloco
+     inteiro é aria-hidden e o nome vem escrito ao lado, em texto real.
+
+     Desvio registrado: a spec cita `--group`. Um modificador do bloco não pode
+     descrever o CONTÊINER de vários blocos — quem empilha é a lista. Por isso
+     o empilhamento é o bloco `sh-avatar-group`, mesmo caminho que o Lote 0
+     seguiu em `sh-input-group`.
+     ====================================================================== */
+
+  .sh-avatar {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-avatar-size, 2.5rem);
+    block-size: var(--sh-avatar-size, 2.5rem);
+    overflow: hidden;
+    border: var(--sh-border-width-hair) solid
+            var(--sh-avatar-border, var(--sh-border-subtle));
+    border-radius: var(--sh-avatar-radius, var(--sh-radius-pill));
+    background-color: var(--sh-avatar-bg, var(--sh-surface-brand-subtle));
+    color: var(--sh-avatar-fg, var(--sh-text-brand));
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-avatar-font-size, var(--sh-font-size-sm));
+    font-weight: var(--sh-weight-semibold);
+    line-height: 1;
+    letter-spacing: var(--sh-tracking-wide);
+    text-transform: uppercase;
+    user-select: none;
+  }
+
+  .sh-avatar__img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .sh-avatar__initials { translate: 0 0.03em; }
+
+  .sh-avatar--sm { --sh-avatar-size: 2rem;   --sh-avatar-font-size: var(--sh-font-size-xs); }
+  .sh-avatar--md { --sh-avatar-size: 2.5rem; --sh-avatar-font-size: var(--sh-font-size-sm); }
+  .sh-avatar--lg { --sh-avatar-size: 3rem;   --sh-avatar-font-size: var(--sh-font-size-md); }
+  .sh-avatar--xl { --sh-avatar-size: 4rem;   --sh-avatar-font-size: var(--sh-font-size-xl); }
+
+  .sh-avatar--square { --sh-avatar-radius: var(--sh-radius-control); }
+  .sh-avatar--accent {
+    --sh-avatar-bg: var(--sh-surface-accent-subtle);
+    --sh-avatar-fg: var(--sh-text-accent);
+    --sh-avatar-border: var(--sh-border-accent);
+  }
+  .sh-avatar--inverse {
+    --sh-avatar-bg: var(--sh-surface-inverse);
+    --sh-avatar-fg: var(--sh-text-inverse);
+    --sh-avatar-border: var(--sh-border-inverse);
+  }
+
+  /* Avatar clicável é um <a> ou <button> com alvo de 44px. */
+  a.sh-avatar::after,
+  button.sh-avatar::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: max(100%, var(--sh-touch-target));
+    translate: -50% -50%;
+  }
+  a.sh-avatar:focus-visible,
+  button.sh-avatar:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    z-index: var(--sh-layer-raised);
+  }
+  @media (hover: hover) {
+    a.sh-avatar:hover,
+    button.sh-avatar:hover { --sh-avatar-border: var(--sh-border-brand); }
+  }
+
+  .sh-avatar-group {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    list-style: none;
+  }
+  .sh-avatar-group > * + * {
+    margin-inline-start: calc(var(--sh-avatar-overlap, 0.85rem) * -1);
+  }
+  /* O anel separa avatares vizinhos; acompanha a superfície onde o grupo
+     está, por --sh-avatar-ring. */
+  .sh-avatar-group .sh-avatar {
+    box-shadow: 0 0 0 var(--sh-border-width-thick)
+                var(--sh-avatar-ring, var(--sh-surface-default));
+  }
+  .sh-avatar-group__more {
+    --sh-avatar-bg: var(--sh-surface-sunken);
+    --sh-avatar-fg: var(--sh-text-default);
+    --sh-avatar-border: var(--sh-border-default);
+  }
+
+  /* ======================================================================
+     sh-logo
+     <a class="sh-logo sh-logo--full" href="/" aria-label="Comunidade Católica Shalom">
+       <svg class="sh-logo__mark">…</svg>
+       <svg class="sh-logo__word">…</svg>
+     </a>
+
+     Depende de reexportar os três SVGs oficiais, hoje com preenchimento fixo
+     #204f8c, para currentColor (docs/03-inventario-componentes.md). Este
+     arquivo NÃO desenha o logotipo: dimensiona, alinha e pinta o que receber.
+     ====================================================================== */
+
+  .sh-logo {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--sh-logo-gap, var(--sh-space-3));
+    block-size: var(--sh-logo-size, 2rem);
+    color: var(--sh-logo-ink, var(--sh-text-brand));
+    text-decoration: none;
+  }
+  .sh-logo > svg,
+  .sh-logo__mark,
+  .sh-logo__word {
+    flex: none;
+    block-size: 100%;
+    inline-size: auto;
+  }
+  .sh-logo__word { color: var(--sh-logo-word-ink, currentColor); }
+  .sh-logo__mark { color: var(--sh-logo-mark-ink, currentColor); }
+
+  /* --full é o padrão nomeado: pomba + lettering lado a lado, no tamanho base.
+     Declarado de propósito mesmo sem trocar nada de .sh-logo, porque o
+     inventário e prova-superficies.html já escrevem a classe — e uma classe
+     escrita que não existe no CSS é dívida silenciosa. Escrever `sh-logo` ou
+     `sh-logo sh-logo--full` dá o mesmo resultado; o modificador só torna a
+     intenção explícita, e é o par legível de --mark (só a pomba). */
+  /* Cada tamanho passa por um token próprio antes de virar --sh-logo-size.
+     Sem esse degrau, um TEMA não conseguiria ajustar a medida: ele só pode
+     setar custom property (herdada), e a declaração do modificador mora no
+     próprio elemento — ganharia sempre. É este degrau que faz o
+     `--sh-logo-mark-size: 3rem` do jubileu-25 chegar em .sh-logo--mark.
+
+     Por que um tema precisa disso: o desenho da marca muda com o tema (a
+     página injeta outro SVG — ver docs-site/componentes/logo.html), e
+     desenhos diferentes pedem medidas diferentes. O lockup do jubileu é
+     ~3:1 com traço manuscrito fino; no 2rem do padrão vira mancha. */
+  .sh-logo--full    { --sh-logo-size: var(--sh-logo-full-size, 2rem); }
+  .sh-logo--mark    { --sh-logo-size: var(--sh-logo-mark-size, 2.5rem); }
+  .sh-logo--sm      { --sh-logo-size: var(--sh-logo-sm-size, 1.5rem); }
+  .sh-logo--lg      { --sh-logo-size: var(--sh-logo-lg-size, 3rem); }
+  .sh-logo--inverse { --sh-logo-ink: var(--sh-text-inverse); }
+
+  .sh-logo--stacked {
+    flex-direction: column;
+    gap: var(--sh-space-2);
+    block-size: auto;
+  }
+  .sh-logo--stacked > svg,
+  .sh-logo--stacked .sh-logo__mark,
+  .sh-logo--stacked .sh-logo__word {
+    block-size: auto;
+    inline-size: var(--sh-logo-size, 2rem);
+  }
+  /* O 3.4 é a proporção do lettering institucional deitado (~4:1 de caixa),
+     não uma constante do universo: o lettering EMPILHADO do jubileu tem caixa
+     quase quadrada (1000 × 698.9) e a 3.4 ele engole o emblema. Por isso a
+     largura virou token — quem monta o par declara a relação que aquele
+     desenho pede, e o padrão continua o de antes. */
+  .sh-logo--stacked .sh-logo__word {
+    inline-size: var(--sh-logo-word-width, calc(var(--sh-logo-size, 2rem) * 3.4));
+  }
+
+  a.sh-logo::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--sh-touch-target));
+    block-size: max(100%, var(--sh-touch-target));
+    translate: -50% -50%;
+  }
+  a.sh-logo:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  /* ======================================================================
+     sh-dove — o símbolo
+     O Shalom DS não redesenha o emblema: ele reserva o lugar e dimensiona a
+     silhueta que a equipe de comunicação entrega. Por isso sh-dove é sempre
+     um invólucro de SVG (ou o próprio <svg>), que pinta por currentColor.
+
+     <span class="sh-dove sh-dove--seal" aria-hidden="true"><svg>…</svg></span>
+
+     Usos (01-identidade.md §5):
+       --divider   filete interrompido ao centro — cai dentro de
+                   .sh-divider--dove, do Lote 0. Máximo um por página.
+       --watermark silhueta grande em --sh-dove-watermark com --sh-dove-opacity.
+                   O pai precisa de position: relative. Nunca atrás de texto
+                   corrido; sempre aria-hidden.
+       --seal      16px ao lado de "Comunidade Católica Shalom". Um por página.
+       --empty     64px em --sh-text-muted, dentro de um estado vazio, com
+                   frase e ação ao lado.
+       --loading   o "sopro": a pomba respira em opacidade e escala. NÃO gira,
+                   não espelha, não inclina. Sob prefers-reduced-motion fica
+                   parada e opaca.
+
+     Piso de 16px embutido: abaixo disso a silhueta vira mancha.
+     ====================================================================== */
+
+  .sh-dove {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-dove-size, var(--sh-icon-size-lg));
+    block-size: var(--sh-dove-size, var(--sh-icon-size-lg));
+    min-inline-size: var(--sh-icon-size-sm);
+    min-block-size: var(--sh-icon-size-sm);
+    color: var(--sh-dove-fill, var(--sh-dove-ink));
+  }
+  .sh-dove > svg,
+  svg.sh-dove {
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  .sh-dove--divider { --sh-dove-size: var(--sh-icon-size-md); }
+
+  .sh-dove--seal {
+    --sh-dove-size: var(--sh-icon-size-sm);
+    vertical-align: -0.15em;
+  }
+
+  .sh-dove--empty {
+    --sh-dove-size: 4rem;
+    --sh-dove-fill: var(--sh-text-muted);
+  }
+
+  .sh-dove--watermark {
+    position: absolute;
+    inset-block-start: var(--sh-dove-inset-block, auto);
+    inset-inline-end: var(--sh-dove-inset-inline, calc(var(--sh-space-8) * -1));
+    z-index: var(--sh-layer-base);
+    --sh-dove-size: var(--sh-dove-watermark-size, 18rem);
+    --sh-dove-fill: var(--sh-dove-watermark);
+    opacity: var(--sh-dove-opacity);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .sh-dove--loading {
+    animation: sh-dove-breath calc(var(--sh-duration-slower) * 4)
+               var(--sh-ease-standard) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sh-dove--loading { animation: none; opacity: 1; }
+  }
+
+  /* Aceita ser o miolo do divisor do Lote 0 sem reescrever nada de lá. */
+  .sh-divider--dove > .sh-dove { flex: none; }
+
+  /* ======================================================================
+     sh-timeline
+     <ol class="sh-timeline sh-timeline--program">
+       <li class="sh-timeline__item" data-state="done">
+         <span class="sh-timeline__marker" aria-hidden="true"></span>
+         <time class="sh-timeline__date" datetime="2026-07-10T09:00">10 jul · 09h</time>
+         <h3 class="sh-timeline__title">Acolhida</h3>
+         <p class="sh-timeline__text">Recepção e credenciamento na portaria.</p>
+       </li>
+       <li class="sh-timeline__item" aria-current="step"> … </li>
+     </ol>
+
+     <ol> real, data em <time datetime>. O passo corrente é aria-current="step"
+     — estado do DOM, não classe. O marcador muda de FORMA além de cor
+     (vazado → cheio → cheio com anel), porque cor sozinha não comunica estado.
+     Para leitor de tela, escreva a palavra: um sh-badge em __state.
+     ====================================================================== */
+
+  /* Geometria declarada no bloco, não em cada uso: o trilho e o marcador se
+     referenciam, e --compact/--program precisam trocar os dois de uma vez.
+     Continua configurável de fora — é só setar a custom property. */
+  .sh-timeline {
+    --sh-timeline-rail:        1.5rem;
+    --sh-timeline-marker-size: 0.875rem;
+    --sh-timeline-marker-top:  0.3rem;
+    --sh-timeline-gap:         var(--sh-space-6);
+    --sh-timeline-item-gap:    var(--sh-space-1);
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sh-timeline__item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-timeline-item-gap);
+    padding-inline-start: calc(var(--sh-timeline-rail) + var(--sh-space-4));
+    padding-block-end: var(--sh-timeline-gap);
+  }
+  .sh-timeline__item:last-child { padding-block-end: 0; }
+
+  /* O trilho. Nasce abaixo do marcador e morre no próximo item.
+     ESTRUTURAL, e por isso sobrevive a DEC-024: é o CONECTOR entre dois
+     marcadores, centrado na calha do trilho — não uma borda na aresta do
+     conteúdo destacando um item. Some no último item justamente porque não
+     há próximo marcador para conectar; uma barra de ênfase não faria isso. */
+  .sh-timeline__item::before {
+    content: '';
+    position: absolute;
+    inset-block: calc(var(--sh-timeline-marker-top) + var(--sh-timeline-marker-size)) 0;
+    inset-inline-start: calc(
+      var(--sh-timeline-rail) / 2 - var(--sh-border-width-thin) / 2);
+    inline-size: var(--sh-border-width-thin);
+    background-color: var(--sh-timeline-rail-color, var(--sh-border-default));
+  }
+  .sh-timeline__item:last-child::before { content: none; }
+
+  .sh-timeline__marker {
+    position: absolute;
+    inset-block-start: var(--sh-timeline-marker-top);
+    inset-inline-start: calc(
+      var(--sh-timeline-rail) / 2 - var(--sh-timeline-marker-size) / 2);
+    inline-size: var(--sh-timeline-marker-size);
+    block-size: var(--sh-timeline-marker-size);
+    border: var(--sh-border-width-thick) solid
+            var(--sh-timeline-marker-ink, var(--sh-border-strong));
+    border-radius: var(--sh-radius-pill);
+    background-color: var(--sh-timeline-marker-bg, transparent);
+  }
+
+  .sh-timeline__date {
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-bold);
+    line-height: var(--sh-leading-snug);
+    letter-spacing: var(--sh-tracking-wider);
+    text-transform: uppercase;
+    color: var(--sh-timeline-date-ink, var(--sh-text-muted));
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .sh-timeline__title {
+    font-size: var(--sh-font-size-md);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-timeline__text {
+    max-inline-size: var(--sh-measure);
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-relaxed);
+    color: var(--sh-text-default);
+    text-wrap: pretty;
+  }
+
+  .sh-timeline__state {
+    align-self: flex-start;
+    margin-block-start: var(--sh-space-1);
+  }
+
+  /* ------------------------------------------------------------- estados */
+
+  /* Cumprido: marcador cheio, trilho já percorrido em cor de marca. */
+  .sh-timeline__item[data-state="done"] {
+    --sh-timeline-marker-ink: var(--sh-border-brand);
+    --sh-timeline-marker-bg: var(--sh-border-brand);
+    --sh-timeline-rail-color: var(--sh-border-brand);
+  }
+  .sh-timeline__item[data-state="done"] .sh-timeline__title { color: var(--sh-text-default); }
+
+  /* Corrente: marcador cheio de acento COM anel — forma diferente das outras
+     duas, não só cor. */
+  .sh-timeline__item[aria-current="step"] {
+    --sh-timeline-marker-ink: var(--sh-border-accent);
+    --sh-timeline-marker-bg: var(--sh-border-accent);
+    --sh-timeline-marker-size: 1.125rem;
+    --sh-timeline-marker-top: 0.18rem;
+    --sh-timeline-date-ink: var(--sh-text-accent);
+  }
+  .sh-timeline__item[aria-current="step"] > .sh-timeline__marker {
+    outline: var(--sh-border-width-thick) solid var(--sh-border-accent);
+    outline-offset: var(--sh-border-width-thick);
+  }
+  .sh-timeline__item[aria-current="step"] .sh-timeline__title {
+    font-weight: var(--sh-weight-bold);
+    color: var(--sh-text-strong);
+  }
+
+  /* Cancelado: marcador vazado em cor de perigo, título riscado. */
+  .sh-timeline__item[data-state="cancelled"] {
+    --sh-timeline-marker-ink: var(--sh-border-danger);
+    --sh-timeline-date-ink: var(--sh-text-danger);
+  }
+  .sh-timeline__item[data-state="cancelled"] .sh-timeline__title {
+    text-decoration: line-through;
+    text-decoration-thickness: max(0.06em, 1px);
+    color: var(--sh-text-muted);
+  }
+
+  /* ---------------------------------------------------------- variantes */
+
+  .sh-timeline--compact {
+    --sh-timeline-gap: var(--sh-space-4);
+    --sh-timeline-rail: 1.25rem;
+    --sh-timeline-marker-size: 0.75rem;
+  }
+  .sh-timeline--compact .sh-timeline__text { font-size: var(--sh-font-size-sm); }
+
+  /* Programação de evento: hora em destaque, item respirado, separador de dia. */
+  .sh-timeline--program {
+    --sh-timeline-gap: var(--sh-space-8);
+    --sh-timeline-item-gap: var(--sh-space-2);
+  }
+  .sh-timeline--program .sh-timeline__date {
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-sm);
+    font-weight: var(--sh-weight-medium);
+    letter-spacing: var(--sh-tracking-normal);
+    text-transform: none;
+    color: var(--sh-timeline-date-ink, var(--sh-text-strong));
+  }
+  .sh-timeline--program .sh-timeline__title { font-size: var(--sh-font-size-lg); }
+
+  .sh-timeline__day {
+    margin-block: var(--sh-space-6) var(--sh-space-4);
+    padding-block-end: var(--sh-space-2);
+    border-block-end: var(--sh-border-width-hair) solid var(--sh-border-subtle);
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h4);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-text-strong);
+  }
+  .sh-timeline__day:first-child { margin-block-start: 0; }
+
+  /* ======================================================================
+     sh-copy
+     <div class="sh-copy" data-sh-copy>
+       <code class="sh-copy__value" id="pix-chave">00020126…5204000053039865802BR</code>
+       <button class="sh-btn sh-btn--sm sh-copy__button"
+               data-sh-copy-button aria-describedby="pix-chave">
+         <svg class="sh-icon sh-btn__icon sh-copy__icon">…</svg>
+         <svg class="sh-icon sh-btn__icon sh-copy__icon--done">…</svg>
+         <span class="sh-btn__label">Copiar</span>
+       </button>
+       <span class="sh-copy__status" role="status" aria-live="polite"></span>
+     </div>
+
+     Sem JS o valor continua legível e selecionável (user-select: all seleciona
+     a chave inteira num clique). Com JS, [data-copied="true"] por ~2s troca o
+     ícone e a confirmação vai por aria-live, não só por cor.
+     ====================================================================== */
+
+  .sh-copy {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-2) var(--sh-space-3);
+    align-items: center;
+    padding: var(--sh-copy-padding, var(--sh-space-2));
+    padding-inline-start: var(--sh-space-3);
+    /* O preenchimento sunken quase não se separa da superfície ao redor
+       (1,1:1 no base claro): quem desenha o limite é a borda, e por isso ela é
+       --sh-border-control (3:1 garantido), como no sh-input. */
+    border: var(--sh-border-width-hair) solid
+            var(--sh-copy-border, var(--sh-border-control));
+    border-radius: var(--sh-radius-control);
+    background-color: var(--sh-copy-bg, var(--sh-surface-sunken));
+    transition: border-color var(--sh-duration-base) var(--sh-ease-standard);
+  }
+
+  .sh-copy__value {
+    flex: 1 1 var(--sh-copy-value-min, 12rem);
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+    font-family: var(--sh-font-mono);
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-default);
+    user-select: all;
+  }
+
+  .sh-copy__button { flex: none; }
+
+  .sh-copy__status {
+    flex: none;
+    font-size: var(--sh-font-size-xs);
+    font-weight: var(--sh-weight-semibold);
+    color: var(--sh-feedback-success-text);
+  }
+  .sh-copy__status:empty { display: none; }
+
+  .sh-copy__icon--done { display: none; }
+  .sh-copy[data-copied="true"] {
+    --sh-copy-border: var(--sh-feedback-success-border);
+  }
+  .sh-copy[data-copied="true"] .sh-copy__icon      { display: none; }
+  .sh-copy[data-copied="true"] .sh-copy__icon--done { display: inline-flex; }
+
+  /* Bloco de código de várias linhas (o .codeblock do CEV). */
+  .sh-copy--pre {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--sh-space-4);
+  }
+  .sh-copy--pre > .sh-copy__value {
+    display: block;
+    flex: none;
+    overflow-x: auto;
+    white-space: pre;
+    user-select: text;
+  }
+  .sh-copy--pre > .sh-copy__button { align-self: flex-end; }
+
+  .sh-copy--quiet {
+    --sh-copy-bg: transparent;
+    --sh-copy-border: var(--sh-border-subtle);
+  }
+
+  /* ======================================================================
+     sh-prose — conteúdo editorial (até 15/08/2026, sh-copy-block)
+
+     A colisão original — duas coisas chamadas "copy" neste lote — foi
+     resolvida pela governança renomeando o bloco de redação:
+       · sh-copy   — valor copiável (o "copiar" de área de transferência).
+                     Não muda: é o que docs/03-inventario-componentes.md
+                     especifica, com __value/__button/[data-copied] e a
+                     lista do que substitui (.pix-key, .codeblock, CopyValue).
+       · sh-prose  — texto editorial (o "copy" de redação): títulos e
+                     parágrafos em Montserrat, citação no acento (Fraunces
+                     SOFT 60, ou a fonte do tema de evento), cada peça
+                     com classe própria (__title, __lede, __list, __quote,
+                     __cite, __note). Pedido no briefing deste lote, fora do
+                     inventário original.
+
+     COLISÃO DE NOME, RESOLVIDA — o nome existe também em
+     foundations/typography.css, camada sh.base, com contrato OPOSTO: aquele
+     .sh-prose estiliza por seletor descendente (.sh-prose h2, .sh-prose ul,
+     .sh-prose li + li, .sh-prose blockquote…) HTML SEM classe nenhuma, vindo
+     de editor — Quill, Markdown. Este bloco aqui é o oposto: cada peça leva
+     classe própria, para quem escreve o texto à mão. Era exatamente essa
+     diferença de contrato que o nome sh-copy-block existia para preservar
+     (ver histórico deste comentário).
+
+     Os dois contratos convivem porque um é para HTML sem classe e o outro
+     para HTML com classe: um mesmo .sh-prose aceita os dois ao mesmo tempo
+     (bloco estruturado que recebeu um trecho colado do editor no meio).
+
+     O que precisava de conserto era só o ESPAÇAMENTO. Este bloco espaça por
+     `gap`; o de sh.base espaça por margem em `> * + *` e `li + li`. Como não
+     havia equivalente aqui para vencer aquelas duas regras, elas somavam
+     (medido no Chrome em prova-superficies.html#copy, 15/08/2026):
+       · entre título/lede/parágrafo/lista/citação/nota: 16px de gap +
+         16px de margin-block-start = 32px, onde o desenho previa 16px;
+       · entre <li> de __list: 8px de gap + 8px = 16px, onde previa 8px.
+     (A __quote escapava por acidente: o `margin: 0` dela zerava a margem.)
+
+     Correção: as duas regras logo abaixo zeram a margem herdada dos filhos
+     diretos e dos <li>. Não é !important nem seletor mais específico à força
+     — sh.components vem depois de sh.base na ordem de camadas declarada em
+     shalom-ds.css, então a camada certa já basta. O ritmo volta a ser só o
+     `gap`, que é quem --sh-prose-gap controla.
+
+     <div class="sh-prose">
+       <h2 class="sh-prose__title">…</h2>
+       <p class="sh-prose__lede">…</p>
+       <p>…</p>
+       <ul class="sh-prose__list"> <li>…</li> </ul>
+       <blockquote class="sh-prose__quote">
+         <p>A paz esteja convosco</p>
+         <cite class="sh-prose__cite">João 20,19</cite>
+       </blockquote>
+     </div>
+     ====================================================================== */
+
+  /* Ritmo é gap, não margem: zera o que .sh-prose > * + * e .sh-prose li + li
+     (foundations/typography.css, camada sh.base) somariam por cima. Sem isto o
+     espaço real dobra — 32px onde o desenho pede 16, 16px onde pede 8.
+     Única exceção deliberada: .sh-prose__subtitle mantém a própria
+     margin-block-start (declarada adiante, mesma especificidade e depois na
+     ordem do arquivo, então vence esta). Um subtítulo abre subseção e pede o
+     ar extra: 16 de gap + 16 de margem = 32px, de propósito. */
+  .sh-prose > * { margin-block-start: 0; }
+  .sh-prose > .sh-prose__list > li { margin-block-start: 0; }
+
+  .sh-prose {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-prose-gap, var(--sh-space-4));
+    max-inline-size: var(--sh-prose-width, var(--sh-measure));
+    color: var(--sh-text-default);
+    font-size: var(--sh-font-size-md);
+    line-height: var(--sh-leading-relaxed);
+  }
+
+  .sh-prose__title {
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h2);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-tight);
+    letter-spacing: var(--sh-tracking-tight);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+  .sh-prose__subtitle {
+    margin-block-start: var(--sh-space-4);
+    font-family: var(--sh-font-display);
+    font-size: var(--sh-font-size-h3);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+
+  .sh-prose__lede {
+    font-size: var(--sh-font-size-lg);
+    line-height: var(--sh-leading-relaxed);
+    color: var(--sh-text-default);
+    text-wrap: pretty;
+  }
+
+  .sh-prose > p { text-wrap: pretty; }
+
+  .sh-prose__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sh-space-2);
+    padding-inline-start: var(--sh-space-6);
+    list-style: disc;
+  }
+  .sh-prose__list--ordered { list-style: decimal; }
+  .sh-prose__list > li::marker { color: var(--sh-text-accent); }
+
+  /* DEC-024: sem traço vertical. A citação se anuncia por três canais que
+     não são barra — recuo (a citação começa depois do texto corrido), aspa
+     tipográfica em tamanho de display na calha do recuo, e a família
+     serifada em itálico. A aspa é conteúdo gerado e decorativo: o <blockquote>
+     já carrega a semântica, e o leitor de tela ignora o ::before. */
+  .sh-prose__quote {
+    position: relative;
+    margin: 0;
+    padding-inline-start: var(--sh-space-8);
+    font-family: var(--sh-font-accent);
+    font-size: var(--sh-font-size-h3);
+    font-style: italic;
+    font-weight: var(--sh-weight-regular);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+    text-wrap: balance;
+  }
+  /* A aspa mora na calha do recuo e não empurra o texto: position:absolute
+     tira do fluxo, e o padding-inline-start acima é que reserva o espaço.
+     line-height:1 + inset negativo alinham a barriga do glifo com a primeira
+     linha da citação em vez do topo do bloco. */
+  .sh-prose__quote::before {
+    content: '\201C';
+    position: absolute;
+    inset-block-start: -0.12em;
+    inset-inline-start: 0;
+    font-family: var(--sh-font-accent);
+    font-size: var(--sh-font-size-display-md);
+    font-style: normal;
+    line-height: 1;
+    color: var(--sh-text-accent);
+  }
+  .sh-prose__cite {
+    display: block;
+    margin-block-start: var(--sh-space-3);
+    font-family: var(--sh-font-text);
+    font-size: var(--sh-font-size-sm);
+    font-style: normal;
+    font-weight: var(--sh-weight-semibold);
+    letter-spacing: var(--sh-tracking-wide);
+    color: var(--sh-text-muted);
+  }
+
+  /* DEC-024: era um traço fino à esquerda. Virou caixa rebaixada com borda
+     completa — mesma lógica do callout, na intensidade mais baixa que a
+     prosa comporta. Continua sendo aparte, não alerta: sem família de cor.
+
+     A borda é --sh-border-control, e não --sh-border-subtle, por medição: é
+     o LIMITE da caixa que diz "isto é um aparte", então ele precisa dos 3:1
+     de 1.4.11. Medido contra o entorno nos seis cenários, subtle dá 1,19 a
+     1,38 (some) e default dá 1,47 a 2,15 (ainda reprova); control é o único
+     token da família que garante o piso — 3,18 a 5,29. O fundo rebaixado
+     sozinho não resolve: fica a 1,06–1,38 do entorno. */
+  .sh-prose__note {
+    padding: var(--sh-space-3) var(--sh-space-4);
+    border: var(--sh-border-width-hair) solid var(--sh-border-control);
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-sunken);
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-prose a:not([class]) { color: var(--sh-text-link); text-decoration: underline; }
+  .sh-prose strong { font-weight: var(--sh-weight-semibold); color: var(--sh-text-strong); }
+
+  .sh-prose--narrow { --sh-prose-width: var(--sh-measure-narrow); }
+  .sh-prose--wide   { --sh-prose-width: var(--sh-measure-wide); }
+  .sh-prose--center { align-items: center; text-align: center; }
+  /* Centralizada: a aspa sai da calha (não há calha) e vira uma linha
+     própria acima do texto, senão ela desalinharia o bloco inteiro. */
+  .sh-prose--center > .sh-prose__quote {
+    padding-inline: var(--sh-space-5);
+    padding-block-start: var(--sh-space-6);
+  }
+  .sh-prose--center > .sh-prose__quote::before {
+    inset-block-start: 0;
+    inset-inline: 0;
+    text-align: center;
+  }
+  .sh-prose--loose  { --sh-prose-gap: var(--sh-space-6); }
+
+  /* ====================================================================== */
+
+  @keyframes sh-dove-breath {
+    0%, 100% { opacity: 0.5; scale: 0.96; }
+    50%      { opacity: 1;   scale: 1; }
+  }
+
+  @keyframes sh-hero-cue {
+    0%, 100% { translate: 0 0; }
+    50%      { translate: 0 var(--sh-space-2); }
+  }
+}

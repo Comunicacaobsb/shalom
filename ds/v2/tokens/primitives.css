@@ -1,0 +1,329 @@
+/* ARQUIVO GERADO por scripts/gerar-tokens.mjs a partir de tokens/tokens.json — NÃO EDITE À MÃO; edite o JSON e regenere */
+
+/* ===========================================================================
+   Shalom DS — Camada 1: primitivos
+   Valores brutos. Nenhum componente deve consumir esta camada diretamente.
+   Rampas de cor derivadas em OKLCH a partir dos dois gradientes do emblema
+   oficial da Comunidade Católica Shalom:
+     navy   #142f53 -> #184e7f   (palavra SHALOM)
+     ember  #f27c23 -> #fae088   (pomba do Espírito Santo)
+   =========================================================================== */
+
+@layer sh.tokens {
+  :root {
+    /* ---------------------------------------------------------------- cor */
+    /* Navy — a palavra. Passos 700 e 800 são os hexes exatos do emblema. */
+    --sh-navy-50:    #f1f8ff;
+    --sh-navy-100:   #e1efff;
+    --sh-navy-200:   #c3defb;
+    --sh-navy-300:   #9bc6f3;
+    --sh-navy-400:   #75aae2;
+    --sh-navy-500:   #508bcb;
+    --sh-navy-600:   #376ba8;
+    --sh-navy-700:   #184e7f;  /* emblema: base do gradiente */
+    --sh-navy-800:   #142f53;  /* emblema: topo do gradiente */
+    --sh-navy-900:   #0b203d;
+    --sh-navy-950:   #05132a;
+    --sh-navy-1000:  #020918;
+
+    /* Ember — a pomba. Passos 200 e 500 são os hexes exatos do emblema.
+       A matiz gira de 96° (luz) para 40° (brasa), como no gradiente radial. */
+    --sh-ember-50:   #fdf9e4;
+    --sh-ember-100:  #faefc5;
+    --sh-ember-200:  #fae088;  /* emblema: luz da pomba */
+    --sh-ember-300:  #fbc456;
+    --sh-ember-400:  #fba32b;
+    --sh-ember-500:  #f27c23;  /* emblema: corpo da pomba */
+    --sh-ember-600:  #d26324;
+    --sh-ember-700:  #ab4b20;
+    --sh-ember-800:  #83391e;
+    --sh-ember-900:  #5f2814;
+    --sh-ember-950:  #3d180a;
+
+    /* Neutros com subtom navy (H 253, croma 0.003–0.027). */
+    --sh-neutral-50:    #f7f9fb;
+    --sh-neutral-100:   #eef1f5;
+    --sh-neutral-200:   #dfe3e9;
+    --sh-neutral-300:   #cad0d7;
+    --sh-neutral-400:   #abb2ba;
+    --sh-neutral-500:   #858d96;
+    --sh-neutral-600:   #656d76;
+    --sh-neutral-700:   #4b535e;
+    --sh-neutral-800:   #313a45;
+    --sh-neutral-900:   #1b242e;
+    --sh-neutral-950:   #0c141e;
+    --sh-neutral-1000:  #03080f;
+
+    --sh-white:  #ffffff;
+    --sh-black:  #000000;
+
+    /* Semânticas de estado. Matizes escolhidas para não colidirem entre si:
+       success 157° · warning 88° · danger 25° · info 206°. */
+    --sh-success-50:   #eefbf2;
+    --sh-success-100:  #d9f5e3;
+    --sh-success-200:  #b5e9c8;
+    --sh-success-300:  #89d4a7;
+    --sh-success-400:  #5cb985;
+    --sh-success-500:  #359b67;
+    --sh-success-600:  #147c4c;
+    --sh-success-700:  #005c35;
+    --sh-success-800:  #004124;
+    --sh-success-900:  #002b16;
+    --sh-success-950:  #00190a;
+
+    /* Estado de alerta. Matiz OKLCH 88. */
+    --sh-warning-50:   #fcf6e9;
+    --sh-warning-100:  #f7ecd1;
+    --sh-warning-200:  #edd8a5;
+    --sh-warning-300:  #dbbd74;
+    --sh-warning-400:  #c29e41;
+    --sh-warning-500:  #a3811f;
+    --sh-warning-600:  #826400;
+    --sh-warning-700:  #604900;
+    --sh-warning-800:  #443300;
+    --sh-warning-900:  #2e2100;
+    --sh-warning-950:  #1a1100;
+
+    /* Estado de erro. Matiz OKLCH 25. */
+    --sh-danger-50:   #fff4f3;
+    --sh-danger-100:  #ffe6e4;
+    --sh-danger-200:  #ffccc7;
+    --sh-danger-300:  #f9a8a0;
+    --sh-danger-400:  #e3847d;
+    --sh-danger-500:  #da514e;
+    --sh-danger-600:  #b33635;
+    --sh-danger-700:  #891f21;
+    --sh-danger-800:  #631214;
+    --sh-danger-900:  #45090a;
+    --sh-danger-950:  #2a0203;
+
+    /* Estado informativo. Matiz OKLCH 206; deliberadamente ciano para nao se
+       confundir com a marca. */
+    --sh-info-50:   #eafbfd;
+    --sh-info-100:  #d1f5f9;
+    --sh-info-200:  #a3e8f1;
+    --sh-info-300:  #6ad3df;
+    --sh-info-400:  #1db7c7;
+    --sh-info-500:  #1c96a3;
+    --sh-info-600:  #007681;
+    --sh-info-700:  #005760;
+    --sh-info-800:  #003d44;
+    --sh-info-900:  #00292d;
+    --sh-info-950:  #00171a;
+
+    /* Gradientes do emblema. Não recolorir; usar como estão. */
+    --sh-gradient-word:    linear-gradient(180deg, var(--sh-navy-800) 0%, var(--sh-navy-700) 100%);
+    --sh-gradient-dove:    radial-gradient(circle at 34% 30%, var(--sh-ember-200) 0%, var(--sh-ember-400) 46%, var(--sh-ember-500) 100%);
+    --sh-gradient-breath:  linear-gradient(100deg, transparent 0%, var(--sh-ember-200) 50%, transparent 100%);
+
+    /* Componente HSL da sombra, para temas retingirem a elevação inteira. */
+    --sh-shadow-hue:  253;
+    --sh-shadow-sat:  62%;
+    --sh-shadow-lum:  14%;
+    --sh-shadow-rgb:  11 32 61;
+
+    /* --------------------------------------------------------- tipografia */
+    /* Montserrat é a fonte do logotipo oficial. Não é semelhança: a linha
+       "COMUNIDADE CATÓLICA" do logotipo É Montserrat Medium, provado por
+       sobreposição de contornos com erro máximo de 0,20% nas dez larguras de
+       letra medidas (estudo-tipografia.html, seção 1.3). Display e texto saem
+       da mesma família porque a marca não tem serifa em milímetro nenhum:
+       nem no wordmark, nem no descritor, nem no lettering do jubileu.
+       DEC-029. */
+    --sh-font-display:  'Montserrat', 'Montserrat Fallback', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    --sh-font-text:     'Montserrat', 'Montserrat Fallback', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+
+    /* Apelido: quem escreve componente pensa "sans", quem escreve token pensa
+       "text". Os dois nomes apontam para a mesma coisa, sempre. */
+    --sh-font-sans:  var(--sh-font-text);
+    --sh-font-mono:  'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    /* Acento RARO. Só citação e momento editorial declarado — nunca display
+       comum, nunca UI, nunca admin. Se aparecer em mais de um punhado de
+       lugares, está errado. Fraunces foi escolhida por ter o eixo SOFT, que
+       arredonda as terminações e ecoa o canto de raio grande do wordmark;
+       nenhuma outra serifada variável faz isso. */
+    --sh-font-accent: 'Fraunces', 'Fraunces Fallback', Georgia, 'Times New Roman', serif;
+
+    /* Eixos variáveis expostos para os temas ajustarem sem trocar a família.
+       700 e não 900: em 700 a Montserrat tem haste/altura-de-caixa 0,232
+       contra 0,249 do wordmark — quase no ponto. Em 900 estoura para 0,337 e
+       se afasta da marca. Medição do estudo, confirmada aqui em fontTools. */
+    --sh-font-display-weight:   700;
+    --sh-font-display-stretch:  100%;
+
+    /* Eixos extras do display, quando a família do tema tiver algum. Nenhuma
+       família do sistema tem `opsz` hoje (Montserrat, Archivo e Caveat só têm
+       peso e largura), então o padrão é `normal`. Fraunces, que tem, é acento
+       e usa --sh-font-accent-axes. */
+    --sh-font-display-axes: normal;
+
+    /* SOFT 60 é o valor que faz a Fraunces repetir o canto arredondado do
+       wordmark; opsz 48 é a faixa de citação (não de texto corrido). */
+    --sh-font-accent-axes:  'SOFT' 60, 'WONK' 1, 'opsz' 48;
+    --sh-weight-light:      300;
+    --sh-weight-regular:    400;
+    --sh-weight-medium:     500;
+    --sh-weight-semibold:   600;
+    --sh-weight-bold:       700;
+    --sh-weight-black:      800;
+
+    /* Escala de UI: rem fixo. Painéis e tabelas não podem respirar com a
+       tela. */
+    --sh-font-size-2xs:  0.6875rem;
+    --sh-font-size-xs:   0.75rem;
+    --sh-font-size-sm:   0.875rem;
+    --sh-font-size-md:   1rem;
+    --sh-font-size-lg:   1.125rem;
+    --sh-font-size-xl:   1.25rem;
+    --sh-font-size-2xl:  1.5rem;
+
+    /* 13px. Degrau EXTRA, exclusivo de contexto denso de admin (célula de
+       datatable). Não é um degrau da escala pública: nenhum componente fora do
+       admin deve usá-lo. Existe porque a Montserrat tem altura-x 0,525 contra
+       0,500 da Figtree — 13px de Montserrat tem a mesma altura-x que 13,65px
+       de Figtree, ou seja, o texto não encolhe aos olhos, mas a coluna devolve
+       7% de largura. */
+    --sh-font-size-dense: 0.8125rem;
+
+    /* Escala editorial: fluida entre 360px e 1280px de viewport.
+       RECALIBRADA na troca para Montserrat (DEC-029). A altura de caixa subiu
+       de 0,670 (Newsreader) para 0,700 — +4,5% de tamanho aparente no mesmo
+       corpo — e a mesma frase ficou ~21% mais larga em display. Os degraus
+       desceram de 4% a 8% para absorver as duas coisas: o display continua
+       maior e mais presente que antes (sans 700 no lugar de serifada 600),
+       sem estourar a linha no celular. Exemplo medido: "Evangelização" em
+       display-xl a 390px passava de 347px de largura, contra 357px de
+       container útil; a 43px passa a 324px, com folga real. */
+    --sh-font-size-h4:          clamp(1.125rem, 1.0761rem + 0.2174vw, 1.25rem);  /* 18 → 20 */
+    --sh-font-size-h3:          clamp(1.25rem, 1.1522rem + 0.4348vw, 1.5rem);  /* 20 → 24 */
+    --sh-font-size-h2:          clamp(1.4375rem, 1.2663rem + 0.7609vw, 1.875rem);  /* 23 → 30 */
+    --sh-font-size-display-sm:  clamp(1.625rem, 1.3315rem + 1.3043vw, 2.375rem);  /* 26 → 38 */
+    --sh-font-size-display-md:  clamp(2rem, 1.5598rem + 1.9565vw, 3.125rem);  /* 32 → 50 */
+    --sh-font-size-display-lg:  clamp(2.3125rem, 1.6033rem + 3.1522vw, 4.125rem);  /* 37 → 66 */
+    --sh-font-size-display-xl:  clamp(2.6875rem, 1.5870rem + 4.8913vw, 5.5rem);  /* 43 → 88 */
+
+    /* 1,04 e não 1: a Montserrat tem ascendente+descendente métricos de 1,219em
+       (a Newsreader tinha exatamente 1,000em), então com entrelinha 1 a caixa
+       de linha fica menor que a caixa do tipo e o "ç" de "coração" vaza 0,09em
+       abaixo — some dentro de qualquer contêiner com overflow oculto. 1,04
+       devolve a folga sem inchar o display. */
+    --sh-leading-none:     1.04;
+    --sh-leading-tight:    1.14;
+    --sh-leading-snug:     1.28;
+    --sh-leading-normal:   1.5;
+    --sh-leading-relaxed:  1.65;
+
+    --sh-tracking-tighter:  -0.035em;
+    --sh-tracking-tight:    -0.018em;
+
+    /* Contexto denso (célula de tabela, painel de admin). Devolve ~1,5% de
+       largura sem mexer no corpo. Só onde a densidade é o requisito. */
+    --sh-tracking-dense:   -0.012em;
+    --sh-tracking-normal:  0em;
+
+    /* 11–12px: nesse corpo a Montserrat fecha os brancos entre letras e o
+       rótulo empasta. Abre-se um fio, não mais que isso. */
+    --sh-tracking-micro:  0.012em;
+    --sh-tracking-wide:   0.04em;
+    --sh-tracking-wider:  0.12em;
+
+    /* Medida de linha. `ch` é a largura do zero, e o zero da Montserrat é só
+       3,3% mais largo que o da Figtree, enquanto o texto corrido é 12,3% mais
+       largo — se a medida ficasse em 68ch, a linha física cresceria e ainda
+       assim caberiam menos caracteres. Os valores abaixo preservam a LARGURA
+       FÍSICA anterior: 66ch de Montserrat = 43,7em ≈ os 43,6em que 68ch de
+       Figtree mediam. De quebra, a contagem real de caracteres por linha cai
+       de ~85 para ~76 e entra na faixa boa de leitura. */
+    --sh-measure-narrow:  44ch;
+    --sh-measure:         66ch;
+    --sh-measure-wide:    81ch;
+
+    /* -------------------------------------------------------- espaçamento */
+    /* Base 4px. Uma escala só, para todo o ecossistema. */
+    --sh-space-0:        0;
+    --sh-space-px:       1px;
+    --sh-space-1:        0.25rem;
+    --sh-space-2:        0.5rem;
+    --sh-space-3:        0.75rem;
+    --sh-space-4:        1rem;
+    --sh-space-5:        1.25rem;
+    --sh-space-6:        1.5rem;
+    --sh-space-8:        2rem;
+    --sh-space-10:       2.5rem;
+    --sh-space-12:       3rem;
+    --sh-space-16:       4rem;
+    --sh-space-20:       5rem;
+    --sh-space-24:       6rem;
+    --sh-space-32:       8rem;
+    --sh-space-section:  clamp(3rem, 1.4783rem + 6.7609vw, 6.5rem);
+    --sh-gutter:         clamp(1rem, 0.6522rem + 1.5459vw, 2rem);
+
+    /* -------------------------------------------------------------- forma */
+    --sh-radius-0:     0;
+    --sh-radius-xs:    0.25rem;
+    --sh-radius-sm:    0.5rem;
+    --sh-radius-md:    0.75rem;
+    --sh-radius-lg:    1rem;
+    --sh-radius-xl:    1.5rem;
+    --sh-radius-2xl:   2rem;
+    --sh-radius-full:  62.4375rem;
+
+    --sh-border-width-hair:   1px;
+    --sh-border-width-thin:   1.5px;
+    --sh-border-width-thick:  2px;
+    --sh-border-width-heavy:  3px;
+
+    /* ------------------------------------------------------------- layout */
+    --sh-container-prose:  44rem;
+    --sh-container-text:   60rem;
+    --sh-container:        75rem;
+    --sh-container-wide:   90rem;
+    --sh-container-admin:  100rem;
+
+    --sh-grid-columns:  12;
+    --sh-grid-gap:      var(--sh-space-6);
+    --sh-touch-target:  2.75rem;
+
+    /* Breakpoints. Documentados aqui, mas media queries não leem custom
+       properties: os valores estão escritos à mão em layout.css e no
+       tokens.json. Para componentes, prefira @container. */
+    --sh-bp-sm:  30rem;  /* 480px */
+    --sh-bp-md:  48rem;  /* 768px */
+    --sh-bp-lg:  64rem;  /* 1024px */
+    --sh-bp-xl:  80rem;  /* 1280px */
+
+    /* ------------------------------------------------------------ camadas */
+    --sh-layer-base:      0;
+    --sh-layer-raised:    10;
+    --sh-layer-sticky:    100;
+    --sh-layer-header:    200;
+    --sh-layer-dropdown:  300;
+    --sh-layer-scrim:     400;
+    --sh-layer-modal:     500;
+    --sh-layer-popover:   600;
+    --sh-layer-toast:     700;
+    --sh-layer-tooltip:   800;
+
+    /* ---------------------------------------------------------- movimento */
+    --sh-duration-instant:  0ms;
+    --sh-duration-fast:     160ms;
+    --sh-duration-base:     480ms;
+    --sh-duration-slow:     640ms;
+    --sh-duration-slower:   720ms;
+
+    --sh-ease-standard:  ease-in-out;
+    --sh-ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
+    --sh-ease-in:        cubic-bezier(0.7, 0, 0.84, 0);
+    --sh-ease-emphasis:  cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    /* -------------------------------------------------------- iconografia */
+    --sh-icon-size-sm:  1rem;
+    --sh-icon-size-md:  1.25rem;
+    --sh-icon-size-lg:  1.5rem;
+    --sh-icon-size-xl:  2rem;
+
+    --sh-icon-stroke:  1.75;
+    --sh-icon-weight:  regular;  /* Phosphor: thin|light|regular|bold|fill|duotone */
+  }
+}

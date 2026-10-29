@@ -1,0 +1,285 @@
+/* ==========================================================================
+   Shalom DS — Lote D: feedback
+   sh-toast · sh-empty · sh-error-state · sh-loading
+
+   Contrato deste arquivo (mesmo de components/foundation.css)
+   ----------------------------------------------------------
+   1. Só a camada semântica para cor. Nenhum primitivo, nenhum hex.
+   2. Nenhum seletor cita [data-sh-theme]. Os seis cenários saem do mesmo CSS.
+   3. Estado vem do DOM: [aria-busy], [data-state], [hidden]. is-* não é
+      usada aqui.
+   4. Tokens de camada 3 com valor padrão inline apontando para a camada 2.
+   5. Zero !important.
+
+   sh-loading compõe sh-skeleton e sh-spinner (Lote 0) em vez de reimplementar
+   —é regra explícita deste lote. sh-toast reusa data-sh-dismiss/
+   data-sh-dismissible de js/shalom-ds.js; o empilhamento e a auto-expiração
+   ficam em js/shalom-ds-feedback.js, um arquivo novo, por cima do mecanismo
+   existente, sem alterá-lo.
+
+   Nota de escopo: sh-progress está em components/data.css, não aqui — ver o
+   comentário equivalente no topo daquele arquivo.
+   ========================================================================== */
+
+@layer sh.components {
+
+  /* ======================================================================
+     sh-toast-region · sh-toast
+     <div class="sh-toast-region" aria-live="polite">          <!-- sucesso/info/loading -->
+     <div class="sh-toast-region sh-toast-region--assertive" role="alert">  <!-- erro -->
+       <div class="sh-toast sh-toast--success" data-sh-dismissible>
+         __icon › __message › __action (opcional) › __dismiss
+
+     A REGIÃO carrega a semântica ao vivo, não o toast individual — é ela que
+     precisa existir no DOM desde o carregamento da página para o leitor de
+     tela associar as inserções futuras. role="alert" já implica
+     aria-live="assertive" + aria-atomic="true", por isso a região de erro usa
+     role em vez de aria-live explícito (mesma convenção de sh-alert).
+
+     Confirmação pode sumir sozinha (sh-toast-region polite + auto-expiração
+     em js/shalom-ds-feedback.js). Erro nunca — a região é assertive/alert,
+     mas o toast de erro em si não recebe temporizador (ver JS): dispensa é
+     sempre manual, por decisão de acessibilidade, não só de estilo.
+
+     Posição no HTML — CONTRATO, não sugestão (aviso de integração do Lote C,
+     que já entrega sh-modal/sh-sheet sobre <dialog> nativo): cada
+     sh-toast-region é filha direta de <body>, nunca descendente de um
+     <dialog>. Um toast disparado de dentro de um modal precisa (1) empilhar
+     acima dele — --sh-layer-toast (700) já vence --sh-layer-modal (500) e
+     --sh-layer-popover (600), mas só se a região estiver fora da árvore do
+     <dialog> — e (2) sobreviver ao fechamento do modal, que remove/esconde
+     tudo que está dentro dele. position:fixed não depende de onde o elemento
+     mora na árvore, então mover a região não muda nada visualmente — só
+     evita os dois problemas acima. Ver prova-dados.html.
+     ====================================================================== */
+
+  .sh-toast-region {
+    position: fixed;
+    z-index: var(--sh-layer-toast);
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--sh-space-3);
+    inset-block-end: var(--sh-space-4);
+    inset-inline-end: var(--sh-space-4);
+    inline-size: min(24rem, calc(100vw - var(--sh-space-4) * 2));
+    max-block-size: calc(100vh - var(--sh-space-8));
+    overflow: visible;
+    pointer-events: none;
+  }
+  .sh-toast-region > * { pointer-events: auto; }
+
+  .sh-toast-region--start { inset-inline-end: auto; inset-inline-start: var(--sh-space-4); }
+  .sh-toast-region--top   { inset-block-end: auto; inset-block-start: var(--sh-space-4); flex-direction: column; }
+  .sh-toast-region--center { inset-inline: 0; margin-inline: auto; align-items: center; }
+
+  .sh-toast {
+    position: relative;
+    display: flex;
+    gap: var(--sh-space-3);
+    align-items: flex-start;
+    padding: var(--sh-space-4);
+    border: var(--sh-border-width-hair) solid
+            var(--sh-toast-border, var(--sh-border-subtle));
+    border-radius: var(--sh-radius-surface);
+    background-color: var(--sh-surface-raised);
+    box-shadow: var(--sh-shadow-lg);
+    color: var(--sh-text-default);
+    animation: sh-toast-in var(--sh-duration-base) var(--sh-ease-standard);
+    transition:
+      opacity var(--sh-duration-base) var(--sh-ease-standard),
+      translate var(--sh-duration-base) var(--sh-ease-standard);
+  }
+
+  .sh-toast[data-state="closing"] {
+    animation: none;
+    opacity: 0;
+    translate: 0 var(--sh-space-3);
+  }
+
+  @keyframes sh-toast-in {
+    from { opacity: 0; translate: 0 var(--sh-space-3); }
+    to   { opacity: 1; translate: 0 0; }
+  }
+
+  .sh-toast__icon {
+    --sh-icon-size: var(--sh-icon-size-lg);
+    flex: none;
+    margin-block-start: calc(var(--sh-space-px) * 2);
+    color: var(--sh-toast-ink, var(--sh-text-accent));
+  }
+  .sh-toast__icon .sh-spinner { --sh-spinner-color: var(--sh-toast-ink, var(--sh-text-accent)); }
+
+  .sh-toast__message {
+    flex: 1;
+    min-inline-size: 0;
+    padding-block-start: var(--sh-space-1);
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-normal);
+    color: var(--sh-text-default);
+  }
+  .sh-toast__message strong { color: var(--sh-text-strong); font-weight: var(--sh-weight-semibold); }
+
+  .sh-toast__action {
+    display: inline-block;
+    margin-inline-start: var(--sh-space-2);
+    color: var(--sh-text-link);
+    font-weight: var(--sh-weight-semibold);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .sh-toast__action:hover { color: var(--sh-text-link-hover); }
+  .sh-toast__action:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+    border-radius: var(--sh-radius-control);
+  }
+
+  .sh-toast__dismiss {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--sh-icon-size-xl);
+    block-size: var(--sh-icon-size-xl);
+    margin: calc(var(--sh-space-1) * -1);
+    border-radius: var(--sh-radius-control);
+    color: var(--sh-text-muted);
+    cursor: pointer;
+  }
+  .sh-toast__dismiss::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: var(--sh-touch-target);
+    block-size: var(--sh-touch-target);
+    translate: -50% -50%;
+  }
+  @media (hover: hover) {
+    .sh-toast__dismiss:hover { background-color: var(--sh-surface-active); color: var(--sh-text-default); }
+  }
+  .sh-toast__dismiss:focus-visible {
+    outline: none;
+    box-shadow: var(--sh-focus-ring);
+  }
+
+  /* Barra de progresso do tempo restante — decorativa; o texto do toast é
+     quem carrega o significado. Autor liga via --sh-toast-duration (JS já
+     escreve essa variável quando arma o temporizador). */
+  .sh-toast[data-sh-toast-duration]::before {
+    content: '';
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: 0;
+    block-size: var(--sh-border-width-thick);
+    inline-size: 100%;
+    border-end-start-radius: var(--sh-radius-surface);
+    border-end-end-radius: var(--sh-radius-surface);
+    background-color: var(--sh-toast-ink, var(--sh-text-accent));
+    opacity: 0.35;
+    animation: sh-toast-timer linear forwards;
+    animation-duration: var(--sh-toast-duration-ms, 5000ms);
+    animation-play-state: var(--sh-toast-play-state, running);
+  }
+  @keyframes sh-toast-timer {
+    from { inline-size: 100%; }
+    to   { inline-size: 0%; }
+  }
+
+  .sh-toast--success { --sh-toast-ink: var(--sh-feedback-success-text); --sh-toast-border: var(--sh-feedback-success-border); }
+  .sh-toast--danger  { --sh-toast-ink: var(--sh-feedback-danger-text);  --sh-toast-border: var(--sh-feedback-danger-border); }
+  .sh-toast--info    { --sh-toast-ink: var(--sh-feedback-info-text);    --sh-toast-border: var(--sh-feedback-info-border); }
+  .sh-toast--loading { --sh-toast-ink: var(--sh-text-accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sh-toast { animation: none; }
+  }
+
+  /* ======================================================================
+     sh-empty · sh-error-state · sh-loading
+     Mesma anatomia: __illustration › __title › __text › __action.
+     A ilustração é a pomba em contorno — a mesma marca em qualquer estado
+     de "nada para mostrar", tingida por contexto, nunca redesenhada.
+
+     sh-loading tem uma segunda forma, quando a forma do dado é desconhecida:
+     __spinner (= .sh-spinner do Lote 0, não reimplementado) no lugar de
+     __illustration. Quando a forma é conhecida, o autor não usa sh-loading
+     nenhum: compõe sh-skeleton direto no espaço, com aria-busy="true" no
+     contêiner — como já documentado em foundation.css.
+     ====================================================================== */
+
+  .sh-empty,
+  .sh-error-state,
+  .sh-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sh-space-3);
+    max-inline-size: var(--sh-measure-narrow);
+    margin-inline: auto;
+    padding-block: var(--sh-feedback-state-padding, var(--sh-space-10));
+    padding-inline: var(--sh-space-6);
+    text-align: center;
+  }
+
+  .sh-empty__illustration,
+  .sh-error-state__illustration {
+    --sh-icon-size: var(--sh-feedback-illustration-size, 3.5rem);
+    color: var(--sh-text-muted);
+  }
+  /* Tom de erro: cor muda, mas o desenho é o mesmo símbolo — e o título/texto
+     já dizem "erro" em palavras, então a cor aqui é reforço, não o sinal. */
+  .sh-error-state__illustration { color: var(--sh-text-danger); }
+
+  .sh-empty__title,
+  .sh-error-state__title,
+  .sh-loading__title {
+    font-size: var(--sh-font-size-lg);
+    font-weight: var(--sh-weight-semibold);
+    line-height: var(--sh-leading-snug);
+    color: var(--sh-text-strong);
+  }
+
+  .sh-empty__text,
+  .sh-error-state__text,
+  .sh-loading__text {
+    font-size: var(--sh-font-size-sm);
+    line-height: var(--sh-leading-relaxed);
+    color: var(--sh-text-muted);
+  }
+
+  .sh-empty__action,
+  .sh-error-state__action,
+  .sh-loading__action {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sh-space-3);
+    justify-content: center;
+    margin-block-start: var(--sh-space-2);
+  }
+
+  /* sh-loading: variante "spinner + texto" — spinner do Lote 0 composto,
+     não recriado. O papel de região viva é do spinner (role="status" já
+     documentado nele); sh-loading só marca aria-busy no contêiner para quem
+     navega por landmarks, evitando dois role="status" aninhados. */
+  /* Sem padding próprio: os três estados usam o mesmo --sh-space-10 do bloco
+     compartilhado acima. Antes daqui sh-loading pedia --sh-space-8 e os outros
+     dois --sh-space-10, pelo mesmo custom property com fallback diferente — o
+     resultado era a página "pulando" 16px quando o carregamento virava vazio
+     ou erro, que é exatamente a troca em que a altura tem de ficar parada. */
+  .sh-loading__spinner { --sh-spinner-size: var(--sh-icon-size-xl); }
+
+  .sh-empty--compact,
+  .sh-error-state--compact,
+  .sh-loading--compact {
+    --sh-feedback-state-padding: var(--sh-space-6);
+    gap: var(--sh-space-2);
+  }
+  .sh-empty--compact .sh-empty__illustration,
+  .sh-error-state--compact .sh-error-state__illustration {
+    --sh-feedback-illustration-size: var(--sh-icon-size-xl);
+  }
+}
