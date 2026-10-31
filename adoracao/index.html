@@ -1,48 +1,88 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F3EDE3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#14110E" media="(prefers-color-scheme: dark)">
 
-  <!-- Recursos globais do site Shalom -->
-  <script>window.skipBaseCSS = true;</script>
+  <!-- Recursos globais do site Shalom: favicons, analytics e tema (data-theme). A página traz o próprio CSS e as próprias fontes. -->
+  <script>window.skipBaseCSS = true; window.skipFonts = true;</script>
   <script src="../js/header.js"></script>
 
-  <!-- Estilos: base global + página -->
-  <link rel="stylesheet" href="../scss/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@48,500,60,1&family=Montserrat:ital,wght@0,400..700;1,500&display=swap">
   <link rel="stylesheet" href="styles.css">
 
+  <meta name="description" content="Escolha uma hora da semana para a adoração perpétua na Capela Kyrios, da Comunidade Católica Shalom em Brasília.">
   <meta property="og:site_name" content="Shalom Brasília">
-  <meta property="og:title" content="Adoração Perpétua — Shalom Brasília" />
-  <meta property="og:description" content="Veja os horários disponíveis e comprometa-se com a Adoração Perpétua" />
-  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Adoração perpétua · Capela Kyrios">
+  <meta property="og:description" content="Veja os horários vagos e assuma uma hora da semana com Jesus.">
+  <meta property="og:type" content="website">
 
-  <title>Adoração Perpétua — Shalom Brasília</title>
+  <title>Adoração perpétua · Capela Kyrios · Shalom Brasília</title>
 </head>
 
 <body>
-  <!-- Header -->
-  <header class="page-header">
-    <h1>Adoração Perpétua</h1>
-    <p>Veja os horários que precisam de adoradores e comprometa-se com Jesus Eucarístico</p>
-  </header>
+  <main class="coluna">
+    <header class="convite">
+      <svg class="convite__logo" viewBox="0 0 1023.86 680.64" role="img" aria-label="Capela Kyrios"><use href="kyrios.svg#kyrios"/></svg>
+      <div class="convite__txt">
+        <h1 class="titulo">Adoração perpétua</h1>
+        <p class="convite__frase">Escolha uma hora da semana para ficar com Jesus, diante do Santíssimo, na Capela Kyrios.</p>
+        <figure class="versiculo">
+          <blockquote>“Então não pudestes vigiar uma hora comigo?”</blockquote>
+          <figcaption>Mt 26,40</figcaption>
+        </figure>
+      </div>
+    </header>
+    <svg class="onda" viewBox="0 0 1200 24" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="onda__eco" d="M0 19C70 19 120 12 190 13S300 21 380 20 470 9 560 10 660 19 740 18 850 7 940 10 1080 19 1200 15"/><path class="onda__relevo" d="M0 17C80 17 130 4 210 5S330 20 420 18 520 2 610 4 720 19 800 16 920 1 1010 6 1130 19 1200 12"/></svg>
 
-  <!-- Main Content (populated by JS) -->
-  <main id="app">
-    <div class="loading">
-      <div class="spinner"></div>
-      <span>Carregando escala de adoração...</span>
-    </div>
+    <section class="secao" aria-labelledby="h-horarios">
+      <h2 class="titulo secao__tit" id="h-horarios" tabindex="-1">Horários vagos desta semana</h2>
+
+      <div id="carregando" role="status">
+        <p class="secao__intro">Carregando os horários…</p>
+        <div class="esq" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="erro" id="erro" role="alert" hidden>
+        <h3 class="titulo erro__tit">Não foi possível carregar os horários</h3>
+        <p class="secao__intro">Pode ser a internet. Confira a conexão e tente de novo. Se preferir, fale direto com a Administração da Adoração pelo WhatsApp.</p>
+        <div class="erro__acoes">
+          <button type="button" class="bt bt--primario" id="tentar">Tentar de novo</button>
+          <a class="bt" id="wa-geral" target="_blank" rel="noopener">Falar com a Administração</a>
+        </div>
+      </div>
+
+      <div id="conteudo" hidden>
+        <p class="secao__intro" id="intro" aria-live="polite"></p>
+        <p class="secao__dica">Toque numa hora e o WhatsApp abre com a mensagem pronta.</p>
+        <div class="modo" role="radiogroup" aria-label="Mostrar">
+          <label class="op"><input type="radio" name="modo" value="vagos" checked><span>Horários vagos</span></label>
+          <label class="op"><input type="radio" name="modo" value="todos"><span>Todos os horários</span></label>
+        </div>
+        <ul class="semana" id="vagos"></ul>
+        <div class="todos" id="todos" hidden>
+          <p class="passo" id="qual-dia">Qual dia?</p>
+          <div class="dias" id="dias" role="radiogroup" aria-labelledby="qual-dia"></div>
+          <div id="paineis"></div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- CTA -->
-  <footer class="cta-section" id="cta" style="display:none;">
-    <p>Jesus conta com você na Adoração!</p>
-    <span class="cta-verse">"Então não pudestes vigiar uma hora comigo?" — Mt 26,40</span>
+  <footer class="rodape">
+    <div class="coluna rodape__in">
+      <p>Capela Kyrios · Comunidade Católica Shalom · Brasília</p>
+      <a class="link" href="https://brasilia.comshalom.workers.dev">Portal Shalom Brasília</a>
+    </div>
   </footer>
 
-  <!-- App logic -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
+  <script src="../js/config.js"></script>
   <script src="app.js"></script>
 </body>
 
