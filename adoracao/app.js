@@ -2,14 +2,20 @@
    Mostra as horas da semana, vindas do banco sem login e sem nomes.
    Cada hora é um link que abre o WhatsApp com a mensagem pronta. */
 
-// WhatsApp da responsável (com código do país, sem +)
-const WHATSAPP_NUMERO = '5561982644432';
+// Os números vêm do banco: a Administração troca no Portal (Adoração, Contatos e meta).
+// Este só vale quando o banco não responde. Com DDD, sem o 55.
+const RESERVA = '61982497559';
+const contato = { assumir: RESERVA, ajuda: RESERVA };
+const wa = (numero, msg) => `https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`;
 
 // Mensagem pré-preenchida (use {dia} e {horario} como variáveis)
 const WHATSAPP_MSG = 'Olá! Gostaria de me comprometer com a Adoração Perpétua no horário de {horario} {dia}. Como faço para me inscrever?';
 
 // Mensagem do link geral, quando os horários não carregam
 const WHATSAPP_GERAL = 'Olá! Gostaria de me comprometer com a Adoração Perpétua. Como faço para me inscrever?';
+
+// Mensagem de quem tem dúvida e fala com o responsável
+const WHATSAPP_AJUDA = 'Olá! Tenho uma dúvida sobre a Adoração Perpétua.';
 
 // Segunda a domingo; ds é o dia_semana do banco (0 domingo a 6 sábado)
 const DIAS = [
@@ -35,7 +41,7 @@ function whatsappURL(dia, horario) {
   const msg = WHATSAPP_MSG
     .replace('{dia}', dia)
     .replace('{horario}', horario);
-  return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`;
+  return wa(contato.assumir, msg);
 }
 
 /* ---------- conexão: a mesma da Livraria, com o banco local só em localhost ---------- */
@@ -121,7 +127,11 @@ async function carregar(focar) {
   estado('carregando');
   const { data, error } = await rpc('capela_adoracao_vagas');
   const ok = !error && data && data.horas;
-  if (ok) desenhar(data.horas);
+  if (ok) {
+    Object.assign(contato, Object.fromEntries(Object.entries(data.contatos || {}).filter(([, v]) => v)));
+    ligarContatos();
+    desenhar(data.horas);
+  }
   estado(ok ? 'ok' : 'erro');
   if (focar) $(ok ? '#h-horarios' : '#tentar').focus();
 }
@@ -143,6 +153,10 @@ $('#vagos').addEventListener('click', (ev) => {
 });
 
 $('#tentar').addEventListener('click', () => carregar(true));
-$('#wa-geral').href = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(WHATSAPP_GERAL)}`;
+function ligarContatos() {
+  $('#wa-geral').href = wa(contato.assumir, WHATSAPP_GERAL);
+  $('#wa-ajuda').href = wa(contato.ajuda, WHATSAPP_AJUDA);
+}
+ligarContatos();
 
 carregar(false);
