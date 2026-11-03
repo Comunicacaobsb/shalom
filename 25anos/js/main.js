@@ -1,146 +1,124 @@
-/* ==========================================================================
-   25 Anos Shalom Brasília - JavaScript
-   ========================================================================== */
+/* 25 Anos Shalom Brasília
+   Menu em <dialog> (o navegador cuida de foco, Esc e devolução do foco) e a agenda do
+   jubileu, lida da planilha publicada no Google. */
 
-/**
- * Smooth scroll para links de âncora
- */
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
+/* ---------- Menu ---------- */
+(function () {
+  var menu = document.getElementById('menu');
+  document.getElementById('abrir-menu').addEventListener('click', function () { menu.showModal(); });
+  document.getElementById('fechar-menu').addEventListener('click', function () { menu.close(); });
+  // clicar no véu (fora do painel) ou num link fecha; o link segue para a seção.
+  // O painel ocupa a altura toda, então "fora" se mede pela caixa, não pelo alvo.
+  menu.addEventListener('click', function (e) {
+    var r = menu.getBoundingClientRect();
+    var fora = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+    if (fora || e.target.closest('a')) menu.close();
   });
-});
+})();
 
-/**
- * Esconder scroll indicator após scroll
- */
-const scrollIndicator = document.querySelector('.scroll-indicator');
-if (scrollIndicator) {
-  window.addEventListener('scroll', function () {
-    if (window.scrollY > 100) {
-      scrollIndicator.style.opacity = '0';
-      scrollIndicator.style.pointerEvents = 'none';
-    } else {
-      scrollIndicator.style.opacity = '0.7';
-      scrollIndicator.style.pointerEvents = 'auto';
-    }
-  });
-}
-
-/**
- * Adicionar classe ao body quando menu está aberto
- */
-const menuOffcanvas = document.getElementById('menuOffcanvas');
-if (menuOffcanvas) {
-  menuOffcanvas.addEventListener('show.bs.offcanvas', function () {
-    document.body.classList.add('menu-open');
-  });
-
-  menuOffcanvas.addEventListener('hide.bs.offcanvas', function () {
-    document.body.classList.remove('menu-open');
-  });
-}
-
-/**
- * Carregar eventos dinamicamente via Google Sheets (CSV)
- */
+/* ---------- Agenda do jubileu ---------- */
 (function () {
   var CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-pbvSfuIvxl3WarKBKMsOBHOO3zmpup7EBInURPaDNRjIhkLSGduNTJxdDyISbRFq3xawLaa5uJC0/pub?gid=919829268&single=true&output=csv';
-  var grid = document.getElementById('eventos-grid');
-  var loader = document.getElementById('eventos-loader');
-  if (!grid) return;
+  // A planilha traz dia e mês, sem o ano: todos os eventos são do ano do jubileu.
+  var ANO = 2026;
+  var MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
 
-  // Mapear tags para classes CSS e badges
-  var TAG_MAP = {
-    'evento principal': { cardClass: 'card-evento-destaque', col: 'col-12', heading: 'h4' },
-    'encerramento': { cardClass: 'card-evento-final', col: 'col-12', heading: 'h4' },
-    'especial': { badgeClass: 'evento-badge-especial' }
-  };
+  var agenda = document.getElementById('agenda');
+  var lista = document.getElementById('eventos-lista');
+  var carregando = document.getElementById('eventos-carregando');
+  var erro = document.getElementById('eventos-erro');
 
-  function parseCSV(text) {
-    var lines = text.trim().split('\n');
-    if (lines.length < 2) return [];
-    var headers = lines[0].split(',').map(function (h) { return h.trim(); });
-    var rows = [];
-    for (var i = 1; i < lines.length; i++) {
-      var values = lines[i].split(',');
-      var row = {};
-      for (var j = 0; j < headers.length; j++) {
-        row[headers[j]] = (values[j] || '').trim();
-      }
-      if (row['Evento']) rows.push(row);
+  // CSV do Google: campos com vírgula vêm entre aspas, aspas internas dobradas
+  function lerCSV(texto) {
+    var linhas = [], campo = '', linha = [], aspas = false;
+    for (var i = 0; i < texto.length; i++) {
+      var c = texto[i];
+      if (aspas) {
+        if (c === '"' && texto[i + 1] === '"') { campo += '"'; i++; }
+        else if (c === '"') aspas = false;
+        else campo += c;
+      } else if (c === '"') aspas = true;
+      else if (c === ',') { linha.push(campo); campo = ''; }
+      else if (c === '\n') { linha.push(campo); linhas.push(linha); linha = []; campo = ''; }
+      else if (c !== '\r') campo += c;
     }
-    return rows;
+    linha.push(campo); linhas.push(linha);
+    var cab = linhas.shift().map(function (h) { return h.trim(); });
+    return linhas.map(function (l) {
+      var o = {};
+      cab.forEach(function (h, j) { o[h] = (l[j] || '').trim(); });
+      return o;
+    }).filter(function (o) { return o.Evento; });
   }
 
-  function renderEventos(eventos) {
-    var html = '';
+  // último dia do evento ("22-26" termina no 26); sem data legível, conta como futuro
+  function fim(ev) {
+    var m = MESES.indexOf(ev.Mes.toUpperCase());
+    var d = parseInt(ev.Dias.split('-').pop(), 10);
+    return m < 0 || !d ? Infinity : new Date(ANO, m, d, 23, 59).getTime();
+  }
+
+  function el(tag, classe, texto) {
+    var n = document.createElement(tag);
+    if (classe) n.className = classe;
+    if (texto) n.textContent = texto;
+    return n;
+  }
+
+  function seta() {
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('class', 'evento__seta');
+    var p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', 'M7 17 17 7M7 7h10v10');
+    svg.appendChild(p);
+    return svg;
+  }
+
+  function mostrar(eventos) {
+    var agora = Date.now();
+    var proximoMarcado = false;
+
     eventos.forEach(function (ev) {
-      var tag = (ev['Tag'] || '').toLowerCase();
-      var config = TAG_MAP[tag] || {};
-      var colClass = config.col || 'col-md-6 col-lg-4';
-      var cardClass = 'card card-evento' + (config.cardClass ? ' ' + config.cardClass : '') + (config.col ? '' : ' h-100');
-      var heading = config.heading || 'h5';
-      var badgeClass = config.badgeClass || '';
+      var passou = fim(ev) < agora;
+      var proximo = !passou && !proximoMarcado;
+      if (proximo) proximoMarcado = true;
 
-      var isDestaque = config.col === 'col-12';
-      var dataSize = isDestaque ? 'width:85px;height:85px' : '';
-      var diaSize = isDestaque ? 'font-size:1.75rem' : '';
-      var mesSize = isDestaque ? 'font-size:0.8rem' : '';
+      var li = el('li', 'evento' + (passou ? ' evento--passou' : '') + (proximo ? ' evento--proximo' : ''));
+      var link = /^https?:\/\//.test(ev.Link) ? ev.Link : '';
+      var corpo = link ? el('a', 'evento__corpo') : el('div', 'evento__corpo');
+      if (link) { corpo.href = link; corpo.target = '_blank'; corpo.rel = 'noopener'; }
 
-      var linkOpen = ev['Link'] ? '<a href="' + ev['Link'] + '" target="_blank" rel="noopener" class="text-decoration-none">' : '';
-      var linkClose = ev['Link'] ? '</a>' : '';
+      var data = el('span', 'evento__data');
+      data.append(el('span', 'evento__dia', ev.Dias), el('span', 'evento__mes', ev.Mes));
 
-      html += '<div class="' + colClass + '">';
-      html += linkOpen;
-      html += '<div class="' + cardClass + '">';
-      html += '<div class="card-body">';
+      var info = el('span', 'evento__info');
+      var selos = el('span', 'evento__selos');
+      if (ev.Tag) selos.append(el('span', 'selo selo--marca', ev.Tag));
+      if (proximo) selos.append(el('span', 'selo selo--proximo', 'Próximo'));
+      if (passou) selos.append(el('span', 'selo', 'Realizado'));
+      if (selos.childNodes.length) info.append(selos);
+      info.append(el('span', 'evento__nome', ev.Evento));
+      if (ev.Descricao) info.append(el('span', 'evento__desc', ev.Descricao));
+      if (link) info.append(el('span', 'oculto', ' (abre em nova aba)'));
 
-      // Data
-      html += '<div class="evento-data"' + (dataSize ? ' style="' + dataSize + '"' : '') + '>';
-      html += '<span class="evento-dia"' + (diaSize ? ' style="' + diaSize + '"' : '') + '>' + ev['Dias'] + '</span>';
-      html += '<span class="evento-mes"' + (mesSize ? ' style="' + mesSize + '"' : '') + '>' + ev['Mes'] + '</span>';
-      html += '</div>';
-
-      // Info
-      html += '<div class="evento-info">';
-      if (ev['Tag']) {
-        html += '<span class="evento-badge' + (badgeClass ? ' ' + badgeClass : '') + '">' + ev['Tag'] + '</span>';
-      }
-      html += '<' + heading + ' class="evento-titulo">' + ev['Evento'] + '</' + heading + '>';
-      if (ev['Descricao']) {
-        html += '<p class="evento-descricao">' + ev['Descricao'] + '</p>';
-      }
-      html += '</div>';
-
-      // Botão flutuante com seta se tiver link
-      if (ev['Link']) {
-        html += '<span class="evento-link-arrow">';
-        html += '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>';
-        html += '</span>';
-      }
-
-      html += '</div></div>';
-      html += linkClose;
-      html += '</div>';
+      corpo.append(data, info);
+      if (link) corpo.append(seta());
+      li.append(corpo);
+      lista.append(li);
     });
 
-    if (loader) loader.style.display = 'none';
-    grid.style.display = '';
-    grid.innerHTML = html;
+    carregando.hidden = true;
+    lista.hidden = false;
+    agenda.removeAttribute('aria-busy');
   }
 
-  function showError() {
-    if (loader) loader.style.display = 'none';
-    grid.style.display = '';
-    grid.innerHTML = '<div class="col-12 text-center text-white-50"><p>Não foi possível carregar os eventos. Tente novamente mais tarde.</p></div>';
+  function falhou() {
+    carregando.hidden = true;
+    erro.hidden = false;
+    agenda.removeAttribute('aria-busy');
   }
 
   fetch(CSV_URL)
@@ -149,15 +127,11 @@ if (menuOffcanvas) {
       return res.text();
     })
     .then(function (csv) {
-      var eventos = parseCSV(csv);
-      if (eventos.length > 0) {
-        renderEventos(eventos);
-      } else {
-        showError();
-      }
+      var eventos = lerCSV(csv);
+      if (eventos.length) mostrar(eventos); else falhou();
     })
     .catch(function (err) {
-      console.error('Erro ao carregar eventos:', err);
-      showError();
+      console.warn('Eventos do jubileu indisponíveis:', err);
+      falhou();
     });
 })();
