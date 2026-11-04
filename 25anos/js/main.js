@@ -71,6 +71,7 @@
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.setAttribute('aria-hidden', 'true');
     svg.setAttribute('class', 'evento__seta');
+    svg.setAttribute('data-sh-nudge', 'up');
     var p = document.createElementNS(ns, 'path');
     p.setAttribute('d', 'M7 17 17 7M7 7h10v10');
     svg.appendChild(p);

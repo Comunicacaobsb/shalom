@@ -47,8 +47,19 @@
 
   --sh-font-text:'Montserrat', 'Montserrat Fallback', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
   --sh-font-accent:'Caveat', cursive;
-  --sh-ease-out:cubic-bezier(.16, 1, .3, 1);
+
+  /* movimento semântico, DS 2.4.0 (DEC-052): a página escolhe o papel, nunca o número */
+  --sh-motion-press:120ms; --sh-motion-feedback:160ms; --sh-motion-state:240ms;
+  --sh-motion-overlay-enter:320ms; --sh-motion-overlay-exit:240ms;
+  --sh-motion-page-enter:320ms; --sh-motion-page-exit:160ms;
+  --sh-motion-expressive:640ms; --sh-motion-loop:720ms; --sh-motion-stagger:40ms;
+  --sh-motion-rise:.5rem; --sh-motion-nudge:.1875rem; --sh-motion-scale-press:.97;
+  --sh-motion-ease-feedback:ease; --sh-motion-ease-enter:cubic-bezier(.16, 1, .3, 1);
+  --sh-motion-ease-exit:cubic-bezier(.4, 0, 1, 1); --sh-motion-ease-move:cubic-bezier(.65, 0, .35, 1);
+  --sh-motion-ease-drawer:cubic-bezier(.32, .72, 0, 1);
 }
+/* movimento reduzido: o que se desloca troca na hora (o resto já só anima com no-preference) */
+@media (prefers-reduced-motion: reduce) { :root { --sh-motion-press:0ms; --sh-motion-state:0ms; } }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -133,13 +144,19 @@ svg { flex: none; }
   line-height: 1.25;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color .16s ease-out, color .16s ease-out;
 }
+.bt, .menu-bt, .menu__fechar, [data-theme] .theme-toggle {
+  transition:
+    background-color var(--sh-motion-feedback) var(--sh-motion-ease-feedback),
+    color var(--sh-motion-feedback) var(--sh-motion-ease-feedback),
+    scale var(--sh-motion-press) var(--sh-motion-ease-enter);
+}
+/* aperto: o botão cede um pouco, como coisa de verdade */
+:is(.bt, .menu-bt, .menu__fechar, [data-theme] .theme-toggle):active { scale: var(--sh-motion-scale-press); }
 .bt svg, .menu-bt svg, .menu__fechar svg, .atalho svg, .evento__seta {
   width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
 }
 .bt--primario { background: var(--sh-action-primary-bg); color: var(--sh-action-primary-fg); }
-.bt:active { translate: 0 1px; }
 @media (hover: hover) {
   .bt:hover { background: var(--sh-surface-hover); color: var(--sh-text-link-hover); }
   .bt--primario:hover { background: var(--sh-action-primary-bg-hover); color: var(--sh-action-primary-fg); }
@@ -214,11 +231,26 @@ svg { flex: none; }
   text-decoration: none;
 }
 @media (hover: hover) { .menu nav a:hover, .menu__fechar:hover { background: var(--sh-surface-hover); } }
+/* gaveta do DS: entra pela esquerda com a curva da gaveta e sai pelo mesmo lado, mais rápido.
+   display e overlay com allow-discrete seguram o painel na tela até a saída terminar. */
 @media (prefers-reduced-motion: no-preference) {
-  .menu[open] { animation: menu-entra .32s var(--sh-ease-out); }
-  .menu[open]::backdrop { animation: veu-entra .32s ease-out; }
-  @keyframes menu-entra { from { translate: -100% 0; } }
-  @keyframes veu-entra { from { opacity: 0; } }
+  .menu, .menu::backdrop {
+    transition:
+      translate var(--sh-motion-overlay-exit) var(--sh-motion-ease-exit),
+      opacity var(--sh-motion-overlay-exit) var(--sh-motion-ease-exit),
+      display var(--sh-motion-overlay-exit) allow-discrete,
+      overlay var(--sh-motion-overlay-exit) allow-discrete;
+  }
+  .menu[open], .menu[open]::backdrop {
+    transition-duration: var(--sh-motion-overlay-enter);
+    transition-timing-function: var(--sh-motion-ease-drawer);
+  }
+  .menu:not([open]) { translate: -100% 0; }
+  .menu:not([open])::backdrop { opacity: 0; }
+  @starting-style {
+    .menu[open] { translate: -100% 0; }
+    .menu[open]::backdrop { opacity: 0; }
+  }
 }
 
 /* botão de tema que o header.js põe em todas as páginas: no canto de cima, espelhando o Menu */
@@ -276,10 +308,10 @@ svg { flex: none; }
 .abertura__arte img { display: block; width: 100%; filter: drop-shadow(0 24px 40px rgb(var(--sh-shadow-rgb) / .22)); }
 /* o único movimento da página: a abertura chega devagar, como a luz da aquarela */
 @media (prefers-reduced-motion: no-preference) {
-  .abertura__marca, .abertura__txt > :not(.abertura__marca), .abertura__arte { animation: chega .9s var(--sh-ease-out) both; }
-  .abertura__txt > :not(.abertura__marca) { animation-delay: .12s; }
-  .abertura__arte { animation-delay: .2s; }
-  @keyframes chega { from { opacity: 0; translate: 0 .75rem; } }
+  .abertura__marca, .abertura__txt > :not(.abertura__marca), .abertura__arte { animation: chega var(--sh-motion-expressive) var(--sh-motion-ease-enter) both; }
+  .abertura__txt > :not(.abertura__marca) { animation-delay: calc(var(--sh-motion-stagger) * 3); }
+  .abertura__arte { animation-delay: calc(var(--sh-motion-stagger) * 5); }
+  @keyframes chega { from { opacity: 0; translate: 0 var(--sh-motion-rise); } }
 }
 
 /* ---------- Os quatro verbos ---------- */
@@ -324,7 +356,7 @@ svg { flex: none; }
   corner-shape: var(--sh-corner-surface);
   color: inherit;
   text-decoration: none;
-  transition: background-color .16s ease-out;
+  transition: background-color var(--sh-motion-feedback) var(--sh-motion-ease-feedback);
 }
 @media (hover: hover) { a.evento__corpo:hover { background: var(--sh-surface-hover); } }
 a.evento__corpo:active { background: var(--sh-surface-active); }
@@ -380,7 +412,7 @@ a.evento__corpo:active { background: var(--sh-surface-active); }
   background-size: 200% 100%;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .esq span { animation: brilho 1.6s linear infinite; }
+  .esq span { animation: brilho calc(var(--sh-motion-loop) * 3) ease-in-out infinite; }
   @keyframes brilho { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 }
 
@@ -388,6 +420,20 @@ a.evento__corpo:active { background: var(--sh-surface-active); }
 .calendario summary { list-style: none; }
 .calendario summary::-webkit-details-marker { display: none; }
 .calendario[open] .calendario__seta { rotate: 180deg; }
+/* acordeão do DS: a altura abre e fecha junto com a seta; sem suporte, abre direto */
+@supports (interpolate-size: allow-keywords) and selector(::details-content) {
+  @media (prefers-reduced-motion: no-preference) {
+    .calendario { interpolate-size: allow-keywords; }
+    .calendario::details-content {
+      block-size: 0;
+      overflow-y: clip;
+      transition:
+        block-size var(--sh-motion-state) var(--sh-motion-ease-move),
+        content-visibility var(--sh-motion-state) allow-discrete;
+    }
+    .calendario[open]::details-content { block-size: auto; }
+  }
+}
 .calendario__quadro {
   margin-top: 1rem;
   overflow: hidden;
@@ -416,22 +462,58 @@ a.evento__corpo:active { background: var(--sh-surface-active); }
   color: inherit;
   text-decoration: none;
   box-shadow: var(--sh-shadow-sm);
-  transition: background-color .16s ease-out, box-shadow .2s ease-out;
+  transition:
+    background-color var(--sh-motion-feedback) var(--sh-motion-ease-feedback),
+    box-shadow var(--sh-motion-state) var(--sh-motion-ease-feedback),
+    translate var(--sh-motion-state) var(--sh-motion-ease-enter);
 }
 .atalho__icone { grid-area: icone; color: var(--sh-text-brand); }
 .atalho .atalho__icone { width: 1.75rem; height: 1.75rem; stroke-width: 1.5; }
 .atalho__nome { grid-area: nome; font-size: 1.1875rem; font-weight: 600; line-height: 1.3; color: var(--sh-text-strong); }
 .atalho__desc { grid-area: desc; font-size: .9375rem; line-height: 1.45; color: var(--sh-text-muted); }
 .atalho__seta { grid-area: seta; color: var(--sh-text-link); }
-@media (prefers-reduced-motion: no-preference) {
-  .atalho__seta { transition: translate .2s var(--sh-ease-out); }
-  .calendario__seta { transition: rotate .2s ease-out; }
-}
+.calendario__seta { transition: rotate var(--sh-motion-state) var(--sh-motion-ease-move); }
+/* cartão interativo do DS: sobe 2px no ponteiro e assenta no aperto */
 @media (hover: hover) {
-  .atalho:hover { background: var(--sh-surface-hover); box-shadow: var(--sh-shadow-md); }
-  .atalho:hover .atalho__seta { translate: .1875rem 0; }
+  .atalho:hover { background: var(--sh-surface-hover); box-shadow: var(--sh-shadow-md); translate: 0 -2px; }
 }
-.atalho:active { background: var(--sh-surface-active); }
+.atalho:active { background: var(--sh-surface-active); translate: 0 0; }
+
+/* ---------- Movimento do DS 2.4.0 (DEC-052), sem carregar o CSS do DS ---------- */
+/* ícone direcional: anda um pouco no sentido da ação, no ponteiro e no foco */
+[data-sh-nudge] { transition: translate var(--sh-motion-state) var(--sh-motion-ease-enter); }
+@media (hover: hover) and (pointer: fine) {
+  :is(a[href], button, summary):hover [data-sh-nudge="forward"] { translate: var(--sh-motion-nudge) 0; }
+  :is(a[href], button, summary):hover [data-sh-nudge="up"] { translate: var(--sh-motion-nudge) calc(var(--sh-motion-nudge) * -1); }
+}
+:is(a[href], button, summary):focus-visible [data-sh-nudge="forward"] { translate: var(--sh-motion-nudge) 0; }
+:is(a[href], button, summary):focus-visible [data-sh-nudge="up"] { translate: var(--sh-motion-nudge) calc(var(--sh-motion-nudge) * -1); }
+
+/* lista que chega: os itens entram um a cada 40ms; do oitavo em diante, juntos */
+@media (prefers-reduced-motion: no-preference) {
+  .sh-stagger > * {
+    animation: sh-stagger-in var(--sh-motion-page-enter) var(--sh-motion-ease-enter) both;
+    animation-delay: calc(var(--sh-stagger-i, 0) * var(--sh-motion-stagger));
+  }
+  .sh-stagger > :nth-child(2) { --sh-stagger-i: 1; }
+  .sh-stagger > :nth-child(3) { --sh-stagger-i: 2; }
+  .sh-stagger > :nth-child(4) { --sh-stagger-i: 3; }
+  .sh-stagger > :nth-child(5) { --sh-stagger-i: 4; }
+  .sh-stagger > :nth-child(6) { --sh-stagger-i: 5; }
+  .sh-stagger > :nth-child(7) { --sh-stagger-i: 6; }
+  .sh-stagger > :nth-child(n + 8) { --sh-stagger-i: 7; }
+}
+@keyframes sh-stagger-in { from { opacity: 0; translate: 0 var(--sh-motion-rise); } }
+
+/* troca de página: a antiga sai rápido e a nova sobe um pouco e aparece */
+::view-transition-old(root) { animation: sh-page-out var(--sh-motion-page-exit) var(--sh-motion-ease-exit) both; }
+::view-transition-new(root) {
+  animation: sh-page-in var(--sh-motion-page-enter) var(--sh-motion-ease-enter) both;
+  animation-delay: calc(var(--sh-motion-page-exit) * .5);
+}
+@keyframes sh-page-out { to { opacity: 0; } }
+@keyframes sh-page-in { from { opacity: 0; translate: 0 var(--sh-motion-rise); } }
+@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }
 
 /* ---------- Providência e Reciclagem ---------- */
 .destaque { display: grid; gap: 2.5rem; align-items: center; }

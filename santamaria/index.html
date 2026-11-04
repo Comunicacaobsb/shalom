@@ -63,7 +63,7 @@
 <body>
 
   <!-- ============ HEADER ============ -->
-  <header class="site-header" id="header">
+  <header class="site-header" id="header" data-sh-persist="header">
     <div class="wrap nav">
       <a class="brand" href="#top" aria-label="Shalom Santa Maria — início">
         <span class="brand-logo" role="img" aria-label="Comunidade Católica Shalom"></span>
@@ -199,8 +199,8 @@
         <div class="carousel__top">
           <div class="carousel__dots" id="carDots" role="tablist" aria-label="Selecionar evento"></div>
           <div class="carousel__arrows">
-            <button id="carPrev" aria-label="Evento anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m15 6-6 6 6 6"/></svg></button>
-            <button id="carNext" aria-label="Próximo evento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>
+            <button id="carPrev" aria-label="Evento anterior"><svg data-sh-nudge="back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m15 6-6 6 6 6"/></svg></button>
+            <button id="carNext" aria-label="Próximo evento"><svg data-sh-nudge="forward" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 6 6-6 6"/></svg></button>
           </div>
         </div>
         <div class="carousel__viewport" id="carViewport">
@@ -242,10 +242,10 @@
         </div>
         <a class="link-arrow" href="https://comshalom.org/brasilia" target="_blank" rel="noopener">
           Ver todas no comshalom
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <svg data-sh-nudge="forward" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
       </div>
-      <ul class="news-grid" id="comshalom-list" aria-live="polite">
+      <ul class="news-grid sh-stagger" id="comshalom-list" aria-live="polite">
         <li class="news-card skeleton"><div class="news-card__media"></div><div class="news-card__body"><div class="sk-line w-40"></div><div class="sk-line w-90"></div><div class="sk-line w-70"></div></div></li>
         <li class="news-card skeleton"><div class="news-card__media"></div><div class="news-card__body"><div class="sk-line w-40"></div><div class="sk-line w-90"></div><div class="sk-line w-70"></div></div></li>
         <li class="news-card skeleton"><div class="news-card__media"></div><div class="news-card__body"><div class="sk-line w-40"></div><div class="sk-line w-90"></div><div class="sk-line w-70"></div></div></li>
