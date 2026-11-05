@@ -1,118 +1,16 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Providência | Shalom Brasília</title>
-  <meta name="description" content="Providência - Comunidade Católica Shalom Brasília. Necessidades das casas comunitárias e habilidades dos irmãos.">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Providência | Shalom Brasília">
-  <meta property="og:description" content="Necessidades das casas comunitárias e catálogo de habilidades dos irmãos.">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="https://brasilia.comshalom.org/providencia/imagens/link.jpg">
-
-  <!-- Header do projeto pai: Bootstrap 5 CSS, Montserrat, Favicons, GA -->
-  <script src="../js/header.js"></script>
-
-  <!-- Cinzel (títulos) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <!-- Estilos locais -->
-  <link rel="stylesheet" href="css/style.css">
-  <!-- Aplica tema salvo antes do render para evitar flash -->
-  <script>(function(){var t=localStorage.getItem('prov-theme');if(t)document.documentElement.setAttribute('data-theme',t)})()</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <!-- A Providência mudou para dentro do Portal (decisão do PO, 04/11/2026). -->
+  <meta http-equiv="refresh" content="0; url=https://brasilia.comshalom.workers.dev/providencia">
+  <link rel="canonical" href="https://brasilia.comshalom.workers.dev/providencia">
+  <title>Providência · Shalom Brasília</title>
+  <script>window.location.replace("https://brasilia.comshalom.workers.dev/providencia");</script>
 </head>
-
 <body>
-
-  <!-- ==================== HEADER ==================== -->
-  <header class="site-header">
-    <div class="container">
-      <div class="header-inner">
-        <a href="./" class="header-logo-link">
-          <img src="imagens/logo-completa.svg" alt="Providência - Shalom" class="header-logo">
-        </a>
-        <h1 class="header-title">Providência</h1>
-      </div>
-    </div>
-  </header>
-
-  <!-- ==================== CONTEÚDO PRINCIPAL ==================== -->
-  <main class="section-content">
-    <div class="container">
-      <div class="content-card hub-card">
-        <p class="section-subtitle mb-2 text-balance text-center font-size-6">“O novo que Deus quer realizar em nós é um novo baseado na pobreza”</p>
-        <p class="section-title small mb-4 text-center">Escrito Pobreza</p>
-
-        <!-- Card: Comunhão de Bens (donut chart com porcentagem do mês) -->
-        <a href="#" id="comunhao-card" class="comunhao-card">
-          <div class="comunhao-donut-wrapper">
-            <!-- Spinner de carregamento (visível até os dados chegarem) -->
-            <div id="comunhao-spinner" class="comunhao-spinner">
-              <div class="spinner-sm"></div>
-            </div>
-            <svg id="comunhao-donut" class="comunhao-donut" viewBox="0 0 128 128">
-              <!-- Trilha de fundo -->
-              <circle class="donut-track" cx="64" cy="64" r="54"
-                fill="none" stroke="rgba(70, 57, 66, 0.12)" stroke-width="10" />
-              <!-- Arco de progresso -->
-              <circle class="donut-progress" cx="64" cy="64" r="54"
-                fill="none" stroke="var(--color-success)" stroke-width="10"
-                stroke-linecap="round"
-                transform="rotate(-90 64 64)" />
-            </svg>
-            <div class="comunhao-donut-text">
-              <span id="comunhao-pct" class="comunhao-pct"></span>
-            </div>
-          </div>
-          <div class="comunhao-info">
-            <h3 class="hub-link-title">Comunhão de Bens</h3>
-            <p id="comunhao-mes" class="comunhao-mes">Carregando...</p>
-          </div>
-        </a>
-
-        <!-- Grid de cards do hub -->
-        <div class="hub-grid">
-
-          <!-- Card: Necessidades -->
-          <a href="necessidades/" class="hub-link-card">
-            <div class="hub-link-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            </div>
-            <h3 class="hub-link-title">Necessidades</h3>
-            <p class="hub-link-desc">Veja o que nossas casas comunitárias e centros de evangelização estão precisando.</p>
-          </a>
-
-          <!-- Card: Habilidades -->
-          <a href="habilidades/" class="hub-link-card">
-            <div class="hub-link-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <h3 class="hub-link-title">Habilidades</h3>
-            <p class="hub-link-desc">Encontre irmãos da comunidade que podem ajudar com seus talentos e serviços.</p>
-          </a>
-
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Scripts -->
-  <script src="../js/centralScript.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/hub.js"></script>
-  <script src="../js/footer.js"></script>
-
-  <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema claro/escuro">
-    <svg class="theme-icon theme-icon--light" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-    <svg class="theme-icon theme-icon--dark" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-  </button>
-
+  <p>A Providência agora fica no Portal Shalom Brasília. <a href="https://brasilia.comshalom.workers.dev/providencia">Abrir no Portal</a>.</p>
 </body>
-
 </html>
