@@ -18,8 +18,19 @@
 
 /* ---------- Agenda do jubileu ---------- */
 (function () {
-  var CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-pbvSfuIvxl3WarKBKMsOBHOO3zmpup7EBInURPaDNRjIhkLSGduNTJxdDyISbRFq3xawLaa5uJC0/pub?gid=919829268&single=true&output=csv';
-  // A planilha traz dia e mês, sem o ano: todos os eventos são do ano do jubileu.
+  // Eventos fixos no site (antes vinham de uma planilha publicada; desligada em 07/11/2026).
+  // Para mudar a agenda, edite as linhas abaixo: Evento,Descricao,Dias,Mes,Tag,Link
+  var EVENTOS_CSV = [
+    'Evento,Descricao,Dias,Mes,Tag,Link',
+    'Kyrios Festival,Celebração dos 25 anos,25,ABR,Evento principal,https://comshalom.org/kyriosfestival/',
+    'Congresso Mariano,,25-26,MAI,,',
+    "Acamp's 25 anos,,22-26,JUL,,",
+    'Jornada Missionária,Samambaia,12-18,AGO,,',
+    'Dia Mundial dos Pobres,,15-16,NOV,,',
+    'Tríduo de Cristo Rei,Missa da Festa,18-20,NOV,,',
+    'Concerto 25 anos,,12,DEZ,Encerramento,'
+  ].join('\n');
+  // A agenda traz dia e mês, sem o ano: todos os eventos são do ano do jubileu.
   var ANO = 2026;
   var MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
 
@@ -122,17 +133,6 @@
     agenda.removeAttribute('aria-busy');
   }
 
-  fetch(CSV_URL)
-    .then(function (res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.text();
-    })
-    .then(function (csv) {
-      var eventos = lerCSV(csv);
-      if (eventos.length) mostrar(eventos); else falhou();
-    })
-    .catch(function (err) {
-      console.warn('Eventos do jubileu indisponíveis:', err);
-      falhou();
-    });
+  var eventos = lerCSV(EVENTOS_CSV);
+  if (eventos.length) mostrar(eventos); else falhou();
 })();
